@@ -100,7 +100,7 @@
         .forEach(fila => {
           const tr = document.createElement("tr");
           const td = document.createElement("td");
-          td.textContent = fila;
+          td.innerHTML = fila;
           tr.appendChild(td);
           cuerpo.appendChild(tr);
         });
