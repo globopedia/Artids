@@ -127,10 +127,11 @@ function mostrarFilas(filas, filtro) {
 }
     document.addEventListener("DOMContentLoaded", async () => {
       const filas = await cargarCSV();
-      const buscador = document.getElementById("buscador");
-      buscador.addEventListener("input", () => mostrarFilas(filas, buscador.value));
-      // mostrarFilas(filas, "Globopedia");
-    });
+ buscador.addEventListener("input", () => {
+  const valor = buscador.value.trim();
+  const filtro = valor === "" ? "Globopedia" : valor;
+  mostrarFilas(filas, filtro);
+});
   </script>
 </body>
 </html>
