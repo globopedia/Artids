@@ -1,2 +1,1 @@
 # buscador-partidos
-Para poder buscar partidos de acuerdo al origen del rival, podés marcar su código, con paréntesis incluído: Bahía Blanca (BB), Bolivia (BOL), Brasil (BRA), Chaco (CHA), Chile (CHI), Chubut (CBT), Colombia (COL), Córdoba y San Francisco (CBA), Ecuador (ECU), Formosa (FSA), Jujuy (JUJ), Junín (JUN), La Plata (LP), Mar del Plata (MP), Mendoza (MZA), Paraguay (PAR), Paraná (PNA), Perú (PER), Posadas (PDS), Rafaela (RLA), Rosario (ROS), San Juan (SJ), Santa Fe (SF), San Luis (SL), Santiago del Estero (SE), Tucumán (TMN), Uruguay (URU), Venezuela (VEN).
