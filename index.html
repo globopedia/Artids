@@ -110,7 +110,14 @@ tr:nth-child(even) {
     const mensaje = document.getElementById("mensaje-vacio");
     cuerpo.innerHTML = "";
 
-    const filtradas = filas.filter(fila => fila.toLowerCase().includes(filtro.toLowerCase()));
+    if (filtro === "") {
+      mensaje.style.display = "block";
+      return; // No mostrar nada si el campo está vacío
+    }
+
+    const filtradas = filas.filter(fila =>
+      fila.toLowerCase().includes(filtro.toLowerCase())
+    );
 
     if (filtradas.length === 0) {
       mensaje.style.display = "block";
@@ -132,12 +139,11 @@ tr:nth-child(even) {
 
     buscador.addEventListener("input", () => {
       const valor = buscador.value.trim();
-      const filtro = valor === "" ? "Globopedia" : valor;
-      mostrarFilas(filas, filtro);
+      mostrarFilas(filas, valor);
     });
 
-    // Al iniciar, solo muestra lo que contenga "Globopedia"
-    mostrarFilas(filas, "Globopedia");
+    // NO mostrar nada al inicio
+    mostrarFilas(filas, "");
   });
 </script>
 </body>
