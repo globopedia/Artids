@@ -94,7 +94,9 @@ tr:nth-child(even) {
     </thead>
     <tbody id="tabla-cuerpo"></tbody>
   </table>
-
+<p id="mensaje-vacio" style="text-align: center; color: #999; font-size: 16px; display: none; margin-top: 20px;">
+  ⚠️ No hay resultados para mostrar.
+</p>
   <script>
     async function cargarCSV() {
       const respuesta = await fetch("Encuentros_Huracan.csv");
@@ -103,20 +105,26 @@ tr:nth-child(even) {
       return filas;
     }
 
-    function mostrarFilas(filas, filtro) {
-      const cuerpo = document.getElementById("tabla-cuerpo");
-      cuerpo.innerHTML = "";
-      filas
-        .filter(fila => fila.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(fila => {
-          const tr = document.createElement("tr");
-          const td = document.createElement("td");
-          td.innerHTML = fila;
-          tr.appendChild(td);
-          cuerpo.appendChild(tr);
-        });
-    }
+function mostrarFilas(filas, filtro) {
+  const cuerpo = document.getElementById("tabla-cuerpo");
+  const mensaje = document.getElementById("mensaje-vacio");
+  cuerpo.innerHTML = "";
 
+  const filtradas = filas.filter(fila => fila.toLowerCase().includes(filtro.toLowerCase()));
+
+  if (filtradas.length === 0) {
+    mensaje.style.display = "block";
+  } else {
+    mensaje.style.display = "none";
+    filtradas.forEach(fila => {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.innerHTML = fila;
+      tr.appendChild(td);
+      cuerpo.appendChild(tr);
+    });
+  }
+}
     document.addEventListener("DOMContentLoaded", async () => {
       const filas = await cargarCSV();
       const buscador = document.getElementById("buscador");
