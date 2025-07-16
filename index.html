@@ -126,20 +126,20 @@
   <h1>ENCUENTROS</h1>
   <input type="text" id="buscador" placeholder="Buscar partidos...">
   <div class="filtros" id="filtros-container">
-    <span class="filtro-btn" data-tipo="Campeonato">Campeonato</span>
-    <span class="filtro-btn" data-tipo="Copa Argentina">Copa Argentina</span>
-    <span class="filtro-btn" data-tipo="Supercopa">Supercopa</span>
-    <span class="filtro-btn" data-tipo="Copa Superliga">Copa Superliga</span>
-    <span class="filtro-btn" data-tipo="Copa Maradona">Copa Maradona</span>
-    <span class="filtro-btn" data-tipo="Nacional B">Nacional B</span>
-    <span class="filtro-btn" data-tipo="Libertadores">Libertadores</span>
-    <span class="filtro-btn" data-tipo="Sudamericana">Sudamericana</span>
-    <span class="filtro-btn" data-tipo="Amistoso">Amistoso</span>
+    <span class="filtro-btn inactivo" data-tipo="Campeonato">Campeonato</span>
+    <span class="filtro-btn inactivo" data-tipo="Copa Argentina">Copa Argentina</span>
+    <span class="filtro-btn inactivo" data-tipo="Supercopa">Supercopa</span>
+    <span class="filtro-btn inactivo" data-tipo="Copa Superliga">Copa Superliga</span>
+    <span class="filtro-btn inactivo" data-tipo="Copa Maradona">Copa Maradona</span>
+    <span class="filtro-btn inactivo" data-tipo="Nacional B">Nacional B</span>
+    <span class="filtro-btn inactivo" data-tipo="Libertadores">Libertadores</span>
+    <span class="filtro-btn inactivo" data-tipo="Sudamericana">Sudamericana</span>
+    <span class="filtro-btn inactivo" data-tipo="Amistoso">Amistoso</span>
   </div>
 <div id="condicion-container" class="filtros">
-  <span class="condicion-btn activo" data-condicion="-local-">-local-</span>
-  <span class="condicion-btn activo" data-condicion="-neutral-">-neutral-</span>
-  <span class="condicion-btn activo" data-condicion="-visitante-">-visitante-</span>
+  <span class="condicion-btn inactivo" data-condicion="-local-">-local-</span>
+  <span class="condicion-btn inactivo" data-condicion="-neutral-">-neutral-</span>
+  <span class="condicion-btn inactivo" data-condicion="-visitante-">-visitante-</span>
 </div>
   <table>
     <thead>
@@ -195,8 +195,8 @@
     const filtros = document.querySelectorAll(".filtro-btn");
     const condiciones = document.querySelectorAll(".condicion-btn");
 
-    let filtrosActivos = Array.from(filtros).map(btn => btn.dataset.tipo);
-    let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
+   let filtrosActivos = [];
+   let condicionesActivas = [];
 
     filtros.forEach(btn => {
       btn.addEventListener("click", () => {
