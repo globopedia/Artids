@@ -98,6 +98,25 @@
         font-size: 15px;
       }
     }
+.condicion-btn {
+  display: inline-block;
+  margin: 5px;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: 2px solid #FF0000;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #ffeaea;
+  color: #FF0000;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+
+.condicion-btn.inactivo {
+  background-color: #ffffff;
+  color: #FF0000;
+  opacity: 0.5;
+}
   </style>
 </head>
 <body>
@@ -117,6 +136,11 @@
     <span class="filtro-btn" data-tipo="Sudamericana">Sudamericana</span>
     <span class="filtro-btn" data-tipo="Amistoso">Amistoso</span>
   </div>
+<div id="condicion-container" class="filtros">
+  <span class="condicion-btn activo" data-condicion="-local-">-local-</span>
+  <span class="condicion-btn activo" data-condicion="-neutral-">-neutral-</span>
+  <span class="condicion-btn activo" data-condicion="-visitante-">-visitante-</span>
+</div>
   <table>
     <thead>
       <tr><th>ENCUENTROS</th></tr>
@@ -125,72 +149,91 @@
   </table>
   <p id="mensaje-vacio">⚠️ No hay resultados para mostrar.</p>
 
-  <script>
-    async function cargarCSV() {
-      const respuesta = await fetch("Encuentros_Huracan.csv");
-      const texto = await respuesta.text();
-      const filas = texto.trim().split('\n').slice(1);
-      return filas;
+<script>
+  async function cargarCSV() {
+    const respuesta = await fetch("Encuentros_Huracan.csv");
+    const texto = await respuesta.text();
+    const filas = texto.trim().split('\n').slice(1);
+    return filas;
+  }
+
+  function mostrarFilas(filas, filtroTexto, filtrosActivos, condicionesActivas) {
+    const cuerpo = document.getElementById("tabla-cuerpo");
+    const mensaje = document.getElementById("mensaje-vacio");
+    cuerpo.innerHTML = "";
+
+    if (filtroTexto === "") {
+      mensaje.style.display = "block";
+      return;
     }
 
-    function mostrarFilas(filas, filtroTexto, filtrosActivos) {
-      const cuerpo = document.getElementById("tabla-cuerpo");
-      const mensaje = document.getElementById("mensaje-vacio");
-      cuerpo.innerHTML = "";
-
-      if (filtroTexto === "") {
-        mensaje.style.display = "block";
-        return;
-      }
-
-      const filtradas = filas.filter(fila => {
-        const coincideTexto = fila.toLowerCase().includes(filtroTexto.toLowerCase());
-        const coincideFiltro = filtrosActivos.some(tipo => fila.toLowerCase().includes(tipo.toLowerCase()));
-        return coincideTexto && coincideFiltro;
-      });
-
-      if (filtradas.length === 0) {
-        mensaje.style.display = "block";
-      } else {
-        mensaje.style.display = "none";
-        filtradas.forEach(fila => {
-          const tr = document.createElement("tr");
-          const td = document.createElement("td");
-          td.innerHTML = fila;
-          tr.appendChild(td);
-          cuerpo.appendChild(tr);
-        });
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const filas = await cargarCSV();
-      const buscador = document.getElementById("buscador");
-      const filtros = document.querySelectorAll(".filtro-btn");
-      let filtrosActivos = Array.from(filtros).map(btn => btn.dataset.tipo);
-
-      filtros.forEach(btn => {
-        btn.addEventListener("click", () => {
-          const tipo = btn.dataset.tipo;
-          btn.classList.toggle("inactivo");
-          if (btn.classList.contains("inactivo")) {
-            filtrosActivos = filtrosActivos.filter(t => t !== tipo);
-          } else {
-            filtrosActivos.push(tipo);
-          }
-          const valor = buscador.value.trim();
-          mostrarFilas(filas, valor, filtrosActivos);
-        });
-      });
-
-      buscador.addEventListener("input", () => {
-        const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, filtrosActivos);
-      });
-
-      // Al inicio no muestra nada
-      mostrarFilas(filas, "", filtrosActivos);
+    const filtradas = filas.filter(fila => {
+      const textoLower = fila.toLowerCase();
+      const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
+      const coincideFiltro = filtrosActivos.some(tipo => textoLower.includes(tipo.toLowerCase()));
+      const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
+      return coincideTexto && coincideFiltro && coincideCondicion;
     });
-  </script>
+
+    if (filtradas.length === 0) {
+      mensaje.style.display = "block";
+    } else {
+      mensaje.style.display = "none";
+      filtradas.forEach(fila => {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.innerHTML = fila;
+        tr.appendChild(td);
+        cuerpo.appendChild(tr);
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const filas = await cargarCSV();
+    const buscador = document.getElementById("buscador");
+    const filtros = document.querySelectorAll(".filtro-btn");
+    const condiciones = document.querySelectorAll(".condicion-btn");
+
+    let filtrosActivos = Array.from(filtros).map(btn => btn.dataset.tipo);
+    let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
+
+    filtros.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tipo = btn.dataset.tipo;
+        btn.classList.toggle("inactivo");
+        if (btn.classList.contains("inactivo")) {
+          filtrosActivos = filtrosActivos.filter(t => t !== tipo);
+        } else {
+          filtrosActivos.push(tipo);
+        }
+        const valor = buscador.value.trim();
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+      });
+    });
+
+    condiciones.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cond = btn.dataset.condicion;
+        btn.classList.toggle("inactivo");
+        if (btn.classList.contains("inactivo")) {
+          condicionesActivas = condicionesActivas.filter(c => c !== cond);
+        } else {
+          condicionesActivas.push(cond);
+        }
+        const valor = buscador.value.trim();
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+      });
+    });
+
+    buscador.addEventListener("input", () => {
+      const valor = buscador.value.trim();
+      mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+    });
+
+    // Al inicio no muestra nada
+    mostrarFilas(filas, "", filtrosActivos, condicionesActivas);
+  });
+</script>
 </body>
 </html>
