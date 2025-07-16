@@ -137,9 +137,9 @@
     <span class="filtro-btn inactivo" data-tipo="Amistoso">Amistoso</span>
   </div>
 <div id="condicion-container" class="filtros">
-  <span class="condicion-btn inactivo" data-condicion="-local-">-local-</span>
-  <span class="condicion-btn inactivo" data-condicion="-neutral-">-neutral-</span>
-  <span class="condicion-btn inactivo" data-condicion="-visitante-">-visitante-</span>
+  <span class="condicion-btn activo" data-condicion="-local-">-local-</span>
+  <span class="condicion-btn activo" data-condicion="-neutral-">-neutral-</span>
+  <span class="condicion-btn activo" data-condicion="-visitante-">-visitante-</span>
 </div>
   <table>
     <thead>
@@ -196,7 +196,7 @@
     const condiciones = document.querySelectorAll(".condicion-btn");
 
    let filtrosActivos = [];
-   let condicionesActivas = [];
+let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
 
     filtros.forEach(btn => {
       btn.addEventListener("click", () => {
