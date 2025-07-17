@@ -251,7 +251,7 @@ let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicio
 
     buscador.addEventListener("input", () => {
       const valor = buscador.value.trim();
-      mostrarFilas(filas, valor, filtrosActivos, condicionesActivasrivalSeleccionado);
+      mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, rivalSeleccionado);
     });
 
     // Al inicio no muestra nada
