@@ -176,7 +176,7 @@
     return filas;
   }
 
-  function mostrarFilas(filas, filtroTexto, filtrosActivos, condicionesActivas) {
+  function mostrarFilas(filas, filtroTexto, filtrosActivos, condicionesActivas, rivalSeleccionado) {
     const cuerpo = document.getElementById("tabla-cuerpo");
     const mensaje = document.getElementById("mensaje-vacio");
     cuerpo.innerHTML = "";
@@ -217,8 +217,8 @@
     const buscador = document.getElementById("buscador");
     const filtros = document.querySelectorAll(".filtro-btn");
     const condiciones = document.querySelectorAll(".condicion-btn");
-
-   let filtrosActivos = [];
+let rivalSeleccionado = "";
+let filtrosActivos = [];
 let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
 
     filtros.forEach(btn => {
@@ -231,7 +231,7 @@ let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicio
           filtrosActivos.push(tipo);
         }
         const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, rivalSeleccionado);
       });
     });
 
@@ -245,17 +245,17 @@ let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicio
           condicionesActivas.push(cond);
         }
         const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, rivalSeleccionado);
       });
     });
 
     buscador.addEventListener("input", () => {
       const valor = buscador.value.trim();
-      mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+      mostrarFilas(filas, valor, filtrosActivos, condicionesActivasrivalSeleccionado);
     });
 
     // Al inicio no muestra nada
-    mostrarFilas(filas, "", filtrosActivos, condicionesActivas);
+    mostrarFilas(filas, "", filtrosActivos, condicionesActivas, rivalSeleccionado);
   });
 </script>
 </body>
