@@ -169,12 +169,13 @@
   <p id="mensaje-vacio">⚠️ No hay resultados para mostrar.</p>
 
 <script>
-  async function cargarCSV() {
-    const respuesta = await fetch("https://globopedia.github.io/Encuentros_Huracan.csv");
-    const texto = await respuesta.text();
-    const filas = texto.trim().split('\n').slice(1);
-    return filas;
-  }
+async function cargarCSV() {
+  const respuesta = await fetch("https://globopedia.github.io/Encuentros_Huracan.csv");
+  const texto = await respuesta.text();
+  const filas = texto.trim().split('\n').slice(1);
+  const datos = filas.map(f => f.split(";")[0]); // 🧠 Usar solo la primera columna (encuentro completo)
+  return datos;
+}
 
   function mostrarFilas(filas, filtroTexto, filtrosActivos, condicionesActivas, rivalSeleccionado) {
     const cuerpo = document.getElementById("tabla-cuerpo");
