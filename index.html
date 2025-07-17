@@ -125,6 +125,19 @@
   </div>
   <h1>ENCUENTROS</h1>
   <input type="text" id="buscador" placeholder="Buscar partidos...">
+<div style="margin: 20px auto; max-width: 400px;">
+  <label for="filtro-rival"><strong>Seleccioná el club rival:</strong></label>
+  <select id="filtro-rival" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #DA291C; border-radius: 8px;">
+    <option value="" data-logo="" selected>Elegí un rival</option>
+    <option value="Boca Juniors" data-logo="https://upload.wikimedia.org/wikipedia/commons/0/0b/Escudo_del_Club_Atl%C3%A9tico_Boca_Juniors.svg">Boca Juniors</option>
+    <option value="River Plate" data-logo="https://upload.wikimedia.org/wikipedia/commons/3/3e/Escudo_del_Club_Atl%C3%A9tico_River_Plate.svg">River Plate</option>
+    <option value="San Lorenzo" data-logo="https://upload.wikimedia.org/wikipedia/commons/c/c0/Escudo_del_Club_Atl%C3%A9tico_San_Lorenzo_de_Almagro.svg">San Lorenzo</option>
+    <option value="Racing" data-logo="https://upload.wikimedia.org/wikipedia/commons/6/6e/Escudo_de_Racing_Club.svg">Racing Club</option>
+    <option value="Independiente" data-logo="https://upload.wikimedia.org/wikipedia/commons/6/6a/Escudo_del_Club_Atl%C3%A9tico_Independiente.svg">Independiente</option>
+    <option value="Vélez Sarsfield" data-logo="https://upload.wikimedia.org/wikipedia/commons/1/1f/Escudo_del_Club_Atl%C3%A9tico_V%C3%A9lez_S%C3%A1rsfield.svg">Vélez Sársfield</option>
+  </select>
+  <div id="rival-info" style="text-align:center; margin-top: 10px;"></div>
+</div>
   <div class="filtros" id="filtros-container">
     <span class="filtro-btn inactivo" data-tipo="Campeonato">Campeonato</span>
     <span class="filtro-btn inactivo" data-tipo="Copa Argentina">Copa Argentina</span>
@@ -172,7 +185,9 @@
       const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
       const coincideFiltro = filtrosActivos.some(tipo => textoLower.includes(tipo.toLowerCase()));
       const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
-
+if (rivalSeleccionado && !textoLower.includes(rivalSeleccionado.toLowerCase())) {
+  return false;
+}
       if (rivalSeleccionado && !textoLower.includes(rivalSeleccionado.toLowerCase())) {
         return false;
       }
@@ -194,7 +209,29 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
-  let rivalSeleccionado = "";
+let rivalSeleccionado = "";
+
+const filtroRival = document.getElementById("filtro-rival");
+const rivalInfo = document.getElementById("rival-info");
+
+filtroRival.addEventListener("change", () => {
+  const selected = filtroRival.options[filtroRival.selectedIndex];
+  rivalSeleccionado = selected.value;
+  const nombre = selected.text;
+  const logo = selected.getAttribute("data-logo");
+
+  if (rivalSeleccionado) {
+    rivalInfo.innerHTML = `
+      <img src="${logo}" alt="${nombre}" style="width:50px; vertical-align:middle; margin-right:10px;"> ${nombre}
+    `;
+  } else {
+    rivalInfo.innerHTML = "";
+  }
+
+  const valor = buscador.value.trim();
+  mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, rivalSeleccionado);
+});
+    let rivalSeleccionado = "";
     const filas = await cargarCSV();
     const buscador = document.getElementById("buscador");
     const filtros = document.querySelectorAll(".filtro-btn");
