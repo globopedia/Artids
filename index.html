@@ -181,10 +181,10 @@
     const mensaje = document.getElementById("mensaje-vacio");
     cuerpo.innerHTML = "";
 
-    if (filtroTexto === "") {
-      mensaje.style.display = "block";
-      return;
-    }
+  if (filtroTexto === "" && !rivalSeleccionado) {
+  mensaje.style.display = "block";
+  return;
+}
 
 const filtradas = filas.filter(fila => {
   const textoLower = fila.toLowerCase();
