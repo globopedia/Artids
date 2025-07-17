@@ -186,17 +186,20 @@
       return;
     }
 
-    const filtradas = filas.filter(fila => {
-      const textoLower = fila.toLowerCase();
-      const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
-      const coincideFiltro = filtrosActivos.some(tipo => textoLower.includes(tipo.toLowerCase()));
-      const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
- // Filtrar por rival si hay uno seleccionado
-      if (rivalSeleccionado && !textoLower.includes(rivalSeleccionado.toLowerCase())) {
-        return false;
-      }
-      return coincideTexto && coincideFiltro && coincideCondicion;
-    });
+const filtradas = filas.filter(fila => {
+  const textoLower = fila.toLowerCase();
+
+  // Filtro por rival
+  if (rivalSeleccionado && !textoLower.includes(rivalSeleccionado.toLowerCase())) {
+    return false;
+  }
+
+  const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
+  const coincideFiltro = filtrosActivos.some(tipo => textoLower.includes(tipo.toLowerCase()));
+  const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
+
+  return coincideTexto && coincideFiltro && coincideCondicion;
+});
 
     if (filtradas.length === 0) {
       mensaje.style.display = "block";
