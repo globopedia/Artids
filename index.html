@@ -191,6 +191,10 @@
       const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
       const coincideFiltro = filtrosActivos.some(tipo => textoLower.includes(tipo.toLowerCase()));
       const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
+ // Filtrar por rival si hay uno seleccionado
+      if (rivalSeleccionado && !textoLower.includes(rivalSeleccionado.toLowerCase())) {
+        return false;
+      }
       return coincideTexto && coincideFiltro && coincideCondicion;
     });
 
