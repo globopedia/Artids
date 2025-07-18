@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -98,25 +97,24 @@
         font-size: 15px;
       }
     }
-.condicion-btn {
-  display: inline-block;
-  margin: 5px;
-  padding: 8px 14px;
-  font-size: 14px;
-  border: 2px solid #FF0000;
-  border-radius: 20px;
-  cursor: pointer;
-  background-color: #ffeaea;
-  color: #FF0000;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
-}
-
-.condicion-btn.inactivo {
-  background-color: #ffffff;
-  color: #FF0000;
-  opacity: 0.5;
-}
+    .condicion-btn {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 14px;
+      border: 2px solid #FF0000;
+      border-radius: 20px;
+      cursor: pointer;
+      background-color: #ffeaea;
+      color: #FF0000;
+      font-weight: bold;
+      transition: all 0.2s ease-in-out;
+    }
+    .condicion-btn.inactivo {
+      background-color: #ffffff;
+      color: #FF0000;
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
@@ -125,6 +123,7 @@
   </div>
   <h1>ENCUENTROS</h1>
   <input type="text" id="buscador" placeholder="Buscar partidos...">
+  
   <div class="filtros" id="filtros-container">
     <span class="filtro-btn inactivo" data-tipo="Campeonato">Campeonato</span>
     <span class="filtro-btn inactivo" data-tipo="Copa Argentina">Copa Argentina</span>
@@ -136,11 +135,19 @@
     <span class="filtro-btn inactivo" data-tipo="Sudamericana">Sudamericana</span>
     <span class="filtro-btn inactivo" data-tipo="Amistoso">Amistoso</span>
   </div>
-<div id="condicion-container" class="filtros">
-  <span class="condicion-btn activo" data-condicion="-local-">-local-</span>
-  <span class="condicion-btn activo" data-condicion="-neutral-">-neutral-</span>
-  <span class="condicion-btn activo" data-condicion="-visitante-">-visitante-</span>
-</div>
+
+  <div id="condicion-container" class="filtros">
+    <span class="condicion-btn activo" data-condicion="local">Local</span>
+    <span class="condicion-btn activo" data-condicion="neutral">Neutral</span>
+    <span class="condicion-btn activo" data-condicion="visitante">Visitante</span>
+  </div>
+
+  <div id="resultado-container" class="filtros">
+    <span class="condicion-btn activo" data-resultado="victoria">Victoria</span>
+    <span class="condicion-btn activo" data-resultado="empate">Empate</span>
+    <span class="condicion-btn activo" data-resultado="derrota">Derrota</span>
+  </div>
+
   <table>
     <thead>
       <tr><th>ENCUENTROS</th></tr>
@@ -157,7 +164,7 @@
     return filas;
   }
 
-  function mostrarFilas(filas, filtroTexto, filtrosActivos, condicionesActivas) {
+  function mostrarFilas(filas, filtroTexto, filtrosActivos, condicionesActivas, resultadosActivos) {
     const cuerpo = document.getElementById("tabla-cuerpo");
     const mensaje = document.getElementById("mensaje-vacio");
     cuerpo.innerHTML = "";
@@ -172,7 +179,8 @@
       const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
       const coincideFiltro = filtrosActivos.some(tipo => textoLower.includes(tipo.toLowerCase()));
       const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
-      return coincideTexto && coincideFiltro && coincideCondicion;
+      const coincideResultado = resultadosActivos.some(res => textoLower.includes(res.toLowerCase()));
+      return coincideTexto && coincideFiltro && coincideCondicion && coincideResultado;
     });
 
     if (filtradas.length === 0) {
@@ -193,10 +201,12 @@
     const filas = await cargarCSV();
     const buscador = document.getElementById("buscador");
     const filtros = document.querySelectorAll(".filtro-btn");
-    const condiciones = document.querySelectorAll(".condicion-btn");
+    const condiciones = document.querySelectorAll(".condicion-btn[data-condicion]");
+    const resultados = document.querySelectorAll(".condicion-btn[data-resultado]");
 
-   let filtrosActivos = [];
-let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
+    let filtrosActivos = [];
+    let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
+    let resultadosActivos = Array.from(resultados).map(btn => btn.dataset.resultado);
 
     filtros.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -208,7 +218,7 @@ let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicio
           filtrosActivos.push(tipo);
         }
         const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, resultadosActivos);
       });
     });
 
@@ -222,17 +232,30 @@ let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicio
           condicionesActivas.push(cond);
         }
         const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, resultadosActivos);
+      });
+    });
+
+    resultados.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const res = btn.dataset.resultado;
+        btn.classList.toggle("inactivo");
+        if (btn.classList.contains("inactivo")) {
+          resultadosActivos = resultadosActivos.filter(r => r !== res);
+        } else {
+          resultadosActivos.push(res);
+        }
+        const valor = buscador.value.trim();
+        mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, resultadosActivos);
       });
     });
 
     buscador.addEventListener("input", () => {
       const valor = buscador.value.trim();
-      mostrarFilas(filas, valor, filtrosActivos, condicionesActivas);
+      mostrarFilas(filas, valor, filtrosActivos, condicionesActivas, resultadosActivos);
     });
 
-    // Al inicio no muestra nada
-    mostrarFilas(filas, "", filtrosActivos, condicionesActivas);
+    mostrarFilas(filas, "", filtrosActivos, condicionesActivas, resultadosActivos);
   });
 </script>
 </body>
