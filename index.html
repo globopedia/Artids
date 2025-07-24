@@ -126,6 +126,15 @@
     <img src="logo_globopedia.png" alt="Logo Globopedia"><img src="Masantonio_Busca.png" alt="Masantonio Busca">
   </div>
   <h1>Buscador de partidos (2010-2025)</h1>
+
+    <div class="filtros" id="rival-container">
+    <select id="rivalSelect">
+      <option value="todos">Todos los rivales</option>
+      <!-- Las opciones se completan en JS dinámicamente -->
+    </select>
+    <img id="escudoRival" src="" alt="Escudo del rival">
+  </div>
+
   <input type="text" id="buscador" placeholder="Buscar por rival, árbitro, jugador, fecha, cancha...">
 
   <div class="filtros" id="filtros-container">
@@ -151,15 +160,6 @@
     <span class="condicion-btn activo" data-resultado="empate">Empate</span>
     <span class="condicion-btn activo" data-resultado="derrota">Derrota</span>
   </div>
-
-  <div class="filtros" id="rival-container">
-    <select id="rivalSelect">
-      <option value="todos">Todos los rivales</option>
-      <!-- Las opciones se completan en JS dinámicamente -->
-    </select>
-    <img id="escudoRival" src="" alt="Escudo del rival">
-  </div>
-
   <table>
     <thead>
       <tr><th>ENCUENTROS</th></tr>
