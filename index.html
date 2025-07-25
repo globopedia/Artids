@@ -245,40 +245,33 @@
     return filas;
   }
 
-  function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado) {
-    const cuerpo = document.getElementById("tabla-cuerpo");
-    const mensaje = document.getElementById("mensaje-vacio");
-    cuerpo.innerHTML = "";
+function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado) {
+  const cuerpo = document.getElementById("tabla-cuerpo");
+  const mensaje = document.getElementById("mensaje-vacio");
+  cuerpo.innerHTML = "";
 
-if (
-  filtroTexto === "" ||
-  rivalSeleccionado === "ninguno" ||
-  competenciaSeleccionada === "ninguno"
-) {
-  mensaje.style.display = "block";
-  return;
+  const filtradas = filas.filter(fila => {
+    const textoLower = fila.toLowerCase();
+    const coincideTexto = filtroTexto === "" || textoLower.includes(filtroTexto.toLowerCase());
+    const coincideCompetencia = competenciaSeleccionada === "todos" || competenciaSeleccionada === "ninguno" || textoLower.includes(competenciaSeleccionada.toLowerCase());
+    const coincideCondicion = condicionesActivas.length === 0 || condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
+    const coincideResultado = resultadosActivos.length === 0 || resultadosActivos.some(res => textoLower.includes(res.toLowerCase()));
+    const coincideRival = rivalSeleccionado === "todos" || rivalSeleccionado === "ninguno" || textoLower.includes(rivalSeleccionado.toLowerCase());
+    const coincideAnio = anioSeleccionado === "todos" || anioSeleccionado === "ninguno" || textoLower.includes(anioSeleccionado.toLowerCase());
+
+    return coincideTexto && coincideCompetencia && coincideCondicion && coincideResultado && coincideRival && coincideAnio;
+  });
+
+  mensaje.style.display = filtradas.length === 0 ? "block" : "none";
+
+  filtradas.forEach(fila => {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.innerHTML = fila;
+    tr.appendChild(td);
+    cuerpo.appendChild(tr);
+  });
 }
-
-    const filtradas = filas.filter(fila => {
-      const textoLower = fila.toLowerCase();
-      const coincideTexto = textoLower.includes(filtroTexto.toLowerCase());
-      const coincideCompetencia = competenciaSeleccionada === "todos" || textoLower.includes(competenciaSeleccionada.toLowerCase());
-      const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
-      const coincideResultado = resultadosActivos.some(res => textoLower.includes(res.toLowerCase()));
-      const coincideRival = rivalSeleccionado === "todos" || textoLower.includes(rivalSeleccionado.toLowerCase());
-      const coincideAnio = anioSeleccionado === "todos" || textoLower.includes(anioSeleccionado.toLowerCase());
-      return coincideTexto && coincideCompetencia && coincideCondicion && coincideResultado && coincideRival && coincideAnio;
-    });
-
-    mensaje.style.display = filtradas.length === 0 ? "block" : "none";
-    filtradas.forEach(fila => {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.innerHTML = fila;
-      tr.appendChild(td);
-      cuerpo.appendChild(tr);
-    });
-  }
 
   document.addEventListener("DOMContentLoaded", async () => {
     const filas = await cargarCSV();
