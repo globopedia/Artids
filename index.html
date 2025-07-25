@@ -317,7 +317,7 @@ if (rivalSeleccionado !== "todos" && rivalSeleccionado !== "ninguno") {
   escudoRival.style.display = "none";
 }
       const valor = buscador.value.trim();
-      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
+      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
     });
 
     competenciaSelect.addEventListener("change", () => {
@@ -330,7 +330,7 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
   escudoCompetencia.style.display = "none";
 }
       const valor = buscador.value.trim();
-      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
+      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
     });
 
     condiciones.forEach(btn => {
@@ -339,7 +339,7 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
         btn.classList.toggle("inactivo");
         condicionesActivas = btn.classList.contains("inactivo") ? condicionesActivas.filter(c => c !== cond) : [...condicionesActivas, cond];
         const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
+        mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
       });
     });
 
@@ -349,13 +349,13 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
         btn.classList.toggle("inactivo");
         resultadosActivos = btn.classList.contains("inactivo") ? resultadosActivos.filter(r => r !== res) : [...resultadosActivos, res];
         const valor = buscador.value.trim();
-        mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
+        mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
       });
     });
 
     buscador.addEventListener("input", () => {
       const valor = buscador.value.trim();
-      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
+      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
     });
 
     mostrarFilas(filas, "", competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
