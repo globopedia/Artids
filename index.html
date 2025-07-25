@@ -10,6 +10,19 @@ select option[value="ninguno"] {
   color: #999999;
   font-style: italic;
 }
+.doble-select {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.doble-select select {
+  font-size: 16px;
+  border-radius: 10px;
+  padding: 10px;
+  border: 2px solid #DA291C;
+}
     body {
       font-family: 'Archivo', sans-serif;
       background-color: #ffffff;
@@ -121,28 +134,26 @@ select option[value="ninguno"] {
   </div>
   <h1>Buscador de partidos (2010-2025)</h1>
 
-  <div class="filtros" id="rival-container">
-    <select id="rivalSelect">
-      <option value="ninguno" disabled selected>Seleccionar rival...</option>
-      <option value="todos">Todos los rivales</option>
-    </select>
-  </div>
+<div class="filtros doble-select">
+  <select id="rivalSelect">
+    <option value="ninguno" disabled selected>Seleccionar rival...</option>
+    <option value="todos">Todos los rivales</option>
+  </select>
 
-  <div class="filtros" id="competencia-container">
-    <select id="competenciaSelect">
-      <option value="ninguno" disabled selected>Seleccionar torneo...</option>
-      <option value="todos">Todos los partidos</option>
-      <option value="Copa Libertadores">Copa Libertadores</option>
-      <option value="Copa Sudamericana">Copa Sudamericana</option>
-      <option value="Campeonato">Campeonato</option>
-      <option value="Copa Argentina">Copa Argentina</option>
-      <option value="Supercopa">Supercopa</option>
-      <option value="Copa Superliga">Copa Superliga</option>
-      <option value="Copa Maradona">Copa Maradona</option>
-      <option value="Nacional B">Nacional B</option>
-      <option value="Amistoso">Amistoso</option>
-    </select>
-  </div>
+  <select id="competenciaSelect">
+    <option value="ninguno" disabled selected>Seleccionar torneo...</option>
+    <option value="todos">Todos los partidos</option>
+    <option value="Copa Libertadores">Copa Libertadores</option>
+    <option value="Copa Sudamericana">Copa Sudamericana</option>
+    <option value="Campeonato">Campeonato</option>
+    <option value="Copa Argentina">Copa Argentina</option>
+    <option value="Supercopa">Supercopa</option>
+    <option value="Copa Superliga">Copa Superliga</option>
+    <option value="Copa Maradona">Copa Maradona</option>
+    <option value="Nacional B">Nacional B</option>
+    <option value="Amistoso">Amistoso</option>
+  </select>
+</div>
 
   <div class="escudos-container">
     <img id="escudoRival" src="" alt="Escudo del rival">
