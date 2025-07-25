@@ -235,26 +235,26 @@ if (
 
     rivalSelect.addEventListener("change", () => {
       rivalSeleccionado = rivalSelect.value;
-      if (rivalSeleccionado !== "todos") {
-        escudoRival.src = `escudos/${rivalSeleccionado}.png`;
-        escudoRival.style.display = "inline-block";
-      } else {
-        escudoRival.src = "";
-        escudoRival.style.display = "none";
-      }
+if (rivalSeleccionado !== "todos" && rivalSeleccionado !== "ninguno") {
+  escudoRival.src = `escudos/${rivalSeleccionado}.png`;
+  escudoRival.style.display = "inline-block";
+} else {
+  escudoRival.src = "";
+  escudoRival.style.display = "none";
+}
       const valor = buscador.value.trim();
       mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
     });
 
     competenciaSelect.addEventListener("change", () => {
       competenciaSeleccionada = competenciaSelect.value;
-      if (competenciaSeleccionada !== "todos") {
-        escudoCompetencia.src = `escudos/${competenciaSeleccionada}.png`;
-        escudoCompetencia.style.display = "inline-block";
-      } else {
-        escudoCompetencia.src = "";
-        escudoCompetencia.style.display = "none";
-      }
+if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno") {
+  escudoCompetencia.src = `escudos/${competenciaSeleccionada}.png`;
+  escudoCompetencia.style.display = "inline-block";
+} else {
+  escudoCompetencia.src = "";
+  escudoCompetencia.style.display = "none";
+}
       const valor = buscador.value.trim();
       mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
     });
