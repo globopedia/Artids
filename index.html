@@ -40,14 +40,14 @@
   color: #999999;
   font-style: italic;
 }
-.doble-select {
+.triple-select {
   display: flex;
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
 }
 
-.doble-select select {
+.triple-select select {
   font-size: 16px;
   border-radius: 10px;
   padding: 10px;
@@ -164,7 +164,7 @@
   </div>
   <h1>Buscador de partidos (2010-2025)</h1>
 
-<div class="filtros doble-select">
+<div class="filtros triple-select">
   <select id="rivalSelect">
     <option value="ninguno" disabled selected>Seleccionar rival...</option>
     <option value="todos">Todos los rivales</option>
@@ -183,11 +183,32 @@
     <option value="Nacional B">Nacional B</option>
     <option value="Amistoso">Amistoso</option>
   </select>
+<select id="anioSelect">
+    <option value="ninguno" disabled selected>Seleccionar año...</option>
+    <option value="todos">Todos los años</option>
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+    <option value="2014">2014</option>
+    <option value="2015">2015</option>
+    <option value="2016">2016</option>
+    <option value="2017">2017</option>
+    <option value="2018">2018</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="2023">2023</option>
+    <option value="2024">2024</option>
+    <option value="2025">2025</option>
+  </select>
 </div>
 
   <div class="escudos-container">
     <img id="escudoRival" src="" alt="Escudo del rival">
     <img id="escudoCompetencia" src="" alt="Logo de la competencia">
+    <img id="escudoAnio" src="" alt="Logo del año">
   </div>
 
   <div id="condicion-container" class="filtros">
@@ -224,7 +245,7 @@
     return filas;
   }
 
-  function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado) {
+  function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado) {
     const cuerpo = document.getElementById("tabla-cuerpo");
     const mensaje = document.getElementById("mensaje-vacio");
     cuerpo.innerHTML = "";
@@ -245,7 +266,8 @@ if (
       const coincideCondicion = condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
       const coincideResultado = resultadosActivos.some(res => textoLower.includes(res.toLowerCase()));
       const coincideRival = rivalSeleccionado === "todos" || textoLower.includes(rivalSeleccionado.toLowerCase());
-      return coincideTexto && coincideCompetencia && coincideCondicion && coincideResultado && coincideRival;
+      const coincideAnio = anioSeleccionado === "todos" || textoLower.includes(anioSeleccionado.toLowerCase());
+      return coincideTexto && coincideCompetencia && coincideCondicion && coincideResultado && coincideRival && coincideAnio;
     });
 
     mensaje.style.display = filtradas.length === 0 ? "block" : "none";
@@ -267,11 +289,14 @@ if (
     const escudoRival = document.getElementById("escudoRival");
     const competenciaSelect = document.getElementById("competenciaSelect");
     const escudoCompetencia = document.getElementById("escudoCompetencia");
-
+    const anioSelect = document.getElementById("anioSelect");
+    const escudoAnio = document.getElementById("escudoAnio");
+    
     let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
     let resultadosActivos = Array.from(resultados).map(btn => btn.dataset.resultado);
     let rivalSeleccionado = "todos";
     let competenciaSeleccionada = "todos";
+    let anioSeleccionado = "ninguno";
 
     const rivales = ["Aldosivi","Alianza Lima","All Boys","Almirante Brown","América","Dep. Anzoátegui","Argentinos Juniors","Arsenal","Atlanta","Banfield","Barracas Central","Belgrano (Cba)","Sp. Belgrano","Boca Juniors","Boca Unidos","Boston River","Brown de Adrogué","Caracas FC","Central Córdoba (Ros)","Central Córdoba (SE)","Chacarita Juniors","Colón","Corinthians","Cruzeiro","Crucero del Norte","Danubio","Defensa y Justicia","Defensor Sporting","Defensores Unidos","Desamparados","Douglas Haig","Emelec","Estudiantes (LP)","Estudiantes (SL)","Excursionistas","Ferro C. Oeste","Gimnasia (Juj)","Gimnasia (LP)","Godoy Cruz","Guaraní","Guillermo Brown","Independiente","Ind. Rivadavia","Ind. Santa Fe","Instituto","Lanús","Dep. Lara","Libertad","Liverpool","Olimpo","Dep. Madryn","Dep. Merlo","Mineros","Atl. Nacional","Newell's Old Boys","Nueva Chicago","Patronato","Peñarol","Platense","Quilmes","Racing Club","Racing (Ola)","Racing (Uru)","Atl. Rafaela","Dep. Riestra","River Plate","Ramón Santamarina","Rosario Central","San Lorenzo","San Martín (SJ)","San Martín (Tmn)","Sarmiento","Sport Recife","Sporting Cristal","Talleres de Escalada","Talleres (Cba)","Temperley","Tigre","Atl. Tucumán","Unión (SF)","Unión (Sls)","Universitario (Bol)","Universitario (Per)","Vélez Sarsfield","Victoriano Arenas","Villa Mitre","Villa San Carlos","Yupanqui"];
 
@@ -335,6 +360,19 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
 
     mostrarFilas(filas, "", competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
   });
+  anioSelect.addEventListener("change", () => {
+  anioSeleccionado = anioSelect.value;
+  if (anioSeleccionado !== "todos" && anioSeleccionado !== "ninguno") {
+    escudoAnio.src = `escudos/${anioSeleccionado}.png`;
+    escudoAnio.style.display = "inline-block";
+  } else {
+    escudoAnio.src = "";
+    escudoAnio.style.display = "none";
+  }
+
+  const valor = buscador.value.trim();
+  mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+});
 </script>
 </body>
 </html>
