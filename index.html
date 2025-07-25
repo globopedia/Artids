@@ -280,13 +280,20 @@ function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesAc
 
   mensaje.style.display = filtradas.length === 0 ? "block" : "none";
 
-  filtradas.forEach(fila => {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
+filtradas.forEach(fila => {
+  const tr = document.createElement("tr");
+  const td = document.createElement("td");
+
+  if (filtroTexto !== "") {
+    const regex = new RegExp(`(${filtroTexto})`, 'gi');
+    td.innerHTML = fila.replace(regex, `<mark>$1</mark>`);
+  } else {
     td.innerHTML = fila;
-    tr.appendChild(td);
-    cuerpo.appendChild(tr);
-  });
+  }
+
+  tr.appendChild(td);
+  cuerpo.appendChild(tr);
+});
 }
 
   document.addEventListener("DOMContentLoaded", async () => {
