@@ -119,12 +119,14 @@
 
   <div class="filtros" id="rival-container">
     <select id="rivalSelect">
+      <option value="ninguno">Seleccionar rival...</option>
       <option value="todos">Todos los rivales</option>
     </select>
   </div>
 
   <div class="filtros" id="competencia-container">
     <select id="competenciaSelect">
+      <option value="ninguno">Seleccionar torneo...</option>
       <option value="todos">Todos los partidos</option>
       <option value="Copa Libertadores">Copa Libertadores</option>
       <option value="Copa Sudamericana">Copa Sudamericana</option>
@@ -178,10 +180,14 @@
     const mensaje = document.getElementById("mensaje-vacio");
     cuerpo.innerHTML = "";
 
-    if (filtroTexto === "") {
-      mensaje.style.display = "block";
-      return;
-    }
+if (
+  filtroTexto === "" ||
+  rivalSeleccionado === "ninguno" ||
+  competenciaSeleccionada === "ninguno"
+) {
+  mensaje.style.display = "block";
+  return;
+}
 
     const filtradas = filas.filter(fila => {
       const textoLower = fila.toLowerCase();
