@@ -297,7 +297,20 @@ if (
     let rivalSeleccionado = "todos";
     let competenciaSeleccionada = "todos";
     let anioSeleccionado = "ninguno";
+  anioSelect.addEventListener("change", () => {
+  anioSeleccionado = anioSelect.value;
+  if (anioSeleccionado !== "todos" && anioSeleccionado !== "ninguno") {
+    escudoAnio.src = `escudos/${anioSeleccionado}.png`;
+    escudoAnio.style.display = "inline-block";
+  } else {
+    escudoAnio.src = "";
+    escudoAnio.style.display = "none";
+  }
 
+  const valor = buscador.value.trim();
+  mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+});
+    
     const rivales = ["Aldosivi","Alianza Lima","All Boys","Almirante Brown","América","Dep. Anzoátegui","Argentinos Juniors","Arsenal","Atlanta","Banfield","Barracas Central","Belgrano (Cba)","Sp. Belgrano","Boca Juniors","Boca Unidos","Boston River","Brown de Adrogué","Caracas FC","Central Córdoba (Ros)","Central Córdoba (SE)","Chacarita Juniors","Colón","Corinthians","Cruzeiro","Crucero del Norte","Danubio","Defensa y Justicia","Defensor Sporting","Defensores Unidos","Desamparados","Douglas Haig","Emelec","Estudiantes (LP)","Estudiantes (SL)","Excursionistas","Ferro C. Oeste","Gimnasia (Juj)","Gimnasia (LP)","Godoy Cruz","Guaraní","Guillermo Brown","Independiente","Ind. Rivadavia","Ind. Santa Fe","Instituto","Lanús","Dep. Lara","Libertad","Liverpool","Olimpo","Dep. Madryn","Dep. Merlo","Mineros","Atl. Nacional","Newell's Old Boys","Nueva Chicago","Patronato","Peñarol","Platense","Quilmes","Racing Club","Racing (Ola)","Racing (Uru)","Atl. Rafaela","Dep. Riestra","River Plate","Ramón Santamarina","Rosario Central","San Lorenzo","San Martín (SJ)","San Martín (Tmn)","Sarmiento","Sport Recife","Sporting Cristal","Talleres de Escalada","Talleres (Cba)","Temperley","Tigre","Atl. Tucumán","Unión (SF)","Unión (Sls)","Universitario (Bol)","Universitario (Per)","Vélez Sarsfield","Victoriano Arenas","Villa Mitre","Villa San Carlos","Yupanqui"];
 
     rivales.forEach(rival => {
@@ -358,21 +371,9 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
       mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
     });
 
-    mostrarFilas(filas, "", competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado);
+    mostrarFilas(filas, "", competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
   });
-  anioSelect.addEventListener("change", () => {
-  anioSeleccionado = anioSelect.value;
-  if (anioSeleccionado !== "todos" && anioSeleccionado !== "ninguno") {
-    escudoAnio.src = `escudos/${anioSeleccionado}.png`;
-    escudoAnio.style.display = "inline-block";
-  } else {
-    escudoAnio.src = "";
-    escudoAnio.style.display = "none";
-  }
 
-  const valor = buscador.value.trim();
-  mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
-});
 </script>
 </body>
 </html>
