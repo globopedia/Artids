@@ -162,6 +162,17 @@ mark {
       height: 60px;
       display: none;
     }
+th, td {
+  text-align: center;
+}
+td img.partido-foto {
+  margin-top: 8px;
+  max-width: 150px;
+  border-radius: 8px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
   </style>
 </head>
 <body>
@@ -244,6 +255,10 @@ mark {
   <p id="mensaje-vacio">⚠️ No hay resultados para mostrar.</p>
 
 <script>
+const fotos = {
+  "2024-07-21 Boca Juniors": "https://tuservidor.com/fotos/huracan_boca_2024.jpg",
+  "2024-05-10 River Plate": "https://tuservidor.com/fotos/huracan_river_2024.jpg"
+};
   async function cargarCSV() {
     const respuesta = await fetch("Encuentros_Huracan.csv");
     const texto = await respuesta.text();
@@ -256,12 +271,7 @@ function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesAc
   const mensaje = document.getElementById("mensaje-vacio");
   cuerpo.innerHTML = "";
 
-  // 🚫 NO mostrar nada si falta seleccionar filtros clave
-  if (
-    rivalSeleccionado === "ninguno" ||
-    competenciaSeleccionada === "ninguno" ||
-    anioSeleccionado === "ninguno"
-  ) {
+  if (rivalSeleccionado === "ninguno" || competenciaSeleccionada === "ninguno" || anioSeleccionado === "ninguno") {
     mensaje.style.display = "block";
     return;
   }
@@ -280,20 +290,24 @@ function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesAc
 
   mensaje.style.display = filtradas.length === 0 ? "block" : "none";
 
-filtradas.forEach(fila => {
-  const tr = document.createElement("tr");
-  const td = document.createElement("td");
+  filtradas.forEach(fila => {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
 
-  if (filtroTexto !== "") {
-    const regex = new RegExp(`(${filtroTexto})`, 'gi');
-    td.innerHTML = fila.replace(regex, `<mark>$1</mark>`);
-  } else {
-    td.innerHTML = fila;
-  }
+    td.innerHTML = filtroTexto !== "" ? fila.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') : fila;
 
-  tr.appendChild(td);
-  cuerpo.appendChild(tr);
-});
+    const clave = Object.keys(fotos).find(k => fila.includes(k));
+    if (clave) {
+      const img = document.createElement("img");
+      img.src = fotos[clave];
+      img.className = "partido-foto";
+      img.alt = "Foto del partido";
+      td.appendChild(img);
+    }
+
+    tr.appendChild(td);
+    cuerpo.appendChild(tr);
+  });
 }
 
   document.addEventListener("DOMContentLoaded", async () => {
