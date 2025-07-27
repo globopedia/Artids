@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Encuentros - Globopedia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500&display=swap" rel="stylesheet">
+  <style>
+mark {
+  background-color: #e0e0e0; /* gris clarito */
+  font-weight: bold;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+  .buscador-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 15px auto;
+}
+
+.lupa-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+#buscador {
+  width: 100%;
+  padding: 12px 15px 12px 46px; /* espacio a la izquierda para la lupa */
+  font-size: 16px;
+  border: 2px solid #DA291C;
+  border-radius: 8px;
+  outline: none;
+}
+
+#buscador:focus {
+  border-color: #E30613;
+  box-shadow: 0 0 5px #E30613;
+}
+    select option[value="ninguno"] {
+  color: #999999;
+  font-style: italic;
+}
+.triple-select {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.triple-select select {
+  font-size: 16px;
+  border-radius: 10px;
+  padding: 10px;
+  border: 2px solid #DA291C;
+}
+    body {
+      font-family: 'Archivo', sans-serif;
+      background-color: #ffffff;
+      color: #111;
+      padding: 20px;
+    }
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-container img {
+      width: 120px;
+      height: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: #FF0000;
+      margin-bottom: 0.5em;
+    }
+    #buscador {
+      display: block;
+      margin: 0 auto 15px auto;
+      padding: 12px 15px;
+      width: 80%;
+      max-width: 500px;
+      font-size: 16px;
+      border: 2px solid #DA291C;
+      border-radius: 8px;
+      outline: none;
+    }
+    #buscador:focus {
+      border-color: #E30613;
+      box-shadow: 0 0 5px #E30613;
+    }
+    .filtros {
+      text-align: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .condicion-btn {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 14px;
+      border: 2px solid #FF0000;
+      border-radius: 20px;
+      cursor: pointer;
+      background-color: #ffeaea;
+      color: #FF0000;
+      font-weight: bold;
+      transition: all 0.2s ease-in-out;
+    }
+    .condicion-btn.inactivo {
+      background-color: #ffffff;
+      color: #FF0000;
+      opacity: 0.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 14px;
+      text-align: left;
+      font-size: 16px;
+      color: #FF0000;
+      background-color: #ffffff;
+    }
+    th {
+      background-color: #DA291C;
+      color: #ffffff;
+    }
+    tr:nth-child(even) {
+      background-color: #ffe0e0;
+    }
+    #mensaje-vacio {
+      text-align: center;
+      color: #999;
+      font-size: 16px;
+      margin-top: 20px;
+      display: none;
+    }
+    #rival-container select,
+    #competenciaSelect {
+      font-size: 16px;
+      border-radius: 10px;
+      padding: 10px;
+      border: 2px solid #DA291C;
+      margin-bottom: 10px;
+    }
+    .escudos-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .escudos-container img {
+      height: 60px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img src="logo_globopedia.png" alt="Logo Globopedia"><img src="Masantonio_Busca.png" alt="Masantonio Busca">
+  </div>
+  <h1>Partidos (2010-2025)</h1>
+
+<div class="filtros triple-select">
+  <select id="rivalSelect">
+    <option value="ninguno" disabled selected>Seleccionar rival...</option>
+    <option value="todos">Todos los rivales</option>
+  </select>
+
+  <select id="competenciaSelect">
+    <option value="ninguno" disabled selected>Seleccionar torneo...</option>
+    <option value="todos">Todos los partidos</option>
+    <option value="Copa Libertadores">Copa Libertadores</option>
+    <option value="Copa Sudamericana">Copa Sudamericana</option>
+    <option value="Campeonato">Campeonato</option>
+    <option value="Copa Argentina">Copa Argentina</option>
+    <option value="Supercopa">Supercopa</option>
+    <option value="Copa Superliga">Copa Superliga</option>
+    <option value="Copa Maradona">Copa Maradona</option>
+    <option value="Nacional B">Nacional B</option>
+    <option value="Amistoso">Amistoso</option>
+  </select>
+<select id="anioSelect">
+    <option value="ninguno" disabled selected>Seleccionar año...</option>
+    <option value="todos">Todos los años</option>
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+    <option value="2014">2014</option>
+    <option value="2015">2015</option>
+    <option value="2016">2016</option>
+    <option value="2017">2017</option>
+    <option value="2018">2018</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="2023">2023</option>
+    <option value="2024">2024</option>
+    <option value="2025">2025</option>
+  </select>
+</div>
+
+  <div class="escudos-container">
+    <img id="escudoRival" src="" alt="Escudo del rival">
+    <img id="escudoCompetencia" src="" alt="Logo de la competencia">
+    <img id="escudoAnio" src="" alt="Logo del año">
+  </div>
+
+  <div id="condicion-container" class="filtros">
+    <span class="condicion-btn activo" data-condicion="local">Local</span>
+    <span class="condicion-btn activo" data-condicion="neutral">Neutral</span>
+    <span class="condicion-btn activo" data-condicion="visitante">Visitante</span>
+  </div>
+
+  <div id="resultado-container" class="filtros">
+    <span class="condicion-btn activo" data-resultado="victoria">Victoria</span>
+    <span class="condicion-btn activo" data-resultado="empate">Empate</span>
+    <span class="condicion-btn activo" data-resultado="derrota">Derrota</span>
+  </div>
+  
+  <div class="buscador-wrapper">
+<svg class="lupa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path fill="#DA291C" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34C15.3 5.01 12.29 2 8.65 2 5.01 2 2 5.01 2 8.65c0 3.63 3.01 6.65 6.65 6.65a6.5 6.5 0 005.34-1.48l.27.28v.79l5 5L20.5 19l-5-5zm-6.85 0C6.01 14 4 11.99 4 9.5S6.01 5 8.65 5 13.3 7.01 13.3 9.5 11.29 14 8.65 14z"/>
+  </svg>
+  <input type="text" id="buscador" placeholder="Filtrar por árbitro, futbolista, estadio...">
+  </div>
+  <table>
+    <thead>
+      <tr><th>ENCUENTROS</th></tr>
+    </thead>
+    <tbody id="tabla-cuerpo"></tbody>
+  </table>
+  <p id="mensaje-vacio">⚠️ No hay resultados para mostrar.</p>
+
+<script>
+  async function cargarCSV() {
+    const respuesta = await fetch("Encuentros_Huracan.csv");
+    const texto = await respuesta.text();
+    const filas = texto.trim().split('\n').slice(1);
+    return filas;
+  }
+
+function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado) {
+  const cuerpo = document.getElementById("tabla-cuerpo");
+  const mensaje = document.getElementById("mensaje-vacio");
+  cuerpo.innerHTML = "";
+
+  // 🚫 NO mostrar nada si falta seleccionar filtros clave
+  if (
+    rivalSeleccionado === "ninguno" ||
+    competenciaSeleccionada === "ninguno" ||
+    anioSeleccionado === "ninguno"
+  ) {
+    mensaje.style.display = "block";
+    return;
+  }
+
+  const filtradas = filas.filter(fila => {
+    const textoLower = fila.toLowerCase();
+    const coincideTexto = filtroTexto === "" || textoLower.includes(filtroTexto.toLowerCase());
+    const coincideCompetencia = competenciaSeleccionada === "todos" || textoLower.includes(competenciaSeleccionada.toLowerCase());
+    const coincideCondicion = condicionesActivas.length === 0 || condicionesActivas.some(cond => textoLower.includes(cond.toLowerCase()));
+    const coincideResultado = resultadosActivos.length === 0 || resultadosActivos.some(res => textoLower.includes(res.toLowerCase()));
+    const coincideRival = rivalSeleccionado === "todos" || textoLower.includes(rivalSeleccionado.toLowerCase());
+    const coincideAnio = anioSeleccionado === "todos" || textoLower.includes(anioSeleccionado.toLowerCase());
+
+    return coincideTexto && coincideCompetencia && coincideCondicion && coincideResultado && coincideRival && coincideAnio;
+  });
+
+  mensaje.style.display = filtradas.length === 0 ? "block" : "none";
+
+filtradas.forEach(fila => {
+  const tr = document.createElement("tr");
+  const td = document.createElement("td");
+
+  if (filtroTexto !== "") {
+    const regex = new RegExp(`(${filtroTexto})`, 'gi');
+    td.innerHTML = fila.replace(regex, `<mark>$1</mark>`);
+  } else {
+    td.innerHTML = fila;
+  }
+
+  tr.appendChild(td);
+  cuerpo.appendChild(tr);
+});
+}
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const filas = await cargarCSV();
+    const buscador = document.getElementById("buscador");
+    const condiciones = document.querySelectorAll(".condicion-btn[data-condicion]");
+    const resultados = document.querySelectorAll(".condicion-btn[data-resultado]");
+    const rivalSelect = document.getElementById("rivalSelect");
+    const escudoRival = document.getElementById("escudoRival");
+    const competenciaSelect = document.getElementById("competenciaSelect");
+    const escudoCompetencia = document.getElementById("escudoCompetencia");
+    const anioSelect = document.getElementById("anioSelect");
+    const escudoAnio = document.getElementById("escudoAnio");
+    
+    let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
+    let resultadosActivos = Array.from(resultados).map(btn => btn.dataset.resultado);
+    let rivalSeleccionado = "todos";
+    let competenciaSeleccionada = "todos";
+    let anioSeleccionado = "ninguno";
+  anioSelect.addEventListener("change", () => {
+  anioSeleccionado = anioSelect.value;
+  if (anioSeleccionado !== "todos" && anioSeleccionado !== "ninguno") {
+    escudoAnio.src = `escudos/${anioSeleccionado}.png`;
+    escudoAnio.style.display = "inline-block";
+  } else {
+    escudoAnio.src = "";
+    escudoAnio.style.display = "none";
+  }
+
+  const valor = buscador.value.trim();
+  mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+});
+    
+    const rivales = ["Aldosivi","Alianza Lima","All Boys","Almirante Brown","América","Dep. Anzoátegui","Argentinos Juniors","Arsenal","Atlanta","Banfield","Barracas Central","Belgrano (Cba)","Sp. Belgrano","Boca Juniors","Boca Unidos","Boston River","Brown de Adrogué","Caracas FC","Central Córdoba (Ros)","Central Córdoba (SE)","Chacarita Juniors","Colo Colo","Colón","Corinthians","Cruzeiro","Crucero del Norte","Danubio","Defensa y Justicia","Defensor Sporting","Defensores Unidos","Desamparados","Douglas Haig","Emelec","Estudiantes (LP)","Estudiantes (SL)","Excursionistas","Ferro C. Oeste","Gimnasia (Juj)","Gimnasia (LP)","Godoy Cruz","Guaraní","Guillermo Brown","Independiente","Ind. Rivadavia","Ind. Santa Fe","Instituto","Lanús","Dep. Lara","Libertad (Par)","Liverpool","Olimpo","Dep. Madryn","Dep. Merlo","Mineros","Atl. Nacional","Newell's Old Boys","Nueva Chicago","Patronato","Peñarol","Platense","Quilmes","Racing Club","Racing (Ola)","Racing (Uru)","Atl. Rafaela","Dep. Riestra","River Plate","Ramón Santamarina","Rosario Central","San Lorenzo","San Martín (Fsa)","San Martín (SJ)","San Martín (Tmn)","Sarmiento (Jun)","Sport Recife","Sporting Cristal","Talleres de Escalada","Talleres (Cba)","Temperley","Tigre","Atl. Tucumán","Unión (SF)","Unión (Sls)","Universitario (Bol)","Universitario (Per)","Vélez Sarsfield","Victoriano Arenas","Villa Mitre","Villa San Carlos","Yupanqui"];
+
+    rivales.forEach(rival => {
+      const option = document.createElement("option");
+      option.value = rival;
+      option.textContent = rival;
+      rivalSelect.appendChild(option);
+    });
+
+    rivalSelect.addEventListener("change", () => {
+      rivalSeleccionado = rivalSelect.value;
+if (rivalSeleccionado !== "todos" && rivalSeleccionado !== "ninguno") {
+  escudoRival.src = `escudos/${rivalSeleccionado}.png`;
+  escudoRival.style.display = "inline-block";
+} else {
+  escudoRival.src = "";
+  escudoRival.style.display = "none";
+}
+      const valor = buscador.value.trim();
+      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+    });
+
+    competenciaSelect.addEventListener("change", () => {
+      competenciaSeleccionada = competenciaSelect.value;
+if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno") {
+  escudoCompetencia.src = `escudos/${competenciaSeleccionada}.png`;
+  escudoCompetencia.style.display = "inline-block";
+} else {
+  escudoCompetencia.src = "";
+  escudoCompetencia.style.display = "none";
+}
+      const valor = buscador.value.trim();
+      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+    });
+
+    condiciones.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cond = btn.dataset.condicion;
+        btn.classList.toggle("inactivo");
+        condicionesActivas = btn.classList.contains("inactivo") ? condicionesActivas.filter(c => c !== cond) : [...condicionesActivas, cond];
+        const valor = buscador.value.trim();
+        mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+      });
+    });
+
+    resultados.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const res = btn.dataset.resultado;
+        btn.classList.toggle("inactivo");
+        resultadosActivos = btn.classList.contains("inactivo") ? resultadosActivos.filter(r => r !== res) : [...resultadosActivos, res];
+        const valor = buscador.value.trim();
+        mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+      });
+    });
+
+    buscador.addEventListener("input", () => {
+      const valor = buscador.value.trim();
+      mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+    });
+
+    mostrarFilas(filas, "", competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
+  });
+
+</script>
+</body>
+</html>
