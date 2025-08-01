@@ -206,16 +206,18 @@ td img.partido-foto {
 <select id="anioSelect">
     <option value="ninguno" disabled selected>Seleccionar año...</option>
     <option value="todos">Todos los años</option>
-    <option value="2010">2010</option>
-    <option value="2011">2011</option>
-    <option value="2012">2012</option>
-    <option value="2013">2013</option>
+    <option value="2009/10">2009/10</option>
+    <option value="2010/11">2010/11</option>
+    <option value="2011/12">2011/12</option>
+    <option value="2012/13">2012/13</option>
+    <option value="2013/14">2013/14</option>
     <option value="2014">2014</option>
     <option value="2015">2015</option>
     <option value="2016">2016</option>
-    <option value="2017">2017</option>
-    <option value="2018">2018</option>
-    <option value="2019">2019</option>
+    <option value="2016/17">2016/17</option>
+    <option value="2017/18">2017/18</option>
+    <option value="2018/19">2018/19</option>
+    <option value="2019/20">2019/20</option>
     <option value="2020">2020</option>
     <option value="2021">2021</option>
     <option value="2022">2022</option>
@@ -259,6 +261,25 @@ td img.partido-foto {
 
 <script>
 const fotos = {
+  "07/08/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhynW27E9ejkNVZHzakxmFJEgELElROR5K0Y78ejZkqSmfHfdY3YV8eiYdjO_5Ud8Y4o60fu-7bIS2mskFzTaaf2HtKtjlg8061zf3EJPqMZmNa2tJwdIUsjH5iy1SyVfcu6pdSFFJSIf2W/w1200-h900/mariano+martinez+gol+a+aaaj.jpg",
+  "15/08/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj8HnzeWfnMTeQ4Z2-jJOjnONA-Gdx4Y-kN_6WzReO8-cGa24GFGkrtw8xV3HpGmZD-0d0T1sPiu1K8i9Caa7nu-YRxT9W6SbFo951-T-xD7cucBrCKGvoJddf4ZHMYX-ZvFu3wvsU0OJc/w1200-h900/2010+Apertura+vs+River+2.jpg",
+  "22/08/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhzNoGEXA6nVjKqET3Lj4n1HaRAgZtWXVeHgX5ZAmgRhsrVYn51r_631ZhOcA3-TQ7WyRnouhLYTOHhso6Goy7_2wcHEaobA4DyPqFFdZmQWoqtwmygJERW_sRtAugmGH34btYqy82Ck7k/w900-h1200/2010+Apertura+vs+Arsenal.jpg",
+  "27/08/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgOKDqM82GRff6uSJkYTjFk2ZA2EwGPl2JJZewcLhLc9N3zdI8UZzx6-PZ8hYX7N9qNYB0Ko-cDdPNKnVjEpWLP4FWcrstsyqyW107tjZXjd9roIgJ05hfjgwwrS6bpUZubjz2ZOQX41gyN/w1200-h900/huracan+1+newells+1+2010.jpg",
+  "05/09/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgA-SjulEaF3M1J9-3iiXEiHhZbAnlDaS957pGqcAeDHzaXKtmSjjX6pe3s6z3Qw_OrbjWnmm8OY76WFyjjUEGb_x_pyLxtqDe6IxX7TQ4Ca-dscrjD1fZ-KMnjh5aZDeSWo9w7KDzV2DR2/w1200-h900/MACHIN+GOL+A+QUILMES+2010.jpg",
+  "11/09/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi3PFtZdnINkYr6Gvtg-8503ULh77bPZ2ILVd3IFHviYNxsUhIs4ObKocvwWZlT3ZB9iyQWTN5b8V-q6IirdiPnivZm7YxASbZ2jbV2uPcz-TKyb7TWJXa7FsTDqWX-_1fNlyg4ziIpwAG5/w1200-h900/vs+Banfield+%2528Z%25C3%25A1rate%2529+Dyn.jpg",
+  "18/09/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKRqRC2hGlbEaYkz5y6yk0g_556sCbIoHIw1biAhGbYa6TseaQeSb7kjUpdkPxy0PmmjtlMizZCfvDsLfgb_oD8HT8j2ukflhI3J3yi1vGcBOblfy0KoKLxlMMKffjQI61ZpfyQDCkFL-h/w1200-h900/vs+GELP+%2528Sapito+Lencina%2529+-+Fotobaires.jpg",
+  "26/09/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhrNvapAk3je37kYJS8KiZUT7m4L476et3vo33rDpzpGyKppS_xhQTcGYy8BJERvJtYjg7lr2PMmTmZzAzVu4ZPdBl2M6v1DdQC3IqEpAjn2fpp53vFDQ1clkZr1FyYX8aLxEKsmp8dBRcD/w1200-h900/vs+Godoy+Cruz.jpg",
+  "02/10/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiULP5Ua5C6-5OMFTIOF0tWEf72O_Fp9rrgwLX-g_RTdD3EfR1TArkxNH-lJDHz79C-3WNCig3WNo6GSig0Y7vTXVxh3DmbvZu_QRImfwBm72KFc9ibPYBC4bKsyhKQCi6pnq_0fjEOWNWb/w1200-h900/vs+Racing.jpg",
+  "09/10/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjeGFLj9XpM2IFAE1ugtQGgSMAcbXyDdth83ZBJD4XdS1hI7AqTkYiVxzXArTorjC79NoE_bmzGAXgxFRWf5LwqDQOin2_uStPImxThkPpZIv3VmM9hU8CQxE02lOzZF8H1jfi2NeQsk3H/w1200-h900/vs+All+Boys.jpg",
+  "17/10/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhr8FVCcrRch7nEFjAQVs4EMdznbTTlFQAQoE5AFmlAOFiBAEH_1_sJZohf8lYYBpIzJe9aXaKQd9ACteHcy7ul3S3m9UkEtmYKM39Apsb58nFJAOmMZFOBtVJCQ5zpRxQt8mqgQ_S-q_s/w1200-h900/vs+Boca.jpg",
+  "24/10/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjg3uB0PqlvVkKIz2gIJVQU1UiGEdtl8jycsA3x7Cs8XmMGAew2P9ym6xC9kXx5W8WamCCEE9JlYOYeuH3ygR8PIvZ77l7WWHjN2p1-ak3yxpXojRQozPKNr1ylAn7D_JdPUSPWVgVQbv8T/w1200-h900/2010-10-24+vs+SL+a.jpg",
+  "05/11/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6bebZmZ5VMF9Zrh0G6nh_Vc8f3ut5mlOgJ39BcuQzz0pqVsSHFSMIRY-H3dnHUvgBG33zyF_ZAJqM8TnsVhhcX4JkDEbDEKJ4dYpKmfF6ZZAy-gehzR00_GCZFllgafx2Ma5byT3u9Jvf/w1200-h900/vs+Olimpo+4-0+Huracan.jpg",
+  "12/11/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgqo1PsIxXRlK8j9HJRCtlWyDnrNzPFD8mTaSFw5oYAmn9sxziQ5ewFJWnRjmTrNAGmzGBOqg_BBUjiMMMPEmt_At92IxAZ3KdqwteNf7Pqft_QA_2H0pt_7rGilT3_9BQT0IM7NAmfoF4I/w900-h1200/huracan+1+colon+2+2010.jpg",
+  "20/11/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbrRxzRH7dEJRBO-Tv41G2j24RO3TzFNDvA2Ewtz4Arl87pioM-o3zC3RYMv4nI0PGJcnrRRJGVb0pW3MKoEs-LCTd5Ke2mKfL_SX1xWJQo-LoT7HM9SJ-hjem759nxrTzZtqA9tLjLPNN/w1200-h900/estudiantes+2+huracan+2010+1.jpg",
+  "29/11/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjz9ggUuhPFeSy0UxcjPO602gZTUQeTg166-K-An2w4oY-fDkE75qtlgl79oowGWguSywuFdgzR3mOmLEPJxmXmuc47wRI2DPPlmCAOomy2efIrhknOhPG7UmCyYSM8s6xgNGmyMgO1ZgD2/w1200-h900/huracan+1+lanus+2+2010+1.jpg",
+  "05/12/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7XGDJG7dumv_QTN4TEA5cEU6Yfc8MnFWTKjWfYytfV_jR3UMirh1H2lSx5xUKBq07OzMYkqtBUw0aFe6_zogW0ohn3CwLE24j9cP3vMKIar6u0Kk88rEiOZcdBVdt_fGuDbFwbg331ScH/w1200-h900/tigre+3+huracan+1.jpg",
+  "08/12/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjibyRx1BwM3iFPR5HUzRLUi0Rj8CJwOTbAyo1vTtRVICSObJzbLhN4iZar9s_3SXYW8sXNViTBSEgGTUI1XNxDW79iqps9Pn_R5WLBrW9l25BvJCiv5yUdPGBzncCabsFYWMNlXtXAQ3NG/w1200-h900/velez+2+huracan+0+2010.jpg",
+  "13/12/2010": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWnFIG1iyOuiUTvb4JKUQ5WfWJvVrlQ1mJuTefYLiZn3zuPit7iFw4jMoxe6OUc6M2F2hdL9VMi46vfVJVXHTXT1PwZyUtmNSvIQDt5q1AW12ArVq53Nr6xkklM8RX1NA3nRsx49GldpQp/w900-h1200/huracan+1+independiente+0+2010.jpg",
   "26/08/2015": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh-dAbbkMCS8Ns1wJjlLwIlv3_K-XmrGl3OE1uCyhNuSRmfQPBemgpUqqF_5lBWg-4Ct_HzuuEX86pSZW_azaLnJPoFZ2lJux_pIhfLRGAmyjrhMJURHj2kUWma0FajEm9_p4028aXV0L5w/w400-h300/vs+tigre+COPA+CUSAMERICANA.jpg",
   "16/09/2015": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgvvDc0hEOkONzkPusReQXLHyPowNmPL2jXt-knrG3xarO_I6iubYiAt__N6mejSobIVZm1bVcn90idf4CVNcN7CmHmugXBrwthgTFBjHWnFVDmz0X1nt5h8jTI-sEn0ktLq_1cU2w25O2S/w400-h300/vs+tigre+COPA+CUSAMERICANA+1.jpg",
   "23/09/2015": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjdgsZCBoO-kraVcR9Rz1W0kVI-q6Rla_guVG-CdfslbVowlX9L2IjRmAPq8d3lH1Wo0MINUe6eQ3TPoY8b_CQrQhLRA7vfgNU0t8-gNSuqcoAuJM2UYY8Xe4JniCppiWBWHp3ipq4iHz7s/w400-h300/VS+RECIFE.jpg",
