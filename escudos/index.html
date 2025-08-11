@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clubes y Estadísticas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'MuseoModerno', sans-serif; background: #fff; color: #222; margin: 20px; }
+    h1 { color: #FF0000; text-align: center; }
+    .logo { display: block; margin: 0 auto 10px auto; width: 100px; }
+    select { padding: 8px; border-radius: 8px; border: 2px solid #FF0000; font-family: 'MuseoModerno', sans-serif; font-size: 16px; margin-bottom: 20px; }
+    .club-card { border: 3px solid #FF0000; border-radius: 20px; padding: 20px; max-width: 700px; margin: 0 auto; background: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    .club-header { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #FF0000; padding-bottom: 10px; margin-bottom: 10px; }
+    .club-header img { width: 70px; height: 70px; object-fit: contain; }
+    h2 { margin: 0; color: #FF0000; font-size: 28px; }
+    .stats { margin-top: 20px; }
+    .stat-group { margin-bottom: 20px; padding: 10px; border: 1px solid #FF0000; border-radius: 12px; background: #fff5f5; }
+    .stat-title { font-weight: bold; color: #FF0000; margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <img src="https://globopedia.github.io/buscador-partidos/logo_globopedia.png" alt="Logo Huracán" class="logo" />
+  <h1>📜 Ficha de Clubes</h1>
+  <div style="text-align:center;">
+    <label>Seleccionar club: </label>
+    <select id="clubSelect"></select>
+  </div>
+
+  <div id="clubInfo" class="club-card" style="display:none;"></div>
+
+  <script>
+    const clubesURL = "https://globopedia.github.io/Rivales-Huracan/clubes.csv";
+    const partidosURL = "https://globopedia.github.io/Rivales-Huracan/Encuentros_Huracan.csv";
+    let clubes = [];
+    let Encuentros_Huracan = [];
+
+    Promise.all([
+      fetch(clubesURL).then(r => r.text()),
+      fetch(partidosURL).then(r => r.text())
+    ]).then(([csvClubes, csvEncuentros_Huracan]) => {
+      clubes = Papa.parse(csvClubes, { header: true, skipEmptyLines: true }).data.map(c => ({
+        id: c.id?.trim(),
+        nombre: c.Nombre?.trim() || c.nombre?.trim(),
+        apodo: c.Apodo || c.apodo || "",
+        fundacion: c.Fundacion || c.fundacion || "",
+        direccion: c.Direccion || c.direccion || "",
+        titulos: c.Titulos || c.titulos || "",
+        estadio: c.Estadio || c.estadio || "",
+        dir_estadio: c["Direccion Estadio"] || c["dir_estadio"] || "",
+        inauguracion: c.Inauguracion || c.inauguracion || "",
+        capacidad: c.Capacidad || c.capacidad || "",
+        ubicaciones_anteriores: c["Ubicaciones anteriores"] || c["ubicaciones_anteriores"] || "",
+        historia: c.Historia || c.historia || "",
+        escudo: c.Escudo || c.escudo || ""
+      }));
+
+      Encuentros_Huracan = Papa.parse(csvEncuentros_Huracan, { header: true, skipEmptyLines: true }).data.map(p => ({
+        detalle: p.detalle || p.Detalle || Object.values(p)[0] || ""
+      }));
+
+      console.log("Clubes cargados:", clubes);
+      console.log("Encuentros cargados:", Encuentros_Huracan);
+
+      llenarSelectClubes();
+    });
+
+    function llenarSelectClubes() {
+      const select = document.getElementById("clubSelect");
+      select.innerHTML = `<option value="">-- Seleccionar --</option>`;
+      clubes.forEach(club => {
+        if (club.id && club.nombre) {
+          const opt = document.createElement("option");
+          opt.value = club.id;
+          opt.textContent = club.nombre;
+          select.appendChild(opt);
+        }
+      });
+      select.addEventListener("change", mostrarClub);
+    }
+
+    function mostrarClub() {
+      const clubId = document.getElementById("clubSelect").value;
+      const club = clubes.find(c => String(c.id).trim() === clubId.trim());
+      if (!club) { alert("No se encontró el club seleccionado"); return; }
+
+      const cont = document.getElementById("clubInfo");
+      cont.style.display = "block";
+      cont.innerHTML = `
+        <div class="club-header">
+          <img src="${club.escudo}" alt="escudo" />
+          <h2>${club.nombre}</h2>
+        </div>
+        <p><b>Apodo:</b> ${club.apodo}</p>
+        <p><b>Fundación:</b> ${club.fundacion}</p>
+        <p><b>Dirección:</b> ${club.direccion}</p>
+        <p><b>Títulos:</b> ${club.titulos}</p>
+        <p><b>Estadio:</b> ${club.estadio}</p>
+        <p><b>Dirección Estadio:</b> ${club.dir_estadio}</p>
+        <p><b>Inauguración:</b> ${club.inauguracion}</p>
+        <p><b>Capacidad:</b> ${club.capacidad}</p>
+        <p><b>Ubicaciones anteriores:</b> ${club.ubicaciones_anteriores}</p>
+        <p><b>Historia:</b> ${club.historia}</p>
+        <div class="stats"><h3 style="color:#FF0000;">📊 Estadísticas</h3>${generarEstadisticas(club.nombre.trim())}</div>
+      `;
+    }
+
+    function generarEstadisticas(nombreClub) {
+      const competencias = ["Campeonato", "Copa Argentina", "Supercopa", "Copa Superliga", "Copa Maradona", "Copa Libertadores", "Copa Sudamericana", "Amistoso"];
+      const condiciones = ["local", "visitante", "neutral"];
+      const resultados = ["victoria", "empate", "derrota"];
+
+      let html = "";
+      competencias.forEach(comp => {
+        let compHTML = "";
+        condiciones.forEach(cond => {
+          let linea = "";
+          resultados.forEach(res => {
+            const total = Encuentros_Huracan.filter(p =>
+              p.detalle &&
+              p.detalle.toLowerCase().includes(nombreClub.toLowerCase()) &&
+              p.detalle.toLowerCase().includes(comp.toLowerCase()) &&
+              p.detalle.toLowerCase().includes(cond.toLowerCase()) &&
+              p.detalle.toLowerCase().includes(res.toLowerCase())
+            ).length;
+            if (total > 0) linea += `${total} ${res}${total>1?'s':''} | `;
+          });
+          if (linea) compHTML += `<p>✅ ${cond}: ${linea.slice(0, -3)}</p>`;
+        });
+        if (compHTML) html += `<div class="stat-group"><div class="stat-title">🏆 ${comp}</div>${compHTML}</div>`;
+      });
+      return html || "<p>Sin datos disponibles</p>";
+    }
+  </script>
+</body>
+</html>
