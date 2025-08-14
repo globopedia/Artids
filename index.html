@@ -356,7 +356,18 @@ function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesAc
     const tr = document.createElement("tr");
     const td = document.createElement("td");
 
-    td.innerHTML = filtroTexto !== "" ? fila.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') : fila;
+  const columnas = fila.split(',');
+  const etiquetas = ["Fecha", "Partido", "Huracán", "Rival", "Estadio", "Goles", "Expulsados"];
+  let html = "";
+
+  columnas.forEach((col, idx) => {
+    const valor = filtroTexto !== "" 
+      ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+      : col;
+    html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
+  });
+
+  td.innerHTML = html;
 
     const clave = Object.keys(fotos).find(k => fila.includes(k));
     if (clave) {
