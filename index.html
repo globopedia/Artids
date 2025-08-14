@@ -352,15 +352,41 @@ function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesAc
 
   mensaje.style.display = filtradas.length === 0 ? "block" : "none";
 
-  filtradas.forEach(fila => {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
+  
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
 
-  const columnas = fila.split(',');
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"' && line[i + 1] === '"') {
+      current += '"'; // doble comilla → comilla literal
+      i++;
+    } else if (char === '"') {
+      inQuotes = !inQuotes; // alterna dentro/fuera de comillas
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+filtradas.forEach(fila => {
+  const tr = document.createElement("tr");
+  const td = document.createElement("td");
+
+  const columnas = parseCSVLine(fila);
   const etiquetas = ["Fecha", "Partido", "Huracán", "Rival", "Estadio", "Goles", "Expulsados"];
   let html = "";
 
   columnas.forEach((col, idx) => {
+    col = col.replace(/^"(.*)"$/, '$1');
     const valor = filtroTexto !== "" 
       ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
       : col;
@@ -369,18 +395,19 @@ function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesAc
 
   td.innerHTML = html;
 
-    const clave = Object.keys(fotos).find(k => fila.includes(k));
-    if (clave) {
-      const img = document.createElement("img");
-      img.src = fotos[clave];
-      img.className = "partido-foto";
-      img.alt = "Foto del partido";
-      td.appendChild(img);
-    }
+  const clave = Object.keys(fotos).find(k => fila.includes(k));
+  if (clave) {
+    const img = document.createElement("img");
+    img.src = fotos[clave];
+    img.className = "partido-foto";
+    img.alt = "Foto del partido";
+    td.appendChild(img);
+  }
 
-    tr.appendChild(td);
-    cuerpo.appendChild(tr);
-  });
+  tr.appendChild(td);
+  cuerpo.appendChild(tr);
+});
+
 }
 
   document.addEventListener("DOMContentLoaded", async () => {
