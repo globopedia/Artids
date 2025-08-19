@@ -8,7 +8,7 @@
 22/01/1956,victoria,visitante,2-0,IND. MEDELLÍN (COL),"Gira por América (amistoso)","Atanasio Girardot (Colombia).",x,x,x,x,x,x
 29/01/1956,derrota,neutral,3-4,MILLONARIOS (COL),"Cuadrangular Internacional (amistoso)","Millonarios: Pedernera.","Londoño (Colombia)",x,x,x,x,x
 14/02/1956,empate,visitante,0-0,IND. MEDELLÍN (COL),"Gira por América (amistoso)","Ind. Medellín: Sánchez; Lauro y Caicedo; Pacheco, Calonga y Retamoso; Larraz, Seghini, Pizarro, Arango y Moreno.","Huracán: Edgardo Madinabeytia; Sherl y Zuluaga; Urquijo, Rodríguez y Ardanaz; Respuela, Rossi, Pedernera, Infante y Onzari",Atanasio Girardot (Colombia).,x,x,x,x
-15/02/1956,empate,neutral,1-1,ATL. NACIONAL (COL),"Amistoso","Coloso de Ibagué (Colombia)","Goles: Lanza y O. Rossi."
+15/02/1956,empate,neutral,1-1,ATL. NACIONAL (COL),"Amistoso","Coloso de Ibagué (Colombia)","Goles: Lanza y O. Rossi."x,x,x,x,x
 17/01/1958,victoria,visitante,2-0,DEP. QUINDÍO (COL),"Gira por América (amistoso)","Londoño (Colombia).","Goles: 43 Romero, 63 Bruno."
 26/01/1958,victoria,visitante,4-1,IND. MEDELLÍN (COL),"Gira por América (amistoso)","Atanasio Girardot (Colombia)."
 31/01/1958,derrota,visitante,1-2,ATL. NACIONAL (COL),"Gira por América (amistoso)","Atanasio Girardot (Colombia)."
@@ -696,6 +696,7 @@
 27/05/2025,victoria,1-0,CORINTHIANS (BRA),"6° fecha de Copa Sudamericana 2025","Huracán: Sebastián Meza; Hernán De la Fuente, Fabio Pereyra (62 Santiago Moya), Nicolás Goitea y Leandro Lescano; Rodrigo Cabral, Víctor Cantillo (22 Lucas Carrizo), Leonel Pérez (46 Emmanuel Ojeda) y Gabriel Alanís (76 Ramón Ábila); Franco Watson y Leonardo Sequeira (62 Matías Tissera).  DT: Frank Kudelka.","Corinthians: Hugo Souza; Félix Torres (56 Matheuzinho), André Ramalho, Cacá y Fabrizio Angileri; André Carrillo, José Martínez (46 Talles Magno), Raniele y Breno Bidon; Ángel Romero (56 Rodrigo Garro) y Memphis Depay.","Tomás A Ducó.",Local,"Gery Vargas (FBF)."
 01/06/2025,derrota,0-1,PLATENSE,"Final del Campeonato Apertura 2025","Huracán: Hernán Galíndez; Tomás Guidara (72 Hernán De la Fuente), Fabio Pereyra, Marco Pellegrino (83 Ramón Ábila) y César Ibáñez; Leandro Pérez (72 Matías Tissera), Leonardo Gil, Matko Miljevic y Agustín Urzi (58 Gabriel Alanís); Walter Mazzantti y Eric Ramírez (46 Leonardo Sequeira).  DT: Frank Kudelka.","Platense: Juan Cozzani; Juan Saborido, Ignacio Vázquez, Oscar Salomón y Tomás Silva (50 Edgar Elizalde); Guido Mainero, Rodrigo Herrera (86 Fernando Juárez), Leonel Picco y Vicente Taborda (83 Franco Zapiola); Augusto Lotti (46 Ignacio Schor) y Ronaldo Martínez (86 Nicolás Orsini).","Madre de Ciudades (Santiago).",Neutral,"Facundo Tello.","Gol: 63 Mainero."
 03/07/2025,empate,0-0,INSTITUTO (CBA),"16vo de Copa Argentina 2025","Huracán: Sebastián Meza; Tomás Guidara, Fabio Pereyra, Nicolás Goitea y César Ibáñez; Leonardo Sequeira, Leonel Pérez, Leonardo Gil y Gabriel Alanís (81 Agustín Urzi); Matko Miljevic y Eric Ramírez (61 Matías Tissera).  DT: Frank Kudelka.","Instituto: Manuel Roffo, Emanuel Beltrán, Gonzalo Requena, Fernando Alarcón y Lucas Rodríguez; Damián Puebla, Francis Mac Allister (67 Jonás Acevedo), Stefano Moreyra y Alex Luna; Gastón Lodico y Nicolás Cordero.","Bielsa (Rosario).",Neutral,"Andrés Gariano.","Penales: Huracán 3x2."
+
 
 
 
