@@ -382,7 +382,7 @@ filtradas.forEach(fila => {
   const td = document.createElement("td");
 
   const columnas = parseCSVLine(fila);
-  const etiquetas = ["Fecha", "Res", "Condición", "Resultado", "Club", "Torneo", "Estadio", "Árbitro", "Huracán", "Rival", "Goles", "Expulsados", "Observaciones"];
+  const etiquetas = ["Fecha", "Res", "Condición", "Resultado", "Club", "Torneo", "Estadio", "Árbitro", "Huracán", "<img id="escudoRival" src="" alt="Escudo del rival">", "Goles", "Expulsados", "Observaciones"];
   let html = "";
 
  columnas.forEach((col, idx) => {
