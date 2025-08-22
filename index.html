@@ -424,6 +424,50 @@ filtradas.forEach(fila => {
     const anioSelect = document.getElementById("anioSelect");
     const escudoAnio = document.getElementById("escudoAnio");
     
+     // === Carga rivales desde clubes.csv (columna "CLUB") ===
+    async function poblarRivalesDesdeCSV() {
+      const url = "https://raw.githubusercontent.com/globopedia/Rivales-Huracan/main/clubes.csv";
+      try {
+        const resp = await fetch(url, { cache: "no-store" });
+        const csv = await resp.text();
+
+        const lines = csv.trim().split(/\r?\n/);
+        if (!lines.length) return;
+
+        const headers = lines[0].split(",");
+        const idxClub = headers.findIndex(h => h.trim().toUpperCase() === "CLUB");
+        if (idxClub === -1) return;
+
+        const set = new Set();
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          const cols = lines[i].split(",");
+          const club = (cols[idxClub] || "").trim();
+          if (club) set.add(club);
+        }
+
+        const listaOrdenada = Array.from(set).sort((a, b) =>
+          a.localeCompare(b, "es", { sensitivity: "base" })
+        );
+
+        // limpiamos las opciones previas a partir de la 3ra
+        while (rivalSelect.options.length > 2) rivalSelect.remove(2);
+
+        listaOrdenada.forEach(club => {
+          const opt = document.createElement("option");
+          opt.value = club;
+          opt.textContent = club;
+          rivalSelect.appendChild(opt);
+        });
+      } catch (e) {
+        console.error("Error cargando clubes.csv:", e);
+      }
+    }
+
+    // llamamos a la función para poblar
+    await poblarRivalesDesdeCSV();
+    // === FIN NUEVO ===
+    
     let condicionesActivas = Array.from(condiciones).map(btn => btn.dataset.condicion);
     let resultadosActivos = Array.from(resultados).map(btn => btn.dataset.resultado);
     let rivalSeleccionado = "todos";
@@ -443,15 +487,6 @@ filtradas.forEach(fila => {
   mostrarFilas(filas, valor, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
 });
     
-    const rivales = ["Aldosivi","Alianza Lima","All Boys","Almirante Brown","América","Dep. Anzoátegui","Argentinos Juniors","Arsenal","Atlanta","Banfield","Barracas Central","Belgrano (Cba)","Sp. Belgrano","Boca Juniors","Boca Unidos","Boston River","Brown de Adrogué","Caracas FC","Central Córdoba (Ros)","Central Córdoba (SE)","Chacarita Juniors","Colo Colo","Colón","Corinthians","Cruzeiro","Crucero del Norte","Danubio","Defensa y Justicia","Defensor Sporting","Defensores Unidos","Desamparados","Douglas Haig","Emelec","Estudiantes (LP)","Estudiantes (SL)","Excursionistas","Ferro C. Oeste","Gimnasia (Juj)","Gimnasia (LP)","Godoy Cruz","Guaraní","Guillermo Brown","Independiente","Ind. Rivadavia","Ind. Santa Fe","Instituto","Lanús","Dep. Lara","Libertad (Par)","Liverpool","Olimpo","Dep. Madryn","Dep. Merlo","Mineros","Atl. Nacional","Newell's Old Boys","Nueva Chicago","Patronato","Peñarol","Platense","Quilmes","Racing Club","Racing (Ola)","Racing (Uru)","Atl. Rafaela","Dep. Riestra","River Plate","Ramón Santamarina","Rosario Central","San Lorenzo de Almagro","San Martín (Fsa)","San Martín (SJ)","San Martín (Tmn)","Sarmiento (Jun)","Sport Recife","Sporting Cristal","Talleres de Escalada","Talleres (Cba)","Temperley","Tigre","Atl. Tucumán","Unión (SF)","Unión (Sls)","Universitario (Bol)","Universitario (Per)","Vélez Sarsfield","Victoriano Arenas","Villa Mitre","Villa San Carlos","Yupanqui"];
-
-    rivales.forEach(rival => {
-      const option = document.createElement("option");
-      option.value = rival;
-      option.textContent = rival;
-      rivalSelect.appendChild(option);
-    });
-
     rivalSelect.addEventListener("change", () => {
       rivalSeleccionado = rivalSelect.value;
 if (rivalSeleccionado !== "todos" && rivalSeleccionado !== "ninguno") {
