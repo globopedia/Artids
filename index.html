@@ -387,16 +387,6 @@ filtradas.forEach(fila => {
 
  columnas.forEach((col, idx) => {
   if (idx === 1 || idx === 2) return; // 👈 saltamos Res y Condición
-if (etiquetas[idx] === "Huracán") {
-  // Caso especial: columna Huracán
-  html += `<p>
-    <img src="https://globopedia.github.io/buscador-partidos/escudos/Huracán.png" 
-         alt="Huracán" 
-         style="height:20px; vertical-align:middle; margin-right:5px;">
-    ${valor}
-  </p>`;
-} else {
-  // El resto de las columnas sigue igual
   col = col.replace(/^"(.*)"$/, '$1');
   const valor = filtroTexto !== "" 
     ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
