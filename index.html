@@ -385,13 +385,15 @@ filtradas.forEach(fila => {
   const etiquetas = ["Fecha", "Res", "Condición", "Resultado", "Club", "Torneo", "Estadio", "Árbitro", "Huracán", "Rival", "Goles", "Expulsados", "Observaciones"];
   let html = "";
 
-  columnas.forEach((col, idx) => {
-    col = col.replace(/^"(.*)"$/, '$1');
-    const valor = filtroTexto !== "" 
-      ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
-      : col;
-    html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
-  });
+ columnas.forEach((col, idx) => {
+  if (idx === 1 || idx === 2) return; // 👈 saltamos Res y Condición
+
+  col = col.replace(/^"(.*)"$/, '$1');
+  const valor = filtroTexto !== "" 
+    ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+    : col;
+  html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
+});
 
   td.innerHTML = html;
 
