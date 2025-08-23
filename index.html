@@ -185,11 +185,16 @@ td img.partido-foto {
   <h1>Partidos (2010-2025)</h1>
 
 <div class="filtros triple-select">
+<div class="filtro-con-buscador">
+  <input type="text" id="input-rival" placeholder="Buscar rival...">
   <select id="rivalSelect">
-    <option value="ninguno" disabled selected>Seleccionar rival...</option>
+  <option value="ninguno" disabled selected>Seleccionar rival...</option>
     <option value="todos">Todos los rivales</option>
   </select>
+</div>
 
+<div class="filtro-con-buscador">
+  <input type="text" id="input-torneo" placeholder="Buscar torneo...">
   <select id="competenciaSelect">
     <option value="ninguno" disabled selected>Seleccionar torneo...</option>
     <option value="todos">Todos los partidos</option>
@@ -203,7 +208,10 @@ td img.partido-foto {
     <option value="Nacional B">Nacional B</option>
     <option value="Amistoso">Amistoso</option>
   </select>
-<select id="anioSelect">
+  </div>
+<div class="filtro-con-buscador">
+  <input type="text" id="input-anio" placeholder="Buscar año...">
+  <select id="anioSelect">
     <option value="ninguno" disabled selected>Seleccionar año...</option>
     <option value="todos">Todos los años</option>
     <option value="2008">2008</option>
@@ -540,7 +548,24 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
 
     mostrarFilas(filas, "", competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado);
   });
+function activarFiltroInput(inputId, selectId) {
+  const input = document.getElementById(inputId);
+  const select = document.getElementById(selectId);
 
+  input.addEventListener("input", () => {
+    const texto = input.value.toLowerCase();
+    for (let i = 0; i < select.options.length; i++) {
+      const opt = select.options[i];
+      const visible = opt.text.toLowerCase().includes(texto);
+      opt.style.display = visible ? "" : "none";
+    }
+  });
+}
+
+// activar en los tres selects
+activarFiltroInput("input-rival", "rivalSelect");
+activarFiltroInput("input-anio", "anioSelect");
+activarFiltroInput("input-torneo", "torneoSelect");
 </script>
 </body>
 </html>
