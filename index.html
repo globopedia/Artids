@@ -567,6 +567,13 @@ if (competenciaSeleccionada !== "todos" && competenciaSeleccionada !== "ninguno"
 activarFiltroInput("input-rival", "rivalSelect");
 activarFiltroInput("input-anio", "anioSelect");
 activarFiltroInput("input-torneo", "torneoSelect");
+
+.filtro-con-buscador {
+  display: flex;
+  flex-direction: column; /* apila input y select en columna */
+  gap: 6px; /* espacio entre input y select */
+  max-width: 250px; /* opcional: ancho más prolijo */
+}
 </script>
 </body>
 </html>
