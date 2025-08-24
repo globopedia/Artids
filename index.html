@@ -194,7 +194,15 @@ td img.partido-foto {
   border-radius: 0 0 8px 8px;
   padding: 6px;
 }
-  </style>
+  
+    .grupo-toggles {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+</style>
 </head>
 <body>
   <div class="logo-container">
@@ -202,75 +210,82 @@ td img.partido-foto {
   </div>
   <h1>Partidos (2010-2025)</h1>
 
-<div class="filtros triple-select">
-<div class="filtro-con-buscador">
-  <input type="text" id="input-rival" placeholder="Buscar rival...">
-  <select id="rivalSelect">
-  <option value="ninguno" disabled selected>Seleccionar rival...</option>
-    <option value="todos">Todos los rivales</option>
-  </select>
-</div>
 
-<div class="filtro-con-buscador">
-  <input type="text" id="input-torneo" placeholder="Buscar torneo...">
-  <select id="competenciaSelect">
-    <option value="ninguno" disabled selected>Seleccionar torneo...</option>
-    <option value="todos">Todos los partidos</option>
-    <option value="Copa Libertadores">Copa Libertadores</option>
-    <option value="Copa Sudamericana">Copa Sudamericana</option>
-    <option value="Campeonato">Campeonato</option>
-    <option value="Copa Argentina">Copa Argentina</option>
-    <option value="Supercopa">Supercopa</option>
-    <option value="Copa Superliga">Copa Superliga</option>
-    <option value="Copa Maradona">Copa Maradona</option>
-    <option value="Nacional B">Nacional B</option>
-    <option value="Amistoso">Amistoso</option>
-  </select>
+  <!-- FILTROS -->
+  <div class="triple-select">
+    <div class="filtro-con-buscador">
+      <input type="text" id="input-rival" placeholder="Buscar rival...">
+      <select id="rivalSelect">
+        <option value="ninguno" disabled selected>Seleccionar rival...</option>
+        <option value="todos">Todos los rivales</option>
+      </select>
+    </div>
+
+    <div class="filtro-con-buscador">
+      <input type="text" id="input-torneo" placeholder="Buscar torneo...">
+      <select id="competenciaSelect">
+        <option value="ninguno" disabled selected>Seleccionar torneo...</option>
+        <option value="todos">Todos los partidos</option>
+        <option value="Copa Libertadores">Copa Libertadores</option>
+        <option value="Copa Sudamericana">Copa Sudamericana</option>
+        <option value="Campeonato">Campeonato</option>
+        <option value="Copa Argentina">Copa Argentina</option>
+        <option value="Supercopa">Supercopa</option>
+        <option value="Copa Superliga">Copa Superliga</option>
+        <option value="Copa Maradona">Copa Maradona</option>
+        <option value="Nacional B">Nacional B</option>
+        <option value="Amistoso">Amistoso</option>
+      </select>
+    </div>
+
+    <div class="filtro-con-buscador">
+      <input type="text" id="input-anio" placeholder="Buscar año...">
+      <select id="anioSelect">
+        <option value="ninguno" disabled selected>Seleccionar año...</option>
+        <option value="todos">Todos los años</option>
+        <option value="2008">2008</option>
+        <option value="2009">2009</option>
+        <option value="2010">2010</option>
+        <option value="2011">2011</option>
+        <option value="2012">2012</option>
+        <option value="2013">2013</option>
+        <option value="2014">2014</option>
+        <option value="2015">2015</option>
+        <option value="2016">2016</option>
+        <option value="2017">2017</option>
+        <option value="2018">2018</option>
+        <option value="2019">2019</option>
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+        <option value="2022">2022</option>
+        <option value="2023">2023</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+      </select>
+    </div>
   </div>
-<div class="filtro-con-buscador">
-  <input type="text" id="input-anio" placeholder="Buscar año...">
-  <select id="anioSelect">
-    <option value="ninguno" disabled selected>Seleccionar año...</option>
-    <option value="todos">Todos los años</option>
-    <option value="2008">2008</option>
-    <option value="2009">2009</option>
-    <option value="2010">2010</option>
-    <option value="2011">2011</option>
-    <option value="2012">2012</option>
-    <option value="2013">2013</option>
-    <option value="2014">2014</option>
-    <option value="2015">2015</option>
-    <option value="2016">2016</option>
-    <option value="2017">2017</option>
-    <option value="2018">2018</option>
-    <option value="2019">2019</option>
-    <option value="2020">2020</option>
-    <option value="2021">2021</option>
-    <option value="2022">2022</option>
-    <option value="2023">2023</option>
-    <option value="2024">2024</option>
-    <option value="2025">2025</option>
-  </select>
-</div>
 
+  <!-- ESCUDOS -->
   <div class="escudos-container">
     <img id="escudoRival" src="" alt="Escudo del rival">
     <img id="escudoCompetencia" src="" alt="Logo de la competencia">
     <img id="escudoAnio" src="" alt="Logo del año">
   </div>
 
-  <div id="condicion-container" class="filtros">
+  <!-- TOGGLES CONDICIÓN -->
+  <div id="condicion-container" class="grupo-toggles">
     <span class="condicion-btn activo" data-condicion="local">Local</span>
     <span class="condicion-btn activo" data-condicion="neutral">Neutral</span>
     <span class="condicion-btn activo" data-condicion="visitante">Visitante</span>
   </div>
 
-  <div id="resultado-container" class="filtros">
+  <!-- TOGGLES RESULTADO -->
+  <div id="resultado-container" class="grupo-toggles">
     <span class="condicion-btn activo" data-resultado="victoria">Victoria</span>
     <span class="condicion-btn activo" data-resultado="empate">Empate</span>
     <span class="condicion-btn activo" data-resultado="derrota">Derrota</span>
   </div>
-  
+
   <div class="buscador-wrapper">
 <svg class="lupa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path fill="#DA291C" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34C15.3 5.01 12.29 2 8.65 2 5.01 2 2 5.01 2 8.65c0 3.63 3.01 6.65 6.65 6.65a6.5 6.5 0 005.34-1.48l.27.28v.79l5 5L20.5 19l-5-5zm-6.85 0C6.01 14 4 11.99 4 9.5S6.01 5 8.65 5 13.3 7.01 13.3 9.5 11.29 14 8.65 14z"/>
