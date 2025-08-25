@@ -216,7 +216,14 @@ td img.partido-foto {
   font-weight: 100;
   text-align: center;
 }
-
+    
+.escudo-huracan {
+  width: 40px;   /* ajustá el tamaño */
+  height: auto;
+  display: block;
+  margin: 0 auto; /* lo centra */
+}
+    
 </style>
 </head>
 <body>
@@ -468,6 +475,14 @@ columnas.forEach((col, idx) => {
 
     html += `<p class="resultado-celda">${valor}</p>`;
   } 
+else if (idx === 7) { // 👈 columna Huracán
+  html += `
+    <p class="huracan-celda">
+      <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+           alt="Huracán" class="escudo-huracan">
+    </p>
+  `;
+}
 else {
     const valor = filtroTexto !== "" 
       ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
