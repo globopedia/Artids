@@ -218,10 +218,9 @@ td img.partido-foto {
 }
     
 .escudo-huracan {
-  width: 40px;   /* ajustá el tamaño */
+  width: 24px;   /* ajustá el tamaño */
   height: auto;
-  display: block;
-  margin: 0 auto; /* lo centra */
+  vertical-align: middle; /* lo alinea en línea con texto */
 }
     
 </style>
@@ -477,7 +476,7 @@ columnas.forEach((col, idx) => {
   } 
 else if (idx === 7) { // 👈 columna Huracán
   html += `
-    <p class="huracan-celda">
+    <p>
       <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
            alt="Huracán" class="escudo-huracan">
     </p>
