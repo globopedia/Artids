@@ -478,13 +478,21 @@ columnas.forEach((col, idx) => {
 
     html += `<p class="resultado-celda">${valor}</p>`;
   } 
-else if (idx === 7) { // 👈 columna Huracán
-  html += `
-     <span class="huracan-celda">
-     <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
-           alt="Huracán" class="escudo-huracan">
-   </span>
-  `;
+  // Columna 8 no muestra de referencia de 1° fila (idx === 8)
+else if (idx === 8) { // columna Huracán
+  col = col.replace(/^"(.*)"$/, '$1');
+
+  const valor = col.replace("Huracán:", 
+    `<img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+          alt="Huracán" class="escudo-huracan">`
+  ).trim();
+
+  // Resaltar coincidencias si hay filtro de texto
+  const valorMarcado = filtroTexto !== "" 
+    ? valor.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+    : valor;
+
+  html += `<p class="huracan-celda">${valorMarcado}</p>`;
 }
 else {
     const valor = filtroTexto !== "" 
