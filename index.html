@@ -449,8 +449,10 @@ columnas.forEach((col, idx) => {
         )
       : col.replace("Resultado:", "").trim();
 
+    html += `<p class="resultado-celda">${valor}</p>`;
+  }
   // Columna 5 no muestra de referencia de 1° fila (idx === 5)
-  if (idx === 5) {
+  else if (idx === 5) {
     const valor = filtroTexto !== "" 
       ? col.replace("Torneo:", "").trim().replace(
           new RegExp(`(${filtroTexto})`, 'gi'), 
@@ -458,9 +460,9 @@ columnas.forEach((col, idx) => {
         )
       : col.replace("Torneo:", "").trim();
 
-    // 👇 lo metemos con su propia clase para darle estilo
     html += `<p class="resultado-celda">${valor}</p>`;
-  } else {
+  } 
+else {
     const valor = filtroTexto !== "" 
       ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
       : col;
