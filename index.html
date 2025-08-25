@@ -202,6 +202,15 @@ td img.partido-foto {
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
+
+    .resultado-celda {
+  font-size: 1.6rem;   /* más grande */
+  font-weight: bold;
+  color: #DA291C;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+    
 </style>
 </head>
 <body>
@@ -426,14 +435,29 @@ filtradas.forEach(fila => {
   const etiquetas = ["Fecha", "Res", "Condición", "Resultado", "Club", "Torneo", "Estadio", "Árbitro", "Huracán", "Rival", "Goles", "Expulsados", "Observaciones"];
   let html = "";
 
- columnas.forEach((col, idx) => {
+columnas.forEach((col, idx) => {
   if (idx === 1 || idx === 2) return; // 👈 saltamos Res y Condición
 
   col = col.replace(/^"(.*)"$/, '$1');
-  const valor = filtroTexto !== "" 
-    ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
-    : col;
-  html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
+
+  // si es la columna de Resultado (idx === 3)
+  if (idx === 3) {
+    const valor = filtroTexto !== "" 
+      ? col.replace("Resultado:", "").trim().replace(
+          new RegExp(`(${filtroTexto})`, 'gi'), 
+          '<mark>$1</mark>'
+        )
+      : col.replace("Resultado:", "").trim();
+
+    // 👇 lo metemos con su propia clase para darle estilo
+    html += `<p class="resultado-celda">${valor}</p>`;
+  } else {
+    const valor = filtroTexto !== "" 
+      ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+      : col;
+
+    html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
+  }
 });
 
   td.innerHTML = html;
