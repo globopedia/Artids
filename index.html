@@ -217,11 +217,14 @@ td img.partido-foto {
   text-align: center;
 }
     
+.huracan-celda {
+  display: inline-block; /* ocupa solo lo que mide el escudo */
+}
+
 .escudo-huracan {
-  width: 22px;   /* ajustá el tamaño */
+  width: 22px;
   height: auto;
-  vertical-align: middle; /* lo alinea en línea con texto */
-  margin-left: 4px;       /* opcional: espacio si queda pegado */
+  vertical-align: middle; /* esto sí lo baja/alinea con texto */
 }
     
 </style>
@@ -477,9 +480,10 @@ columnas.forEach((col, idx) => {
   } 
 else if (idx === 7) { // 👈 columna Huracán
   html += `
-      <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+     <span class="huracan-celda">
+     <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
            alt="Huracán" class="escudo-huracan">
-    </p>
+   </span>
   `;
 }
 else {
