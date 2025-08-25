@@ -440,7 +440,7 @@ columnas.forEach((col, idx) => {
 
   col = col.replace(/^"(.*)"$/, '$1');
 
-  // si es la columna de Resultado (idx === 3)
+  // Columna 3 no muestra de referencia de 1° fila (idx === 3)
   if (idx === 3) {
     const valor = filtroTexto !== "" 
       ? col.replace("Resultado:", "").trim().replace(
@@ -448,6 +448,15 @@ columnas.forEach((col, idx) => {
           '<mark>$1</mark>'
         )
       : col.replace("Resultado:", "").trim();
+
+  // Columna 5 no muestra de referencia de 1° fila (idx === 5)
+  if (idx === 5) {
+    const valor = filtroTexto !== "" 
+      ? col.replace("Torneo:", "").trim().replace(
+          new RegExp(`(${filtroTexto})`, 'gi'), 
+          '<mark>$1</mark>'
+        )
+      : col.replace("Torneo:", "").trim();
 
     // 👇 lo metemos con su propia clase para darle estilo
     html += `<p class="resultado-celda">${valor}</p>`;
