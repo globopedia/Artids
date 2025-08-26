@@ -204,14 +204,22 @@ td img.partido-foto {
     }
 
 .resultado-celda {
-  font-size: 3rem !important;   /* más grande */
+  font-size: 2.7rem !important;   /* más grande */
   font-weight: bold;
   color: #DA291C;
   text-align: center;
   margin: 0.5rem 0;
 }
 
-    .torneo-celda {
+.rival-celda {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+  text-align: center;
+  margin: 0.2rem 0;
+}
+  
+  .torneo-celda {
   font-size: 1rem !important;
   font-weight: 100;
   text-align: center;
@@ -222,7 +230,7 @@ td img.partido-foto {
 }
 
 .escudo-huracan {
-  width: 22px;
+  width: 25px;
   height: auto;
   vertical-align: middle; /* esto sí lo baja/alinea con texto */
 }
@@ -482,27 +490,31 @@ filtradas.forEach(fila => {
       html += `<p class="torneo-celda">${valorFinal}</p>`;
     }
 
-    // Huracán / Rival (idx 8 y 9)
-    else if (condicion === "visitante" && idx === 8) {
-      // Primero Rival
-      html += `<p class="rival-celda"><strong>${etiquetas[9]}:</strong> ${rival}</p>`;
-      // Después Huracán con escudo
-      html += `<p class="huracan-celda">
-                 <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png"
-                      alt="Huracán" class="escudo-huracan">
-               </p>`;
-    }
-    else if (condicion === "visitante" && idx === 9) {
-      // ya mostrado arriba → skip
-      return;
-    }
-    else if (idx === 8) {
-      // Local o Neutral → siempre escudo de Huracán
-      html += `<p class="huracan-celda">
-                 <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png"
-                      alt="Huracán" class="escudo-huracan">
-               </p>`;
-    }
+// Huracán / Rival (idx 8 y 9)
+else if (condicion === "visitante" && idx === 8) {
+  // Primero Rival
+  html += `<p class="rival-celda"><strong>${etiquetas[9]}:</strong> ${rival}</p>`;
+  // Después Huracán con escudo + info
+  const valor = huracan.replace(
+    "Huracán:",
+    `<img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+          alt="Huracán" class="escudo-huracan">`
+  ).trim();
+  html += `<p class="huracan-celda">${valor}</p>`;
+}
+else if (condicion === "visitante" && idx === 9) {
+  // ya mostrado arriba → skip
+  return;
+}
+else if (idx === 8) {
+  // Local o Neutral → siempre escudo + info
+  const valor = col.replace(
+    "Huracán:",
+    `<img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+          alt="Huracán" class="escudo-huracan">`
+  ).trim();
+  html += `<p class="huracan-celda">${valor}</p>`;
+}
 
     // Todas las demás columnas
     else {
