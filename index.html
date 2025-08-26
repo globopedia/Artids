@@ -448,63 +448,71 @@ filtradas.forEach(fila => {
   const td = document.createElement("td");
 
   const columnas = parseCSVLine(fila);
-  const etiquetas = ["Fecha", "Res", "Condición", "Resultado", "Club", "Torneo", "Estadio", "Árbitro", "Huracán", "Rival", "Goles", "Expulsados", "Observaciones"];
+  const etiquetas = ["Fecha", "Condición", "Situación", "Resultado", "Club", "Torneo", "Estadio", "Árbitro", "Huracán", "Rival", "Goles", "Expulsados", "Observaciones"];
   let html = "";
 
-columnas.forEach((col, idx) => {
-  if (idx === 1 || idx === 2) return; // 👈 saltamos Res y Condición
+  // Condición del partido
+  const condicion = columnas[1]?.toLowerCase().trim(); // idx 1 = condición
+  const huracan = columnas[8];
+  const rival = columnas[9];
 
-  col = col.replace(/^"(.*)"$/, '$1');
+  columnas.forEach((col, idx) => {
+    if (idx === 1 || idx === 2) return; // 👈 saltamos Condición y Situación
 
-  // Columna 3 no muestra de referencia de 1° fila (idx === 3)
-  if (idx === 3) {
-    const valor = filtroTexto !== "" 
-      ? col.replace("Resultado:", "").trim().replace(
-          new RegExp(`(${filtroTexto})`, 'gi'), 
-          '<mark>$1</mark>'
-        )
-      : col.replace("Resultado:", "").trim();
+    col = col.replace(/^"(.*)"$/, '$1');
+    let valor = filtroTexto !== "" 
+        ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+        : col;
 
-    html += `<p class="resultado-celda">${valor}</p>`;
-  }
-  // Columna 5 no muestra de referencia de 1° fila (idx === 5)
-  else if (idx === 5) {
-    const valor = filtroTexto !== "" 
-      ? col.replace("Torneo:", "").trim().replace(
-          new RegExp(`(${filtroTexto})`, 'gi'), 
-          '<mark>$1</mark>'
-        )
-      : col.replace("Torneo:", "").trim();
+    // Resultado (idx 3) → sin prefijo
+    if (idx === 3) {
+      const limpio = col.replace("Resultado:", "").trim();
+      const valorFinal = filtroTexto !== "" 
+        ? limpio.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+        : limpio;
+      html += `<p class="resultado-celda">${valorFinal}</p>`;
+    }
 
-    html += `<p class="resultado-celda">${valor}</p>`;
-  } 
-  // Columna 8 no muestra de referencia de 1° fila (idx === 8)
-else if (idx === 8) { // columna Huracán
-  col = col.replace(/^"(.*)"$/, '$1');
+    // Torneo (idx 5) → sin prefijo
+    else if (idx === 5) {
+      const limpio = col.replace("Torneo:", "").trim();
+      const valorFinal = filtroTexto !== "" 
+        ? limpio.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
+        : limpio;
+      html += `<p class="torneo-celda">${valorFinal}</p>`;
+    }
 
-  const valor = col.replace("Huracán:", 
-    `<img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
-          alt="Huracán" class="escudo-huracan">`
-  ).trim();
+    // Huracán / Rival (idx 8 y 9)
+    else if (condicion === "visitante" && idx === 8) {
+      // Primero Rival
+      html += `<p class="rival-celda"><strong>${etiquetas[9]}:</strong> ${rival}</p>`;
+      // Después Huracán con escudo
+      html += `<p class="huracan-celda">
+                 <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png"
+                      alt="Huracán" class="escudo-huracan">
+               </p>`;
+    }
+    else if (condicion === "visitante" && idx === 9) {
+      // ya mostrado arriba → skip
+      return;
+    }
+    else if (idx === 8) {
+      // Local o Neutral → siempre escudo de Huracán
+      html += `<p class="huracan-celda">
+                 <img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png"
+                      alt="Huracán" class="escudo-huracan">
+               </p>`;
+    }
 
-  // Resaltar coincidencias si hay filtro de texto
-  const valorMarcado = filtroTexto !== "" 
-    ? valor.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
-    : valor;
-
-  html += `<p class="huracan-celda">${valorMarcado}</p>`;
-}
-else {
-    const valor = filtroTexto !== "" 
-      ? col.replace(new RegExp(`(${filtroTexto})`, 'gi'), '<mark>$1</mark>') 
-      : col;
-
-    html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
-  }
-});
+    // Todas las demás columnas
+    else {
+      html += `<p><strong>${etiquetas[idx]}:</strong> ${valor}</p>`;
+    }
+  });
 
   td.innerHTML = html;
 
+  // Adjuntar foto si corresponde
   const clave = Object.keys(fotos).find(k => fila.includes(k));
   if (clave) {
     const img = document.createElement("img");
