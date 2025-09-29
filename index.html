@@ -496,7 +496,7 @@ else if (condicion === "visitante" && idx === 8) {
   // Después Huracán con escudo + info
   const valor = huracan.replace(
     "Huracán:",
-    `<img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+    `<img src="https://globopedia.github.io/Lubs/Escudos/Huracán.png" 
           alt="Huracán" class="escudo-huracan">`
   ).trim();
   html += `<p class="huracan-celda">${valor}</p>`;
@@ -509,7 +509,7 @@ else if (idx === 8) {
   // Local o Neutral → siempre escudo + info
   const valor = col.replace(
     "Huracán:",
-    `<img src="https://globopedia.github.io/Rivales-Huracan/Escudos/Huracán.png" 
+    `<img src="https://globopedia.github.io/Lubs/Escudos/Huracán.png" 
           alt="Huracán" class="escudo-huracan">`
   ).trim();
   html += `<p class="huracan-celda">${valor}</p>`;
@@ -553,7 +553,7 @@ else if (idx === 8) {
     
      // === Carga rivales desde clubes.csv (columna "CLUB") ===
     async function poblarRivalesDesdeCSV() {
-      const url = "https://raw.githubusercontent.com/globopedia/Rivales-Huracan/main/clubes.csv";
+      const url = "https://raw.githubusercontent.com/globopedia/Lubs/main/clubes.csv";
       try {
         const resp = await fetch(url, { cache: "no-store" });
         const csv = await resp.text();
