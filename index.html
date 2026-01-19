@@ -393,14 +393,30 @@ const fotos = {
   "19/04/2016": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1xd16WsATEOxtdjkGlzO7d_iPgZ4sWwahwqKxNTe-ZiWk898YV5QV9ig-vtOEFQzmnfe2PSQhh_LStIRXmmm3ZNVzWQOEzUyHs3GH6_QuzKlMaJkmpbR5nI_X_GmdPpOUHedLCWL4CjWH/w400-h300/VS+ATL.NACIONAL.jpg",
   "26/04/2016": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg55CaZOh0CvGf_Xk799hYSjRz73h-qH51kXEYnYQznYv41hEmlcUlDDWuap7AGQPLx3XBeEu92prPBj9mlRynvTmMncPmQNAmEChDA6IqLOSs0ry-KGTLcGB24IFPxeP7LQKRzm_lrIhie/w400-h300/VS+ATLE.NACIONAL+2.jpg",
   "03/05/2016": "https://blogger.googleusercontent.com/img/a/AVvXsEhOoWxgwZlYNW_0ogasYpk3pHII3wbdA0n_9QIiLoMKR1g6o51zQLMjA-O-YH__mtKrx_Yj5Z8jusvPJ75VLFSSW-cK-wK547w6Dg80VL8AwhYel3QA4aPKVOeWRNloE-mKOJwCtUSLkxAGBBIAl3kt__p_C_GC5iTjfL7wb4vIHo8GHvLoGaQ-fnhhEeSE=w400-h300"
-};
+  };
+
   async function cargarCSV() {
-    const respuesta = await fetch("Encuentros_Huracan.csv");
+  const archivos = [
+    "Artids2000.csv",
+    "Encuentros_Huracan.csv",
+  ];
+
+  let todasLasFilas = [];
+
+  for (const archivo of archivos) {
+    const respuesta = await fetch(archivo);
+    if (!respuesta.ok) {
+      throw new Error("No se pudo cargar " + archivo);
+    }
+
     const texto = await respuesta.text();
-    const filas = texto.trim().split('\n').slice(1);
-    return filas;
+    const filas = texto.trim().split("\n").slice(1);
+    todasLasFilas = todasLasFilas.concat(filas);
   }
 
+  return todasLasFilas;
+}
+  
 function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado) {
   const cuerpo = document.getElementById("tabla-cuerpo");
   const mensaje = document.getElementById("mensaje-vacio");
