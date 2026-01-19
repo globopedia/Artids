@@ -395,7 +395,28 @@ const fotos = {
   "03/05/2016": "https://blogger.googleusercontent.com/img/a/AVvXsEhOoWxgwZlYNW_0ogasYpk3pHII3wbdA0n_9QIiLoMKR1g6o51zQLMjA-O-YH__mtKrx_Yj5Z8jusvPJ75VLFSSW-cK-wK547w6Dg80VL8AwhYel3QA4aPKVOeWRNloE-mKOJwCtUSLkxAGBBIAl3kt__p_C_GC5iTjfL7wb4vIHo8GHvLoGaQ-fnhhEeSE=w400-h300"
   };
 
-async function cargarCSV() { const respuesta = await fetch("Encuentros_Huracan.csv"); const texto = await respuesta.text(); const filas = texto.trim().split('\n').slice(1); return filas; }
+async function cargarCSV() {
+  const archivos = [
+    "Artids2000.csv",
+    "Encuentros_Huracan.csv"
+  ];
+
+  let filasTotales = [];
+
+  for (const archivo of archivos) {
+    const respuesta = await fetch(archivo);
+    if (!respuesta.ok) {
+      console.error("No se pudo cargar:", archivo);
+      continue;
+    }
+
+    const texto = await respuesta.text();
+    const filas = texto.trim().split("\n").slice(1); // saltea encabezado
+    filasTotales = filasTotales.concat(filas);
+  }
+
+  return filasTotales;
+}
   
 function mostrarFilas(filas, filtroTexto, competenciaSeleccionada, condicionesActivas, resultadosActivos, rivalSeleccionado, anioSeleccionado) {
   const cuerpo = document.getElementById("tabla-cuerpo");
