@@ -56,6 +56,44 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 21/08/1983,Sosa,neutral,empate,0,0,Ind. Santa Fe (Colombia),Amistoso 1983,Romelio Martínez (Barranquilla),sin datos,sin datos,sin datos,foto,45,90
 24/08/1983,Sosa,visitante,empate,0,0,Unión Magdalena (Colombia),1° fecha del Trofeo Cartagena de Indias 1983,Eduardo Santos (Santa Marta),sin datos,sin datos,sin datos,foto,45,90
 26/08/1983,Sosa,visitante,victoria,2,1,Junior (Colombia),2° fecha del Trofeo Cartagena de Indias 1983,Romelio Martínez (Barranquilla),sin datos,sin datos,sin datos,foto,16 GOL Claudio Morresi (HUR)</br>77 GOL Claudio García (HUR)</br>83 GOL Edgardo Bauza (JUN) -penal-,45,90
+14/08/1999,Babington,visitante,derrota,0,1,Español,1° fecha del Nacional B 1999/2000
+21/08/1999,Babington,local,empate,2,2,San Miguel,2° fecha del Nacional B 1999/2000
+29/08/1999,Babington,visitante,victoria,3,0,Temperley,3° fecha del Nacional B 1999/2000
+06/09/1999,Babington,local,Victoria,4,1,Arsenal,4° fecha del Nacional B 1999/2000
+11/09/1999,Babington,visitante,victoria,2,1,Nueva Chicago,5° fecha del Nacional B 1999/2000
+19/09/1999,Babington,local,Victoria,1,0,Central Córdoba (Rosario) ,6° fecha del Nacional B 1999/2000
+25/09/1999,Babington,visitante,victoria,3,2,Defensa y Justicia,7° fecha del Nacional B 1999/2000
+02/10/1999,Babington,local,empate,0,0,Morón,8° fecha del Nacional B 1999/2000
+10/10/1999,Babington,visitante,victoria,2,1,Tigre,9° fecha del Nacional B 1999/2000
+16/10/1999,Babington,visitante,empate,2,2,Los Andes,10° fecha del Nacional B 1999/2000
+30/10/1999,Babington,local,Victoria,2,1,Banfield,11° fecha del Nacional B 1999/2000
+06/11/1999,Babington,visitante,victoria,1,0,El Porvenir,12° fecha del Nacional B 1999/2000
+13/11/1999,Babington,local,derrota,1,3,Platense,13° fecha del Nacional B 1999/2000
+20/11/1999,Babington,visitante,victoria,4,2,All Boys,14° fecha del Nacional B 1999/2000
+27/11/1999,Babington,local,empate,1,1,Argentino (Rosario) ,15° fecha del Nacional B 1999/2000
+05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
+12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
+18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+05/02/2000,Babington,visitante,empate,3,3,San Miguel,19° fecha del Nacional B 1999/2000
+13/02/2000,Babington,local,victoria,3,1,Temperley,20° fecha del Nacional B 1999/2000
+19/02/2000,Babington,visitante,victoria,2,0,Arsenal,21° fecha del Nacional B 1999/2000
+26/02/2000,Babington,local,victoria,4,1,Nueva Chicago,22° fecha del Nacional B 1999/2000
+04/03/2000,Babington,visitante,derrota,0,1,Central Córdoba (Rosario) ,23° fecha del Nacional B 1999/2000
+11/03/2000,Babington,local,empate,1,1,Defensa y Justicia,24° fecha del Nacional B 1999/2000
+18/03/2000,Babington,visitante,victoria,2,1,Morón,25° fecha del Nacional B 1999/2000
+25/03/2000,Babington,local,Victoria,2,1,Tigre,26° fecha del Nacional B 1999/2000
+02/04/2000,Babington,local,derrota,0,1,Los Andes,27° fecha del Nacional B 1999/2000
+08/04/2000,Babington,visitante,derrota,0,1,Banfield,28° fecha del Nacional B 1999/2000
+15/04/2000,Babington,local,empate,2,2,El Porvenir,29° fecha del Nacional B 1999/2000
+23/04/2000,Babington,visitante,victoria,2,1,Platense,30° fecha del Nacional B 1999/2000
+06/05/2000,Babington,local,Victoria,6,0,All Boys,31° fecha del Nacional B 1999/2000
+14/05/2000,Babington,visitante,victoria,5,0,Argentino (Rosario) ,32° fecha del Nacional B 1999/2000
+20/05/2000,Babington,local,empate,2,2,Quilmes,33° fecha del Nacional B 1999/2000
+28/05/2000,Babington,visitante,derrota,1,2,Almagro,34° fecha del Nacional B 1999/2000
+04/06/2000,Babington,visitante,victoria,2,1,San Martín (Mendoza),Semifinal del Nacional B 1999/2000
+10/06/2000,Babington,local,derrota,0,1,San Martín (Mendoza),Semifinal del Nacional B 1999/2000
+17/06/2000,Babington,visitante,victoria,1,0,Quilmes,Final del Nacional B 1999/2000
+25/06/2000,Babington,local,empate,1,1,Quilmes,Final del Nacional B 1999/2000
 30/07/2000,Babington,visitante,empate,1,1,Colón (Santa Fe),1° fecha del Campeonato Apertura 2000
 04/08/2000,Babington,local,victoria,3,1,Rosario Central,2° fecha del Campeonato Apertura 2000
 20/08/2000,Babington,visitante,victoria,2,0,Independiente,3° fecha del Campeonato Apertura 2000
@@ -357,6 +395,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 29/11/2008,Cappa,local,derrota,1,4,San Lorenzo de Almagro,17° fecha del Campeonato Apertura 2008,La Bombonera,Saúl Laverni,"Alejandro Limia; Carlos Araujo, Paolo Golt, Diego Herner y Carlos Arano; Leandro J Díaz (74 Ariel Cólzera), Gastón Esmerado, Hugo Barrientos y César González; Javier Pastore y Hernán Barcos.","Agustín Orión; Gastón Aguirre, Nicolás Bianchi Arce, Fernando Meza (17 Diego Rivero (43 Juan C. Menseguez)) y Aureliano Torres; Hernán A González, Cristian Ledesma (65 Cristian M Chávez), Juan M. Torres y Santiago Solari (71 Santiago Hirsig); Andrés Silvera y Gonzalo Bergessio.",https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9DYDTE9clUfKTbo_5wH6NN0fFXlHjwLauLclZY34y9MUy1mxdBbQBcusNjG8ihFVcvqm0C7RjVp9c8QaSvC247evK7aMkb9LETcxnsu5ukHPcI5woidPA5HA6lceBn33BtCTiTE4BPnT-/w600-h400/2010-04-18.jpg,10 GOL Paolo Goltz (HUR)</br>14 EXP Javier Pastore (HUR)</br><b>Suspendido a los 16 por lluvia, continuó el 02/12/2025</b></br>41 GOL Aureliano Torres (SLO) -cabezazo-</br><b>1° Tiempo: Huracán 1x1 San Lorenzo</b></br>53 GOL Cristian M Chávez (SLO) -cabezazo-</br>62 GOL Andrés Silvera (SLO) -cabezazo-</br>72 GOL Andrés Silvera (SLO),45,90
 06/12/2008,Cappa,visitante,derrota,0,1,Arsenal,18° fecha del Campeonato Apertura 2008,El Viaducto,Gabriel Brazenas,"Gastón Monzón; Carlos Araujo, Paolo Goltz, Diego Herner e Iván Nadal; Patricio Toranzo (78 Luciano Nieto), Gastón Esmerado (46 Ariel Cólzera), Hugo Barrientos y Sergio Meza Sánchez; César González y Hernán Barcos.","Cristian Campestrini; Sergio Sena, Carlos Casteglione, Javier Gandolfi (60 Mariano Brau) y Damián Pérez (89 Cristian Díaz), Sebastián Carrera, Cristian Pellerano, Matías Carabajal (76 Iván Marcone) y Javier Yacuzzi; Alejandro Gómez y Mauro Matos.",https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXOOWuKy0fD5qgzXcmBhPz6BlmREhbzcmY7Z_aepoqJj0GrX_3TSN1cntLgLuWoqHF1VAERgDN8z1avEZoLXflwHLdWloHPAClQLgU4TIzG5wHfGwXaXY0lMo-yXyKIAysLBQv31RnawAf/w600-h400/VS+ARSENAL.jpg,35 GOL Mauro Matos (ARS)</br>1° Tiempo: Arsenal 1x0 Huracán,45,90
 13/12/2008,Cappa,local,victoria,3,0,Vélez Sarsfield,19° fecha del Campeonato Apertura 2008,Tomás A. Ducó,Jorge Baliño,"Gastón Monzón; Carlos Araujo, Ezequiel Filippetto (59 Gastón Esmerado), Kevin Cura y Carlos Arano; Leandro J Díaz, Hugo Barrientos, César González y Javier Pastore; Hernán Barcos (39 Ariel Cólzera) y Matías Defederico (73 Patricio Toranzo).","Marcelo Barovero; Mariano Uglessich, Fernando Tobio, Marco Torsiglieri y Emiliano Papa; Nicolás Cabrera (46 Leonel Cigno), Leandro Coronel (56 Pablo Lima), Alejandro Cabral y Leandro Velázquez (70 Leonardo Piris); Hernán López y Roberto Nanni.",https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrdSizklNZLn1rqn6rAhFOL-WIhK0-kWDQft93EXeMNNfkUCZ2BFJ-TXVktzfF4ejZ5Fwh-3Q1f6r5RpJ3In4EpOMsePltDUK-KdASKV6NovoLH5kRC6eVDQO5BS_zXz6fPBOM-RHaAaeo/w600-h400/VS+VELEZ+1.jpg,15 GOL Matías Defederico (HUR)</br>42 GOL César González (HUR)</br><b>1° Tiempo: Huracán 2x0 Vélez</b></br>48 GOL Javier Pastore (HUR)</br>49 EXP Marco Torsiglieri (VEL),45,90
+
 
 
 
