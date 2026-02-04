@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ranking de rendimiento — Huracán</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background:#f8f8f8;
+      margin:20px;
+    }
+    h2 {
+      color:#b30000;
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+      background:white;
+    }
+    th, td {
+      padding:8px;
+      border-bottom:1px solid #ddd;
+      text-align:center;
+      font-size:14px;
+    }
+    th {
+      background:#eee;
+    }
+    td.nombre {
+      text-align:left;
+      font-weight:bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📊 Ranking de rendimiento — Futbolistas de Huracán</h2>
+
+<div id="ranking">Cargando datos...</div>
+
+<script>
+/* =========================
+   FUNCIONES BASE
+========================= */
+
+function norm(t) {
+  return (t || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+/* =========================
+   OBTENER FUTBOLISTAS
+========================= */
+
+function obtenerFutbolistasUnicos(encuentros) {
+  const set = new Set();
+
+  encuentros.forEach(p => {
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+
+    jugadores.forEach(j => set.add(j));
+  });
+
+  return Array.from(set);
+}
+
+/* =========================
+   CALCULAR RENDIMIENTO
+========================= */
+
+function calcularRendimientoFutbolista(nombre, encuentros) {
+
+  const partidos = encuentros.filter(p => {
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+
+    return jugadores.some(j => norm(j) === norm(nombre));
+  });
+
+  if (!partidos.length) return null;
+
+  const total = partidos.length;
+  const ganados = partidos.filter(p => norm(p.Situación) === "victoria").length;
+  const empatados = partidos.filter(p => norm(p.Situación) === "empate").length;
+
+  const efectividad = ((ganados * 3 + empatados) * 100 / (total * 3));
+
+  return {
+    nombre,
+    partidos: total,
+    efectividad: Number(efectividad.toFixed(1))
+  };
+}
+
+/* =========================
+   GENERAR RANKING
+========================= */
+
+function generarRanking(encuentros) {
+
+  const nombres = obtenerFutbolistasUnicos(encuentros);
+
+  return nombres
+    .map(n => calcularRendimientoFutbolista(n, encuentros))
+    .filter(Boolean)
+    .sort((a, b) => b.efectividad - a.efectividad);
+}
+
+/* =========================
+   RENDER
+========================= */
+
+function renderRanking(ranking) {
+
+  const cont = document.getElementById("ranking");
+
+  cont.innerHTML = `
+    <table>
+      <tr>
+        <th>#</th>
+        <th>Futbolista</th>
+        <th>PJ</th>
+        <th>Efectividad</th>
+      </tr>
+      ${ranking.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td class="nombre">${r.nombre}</td>
+          <td>${r.partidos}</td>
+          <td>${r.efectividad}%</td>
+        </tr>
+      `).join("")}
+    </table>
+  `;
+}
+
+/* =========================
+   CARGA DEL CSV
+========================= */
+
+Papa.parse("Artids2000.csv", {
+  download: true,
+  header: true,
+  complete: res => {
+    const encuentros = res.data;
+    const ranking = generarRanking(encuentros);
+    renderRanking(ranking);
+  }
+});
+</script>
+
+</body>
+</html>
