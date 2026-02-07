@@ -109,7 +109,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 29/08/1987,D’Accorso,visitante,victoria,3,0,Italiano,5° fecha del Nacional B 1987/88
 05/09/1987,D’Accorso,local,victoria,1,0,Guaraní A. Franco (Posadas),6° fecha del Nacional B 1987/88
 12/09/1987,D’Accorso,visitante,victoria,2,0,Lanús,7° fecha del Nacional B 1987/88
-19/09/1987,D’Accorso,local,derrota,0,1,Mandiyú,8° fecha del Nacional B 1987/88
+19/09/1987,D’Accorso,local,derrota,0,1,Mandiyú (Corrientes),8° fecha del Nacional B 1987/88
 27/09/1987,D’Accorso,visitante,victoria,2,1,Cipolletti (Confluencia),9° fecha del Nacional B 1987/88
 03/10/1987,D’Accorso,local,victoria,2,1,Tigre,10° fecha del Nacional B 1987/88
 10/10/1987,D’Accorso,visitante,derrota,0,3,Atl. Tucumán,11° fecha del Nacional B 1987/88
@@ -133,9 +133,9 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 27/02/1988,Viberti,visitante,victoria,2,0,Mandiyú (Corrientes),29° fecha del Nacional B 1987/88
 05/03/1988,Viberti,local,victoria,1,0,Cipolletti (Confluencia),30° fecha del Nacional B 1987/88
 14/03/1988,Viberti,visitante,derrota,1,2,Tigre,31° fecha del Nacional B 1987/88
-19/03/1988,Viberti,local,derrota,0,1,Gimnasia (Jujuy),32° fecha del Nacional B 1987/88
-28/03/1988,Viberti,visitante,derrota,2,4,Los Andes,33° fecha del Nacional B 1987/88
-31/03/1988,Viberti,local,victoria,2,1,Atl. Tucumán,34° fecha del Nacional B 1987/88
+19/03/1988,Viberti,visitante,derrota,0,1,Gimnasia (Jujuy),33° fecha del Nacional B 1987/88
+28/03/1988,Viberti,local,derrota,2,4,Los Andes,34° fecha del Nacional B 1987/88
+31/03/1988,Viberti,local,victoria,2,1,Atl. Tucumán,32° fecha del Nacional B 1987/88
 03/04/1988,Viberti,visitante,empate,0,0,Colón (Santa Fe),35° fecha del Nacional B 1987/88
 09/04/1988,Viberti,local,victoria,2,1,Alte. Brown,36° fecha del Nacional B 1987/88
 16/04/1988,Viberti,visitante,empate,0,0,Douglas Haig (Pergamino),37° fecha del Nacional B 1987/88
@@ -686,6 +686,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 29/11/2008,Cappa,local,derrota,1,4,San Lorenzo,17° fecha del Campeonato Apertura 2008,La Bombonera,Saúl Laverni,"Alejandro Limia; Carlos Araujo, Paolo Goltz, Diego Herner y Carlos Arano; Leandro J Díaz (74 Ariel Cólzera), Gastón Esmerado, Hugo Barrientos y César González; Javier Pastore y Hernán Barcos.","Agustín Orión; Gastón Aguirre, Nicolás Bianchi Arce, Fernando Meza (17 Diego Rivero (43 Juan C. Menseguez)) y Aureliano Torres; Hernán A González, Cristian Ledesma (65 Cristian M Chávez), Juan M. Torres y Santiago Solari (71 Santiago Hirsig); Andrés Silvera y Gonzalo Bergessio.",https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9DYDTE9clUfKTbo_5wH6NN0fFXlHjwLauLclZY34y9MUy1mxdBbQBcusNjG8ihFVcvqm0C7RjVp9c8QaSvC247evK7aMkb9LETcxnsu5ukHPcI5woidPA5HA6lceBn33BtCTiTE4BPnT-/w600-h400/2010-04-18.jpg,10 GOL Paolo Goltz (HUR)</br>14 EXP Javier Pastore (HUR)</br><b>Suspendido a los 16 por lluvia, continuó el 02/12/2025</b></br>41 GOL Aureliano Torres (SLO) -cabezazo-</br><b>1° Tiempo: Huracán 1x1 San Lorenzo</b></br>53 GOL Cristian M Chávez (SLO) -cabezazo-</br>62 GOL Andrés Silvera (SLO) -cabezazo-</br>72 GOL Andrés Silvera (SLO),45,90
 06/12/2008,Cappa,visitante,derrota,0,1,Arsenal,18° fecha del Campeonato Apertura 2008,El Viaducto,Gabriel Brazenas,"Gastón Monzón; Carlos Araujo, Paolo Goltz, Diego Herner e Iván Nadal; Patricio Toranzo (78 Luciano Nieto), Gastón Esmerado (46 Ariel Cólzera), Hugo Barrientos y Sergio Meza Sánchez; César González y Hernán Barcos.","Cristian Campestrini; Sergio Sena, Carlos Casteglione, Javier Gandolfi (60 Mariano Brau) y Damián Pérez (89 Cristian Díaz), Sebastián Carrera, Cristian Pellerano, Matías Carabajal (76 Iván Marcone) y Javier Yacuzzi; Alejandro Gómez y Mauro Matos.",https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXOOWuKy0fD5qgzXcmBhPz6BlmREhbzcmY7Z_aepoqJj0GrX_3TSN1cntLgLuWoqHF1VAERgDN8z1avEZoLXflwHLdWloHPAClQLgU4TIzG5wHfGwXaXY0lMo-yXyKIAysLBQv31RnawAf/w600-h400/VS+ARSENAL.jpg,35 GOL Mauro Matos (ARS)</br>1° Tiempo: Arsenal 1x0 Huracán,45,90
 13/12/2008,Cappa,local,victoria,3,0,Vélez Sarsfield,19° fecha del Campeonato Apertura 2008,Tomás A. Ducó,Jorge Baliño,"Gastón Monzón; Carlos Araujo, Ezequiel Filippetto (59 Gastón Esmerado), Kevin Cura y Carlos Arano; Leandro J Díaz, Hugo Barrientos, César González y Javier Pastore; Hernán Barcos (39 Ariel Cólzera) y Matías Defederico (73 Patricio Toranzo).","Marcelo Barovero; Mariano Uglessich, Fernando Tobio, Marco Torsiglieri y Emiliano Papa; Nicolás Cabrera (46 Leonel Cigno), Leandro Coronel (56 Pablo Lima), Alejandro Cabral y Leandro Velázquez (70 Leonardo Piris); Hernán López y Roberto Nanni.",https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrdSizklNZLn1rqn6rAhFOL-WIhK0-kWDQft93EXeMNNfkUCZ2BFJ-TXVktzfF4ejZ5Fwh-3Q1f6r5RpJ3In4EpOMsePltDUK-KdASKV6NovoLH5kRC6eVDQO5BS_zXz6fPBOM-RHaAaeo/w600-h400/VS+VELEZ+1.jpg,15 GOL Matías Defederico (HUR)</br>42 GOL César González (HUR)</br><b>1° Tiempo: Huracán 2x0 Vélez</b></br>48 GOL Javier Pastore (HUR)</br>49 EXP Marco Torsiglieri (VEL),45,90
+
 
 
 
