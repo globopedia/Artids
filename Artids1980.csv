@@ -98,10 +98,10 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 14/04/1987,Leone,visitante,derrota,0,4,Tigre,40° fecha del Nacional B 1986/87
 18/04/1987,Leone,local,victoria,4,1,Chaco For Ever,41° fecha del Nacional B 1986/87
 02/05/1987,Tardivo,visitante,derrota,1,4,Armenio,42° fecha del Nacional B 1986/87
-09/05/1987,Tardivo,victoria,1,0,Mandiyú (Corrientes),4to de final del Octogonal 1987
-16/05/1987,Tardivo,victoria,1,0,Mandiyú (Corrientes),4to de final del Octogonal 1987
-23/05/1987,Tardivo,derrota,0,1,Belgrano (Córdoba),Semifinal del Octogonal 1987
-30/05/1987,Tardivo,derrota,1,2,Belgrano (Córdoba),Semifinal del Octogonal 1987
+09/05/1987,Tardivo,visitante,victoria,1,0,Mandiyú (Corrientes),4to de final del Octogonal NB 1987
+16/05/1987,Tardivo,local,victoria,1,0,Mandiyú (Corrientes),4to de final del Octogonal NB 1987
+23/05/1987,Tardivo,visitante,derrota,0,1,Belgrano (Córdoba),Semifinal del Octogonal NB 1987
+30/05/1987,Tardivo,local,derrota,1,2,Belgrano (Córdoba),Semifinal del Octogonal NB 1987
 02/08/1987,D'Accorso,visitante,victoria,2,1,Central Córdoba (Santiago),1° fecha del Nacional B 1987/88
 08/08/1987,D'Accorso,local,derrota,1,2,Dep. Maipú (Mendoza),2° fecha del Nacional B 1987/88
 17/08/1987,D'Accorso,visitante,victoria,1,0,Temperley,3° fecha del Nacional B 1987/88
@@ -541,6 +541,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
