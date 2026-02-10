@@ -102,23 +102,23 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 16/05/1987,Tardivo,victoria,1,0,Mandiyú (Corrientes),4to de final del Octogonal 1987
 23/05/1987,Tardivo,derrota,0,1,Belgrano (Córdoba),Semifinal del Octogonal 1987
 30/05/1987,Tardivo,derrota,1,2,Belgrano (Córdoba),Semifinal del Octogonal 1987
-02/08/1987,D’Accorso,visitante,victoria,2,1,Central Córdoba (Santiago),1° fecha del Nacional B 1987/88
-08/08/1987,D’Accorso,local,derrota,1,2,Dep. Maipú (Mendoza),2° fecha del Nacional B 1987/88
-17/08/1987,D’Accorso,visitante,victoria,1,0,Temperley,3° fecha del Nacional B 1987/88
-22/08/1987,D’Accorso,local,victoria,2,1,Belgrano (Córdoba),4° fecha del Nacional B 1987/88
-29/08/1987,D’Accorso,visitante,victoria,3,0,Italiano,5° fecha del Nacional B 1987/88
-05/09/1987,D’Accorso,local,victoria,1,0,Guaraní A. Franco (Posadas),6° fecha del Nacional B 1987/88
-12/09/1987,D’Accorso,visitante,victoria,2,0,Lanús,7° fecha del Nacional B 1987/88
-19/09/1987,D’Accorso,local,derrota,0,1,Mandiyú (Corrientes),8° fecha del Nacional B 1987/88
-27/09/1987,D’Accorso,visitante,victoria,2,1,Cipolletti (Confluencia),9° fecha del Nacional B 1987/88
-03/10/1987,D’Accorso,local,victoria,2,1,Tigre,10° fecha del Nacional B 1987/88
-10/10/1987,D’Accorso,visitante,derrota,0,3,Atl. Tucumán,11° fecha del Nacional B 1987/88
-17/10/1987,D’Accorso,local,victoria,2,0,Gimnasia (Jujuy),12° fecha del Nacional B 1987/88
-24/10/1987,D’Accorso,visitante,empate,0,0,Los Andes,13° fecha del Nacional B 1987/88
-31/10/1987,D’Accorso,local,empate,0,0,Colón (Santa Fe),14° fecha del Nacional B 1987/88
-07/11/1987,D’Accorso,visitante,derrota,1,2,Alte. Brown,15° fecha del Nacional B 1987/88
-14/11/1987,D’Accorso,local,empate,2,2,Douglas Haig (Pergamino),16° fecha del Nacional B 1987/88
-21-11-1987,Cantú,visitante,derrota,0,1,Quilmes,17° fecha del Nacional B 1987/88
+02/08/1987,D'Accorso,visitante,victoria,2,1,Central Córdoba (Santiago),1° fecha del Nacional B 1987/88
+08/08/1987,D'Accorso,local,derrota,1,2,Dep. Maipú (Mendoza),2° fecha del Nacional B 1987/88
+17/08/1987,D'Accorso,visitante,victoria,1,0,Temperley,3° fecha del Nacional B 1987/88
+22/08/1987,D'Accorso,local,victoria,2,1,Belgrano (Córdoba),4° fecha del Nacional B 1987/88
+29/08/1987,D'Accorso,visitante,victoria,3,0,Italiano,5° fecha del Nacional B 1987/88
+05/09/1987,D'Accorso,local,victoria,1,0,Guaraní A. Franco (Posadas),6° fecha del Nacional B 1987/88
+12/09/1987,D'Accorso,visitante,victoria,2,0,Lanús,7° fecha del Nacional B 1987/88
+19/09/1987,D'Accorso,local,derrota,0,1,Mandiyú (Corrientes),8° fecha del Nacional B 1987/88
+27/09/1987,D'Accorso,visitante,victoria,2,1,Cipolletti (Confluencia),9° fecha del Nacional B 1987/88
+03/10/1987,D'Accorso,local,victoria,2,1,Tigre,10° fecha del Nacional B 1987/88
+10/10/1987,D'Accorso,visitante,derrota,0,3,Atl. Tucumán,11° fecha del Nacional B 1987/88
+17/10/1987,D'Accorso,local,victoria,2,0,Gimnasia (Jujuy),12° fecha del Nacional B 1987/88
+24/10/1987,D'Accorso,visitante,empate,0,0,Los Andes,13° fecha del Nacional B 1987/88
+31/10/1987,D'Accorso,local,empate,0,0,Colón (Santa Fe),14° fecha del Nacional B 1987/88
+07/11/1987,D'Accorso,visitante,derrota,1,2,Alte. Brown,15° fecha del Nacional B 1987/88
+14/11/1987,D'Accorso,local,empate,2,2,Douglas Haig (Pergamino),16° fecha del Nacional B 1987/88
+21/11/1987,Cantú,visitante,derrota,0,1,Quilmes,17° fecha del Nacional B 1987/88
 28/11/1987,Viberti,visitante,empate,1,1,Chaco For Ever,18° fecha del Nacional B 1987/88
 06/12/1987,Viberti,local,victoria,2,0,Defensa y Justicia,19° fecha del Nacional B 1987/88
 12/12/1987,Viberti,visitante,derrota,1,2,Ferro C. Oeste (Gral. Pico),20° fecha del Nacional B 1987/88
@@ -495,4 +495,5 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
