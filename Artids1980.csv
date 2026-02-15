@@ -64,7 +64,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 27/02/1985,Guerra,visitante,empate,1,1,Atl. Santa Rosa,Amistoso
 03/03/1985,Guerra,visitante,empate,1,1,Independiente,3° fecha del Campeonato Nacional “Gral. San Martín”,Doble Visera,-,-,-,foto,GOL Claudio Morresi (HUR)
 06/03/1985,Guerra,visitante,derrota,0,1,Talleres (Córdoba),4° fecha del Campeonato Nacional Gral. San Martín,Mundialista (Córdoba)
-10-3-1985,Guerra,local,victoria,4,3,Independiente,5° fecha del Campeonato Nacional Gral. San Martín,Tomás A. Ducó,-,-,-,foto,GOL Claudio MorresixxxGOL Mendoza (HUR)xxxGOL Claudio García (HUR)
+10/03/1985,Guerra,local,victoria,4,3,Independiente,5° fecha del Campeonato Nacional Gral. San Martín,Tomás A. Ducó,-,-,-,foto,GOL Claudio MorresixxxGOL Mendoza (HUR)xxxGOL Claudio García (HUR)
 17/03/1985,Guerra,visitante,derrota,1,2,Guaraní A. Franco (Posadas),6° fecha del Campeonato Nacional Gral. San Martín,Guaraní (Posadas),-,-,-,foto,GOL Claudio García (HUR)
 20/03/1985,Guerra,local,victoria,2,1,Racing (Córdoba),2° fase del Campeonato Nacional “Gral. San Martín”,Tomás A. Ducó,-,-,-,foto,GOL Claudio García (HUR)xxxGOL Claudio Morresi (HUR)
 24/03/1985,Guerra,visitante,empate,1,1,Racing (Córdoba),2° fase del Nacional Gral. San Martín,Nueva Italia (Córdoba),-,-,-,foto,GOL Néstor Candedo (HUR)
@@ -102,17 +102,17 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 18/12/1985,Varacka,visitante,victoria,3,1,Talleres (Córdoba),24° fecha del Campeonato 1985/86
 19/01/1986,Varacka,local,victoria,3,0,Racing (Córdoba),25° fecha del Campeonato 1985/86
 26/01/1986,Varacka,visitante,0,4,Newell’s Old Boys (Rosario),26° fecha del Campeonato 1985/86
-02/02/1986,Dellacha,empate,0,Vélez Sarsfield,27° fecha del Campeonato 1985/86
-09/02/1986,Dellacha,victoria,2,1,Gimnasia (La Plata),28° fecha del Campeonato 1985/86
-16/02/1986,Dellacha,victoria,4,0,Español,29° fecha del Campeonato 1985/86
-23/02/1986,Dellacha,derrota,3,4,Boca Juniors,30° fecha del Campeonato 1985/86
-26/02/1986,Dellacha,empate,3,3,Ferro C. Oeste,31° fecha del Campeonato 1985/86
-02/03/1986,Dellacha,derrota,1,3,Platense,32° fecha del Campeonato 1985/86
-09/03/1986,Dellacha,victoria,2,1,Temperley,33° fecha del Campeonato 1985/86
+02/02/1986,Dellacha,local,empate,0,Vélez Sarsfield,27° fecha del Campeonato 1985/86
+09/02/1986,Dellacha,visitante,victoria,2,1,Gimnasia (La Plata),28° fecha del Campeonato 1985/86
+16/02/1986,Dellacha,local,victoria,4,0,Español,29° fecha del Campeonato 1985/86
+23/02/1986,Dellacha,visitante,derrota,3,4,Boca Juniors,30° fecha del Campeonato 1985/86
+26/02/1986,Dellacha,local,empate,3,3,Ferro C. Oeste,31° fecha del Campeonato 1985/86
+02/03/1986,Dellacha,visitante,derrota,1,3,Platense,32° fecha del Campeonato 1985/86
+09/03/1986,Dellacha,local,victoria,2,1,Temperley,33° fecha del Campeonato 1985/86
 16/03/1986,Dellacha,visitante,victoria,3,0,Instituto,34° fecha del Campeonato 1985/86
 06/04/1986,Dellacha,local,derrota,0,1,Unión (Santa Fe),36° fecha del Campeonato 1985/86
-13/04/1986,Dellacha,victoria,3,2,Estudiantes (La Plata),37° fecha del Campeonato 1985/86
-20/04/1986,Dellacha,empate,1,1,San Lorenzo de Almagro,38° fecha del Campeonato 1985/86
+13/04/1986,Dellacha,visitante,victoria,3,2,Estudiantes (La Plata),37° fecha del Campeonato 1985/86
+20/04/1986,Dellacha,local,empate,1,1,San Lorenzo de Almagro,38° fecha del Campeonato 1985/86
 04/06/1986,Dellacha,local,victoria,2,0,Lanús,4to de final del Octogonal 1986,Ferro,Pérez,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina (80 Carrizo), Claudio Cabrera y Claudio García; José Iglesias, Labaroni y Héctor Herrero.","Osvaldo Santos; Antonio Váttimos, Luis Sánchez Sotelo, Ricardo Demagistris y Juan C Ramírez; Rolando Bertolini, Ángel Mamberto y Héctor Vicente (70 Hugo Lacava Schell); Sergio Saturno, Leonardo Rodríguez y Gilmar Villagrán (51 Rubén Rojas).",foto,44 GOL Héctor Herrero (HUR)</br>51 GOL Claudio García (HUR)
 07/06/1986,Dellacha,visitante,victoria,3,2,Lanús,4to de final del Octogonal 1986,Monumental,Carlos Mastrángelo,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina (73 José Zuttión), Claudio Cabrera y Claudio García; José Iglesias, Labaroni y Héctor Herrero.","Osvaldo Santos; Juan C Ramírez, Luis Sánchez Sotelo, Ricardo Demagistris y José Serrizuela; Rolando Bertolini, Ángel Mamberto (46 Oscar Lebioso), Néstor Sicher; Sergio Saturno, Rubén Rojas y Leonardo Rodríguez (61 Hugo Lacava Schell).",foto,23 GOL Daniel Messina (HUR) </br>27 GOL Claudio García (HUR)</br>55 GOL Héctor Herrero (HUR)</br>73 GOL Rojas (LAN) </br>77 GOL José Serrizuela (LAN)
 11/06/1986,Dellacha,local,victoria,1,0,Los Andes,Semifinal del Octogonal 1986,José Amalfitani,Jorge Borrelli,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni.","Panciroli; Escobedo, Cuffaro Russo, Medina y Meza; Pizzo, Castro y Galloni, Ariel Paolorossi, Alarcón y Cuellos.",foto,11 GOL Claudio García (HUR).
@@ -641,6 +641,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
