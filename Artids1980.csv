@@ -50,12 +50,12 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 26/08/1975,Delem,visitante,victoria,2,1,Ind. Santa Fe (Colombia),El Campín (Bogotá),Amistoso,-,"Miguel Leyes; Nelson Chabay, Alberto Fanesi, Paolino y Jorge Carrascosa; Miguel Brindisi (Carlos Leone), Francisco Russo y René Houseman; José Scalise (Candedo), Omar Larrosa y Jorge Sanabria.","López; Rodríguez, Pacheco, Recúpero (Rangel) y Chia; Tébes, Sarnari y Cañón; Pandolfi, Pineros y Viáfara.",foto,15 GOL Cañón (ISF)</br>39 GOL Omar Larrosa (HUR)</br>81 GOL Jorge Sanabria (HUR),45,90
 28/08/1975,Delem,visitante,empate,1,1,Tigres (México),Amistoso,Universitario (Monterrey),-,"Agustín Cejas; Miguel Brindisi; René Houseman.","Meza; Lola, Jiménez.",</br>22 GOL Jiménez</br>68 GOL Houseman,45,90
 30/08/1975,Delem,visitante,empate,2,2,Leones Negros (México),Amistoso,Jalisco (Guadalajara),Marcel Pérez Guevara (México),"Miguel Leyes; Nelson Chabay, Jorge Paolino, (66 Rubén Ríos), Alberto Fanesi y Jorge Carrascosa, Miguel Brindisi, Carlos Leone y José Scalise; René Houseman (63 Herrera), Omar Larrosa y Jorge Sanabria (50 Víctor Longo).","Calderón; Ríos, Santoyo, Rivas (75 Olvera) y Rodríguez Jara; Andrade, Mañón y Jair; Euzebio, Martínez (50 Gutiérrez) y López.",</br>30 GOL Jair (LEO)</br>46 GOL Euzebio (LEO)</br>78 GOL Brindisi (HUR) -penal-</br>84 GOL Leone (HUR),45,90
-05/09/1975,Delem,neutral,derrota,0,1,Selección de México Olímpica,Copa de América,East College (Los Angeles),Jesús Mercado (México),"Agustín Cejas; Nelson Chabay, Paolino, Alberto Fanesi y Jorge Carrascosa; Miguel Brindisi, Roque Avallay y Omar Larrosa; René Houseman, José Scalise y Jorge Sanabria.","Gómez; Márquez, García, Viveros y Carrillo; De la Rosa, Caballero y Cosío; Tapía, Rangel y Sánchez.",</br>27 GOL Rergis,45,90
+05/09/1975,Delem,neutral,derrota,0,1,Selección de México Olímpica,Copa de América (amistoso),East College (Los Angeles),Jesús Mercado (México),"Agustín Cejas; Nelson Chabay, Paolino, Alberto Fanesi y Jorge Carrascosa; Miguel Brindisi, Roque Avallay y Omar Larrosa; René Houseman, José Scalise y Jorge Sanabria.","Gómez; Márquez, García, Viveros y Carrillo; De la Rosa, Caballero y Cosío; Tapía, Rangel y Sánchez.",</br>27 GOL Rergis,45,90
 22/08/1976,Juárez,visitante,derrota,1,3,Junior (Colombia),Gira por Sudamérica (amistoso),Romelio Martínez (Barranquilla),-,"Héctor Baley (Jurkevicius); Abelardo Cheves, Aldo Espinoza, Alberto Fanesi y Jorge Carrascosa (Verón); Carlos Leone (Rubén Ríos), Candedo (Luis Cabrera) y Omar Larrosa; René Houseman (Rico), Osvaldo Ardiles y Sánchez (Jorge Sanabria).","Delménico; Araújo, Miranda, Berdugo y Amaya (González); Maldonado, Cerminatto (Cabezas) y Comesaña; Cibeyra, B. Martínez y Verón (Fiorillo).","Goles: 3 y 20 Verón, 25 B. Martínez, 51 Sanabria.",45,90
 26/08/1976,Juárez,visitante,derrota,2,3,Dep. Cali (Colombia),Gira por Sudamérica (amistoso),Pascual Guerrero (Cali),O. Sánchez,"Omar Larrosa; René Houseman y Luis Cabrera.","Zape; Samboni; Álvarez; Benítez y Lorea.",</br>6 GOL Lorea (CAL)</br>50 Lorea (CAL)</br>20 René Houseman (HUR)</br>51 EXP Omar Larrosa</br>57 Benítez (CAL)</br>63 GOL Luis Cabrera (HUR)</br>87 EXP Samboni (CAL)</br>89 EXP Luis Cabrera (HUR),45,90
 21/08/1983,Sosa,neutral,empate,0,0,Ind. Santa Fe (Colombia),Amistoso 1983,Romelio Martínez (Barranquilla),-,-,-,foto,45,90
-24/08/1983,Sosa,visitante,empate,0,0,Unión Magdalena (Colombia),1° fecha del Trofeo Cartagena de Indias 1983,Eduardo Santos (Santa Marta),-,-,-,foto,45,90
-26/08/1983,Sosa,visitante,victoria,2,1,Junior (Colombia),2° fecha del Trofeo Cartagena de Indias 1983,Romelio Martínez (Barranquilla),-,-,-,foto,16 GOL Claudio Morresi (HUR)</br>77 GOL Claudio García (HUR)</br>83 GOL Edgardo Bauza (JUN) -penal-,45,90
+24/08/1983,Sosa,visitante,empate,0,0,Unión Magdalena (Colombia),1° fecha del Trofeo Cartagena de Indias 1983 (amistoso),Eduardo Santos (Santa Marta),-,-,-,foto,45,90
+26/08/1983,Sosa,visitante,victoria,2,1,Junior (Colombia),2° fecha del Trofeo Cartagena de Indias 1983 (amistoso),Romelio Martínez (Barranquilla),-,-,-,foto,16 GOL Claudio Morresi (HUR)</br>77 GOL Claudio García (HUR)</br>83 GOL Edgardo Bauza (JUN) -penal-,45,90
 06/02/1985,Guerra,local,empate,2,2,Los Andes,Amistoso
 08/02/1985,Guerra,visitante,victoria,1,0,Andes Talleres (Mendoza),Amistoso
 10/02/1985,Guerra,visitante,victoria,2,1,Huracán (Mendoza),Amistoso
@@ -71,11 +71,11 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 31/03/1985,Guerra,neutral,empate,0,0,Chacarita Juniors,Rueda Perdedores del Campeonato Nacional 'Gral. San Martín',Atlanta,
 18/04/1985,Varacka,visitante,derrota,1,3,Gimnasia (La Plata),Amistoso
 12/05/1985,Varacka,local,empate,4,4,River Plate,Amistoso
-02/06/1985,Varacka,neutral,victoria,1,0,Selección de Tailandia,1° fecha de la Copa del Presidente,Dongdaemun (Seúl),45,90
-04/06/1985,Varacka,visitante,empate,1,1,Selección de Corea del Sur,2° fecha de la Copa del Presidente,Dongdaemun (Seúl),-,-,-,foto,21 GOL Claudio García (HUR)XXX75 GOL Baek Jong-Chul (COR),45,90
-09/06/1985,Varacka,visitante,derrota,1,4,Selección de Corea del Sur B,1° fecha de la Copa del Presidente,Mudeung (Gwangju),-,-,-,foto,22 GOL Kim Jong-Boo (COR)XXX27 GOL Kim Joo-Sung,45,90 (COR)XXX58 GOL Lee Kee-Keun (COR)XXX75 GOL Darío Labaroni (HUR)XXX77 GOL Noh Soo-Jin (COR),45,90,
-11/06/1985,Varacka,neutral,derrota,2,5,Selección de Irak,2° fecha de la Copa del Presidente,Civil (Daegu),-,-,-,foto,5 GOL Karim Allawi (IRA)XXX17 GOL Ahmad Radhi (IRA)XXX55 GOL Claudio (HUR)XXX61 GOL Adrián (HUR)XXX67 GOL Ahmad Radhi (IRA)XXX75 GOL Basil Gorgis (IRA)XXX85 GOL Karim Saddam (IRA),45,90
-13/06/1985,Varacka,neutral,derrota,1,2,Selección de Canadá,3° fecha de la Copa del Presidente,Dongdaemun (Seúl),-,-,-,foto,GOL Mark Karpun (CAN)xxxGOL Mark Karpun (CAN),45,90
+02/06/1985,Varacka,neutral,victoria,1,0,Selección de Tailandia,1° fecha de la Copa del Presidente (amistoso),Dongdaemun (Seúl),45,90
+04/06/1985,Varacka,visitante,empate,1,1,Selección de Corea del Sur,2° fecha de la Copa del Presidente (amistoso),Dongdaemun (Seúl),-,-,-,foto,21 GOL Claudio García (HUR)XXX75 GOL Baek Jong-Chul (COR),45,90
+09/06/1985,Varacka,visitante,derrota,1,4,Selección de Corea del Sur B,1° fecha de la Copa del Presidente (amistoso),Mudeung (Gwangju),-,-,-,foto,22 GOL Kim Jong-Boo (COR)XXX27 GOL Kim Joo-Sung,45,90 (COR)XXX58 GOL Lee Kee-Keun (COR)XXX75 GOL Darío Labaroni (HUR)XXX77 GOL Noh Soo-Jin (COR),45,90,
+11/06/1985,Varacka,neutral,derrota,2,5,Selección de Irak,2° fecha de la Copa del Presidente (amistoso),Civil (Daegu),-,-,-,foto,5 GOL Karim Allawi (IRA)XXX17 GOL Ahmad Radhi (IRA)XXX55 GOL Claudio (HUR)XXX61 GOL Adrián (HUR)XXX67 GOL Ahmad Radhi (IRA)XXX75 GOL Basil Gorgis (IRA)XXX85 GOL Karim Saddam (IRA),45,90
+13/06/1985,Varacka,neutral,derrota,1,2,Selección de Canadá,3° fecha de la Copa del Presidente (amistoso),Dongdaemun (Seúl),-,-,-,foto,GOL Mark Karpun (CAN)xxxGOL Mark Karpun (CAN),45,90
 02/07/1985,Varacka,visitante,derrota,1,3,Estudiantes (La Plata),Amistoso
 06/07/1985,Varacka,local,derrota,0,1,Argentinos Juniors,1° fecha del Campeonato 1985/86
 14/07/1985,Varacka,visitante,victoria,2,1,Independiente,2° fecha del Campeonato 1985/86
@@ -641,6 +641,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
