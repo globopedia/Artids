@@ -15,7 +15,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 02/02/1958,Sbarra,visitante,victoria,3,2,Ind. Santa Fe (Colombia),Gira por América (amistoso),El Campín (Bogotá),-,-,-,foto,-,45,90
 09/02/1958,Sbarra,neutral,victoria,5,0,Liga de Cundinamarca (Colombia),Gira por América (amistoso),Pascual Guerrero (Cali),-,-,-,foto,-,45,90
 13/02/1958,Sbarra,visitante,victoria,5,0,Selección de Colombia,Gira por América (amistoso),Pascual Guerrero (Cali),-,x,x,foto,-,45,90
-16/02/1958,Sbarra,visitante,victoria,2,0,Liga de Valle del Cauca (Colombia),Gira por América (Amistoso),Pascual Guerrero (Colombia),-,-,-,foto,-,45,90
+16/02/1958,Sbarra,visitante,victoria,2,0,Liga de Valle (Colombia),Gira por América (Amistoso),Pascual Guerrero (Colombia),-,-,-,foto,-,45,90
 07/01/1960,Rossi,visitante,victoria,4,0,Dep. Cali (Colombia),1° fecha Cervecería Sultana (Amistoso),Pascual Guerrero (Cali),Ovidio Orrego,"Walter Taibo; Carlos Arredondo, Victorio Civrán (Ángel Julio), Villano y Miguel Vidal (Sánchez); Osvaldo Crosta y Néstor Rossi; Alberto Rendo, Oscar Rossi, Juan C Soria (Suárez) y Figueroa (Juan L Cañete).","Fernando Sierra; Víctor Suárez (Hernán Martínez), Luis Castro, Rubén Muzo y Luis Tejada; Camilo Cervino y Alberto Castronovo (Giomar Rojas); Miguel Panesso, Vergara, Juan M López y Guillermo Arredondo.",foto,23 GOL Alberto Rendo (HUR)</br>70 GOL Suárez (HUR)</br>74 GOL Oscar Rossi (HUR)</br>83 GOL Oscar Rossi (HUR),45,90
 13/01/1960,Rossi,visitante,empate,1,1,América (Colombia),3° fecha Cervecería Sultana (Amistoso),Pascual Guerrero (Cali),Ovidio Orrego,"Walter Taibo; Carlos Arredondo, Ángel Julio, Villano y Miguel Vidal; Osvaldo Crosta y Néstor Rossi (46 Brunetti); Alberto Rendo (50 Molina), Oscar Rossi (46 Suárez), Juan C Soria (50 Juan L Cañete) y Figueroa.","Carlos Montaño; Israel Sánchez, Jorge Mousegne, Faustino Abadía y Perdomo; Juan A Vairo y Ruiz; Lenis, Cejas, Florido y Carlos Fresquet.",foto,53 GOL Lenis (AME)</br>73 GOL Molina (HUR),45,90
 17/01/1960,Rossi,visitante,victoria,2,1,Ind. Medellín (Colombia),1° fecha Ciudad de Medellín (Amistoso),Atanasio Girardot (Colombia),Sundheim,"Walter Taibo; Carlos Arredondo, Victorio Civrán, Villano y Miguel Vidal; Osvaldo Crosta y Néstor Rossi; Alberto Rendo, Oscar Rossi, Juan C Soria y Juan L Cañete.","Tissera; Echeverri, Hernando Caicedo, Alberto Castronovo y Terra; González (Vulcano) y Héctor Fernández; Arango, Miguel Zazzini, Campillo y José Lanza.",foto,25 GOL Osvaldo Crosta (HUR)</br>75 GOL Juan C Soria (HUR)</br>89 GOL Vulcano (DIM),45,90
@@ -404,7 +404,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 28/11/1993,Trossero,local,derrota,0,1,San Lorenzo de Almagro,11° fecha del Campeonato Apertura 1993
 02/12/1993,Trossero,visitante,empate,1,1,Newell's Old Boys (Rosario),12° fecha del Campeonato Apertura 1993
 05/12/1993,Crosta,local,victoria,2,0,Español,13° fecha del Campeonato Apertura 1993
-09/12/1993,Crosta,local,victoria,2,1,Sel. de Bolivia,Amistoso,-,-,-,foto,GOL Gabriel Amato (HUR) GOL Conti (HUR)
+09/12/1993,Crosta,local,victoria,2,1,Selección de Bolivia,Amistoso,-,-,-,foto,GOL Gabriel Amato (HUR) GOL Conti (HUR)
 11/12/1993,Cúper,visitante,derrota,0,5,Platense,14° fecha del Campeonato Apertura 1993
 19/12/1993,Cúper,local,victoria,3,1,Mandiyú,15° fecha del Campeonato Apertura 1993
 26/12/1993,Cúper,visitante,0,0,Rosario Central,16° fecha del Campeonato Apertura 1993
@@ -641,6 +641,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
