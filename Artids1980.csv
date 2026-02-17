@@ -367,7 +367,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 00/00/1992,Fanesi,neutral,victoria,2,1,Independiente,3° fecha de Copa Libertad 1992,Aguas Corrientes (Necochea)
 07/02/1992,Fanesi,visitante,victoria,2,0,Vélez Sarsfield,1° fecha de la Copa Ciudad de Buenos Aires 1992,José Amalfitani
 09/02/1992,Fanesi,neutral,derrota,2,3,Racing Club,2° fecha de la Copa Ciudad de Buenos Aires 1992,José Amalfitani
-15/02/1992,Fanesi,local,derrota,1,2,Lausanna (Suiza),Amistoso 1992
+15/02/1992,Fanesi,local,derrota,1,2,Lausanne (Suiza),Amistoso 1992
 22/02/1992,Fanesi,local,victoria,2,0,Rosario Central,1° fecha del Campeonato Clausura 1992
 01/03/1992,Fanesi,visitante,empate,0,0,Racing Club,2° fecha del Campeonato Clausura 1992
 08/03/1992,Fanesi,local,victoria,3,2,Gimnasia (La Plata),3° fecha del Campeonato Clausura 1992
@@ -388,7 +388,51 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 28/06/1992,Fanesi,local,victoria,2,0,Quilmes,18° fecha del Campeonato Clausura 1992
 05/07/1992,Fanesi,visitante,victoria,2,1,Unión (Santa Fe),19° fecha del Campeonato Clausura 1992,1° fecha del Campeonato Clausura 1992
 12/07/1992,Fanesi,visitante,derrota,0,1,Vélez Sarsfield,8vo de final de Liguilla 1992
-01/08/1993,Trossero,empate,2,2,Rosario Central,19° fecha del Clausura 1993
+07/08/1992,Trossero,local,empate,3,3,Independiente,1° fecha del Campeonato Apertura 1992
+16/08/1992,Trossero,visitante,victoria,2,0,Español,2° fecha del Campeonato Apertura 1992
+23/08/1992,Trossero,local,victoria,2,0,San Martín (Tucumán),3° fecha del Campeonato Apertura 1992
+30/08/1992,Trossero,visitante,victoria,3,1,Belgrano (Córdoba),4° fecha del Campeonato Apertura 1992
+06/09/1992,Trossero,local,derrota,0,2,Vélez Sarsfield,5° fecha del Campeonato Apertura 1992
+13/09/1992,Trossero,visitante,empate,2,2,Boca Juniors,6° fecha del Campeonato Apertura 1992
+20/09/1992,Trossero,visitante,empate,0,0,Ferro C. Oeste,7° fecha del Campeonato Apertura 1992
+00/09/1992,Trossero,local,derrota,0,2,River Plate,8° fecha del Campeonato Apertura 1992
+03/10/1992,Trossero,visitante,derrota,0,2,Newell’s Old Boys (Rosario),9° fecha del Campeonato Apertura 1992
+11/10/1992,Trossero,local,empate,2,2,Gimnasia (La Plata),10° fecha del Campeonato Apertura 1992
+23/11/1992,Trossero,visitante,victoria,1,0,Racing Club,11° fecha del Campeonato Apertura 1992
+01/11/1992,Trossero,local,derrota,1,2,Platense,12° fecha del Campeonato Apertura 1992
+08/11/1992,Trossero,visitante,victoria,1,0,Mandiyú (Corrientes),13° fecha del Campeonato Apertura 1992
+15/11/1992,Trossero,local,victoria,2,1,Talleres (Córdoba),14° fecha del Campeonato Apertura 1992
+22/11/1992,Trossero,visitante,derrota,0,2,Lanús,15° fecha del Campeonato Apertura 1992
+29/11/1992,Trossero,local,victoria,1,0,San Lorenzo de Almagro,16° fecha del Campeonato Apertura 1992
+06/12/1992,Trossero,visitante,victoria,3,2,Argentinos Juniors,17° fecha del Campeonato Apertura 1992
+13/12/1992,Trossero,local,victoria,3,2,Rosario Central,18° fecha del Campeonato Apertura 1992
+20/12/1992,Trossero,visitante,derrota,0,1,Estudiantes (La Plata),19° fecha del Campeonato Apertura 1992
+17/01/1993,Trossero,local,derrota,0,1,Nacional (Uruguay),1° fecha de Copa Libertad 1993,Tomás A. Ducó,-,-,-,foto,-,23,46
+17/01/1993,Trossero,local,derrota,0,1,Newell’s Old Boys (Rosario),2° fecha de Copa Libertad 1993,Tomás A. Ducó,-,-,-,foto,-,23,46
+30/01/1993,Trossero,visitante,victoria,1,0,Vélez Sarsfield,1° fecha de Copa Libertad 1993 III
+30/01/1993,Trossero,neutral,derrota,0,3,CR Flamengo (Brasil),2° fecha de Copa Libertad 1993 III
+20/02/1993,Trossero,visitante,derrota,1,3,Independiente,1° fecha del Campeonato Clausura 1993
+28/02/1993,Trossero,local,empate,1,1,Español,2° fecha del Campeonato Clausura 1993
+03/03/1993,Trossero,visitante,victoria,3,1,San Martín (Tucumán),3° fecha del Campeonato Clausura 1993
+07/03/1993,Trossero,local,empate,0,0,Belgrano (Córdoba),4° fecha del Campeonato Clausura 1993
+14/03/1993,Trossero,visitante,derrota,0,3,Vélez Sarsfield,5° fecha del Campeonato Clausura 1993
+21/03/1993,Trossero,local,empate,1,1,Boca Juniors,6° fecha del Campeonato Clausura 1993
+28/03/1993,Trossero,local,victoria,3,0,Ferro C. Oeste,7° fecha del Campeonato Clausura 1993
+04/04/1993,Trossero,visitante,derrota,2,4,River Plate,8° fecha del Campeonato Clausura 1993
+11/04/1993,Trossero,visitante,empate,1,1,Gimnasia (La Plata),10° fecha del Campeonato Clausura 1993
+16/04/1993,Trossero,local,derrota,0,1,Racing Club,11° fecha del Campeonato Clausura 1993
+22/04/1993,Trossero,local,victoria,2,1,Newell’s Old Boys (Rosario),9° fecha del Campeonato Clausura 1993
+25/04/1993,Trossero,visitante,empate,1,1,Platense,12° fecha del Campeonato Clausura 1993
+02/05/1993,Trossero,local,victoria,2,1,Mandiyú (Corrientes),13° fecha del Campeonato Clausura 1993
+09/05/1993,Trossero,visitante,empate,0,0,Talleres (Córdoba),14° fecha del Campeonato Clausura 1993
+16/05/1993,Trossero,local,victoria,1,0,Lanús,15° fecha del Campeonato Clausura 1993
+22/05/1993,Trossero,visitante,derrota,0,1,San Lorenzo de Almagro,16° fecha del Campeonato Clausura 1993
+05/06/1993,Trossero,local,victoria,2,1,Argentinos Juniors,17° fecha del Campeonato Clausura 1993
+12/06/1993,Trossero,visitante,victoria,2,1,Estudiantes (La Plata),18° fecha del Campeonato Clausura 1993
+27/06/1993,Trossero,visitante,derrota,0,2,San Lorenzo de Almagro,1° fase de Copa Centenario 1993
+04/07/1993,Trossero,local,empate,0,0,San Lorenzo de Almagro,1° fase de Copa Centenario 1993
+11/07/1993,Trossero,neutral,derrota,1,2,Español,1° fase (Rueda Perdedores) de Copa Centenario 1993
+01/08/1993,Trossero,visitante,empate2,2,Rosario Central,18° fecha del Campeonato Clausura 1993
 11/08/1993,Trossero,visitante,derrota,0,1,Peñarol (Uruguay),8vo de Final de Copa Conmebol,Centenario (Montevideo),Cerdeira,"Marcos Gutiérrez; Antonio Váttimos, Gabriel Rinaldi, Dante Unali y Ramón Brítez; Ledesma (Palavecino), Walter De Felippe, Víctor Delgado y Hugo Morales; Arias (Rodolfo Flores) y Jorge Cruz.","Carlos Díaz; Nelson Olveira, Nelson Gutiérrez, Augusto Consani y Álvaro Marenco; Gustavo Da Silva, Gustavo Rehermann, Diego Ciappesoni y Andrée González; Gustavo Ferreyra (Nicolás Rotundo) y Heberley Sosa (Antonio Pacheco).",foto,43 GOL Gustavo Ferreyra (PEÑ)</br>89 EXP Nelson Olveira (PEÑ)</br>89 EXP Dante Unali (HUR)
 20/08/1993,Trossero,local,empate,1,1,Peñarol (Uruguay),8vo de Final de Copa Conmebol,Tomás A. Ducó,Gamboa,"Marcos Gutiérrez; Antonio Váttimos, Pedro Barrios, Couceiro y Ramón Brítez; Ledesma (Conti), Walter De Felippe, Víctor Delgado y Hugo Morales; Walter Pelletti y Rodolfo Flores.","Carlos Díaz; Gustavo Da Silva, Nelson Gutiérrez, Augusto Consani y Álvaro Marenco; Camilo Lauría, Gustavo Rehermann, Diego Ciappesoni y Andrée González (Boris Acuña); Gustavo Ferreyra y Heberley Sosa (Antonio Pacheco).",foto,55 GOL Gustavo Rehermann (PEÑ)</br>82 GOL Walter Pelletti (HUR)
 11/09/1993,Trossero,visitante,empate,0,0,Gimnasia (La Plata),1° fecha del Campeonato Apertura 1993
@@ -641,6 +685,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
