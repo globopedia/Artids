@@ -93,6 +93,58 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 21/08/1978,Rendo,derrota,0,1,Valencia (España),1° fecha del Trofeo Naranja (amistoso),Luis Casanova (Valencia),Pes Pérez (España),"Héctor Baley; Abelardo Cheves, Carlos Demarta, René Daulte y Lorenzo Ojeda; José Úbeda (Miguel Gallardo), Patricio Wade (Carlos Domengoni) y Carlos Babington; René Houseman, Luis Cabrera y Oscar Ferrero.","Manzanedo; Cordero, Botubot, Bonhof y Cerveró; Saura, Pepe Carrete y Diarte; Cabral (46 Solsona), Felman (46 Arias) y Mario Kempes.",foto,58 GOL Bonhof (VAL),45,90
 10/08/1979,Cayetano,neutral,empate,0,0,Valencia (España),Semifinal del Torneo Mundial,Nagai (Osaka),-,"Jesús Borzi; Abelardo Cheves, Víctor Longo, José Galván y Jorge Carrascosa; Miguel Brindisi (46 Ojeda), Miguel Gallardo (46 Demarta) y Carlos Babington; René Houseman (46 Romano), Jorge Sanabria y Dante Sanabria.","Pereira; Domingo (46 Saura), Palmer, Cerveró (Pepe Carrete) y Dani Cabezas; Higinio García (46 Botubot), Arias y Castellanos; Vilarrodá (46 Felman), Mario Kempes y José Albiol (46 Jiménez).",foto,1° Tiempo: Huracán 0x0 Valencia,45,90
 13/08/1979,Cayetano,neutral,derrota,3,4,Valencia (España),Semifinal (desempate) del Torneo Mundial,Karakuen Park (Tokio),-,"Jesús Borzi; Abelardo Cheves, Víctor Longo, José Galván y Jorge Carrascosa; Miguel Brindisi, Miguel Gallardo y Carlos Babington; René Houseman, Jorge Sanabria y Dante Sanabria.","Pereira; Palmer, Cerveró, Dani Cabezas y Arias; Higinio García, Castellanos y Saura; Vilarrodá, Jiménez y Mario Kempes.",foto,27 GOL Saura (VAL) </br>39 GOL Carlos Babington (HUR)</br>51 GOL Miguel Brindisi (HUR)</br>55 GOL Saura (VAL)</br>60 GOL René Houseman (HUR)</br>65 GOL Saura (VAL)</br>73 Jiménez (VAL)
+14/02/1982,Basile,visitante,victoria,4,2,Boca Juniors,1° fecha del Campeonato Nacional 1982
+21/02/1982,Basile,local,victoria,2,1,Rosario Central,2° fecha del Campeonato Nacional 1982
+28/02/1982,Basile,visitante,derrota,0,2,Estudiantes (La Plata),3° fecha del Campeonato Nacional 1982
+03/03/1982,Basile,local,empate,0,0,Talleres (Córdoba),4° fecha del Campeonato Nacional 1982
+07/03/1982,Basile,local,empate,0,0,Nueva Chicago,5° fecha del Campeonato Nacional 1982
+14/03/1982,Basile,visitante,empate,1,1,Gimnasia y Esgrima (Mendoza),6° fecha del Campeonato Nacional 1982
+21/03/1982,Basile,visitante,victoria,1,0,Central Norte (Salta),7° fecha del Campeonato Nacional 1982
+28/03/1982,Basile,local,victoria,4,1,Mariano Moreno (Junín),8° fecha del Campeonato Nacional 1982
+04/04/1982,Basile,local,empate,3,3,Boca Juniors,9° fecha del Campeonato Nacional 1982
+08/04/1982,Basile,visitante,derrota,0,2,Rosario Central,10° fecha del Campeonato Nacional 1982
+11/04/1982,Basile,local,derrota,0,1,Estudiantes (La Plata),11° fecha del Nacional del Campeonato Nacional 1982
+18/04/1982,Diz,visitante,victoria,2,0,Talleres (Córdoba),12° fecha del Nacional del Campeonato Nacional 1982
+25/04/1982,Basile,visitante,derrota,0,1,Nueva Chicago,13° fecha del Nacional del Campeonato Nacional 1982
+02/05/1982,Basile,local,derrota,0,3,Gimnasia y Esgrima (Mendoza),14° fecha del Nacional del Campeonato Nacional 1982
+10/06/1982,Basile,local,empate,1,1,Central Norte (Salta),15° fecha del Nacional del Campeonato Nacional 1982
+16/05/1982,Diz,visitante,empate,1,1,Mariano Moreno (Junín),16° fecha del Campeonato Nacional 1982
+18/07/1982,Varacka,local,victoria,1,0,Independiente,1° fecha del Campeonato de 1° ‘A’ 1982
+25/07/1982,Varacka,visitante,derrota,0,1,Estudiantes (La Plata),2° fecha del Campeonato de 1° ‘A’ 1982
+01/08/1982,Varacka,local,empate,0,0,Ferro C. Oeste,3° fecha del Campeonato de 1° ‘A’ 1982
+08/08/1982,Varacka,visitante,victoria,2,0,Sarmiento (Junín),4° fecha del Campeonato de 1° ‘A’ 1982
+14/08/1982,Varacka,local,empate,0,0,Instituto (Córdoba),5° fecha del Campeonato de 1° ‘A’ 1982
+17/08/1982,Varacka,visitante,victoria,2,0,Nueva Chicago,6° fecha del Campeonato de 1° ‘A’ 1982
+22/08/1982,Varacka,local,victoria,2,0,Newell’s Old Boys,7° fecha del Campeonato de 1° ‘A’ 1982
+29/08/1982,Varacka,visitante,empate,1,1,Argentinos Juniors,8° fecha del Campeonato de 1° ‘A’ 1982
+05/09/1982,Varacka,local,empate,0,0River Plate,9° fecha del Campeonato de 1° ‘A’ 1982
+08/09/1982,Varacka,visitante,empate,0,0,Racing Club,10° fecha del Campeonato de 1° ‘A’ 1982
+12/09/1982,Varacka,local,victoria,2,0,Quilmes,11° fecha del Campeonato de 1° ‘A’ 1982
+19/09/1982,Varacka,visitante,derrota,1,2,Unión (Santa Fe),12° fecha del Campeonato de 1° ‘A’ 1982
+25/09/1982,Varacka,local,derrota,1,2,Talleres (Córdoba),13° fecha del Campeonato de 1° ‘A’ 1982
+29/09/1982,Varacka,visitante,victoria,3,0,Vélez Sarsfield,14° fecha del Campeonato de 1° ‘A’ 1982
+03/10/1982,Varacka,local,empate,2,2,Racing (Córdoba),15° fecha del Campeonato de 1° ‘A’ 1982
+10/10/1982,Varacka,visitante,victoria,2,1,Rosario Central,17° fecha del Campeonato de 1° ‘A’ 1982
+17/10/1982,Varacka,local,victoria,3,1,Platense,18° fecha del Campeonato de 1° ‘A’ 1982
+24/10/1982,Varacka,visitante,empate,0,0,Boca Juniors,19° fecha del Campeonato de 1° ‘A’ 1982
+31/10/1982,Varacka,visitante,empate,1,1,Independiente,20° fecha del Campeonato de 1° ‘A’ 1982
+03/11/1982,Varacka,local,derrota,1,3,Estudiantes (La Plata),21° fecha del Campeonato de 1° ‘A’ 1982
+07/11/1982,Varacka,visitante,victoria,2,1,Ferro C. Oeste,22° fecha del Campeonato de 1° ‘A’ 1982
+10/11/1982,Varacka,local,victoria,3,1,Sarmiento (Junín),23° fecha del Campeonato de 1° ‘A’ 1982
+14/11/1982,Diz,visitante,derrota,0,2,Instituto (Córdoba),24° fecha del Campeonato de 1° ‘A’ 1982
+21/11/1982,Diz,local,empate,1,1,Nueva Chicago,25° fecha del Campeonato de 1° ‘A’ 1982
+28/11/1982,Diz,visitante,derrota,0,2,Newell's Old Boys (Rosario),26° fecha del Campeonato de 1° ‘A’ 1982
+05/12/1982,Diz,local,victoria,1,0,Argentinos Juniors,27° fecha del Campeonato de 1° ‘A’ 1982
+08/12/1982,Diz,visitante,victoria,2,1,River Plate,28° fecha del Campeonato de 1° ‘A’ 1982
+12/12/1982,Diz,local,victoria,1,0,Racing Club,29° fecha del Campeonato de 1° ‘A’ 1982
+19/12/1982,Diz,visitante,empate,0,0,Quilmes,30° fecha del Campeonato de 1° ‘A’ 1982
+22/12/1982,Diz,local,victoria,1,0,Unión (Santa Fe),31° fecha del Campeonato de 1° ‘A’ 1982
+30/12/1982,Diz,visitante,derrota,0,2,Vélez Sarsfield,33° fecha del Campeonato de 1° ‘A’ 1982
+05/01/1983,Diz,local,derrota,2,3,Talleres (Córdoba),32° fecha del Campeonato de 1° ‘A’ 1982
+08/01/1983,Diz,visitante,derrota,1,3,Racing (Córdoba),34° fecha del Campeonato de 1° ‘A’ 1982
+22/01/1983,Diz,local,victoria,1,0,Rosario Central,37° fecha del Campeonato de 1° ‘A’ 1982
+29/01/1983,Diz,visitante,derrota,2,4,Platense,36° fecha del Campeonato de 1° ‘A’ 1982
+05/02/1983,Diz,local,empate,3,3,Boca Juniors,38° fecha del Campeonato de 1° ‘A’ 1982
 13/03/1983,Sosa,local,victoria,1,0,Atl. Concepción (Tucumán),1° fecha del Campeonato Nacional 1983
 20/03/1983,Sosa,local,victoria,4,1,Renato Cesarini (Rosario),2° fecha el Campeonato Nacional 1983
 27/03/1983,Sosa,visitante,empate,0,0,Racing Club,3° fecha del Campeonato Nacional 1983
@@ -822,6 +874,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
