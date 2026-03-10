@@ -157,11 +157,11 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 29/05/1974,Menotti,neutral,victoria,1,0,Rosario Central,2° fecha (fase final) del Campeonato Metropolitano 1974,La Bombonera,Maino,"Miguel Leyes; Rubén Suñé, Alberto Fanesi, Rubén Díaz, Francisco Lavorato; Roberto Quiroga, Francisco Russo y Carlos Babington; José Scalise, Eduardo Maglioni (57 Carlos Leone) y Omar Larrosa (85 Ibrahim Hallar).","Biasutto; González, Killer, Cornero y Burgos; Carlos Aimar, Solari y Zavagno; Bóveda, Roberto Cabral y Carril (74 Arico).",foto,75 GOL Carlos Babington (HUR) -penal-,45,90
 02/06/1974,Menotti,neutral,derrota,1,3,Boca Juniors,3° fecha (fase final) del Campeonato Metropolitano 1974,José Amalfitani,Oscar Veiró,"Miguel Leyes; Rubén Suñé, Alberto Fanesi, Rubén Díaz y Francisco Lavorato; Omar Larrosa, Francisco Russo y Carlos Babington; José Scalise, Eduaro Maglioni (68 Ibrahim Hallar) y Eduardo Quiroga.","Sánchez; Ovide, Nicolau, Rogel y Roberto Tarantini; Benítez, Marcelo Trobbiani y Osvaldo Potente; Ponce, García Cambón y Ferrero.",foto,50 GOL Osvaldo Potente (BJU)</br>69 GOL Osvaldo Potente (BJU)</br>71 GOL Osvaldo Potente (BJU</br>78 GOL José Scalise (HUR),45,90
 21/07/1974,Menotti,local,victoria,3,0,San Lorenzo (Mar del Plata),1° fecha del Campeonato Nacional 1974
-28/07/1974,Menoti,visitante,empate,1,1,Atl. Tucumán,2° fecha del Campeonato Nacional 1974
+28/07/1974,Menotti,visitante,empate,1,1,Atl. Tucumán,2° fecha del Campeonato Nacional 1974
 04/08/1974,Menotti,local,empate,0,0,San Martín (Mendoza),3° fecha del Campeonato Nacional 1974
 11/08/1974,Menotti,visitante,derrota,2,3,Independiente,4° fecha del Campeonato Nacional 1974
 18/08/1974,Menotti,local,victoria,2,0,San Lorenzo de Almagro,5° fecha (interzonal) del Campeonato Nacional 1974,Tomás A. Ducó,Roberto Barreiro,"Héctor Roganti; Rubén Suñé, Alberto Fanesi, Rubén Díaz y Jorge Carrascosa; Miguel Brindisi, Francisco Russo y Carlos Babington; José Scalise, Omar Larrosa y Roberto Gramajo.","Anhielo; Rubén Glaría, Rezza, Piris y Jorge Olguín; Espósito, Telch (46 Maletti) y García Ameijenda; Chazarreta, Juan J Irigoyen (62 Scotta) y Oscar Ortiz.",foto,59 GOL Carlos Babington (HUR)-penal-</br>75 GOL Miguel Brindisi (HUR)</br>76 EXP Piris (SLO),45,90
-25/08/1974,Menotti,local,5,0,Huracán (Comodoro),6° fecha del Campeonato Nacional 1974
+25/08/1974,Menotti,local,victoria,5,0,Huracán (Comodoro),6° fecha del Campeonato Nacional 1974
 27/08/1974,Menotti,visitante,-,-,-,Nacional (Colombia),Amistoso,-,-,-,foto,-,45,90
 29/08/1974,Menotti,visitante,-,-,-,Millonarios (colombia),Amistoso,-,-,-,foto,-,45,90
 01/09/1974,Menotti,visitante,empate,2,2,Chaco For Ever,7° fecha del Campeonato Nacional 1974
@@ -175,7 +175,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 27/09/1974,Menotti,local,victoria,2,1,Atl. Tucumán,11° fecha del Campeonato Nacional 1974
 06/10/1974,Menotti,visitante,derrota,0,3,San Martín (Mendoza),12° fecha del Campeonato Nacional 1974
 20/10/1974,Menotti,local,empate,3,3,Independiente,13° fecha del Campeonato Nacional 1974
-27/10/1974,Menotti,visitante,2,2,San Lorenzo de Almagro,14° fecha (interzonal) del Campeonato Nacional 1974
+27/10/1974,Menotti,visitante,empate,2,2,San Lorenzo de Almagro,14° fecha (interzonal) del Campeonato Nacional 1974
 03/11/1974,Menotti,visitante,victoria,4,0,Huracán (Comodoro),15° fecha del Campeonato Nacional 1974
 08/11/1974,Menotti,local,victoria,2,1,Chaco For Ever,16° fecha del Campeonato Nacional 1974
 18/11/1974,Menotti,visitante,victoria,3,1,Vélez Sarsfield,17° fecha del Campeonato Nacional 1974
@@ -1343,6 +1343,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 05/12/1999,Babington,visitante,empate,0,0,Quilmes,16° fecha del Nacional B 1999/2000
 12/12/1999,Babington,local,empate,3,3,Almagro,17° fecha del Nacional B 1999/2000
 18/12/1999,Babington,local,victoria,5,0,Español,18° fecha del Nacional B 1999/2000
+
 
 
 
