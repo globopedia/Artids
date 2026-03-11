@@ -250,6 +250,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 16/11/1975,Delem,local,victoria,2,1,All Boys,14° fecha del Campeonato Nacional 1975
 23/11/1975,Delem,visitante,derrota,0,1,River Plate,15° fecha del Campeonato Nacional 1975
 30/11/1975,Delem,local,victoria,2,1,Gimnasia y Esgrima (Mendoza),16° fecha del Campeonato Nacional 1975
+25/01/1976,Juárez,neutral,derrota,2,3,Estudiantes (La Plata),Clasificación 1975 Pre-Libertadores
 15/02/1976,Juárez,local,derrota,1,2,Independiente,1° fecha del Campeonato Metropolitano 1976
 18/02/1976,Juárez,visitante,victoria,2,1,All Boys,2° fecha del Campeonato Metropolitano 1976
 22/02/1976,Juárez,local,victoria,2,1,Boca Juniors,3° fecha del Campeonato Metropolitano 1976
@@ -305,7 +306,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 14/12/1976,Juárez,local,victoria,2,1,San Lorenzo de Almagro,18° fecha del Campeonato Nacional 1976
 16/12/1976,Juárez,neutral,visitante,victoria,2,0,Newell's Old Boys (Rosario),4to de Final del Campeonato Nacional 1976
 19/12/1976,Juárez,neutral,derrota,0,1,Boca Juniors,Semifinal del Campeonato Nacional 1976
-29/12/1976,Juárez,neutral,derrota,1,4,River Plate,Clasificación 1976 a Libertadores
+29/12/1976,Juárez,neutral,derrota,1,4,River Plate,Clasificación 1976 Pre-Libertadores
 20/02/1977,Chabay,visitante,victoria,2,1,Banfield,1° fecha del Campeonato Metropolitano 1977
 06/03/1977,Chabay,local,empate,2,2,Estudiantes (La Plata),2° fecha del Campeonato Metropolitano 1977
 13/03/1977,Chabay,visitante,empate,1,1,Lanús,3° fecha del Campeonato Metropolitano 1977
@@ -713,5 +714,6 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 09/12/1984,Silveira,local,derrota,0,3,Platense,36° fecha del Campeonato de 1° 'A' 1984
 16/12/1984,Silveira,visitante,empate,1,1,San Lorenzo de Almagro,37° fecha del Campeonato de 1° 'A' 1984
 21/12/1984,Silveira,local,empate,2,2,Talleres (Córdoba),38° fecha del Campeonato de 1° 'A' 1984
+
 
 
