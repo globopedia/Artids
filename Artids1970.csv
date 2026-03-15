@@ -74,8 +74,47 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 08/02/1969,Rossi,visitante,empate,1,1,Sporting (Bahía Blanca),1° fase de la Copa Argentina 1969,Olimpo (Bahía Blanca),Álvarez,"Raúl Navarro; José Diez, Alberto Dopacio, Edgardo Cantú y Rodolfo Chazarreta; Tito Gómez, Sebastián Viberti y Miguel Brindisi; Hugo Tedesco, Luis Vera y Luis Giribet.",-,foto,GOL Miguel Brindisi (HUR),45,90
 13/02/1969,Rossi,neutral,derrota,2,4,Platense,8vo de final de la Copa Argentina 1969,El Cilindro,Roberto Barreiro,"Raúl Navarro; José Diez, Leonardo Mansueto, Edgardo Cantú y Rodolfo Chazarreta; Constantini y Tito Gómez; Miguel Brindisi, Luis Vera, Jorge Olmedo y Luis Giribet.",-,foto,GOL Luis Vera (HUR)</br>GOL Luis Giribet (HUR),45,90
 20/02/1969,Vidal,neutral,victoria,3,0,Platense,8vo de final de la Copa Argentina 1969,Atlanta,Álvarez,"Raúl Navarro; José Diez, Leonardo Mansueto, Edgardo Cantú y Rodolfo Chazarreta; Tito Gómez y Sebastián Viberti (Alberto Dopacio); Miguel Brindisi, Araquem de Melo, Luis Vera y Luis Giribet.",-,foto,GOL Sebastián Viberti (HUR)</br>GOL Alberto Dopacio (HUR)</br>GOL Luis Giribet (HUR),45,90
-09/07/1969,Yebra,neutral,derrota,0,1,Colón (Santa Fe),4to de final de la Copa Argentina 1969,15 de Abril (Santa Fe),Comesaña,"Hernandorena; Rodolfo Chazarreta, Alberto Dopacio, Edgardo Cantú y Nelson López; Sebastián Viberti, Rodolfo Vilanoba y Meija; Hugo Tedesco, Alfredo Obberti y Alberto Cabaleiro.",-,foto,sin datos,45,90
-13/07/1969,Yebra,neutral,victoria,3,2,Colón (Santa Fe),4to de final de la Copa Argentina 1969,Gasómetro,Brusca,"Hernandorena; José Diez, Alberto Dopacio, Edgardo Cantú y Rodolfo Chazarreta; Sebastián Viberti, Rodolfo Vilanoba y Meija; Hugo Tedesco, Alfredo Obberti y Luis Giribet.",-,foto,GOL Rodolfo Vilanoba (HUR)</br>GOL Hugo Tedesco (HUR)</br>GOL Luis Giribet (HUR)</br>PEN Huracán 2x3 Colón,45,90
+23/02/1969,Rossi,visitante,derrota,0,1,Quilmes,1° fecha del Campeonato Metropolitano 1969,Quilmes
+02/03/1969,Rossi,local,victoria,2,0,Unión (Santa Fe),2° fecha del Campeonato Metropolitano 1969,Gasómetro
+09/03/1969,Rossi,visitante,derrota,2,3,Dep. Morón,3° fecha del Campeonato Metropolitano 1969,José Amalfitani
+16/03/1969,Yebra,local,empate,1,1,Racing Club,4° fecha del Campeonato Metropolitano 1969,Gasómetro
+23/03/1969,Yebra,visitante,victoria,4,1,Argentinos Juniors,5° fecha del Campeonato Metropolitano 1969,La Paternal
+30/03/1969,Yebra,local,derrota,0,1,River Plate,6° fecha del Campeonato Metropolitano 1969,Gasómetro
+03/04/1969,Yebra,visitante,empate,2,2,Los Andes,7° fecha del Campeonato Metropolitano 1969,Eduardo Gallardón
+09/04/1969,Yebra,local,empate,1,1,Newell's Old Boys (Rosario),8° fecha del Campeonato Metropolitano 1969,Gasómetro
+13/04/1969,Yebra,visitante,empate,3,3,Estudiantes (La Plata),9° fecha del Campeonato Metropolitano 1969,Quilmes
+20/04/1969,Yebra,visitante,victoria,2,1,San Lorenzo de Almagro,10° fecha -interzonal- del Campeonato Metropolitano 1969,Gasómetro
+27/04/1969,Yebra,local,derrota,0,2,Platense,11° fecha del Campeonato Metropolitano 1969,Gasómetro
+01/05/1969,Yebra,local,victoria,6,3,Quilmes,12° fecha del Campeonato Metropolitano 1969,La Bombonera
+04/05/1969,Yebra,visitante,victoria,2,1,Unión (Santa Fe),13° fecha del Campeonato Metropolitano 1969,15 de Abril (Santa Fe)
+09/05/1969,Yebra,local,victoria,3,0,Dep. Morón,14° fecha del Campeonato Metropolitano 1969,Gasómetro
+18/05/1969,Yebra,visitante,derrota,1,3,Racing Club,15° fecha del Campeonato Metropolitano 1969,El Cilindro
+25/05/1969,Yebra,local,empate,0,0,Argentinos Juniors,16° fecha del Campeonato Metropolitano 1969,Gasómetro
+01/06/1969,Yebra,visitante,empate,0,0,River Plate,17° fecha del Campeonato Metropolitano 1969,Monumental
+05/06/1969,Yebra,local,victoria,3,1,Los Andes,18° fecha del Campeonato Metropolitano 1969,Gasómetro
+08/06/1969,Yebra,visitante,empate,1,1,Newell's Old Boys (Rosario),19° fecha del Campeonato Metropolitano 1969,Parque Independencia (Rosario)
+15/06/1969,Yebra,local,empate,2,2,Estudiantes (La Plata),20° fecha del Campeonato Metropolitano 1969,Gasómetro
+22/06/1969,Yebra,local,visitante,victoria,3,1,San Lorenzo de Almagro,21° fecha -interzonal- del Campeonato Metropolitano 1969,La Bombonera
+27/06/1969,Yebra,visitante,derrota,0,1,Platense,22° fecha del Campeonato Metropolitano 1969,Gasómetro
+09/07/1969,Yebra,neutral,derrota,0,1,Colón (Santa Fe),4to de final de la Copa Argentina 1969,15 de Abril (Santa Fe),Comesaña,"Néstor Hernandorena; Rodolfo Chazarreta, Alberto Dopacio, Edgardo Cantú y Nelson López; Sebastián Viberti, Rodolfo Vilanoba y Meija; Hugo Tedesco, Alfredo Obberti y Alberto Cabaleiro.",-,foto,sin datos,45,90
+13/07/1969,Yebra,neutral,victoria,3,2,Colón (Santa Fe),4to de final de la Copa Argentina 1969,Gasómetro,Brusca,"Néstor Hernandorena; José Diez, Alberto Dopacio, Edgardo Cantú y Rodolfo Chazarreta; Sebastián Viberti, Rodolfo Vilanoba y Meija; Hugo Tedesco, Alfredo Obberti y Luis Giribet.",-,foto,GOL Rodolfo Vilanoba (HUR)</br>GOL Hugo Tedesco (HUR)</br>GOL Luis Giribet (HUR)</br>PEN Huracán 2x3 Colón,45,90
+07/09/1969,Acosta,local,victoria,2,0,Estudiantes (La Plata),1° fecha del Campeonato Nacional 1969,Pedraza y Crámer
+12/09/1969,Acosta,visitante,empate,2,2,Platense,2° fecha del Campeonato Nacional 1969,El Cilindro
+21/09/1969,Acosta,local,derrota,0,3,Desamparados (San Juan),3° fecha del Campeonato Nacional 1969,Ferro,
+30/09/1969,Acosta,victoria,1,0,Talleres (Córdoba),4° fecha del Campeonato Nacional 1969,Barrio Jardín (Córdoba)
+05/10/1969,Acosta,victoria,5,0,San Lorenzo (Mar del Plata),5° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+12/10/1969,Acosta,victoria,2,0,San Martín (Tucumán),6° fecha del Campeonato Nacional 1969,La Ciudadela (Tucumán)
+16/10/1969,Acosta,victoria,1,0,Racing Club,7° fecha del Campeonato Nacional 1969,Gasómetro
+19/10/1969,Acosta,empate,0,0,Vélez Sarsfield,8° fecha del Campeonato Nacional 1969,José Amalfitani
+26/10/1969,Acosta,victoria,2,0,Chacarita Juniors,9° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+02/11/1969,Acosta,victoria,1,0,Quilmes,10° fecha del Campeonato Nacional 1969,Quilmes
+09/11/1969,Acosta,derrota,0,1,Lanús,11° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+12/11/1969,Acosta,empate,2,2,San Martín (Mendoza),12° fecha del Campeonato Nacional 1969,San Martín (Mendoza)
+16/11/1969,Acosta,derrota,1,2,Unión (Santa Fe),13° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+23/11/1969,Acosta,derrota,1,2,Independiente,14° fecha del Campeonato Nacional 1969Tomás A. Ducó
+30/11/1969,Acosta,derrota,0,1,Boca Juniors,15° fecha del Campeonato Nacional 1969,La Bombonera
+07/12/1969,Acosta,derrota,1,3,River Plate,16° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+14/12/1969,Acosta,derrota,1,2,San Lorenzo de Almagro,17° fecha del Campeonato Nacional 1969,Gasómetro
 04/03/1970,Vigo,visitante,derrota,2,4,Rosario Central,1° fase de la Copa Argentina 1970,Arroyito (Rosario),Boccardi,"Raúl Navarro; Rolando Gramari, Alberto Dopacio, Daniel Buglione (Palma) y Héctor Fresneda; Tito Gómez, Rodolfo Vilanoba y Hugo Tedesco (Juan C López); Alfredo Obberti, Héctor Veira y Osvaldo Clausi.","Biasutto; González, Alberto Fanesi, Mesiano y Jorge Carrascosa; Colman (H Díaz), M Bustos y Correa; Balbuena, Castronovo y Garello (Bustos).",foto,GOL Héctor Veira (HUR),45,90 (HUR)</br>GOL Balbuena (RCE)</br>GOL Alfredo Obberti (HUR)</br>GOL Correa (RCE) </br>GOL Tito Gómez (HUR)</br>GOL Castronovo (RCE),45,90
 07/03/1970,Vigo,local,empate,1,1,Rosario Central,1° fase de la Copa Argentina 1970,Tomás A. Ducó,Busca,"Raúl Navarro; Rolando Gramari, Alberto Dopacio, Daniel Buglione y Héctor Fresneda; Tito Gómez (José Varela), Rodolfo Vilanoba y Hugo Tedesco; Juan C López (A Sotelo), Héctor Veira y Osvaldo Clausi.","Biasutto; González, Alberto Fanesi, Mesiano y Jorge Carrascosa; Pierucci, M Bustos y Correa (Díaz); Balbuena, Castronovo y A Gómez (Zavagno).",foto,8 GOL Osvaldo Clausi (HUR)</br>85 GOL Zavagno (RCE),45,90
 22/03/1970,Vigo,local,victoria,5,3,Los Andes,1° fecha del Campeonato Metropolitano 1970,Tomás A. Ducó,Ducatelli,"Raúl Navarro; Héctor Fresneda, Alberto Dopacio, Edgardo Cantú y Nelson López; Tito Gómez, Rodolfo Vilanoba y Héctor Veira (Osvaldo Clausi); Hugo Tedesco, Roque Avallay y Luis Giribet.",-,foto,4 GOL Luis Giribet (HUR) </br>15 GOL Hugo Tedesco (HUR)</br>24 GOL Luis Giribet (HUR)</br>49 GOL Hugo Tedesco (HUR)</br>70 GOL Nelson López (HUR),45,90
@@ -87,7 +126,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 26/04/1970,Pedernera,visitante,victoria,2,0,Boca Juniors,7° fecha del Campeonato Metropolitano 1970,La Bombonera,Mateo,"Raúl Navarro; Julio Alas, Alberto Dopacio (Daniel Buglione), Edgardo Cantú y Héctor Fresneda; Alberto Rendo (Carlos Leone), Rodolfo Vilanoba y Miguel Brindisi; Hugo Tedesco, Roque Avallay y Luis Giribet.",-,foto,12 GOL Miguel Brindisi (HUR)</br>49 GOL Luis Giribet (HUR),45,90
 03/05/1970,Pedernera,local,victoria,3,2,San Lorenzo de Almagro,8° fecha del Campeonato Metropolitano 1970,Tomás A. Ducó,Coerezza,"Raúl Navarro; Julio Alas, Daniel Buglione, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba y Brindisi; Hugo Tedesco, Roque Avallay y Luis Giribet.",-,foto,25 Roque Avallay (HUR)</br>29 GOL Alberto Rendo (HUR)</br>69 GOL Hugo Tedesco (HUR)
 10/05/1970,Pedernera,visitante,empate,0,0,Argentinos Juniors,9° fecha del Campeonato Metropolitano 1970,Atlanta,Ángel Coerezza,"Raúl Navarro; Julio Alas, Daniel Buglione, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba y Miguel Brindisi; Hugo Tedesco, Roque Avallay y Luis Giribet.",-,foto,sin datos,45,90
-18/05/1970,Pedernera,local,empate,0,0,Banfield,10° fecha del Campeonato Metropolitano 1970,El Gasómetro,Leiró,"Raúl Navarro; Julio Alas, Daniel Buglione, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba y Miguel Brindisi; Hugo Tedesco, Roque Avallay (Araquem de Melo) y Luis Giribet.",-,foto,sin datos,45,90
+18/05/1970,Pedernera,local,empate,0,0,Banfield,10° fecha del Campeonato Metropolitano 1970,Gasómetro,Leiró,"Raúl Navarro; Julio Alas, Daniel Buglione, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba y Miguel Brindisi; Hugo Tedesco, Roque Avallay (Araquem de Melo) y Luis Giribet.",-,foto,sin datos,45,90
 24/05/1970,Pedernera,local,empate,1,1,Chacarita Juniors,11° fecha del Campeonato Metropolitano 1970,Tomás A. Ducó,García,"Raúl Navarro; Julio Alas, Daniel Buglione, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba (Carlos Leone) y Miguel Brindisi; Hugo Tedesco, Araquem de Melo y Luis Giribet.",-,foto,41 GOL Luis Giribet (HUR),45,90
 28/05/1970,Pedernera,visitante,empate,2,2,Lanús,12° fecha del Campeonato Metropolitano 1970,Lanús,Roberto Barreiro,"Raúl Navarro; Julio Alas (Rolando Gramari), Daniel Buglione, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba y Miguel Brindisi; Hugo Tedesco, Araquem de Melo y Luis Giribet.",-,foto,1 GOL Miguel Brindisi; 12', Tedesco (HUR),45,90
 31/05/1970,Pedernera,local,derrota,2,4,Atlanta,13° fecha del Campeonato Metropolitano 1970,Tomás A. Ducó,Goicoechea,"Raúl Navarro; Rolando Gramari, Alberto Dopacio, Edgardo Cantú y Héctor Fresneda; Alberto Rendo, Rodolfo Vilanoba y Miguel Brindisi; Hugo Tedesco, Araquem de Melo (Carlos Babington) y Luis Giribet.",foto,80 GOL Carlos Babington (HUR); 82 GOL Alberto Rendo (HUR),45,90
