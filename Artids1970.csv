@@ -101,20 +101,20 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 07/09/1969,Acosta,local,victoria,2,0,Estudiantes (La Plata),1° fecha del Campeonato Nacional 1969,Pedraza y Crámer
 12/09/1969,Acosta,visitante,empate,2,2,Platense,2° fecha del Campeonato Nacional 1969,El Cilindro
 21/09/1969,Acosta,local,derrota,0,3,Desamparados (San Juan),3° fecha del Campeonato Nacional 1969,Ferro,
-30/09/1969,Acosta,victoria,1,0,Talleres (Córdoba),4° fecha del Campeonato Nacional 1969,Barrio Jardín (Córdoba)
-05/10/1969,Acosta,victoria,5,0,San Lorenzo (Mar del Plata),5° fecha del Campeonato Nacional 1969,Tomás A. Ducó
-12/10/1969,Acosta,victoria,2,0,San Martín (Tucumán),6° fecha del Campeonato Nacional 1969,La Ciudadela (Tucumán)
-16/10/1969,Acosta,victoria,1,0,Racing Club,7° fecha del Campeonato Nacional 1969,Gasómetro
-19/10/1969,Acosta,empate,0,0,Vélez Sarsfield,8° fecha del Campeonato Nacional 1969,José Amalfitani
-26/10/1969,Acosta,victoria,2,0,Chacarita Juniors,9° fecha del Campeonato Nacional 1969,Tomás A. Ducó
-02/11/1969,Acosta,victoria,1,0,Quilmes,10° fecha del Campeonato Nacional 1969,Quilmes
-09/11/1969,Acosta,derrota,0,1,Lanús,11° fecha del Campeonato Nacional 1969,Tomás A. Ducó
-12/11/1969,Acosta,empate,2,2,San Martín (Mendoza),12° fecha del Campeonato Nacional 1969,San Martín (Mendoza)
-16/11/1969,Acosta,derrota,1,2,Unión (Santa Fe),13° fecha del Campeonato Nacional 1969,Tomás A. Ducó
-23/11/1969,Acosta,derrota,1,2,Independiente,14° fecha del Campeonato Nacional 1969Tomás A. Ducó
-30/11/1969,Acosta,derrota,0,1,Boca Juniors,15° fecha del Campeonato Nacional 1969,La Bombonera
-07/12/1969,Acosta,derrota,1,3,River Plate,16° fecha del Campeonato Nacional 1969,Tomás A. Ducó
-14/12/1969,Acosta,derrota,1,2,San Lorenzo de Almagro,17° fecha del Campeonato Nacional 1969,Gasómetro
+30/09/1969,Acosta,visitante,victoria,1,0,Talleres (Córdoba),4° fecha del Campeonato Nacional 1969,Barrio Jardín (Córdoba)
+05/10/1969,Acosta,local,victoria,5,0,San Lorenzo (Mar del Plata),5° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+12/10/1969,Acosta,visitante,victoria,2,0,San Martín (Tucumán),6° fecha del Campeonato Nacional 1969,La Ciudadela (Tucumán)
+16/10/1969,Acosta,local,victoria,1,0,Racing Club,7° fecha del Campeonato Nacional 1969,Gasómetro
+19/10/1969,Acosta,visitante,empate,0,0,Vélez Sarsfield,8° fecha del Campeonato Nacional 1969,José Amalfitani
+26/10/1969,Acosta,local,victoria,2,0,Chacarita Juniors,9° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+02/11/1969,Acosta,visitante,victoria,1,0,Quilmes,10° fecha del Campeonato Nacional 1969,Quilmes
+09/11/1969,Acosta,local,derrota,0,1,Lanús,11° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+12/11/1969,Acosta,visitante,empate,2,2,San Martín (Mendoza),12° fecha del Campeonato Nacional 1969,San Martín (Mendoza)
+16/11/1969,Acosta,local,derrota,1,2,Unión (Santa Fe),13° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+23/11/1969,Acosta,local,derrota,1,2,Independiente,14° fecha del Campeonato Nacional 1969Tomás A. Ducó
+30/11/1969,Acosta,visitante,derrota,0,1,Boca Juniors,15° fecha del Campeonato Nacional 1969,La Bombonera
+07/12/1969,Acosta,local,derrota,1,3,River Plate,16° fecha del Campeonato Nacional 1969,Tomás A. Ducó
+14/12/1969,Acosta,visitante,derrota,1,2,San Lorenzo de Almagro,17° fecha del Campeonato Nacional 1969,Gasómetro
 04/03/1970,Vigo,visitante,derrota,2,4,Rosario Central,1° fase de la Copa Argentina 1970,Arroyito (Rosario),Boccardi,"Raúl Navarro; Rolando Gramari, Alberto Dopacio, Daniel Buglione (Palma) y Héctor Fresneda; Tito Gómez, Rodolfo Vilanoba y Hugo Tedesco (Juan C López); Alfredo Obberti, Héctor Veira y Osvaldo Clausi.","Biasutto; González, Alberto Fanesi, Mesiano y Jorge Carrascosa; Colman (H Díaz), M Bustos y Correa; Balbuena, Castronovo y Garello (Bustos).",foto,GOL Héctor Veira (HUR),45,90 (HUR)</br>GOL Balbuena (RCE)</br>GOL Alfredo Obberti (HUR)</br>GOL Correa (RCE) </br>GOL Tito Gómez (HUR)</br>GOL Castronovo (RCE),45,90
 07/03/1970,Vigo,local,empate,1,1,Rosario Central,1° fase de la Copa Argentina 1970,Tomás A. Ducó,Busca,"Raúl Navarro; Rolando Gramari, Alberto Dopacio, Daniel Buglione y Héctor Fresneda; Tito Gómez (José Varela), Rodolfo Vilanoba y Hugo Tedesco; Juan C López (A Sotelo), Héctor Veira y Osvaldo Clausi.","Biasutto; González, Alberto Fanesi, Mesiano y Jorge Carrascosa; Pierucci, M Bustos y Correa (Díaz); Balbuena, Castronovo y A Gómez (Zavagno).",foto,8 GOL Osvaldo Clausi (HUR)</br>85 GOL Zavagno (RCE),45,90
 22/03/1970,Vigo,local,victoria,5,3,Los Andes,1° fecha del Campeonato Metropolitano 1970,Tomás A. Ducó,Ducatelli,"Raúl Navarro; Héctor Fresneda, Alberto Dopacio, Edgardo Cantú y Nelson López; Tito Gómez, Rodolfo Vilanoba y Héctor Veira (Osvaldo Clausi); Hugo Tedesco, Roque Avallay y Luis Giribet.",-,foto,4 GOL Luis Giribet (HUR) </br>15 GOL Hugo Tedesco (HUR)</br>24 GOL Luis Giribet (HUR)</br>49 GOL Hugo Tedesco (HUR)</br>70 GOL Nelson López (HUR),45,90
