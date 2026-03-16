@@ -203,40 +203,40 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 04/12/1971,Menotti,local,empate,1,1,River Plate,12° fecha del Campeonato Nacional 1971,Gasómetro,
 07/12/1971,Menotti,visitante,victoria,2,0,Argentinos Juniors,13° fecha del Campeonato Nacional 1971,Atlanta,
 11/12/1971,Menotti,local,derrota,0,2,Kimberley (Mar del Plata),14° fecha del Campeonato Nacional 1971,Gral. San Martín (Mar del Plata)
-27/02/1972,Menotti,visitante,derrota,2,3,Racing Club
-05/03/1972,Menotti,local,victoria,3,1,Estudiantes (La Plata)
-12/03/1972,Menotti,visitante,victoria,2,0,Lanús
-15/03/1972,Menotti,local,derrota,2,3,Atlanta
-19/03/1972,Menotti,visitante,derrota,1,2,Colón (Santa Fe)
-24/03/1972,Menotti,visitante,empate,2,2,Vélez Sarsfield
-30/03/1972,Menotti,local,derrota,1,2,Rosario Central
-02/04/1972,Menotti,visitante,empate,2,2,Boca Juniors
-09/04/1972,Menotti,local,empate,1,1,Independiente
-13/04/1972,Menotti,visitante,victoria,3,1,Gimnasia y Esgrima (La Plata)
-16/04/1972,Menotti,local,victoria,3,1,Argentinos Juniors
-23/04/1972,Menotti,visitante,victoria,2,0,Banfield
-30/04/1972,Menotti,local,empate,2,2,Chacarita Juniors
-07/05/1972,Menotti,visitante,empate,2,2,San Lorenzo de Almagro
-14/05/1972,Menotti,local,victoria,2,1,Ferro C. Oeste
-21/05/1972,Menotti,visitante,empate,2,2,Newell's Old Boys
-28/05/1972,Menotti,local,empate,1,1,River Plate
-04/06/1972,Menotti,local,empate,1,1,Racing Club
-09/06/1972,Menotti,visitante,derrota,1,2,Estudiantes (La Plata)
-18/06/1972,Menotti,local,victoria,4,3,Lanús
-25/06/1972,Menotti,visitante,victoria,4,1,Atlanta
-08/07/1972,Menotti,local,derrota,1,4,Colón (Santa Fe)
-16/07/1972,Menotti,local,derrota,0,1,Vélez Sarsfield
-23/07/1972,Menotti,visitante,derrota,0,1,Rosario Central
-30/07/1972,Menotti,local,victoria,5,1,Boca Juniors
-06/08/1972,Menotti,visitante,empate,1,1,Independiente
-13/08/1972,Menotti,local,3,1,Gimnasia y Esgrima (La Plata)
-20/08/1972,Menotti,visitante,empate,2,2,Argentinos Juniors
-27/08/1972,Menotti,local,victoria,1,0,Banfield
-03/09/1972,Menotti,visitante,empate,1,1,Chacarita Juniors
-10/09/1972,Menotti,local,victoria,3,0,San Lorenzo de Almagro
-17/09/1972,Menotti,visitante,empate,2,2,Ferro C. Oeste
-24/09/1972,Menotti,local,victoria,2,1,Newell's Old Boys
-30/09/1972,Menotti,visitante,victoria,2,1,River Plate
+27/02/1972,Menotti,visitante,derrota,2,3,Racing Club,1° fecha del Campeonato Metropolitano 1972
+05/03/1972,Menotti,local,victoria,3,1,Estudiantes (La Plata),2° fecha del Campeonato Metropolitano 1972
+12/03/1972,Menotti,visitante,victoria,2,0,Lanús,3° fecha del Campeonato Metropolitano 1972
+15/03/1972,Menotti,local,derrota,2,3,Atlanta,4° fecha del Campeonato Metropolitano 1972
+19/03/1972,Menotti,visitante,derrota,1,2,Colón (Santa Fe),5° fecha del Campeonato Metropolitano 1972
+24/03/1972,Menotti,visitante,empate,2,2,Vélez Sarsfield,6° fecha del Campeonato Metropolitano 1972
+30/03/1972,Menotti,local,derrota,1,2,Rosario Central,7° fecha del Campeonato Metropolitano 1972
+02/04/1972,Menotti,visitante,empate,2,2,Boca Juniors,8° fecha del Campeonato Metropolitano 1972
+09/04/1972,Menotti,local,empate,1,1,Independiente,9° fecha del Campeonato Metropolitano 1972
+13/04/1972,Menotti,visitante,victoria,3,1,Gimnasia y Esgrima (La Plata),10° fecha del Campeonato Metropolitano 1972
+16/04/1972,Menotti,local,victoria,3,1,Argentinos Juniors,11° fecha del Campeonato Metropolitano 1972
+23/04/1972,Menotti,visitante,victoria,2,0,Banfield,12° fecha del Campeonato Metropolitano 1972
+30/04/1972,Menotti,local,empate,2,2,Chacarita Juniors,13° fecha del Campeonato Metropolitano 1972
+07/05/1972,Menotti,visitante,empate,2,2,San Lorenzo de Almagro,14° fecha -interzonal- del Campeonato Metropolitano 1972
+14/05/1972,Menotti,local,victoria,2,1,Ferro C. Oeste,15° fecha del Campeonato Metropolitano 1972
+21/05/1972,Menotti,visitante,empate,2,2,Newell's Old Boys (Rosario),16° fecha del Campeonato Metropolitano 1972
+28/05/1972,Menotti,local,empate,1,1,River Plate,17° fecha del Campeonato Metropolitano 1972
+04/06/1972,Menotti,local,empate,1,1,Racing Club,18° fecha del Campeonato Metropolitano 1972
+09/06/1972,Menotti,visitante,derrota,1,2,Estudiantes (La Plata),19° fecha del Campeonato Metropolitano 1972
+18/06/1972,Menotti,local,victoria,4,3,Lanús,20° fecha del Campeonato Metropolitano 1972
+25/06/1972,Menotti,visitante,victoria,4,1,Atlanta,21° fecha del Campeonato Metropolitano 1972
+08/07/1972,Menotti,local,derrota,1,4,Colón (Santa Fe),22° fecha del Campeonato Metropolitano 1972
+16/07/1972,Menotti,local,derrota,0,1,Vélez Sarsfield,23° fecha del Campeonato Metropolitano 1972
+23/07/1972,Menotti,visitante,derrota,0,1,Rosario Central,24° fecha del Campeonato Metropolitano 1972
+30/07/1972,Menotti,local,victoria,5,1,Boca Juniors,25° fecha del Campeonato Metropolitano 1972
+06/08/1972,Menotti,visitante,empate,1,1,Independiente,26° fecha del Campeonato Metropolitano 1972
+13/08/1972,Menotti,local,3,1,Gimnasia y Esgrima (La Plata),27° fecha del Campeonato Metropolitano 1972
+20/08/1972,Menotti,visitante,empate,2,2,Argentinos Juniors,28° fecha del Campeonato Metropolitano 1972
+27/08/1972,Menotti,local,victoria,1,0,Banfield,29° fecha del Campeonato Metropolitano 1972
+03/09/1972,Menotti,visitante,empate,1,1,Chacarita Juniors,30° fecha del Campeonato Metropolitano 1972
+10/09/1972,Menotti,local,victoria,3,0,San Lorenzo de Almagro,31° fecha -interzonal- del Campeonato Metropolitano 1972
+17/09/1972,Menotti,visitante,empate,2,2,Ferro C. Oeste,32° fecha del Campeonato Metropolitano 1972
+24/09/1972,Menotti,local,victoria,2,1,Newell's Old Boys (Rosario),1° fecha del Campeonato Metropolitano 1972
+30/09/1972,Menotti,visitante,victoria,2,1,River Plate,1° fecha del Campeonato Metropolitano 1972
 15/10/1972,Menotti,visitante,derrota,1,2,Colón (Santa Fe),1° fecha del Campeonato Nacional 1972
 22/10/1972,Menotti,local,empate,1,1,Argentinos Juniors,2° fecha del Campeonato Nacional 1972
 27/10/1972,Menotti,visitante,victoria,4,3,Banfield,3° fecha del Campeonato Nacional 1972
