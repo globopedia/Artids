@@ -60,7 +60,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 20/12/1963,Zoppi,visitante,victoria,5,1,Selección de Colombia Juvenil,Gira por América (amistoso),Municipal (Girardot),Lires López,"Osvaldo Ayala; Pedro Cubilla, Carlos Arredondo, Castillo y Miguel Vidal; Fernández y Juan C Sarnari; Néstor Canevari, Juan J Rodríguez, Sarmiento y Jorge Diz.","Luna; Ortega, Castillo, Galiria y Herrera; Collantes y González; Toscano, Arcia, Pineros y Buitrago.",8 GOL Juan C Sarnari (HUR)</br>25 GOL Fernández (HUR)</br>38 GOL Diz (HUR)</br>75 GOL Toscano (HUR)</br>77 GOL Canaveri (HUR)</br>85 GOL Canevari (HUR),45,90
 22/12/1963,Zoppi,visitante,derrota,0,1,Millonarios (Colombia),Gira por América (amistoso),El Campín (Bogotá),Reynal (Colombia),-,-,36 GOL Gamboa (MIL)</br>36 EXP Canevari (HUR)</br>36 EXP Devoto (HUR)</br>36 EXP Rodríguez (HUR)</br>36 EXP Sarmiento (HUR) -se le permitió reingresar-,45,90
 16/04/1964,Spinetto,local,victoria,6,0,Flamengo RS (Brasil),Amistoso,Tomás A. Ducó,José Praddaude,"Osvaldo Ayala; Juan C Devoto, Jorge Ginarte, Juan C Schneider y Miguel Vidal; Alberto Rendo y Sebastián Viberti (Roberto Hiriart); Héctor Facundo (Carlos Santana), Oscar López, Arsenio Valdez y Roberto Brookes.","Sachet (Caliduro); Souza, Bastos, Olivera y Pescuma; Tonieto y Almeida; Moraes, Tomiello, (Guimaraes), Alves y Bacarel (Trindade).",foto,13 GOL Alberto Rendo (HUR)</br>26 GOL Arsenio Valdez (HUR)</br>31 GOL Héctor Facundo (HUR)</br>39 GOL Héctor Facundo (HUR)</br>44 GOL Héctor Facundo (HUR)</br>81 GOL Roberto Hiriart (HUR),45,90
-06/03/1966,Baldonedo,visitante,Victoria,4,3,Argentinos Juniors,1° fecha del Campeonato 1966,La Paternal
+06/03/1966,Baldonedo,visitante,victoria,4,3,Argentinos Juniors,1° fecha del Campeonato 1966,La Paternal
 13/03/1966,Baldonedo,local,victoria,3,1,Ferro C. Oeste,2° fecha del Campeonato 1966,Tomás A. Ducó
 20/03/1966,Baldonedo,visitante,empate,0,0,Rosario Central,3° fecha del Campeonato 1966,Arroyito (Rosario)
 27/03/1966,Baldonedo,local,victoria,1,0,Colón	(Santa Fe),4° fecha del Campeonato 1966,Tomás A. Ducó
@@ -91,7 +91,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 25/09/1966,Acosta,visitante,derrota,1,4,San Lorenzo de Almagro,29° fecha del Campeonato 1966,Gasómetro
 02/10/1966,Acosta,local,victoria,2,1,Atlanta,30° fecha del Campeonato 1966,Tomás A. Ducó
 09/10/1966,Acosta,visitante,derrota,1,2,Vélez Sarsfield,31° fecha del Campeonato 1966,José Amalfitani
-16/10/1966,Acosta,local,empate,0,0,Newell's Old Boys,32° fecha del Campeonato 1966,Tomás A. Ducó
+16/10/1966,Acosta,local,empate,0,0,Newell's Old Boys (Rosario),32° fecha del Campeonato 1966,Tomás A. Ducó
 23/10/1966,Acosta,visitante,derrota,0,2,Quilmes,33° fecha del Campeonato 1966,Quilmes
 30/10/1966,Acosta,local,empate,1,1,Banfield,34° fecha del Campeonato 1966,Tomás A. Ducó
 13/11/1966,Acosta,visitante,empate,1,1,Chacarita Juniors,35° fecha del Campeonato 1966,San Martín
@@ -570,7 +570,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 11/07/1976,Juárez,neutral,victoria,4,2,Unión (Santa Fe),5° fecha (Fase Final) del Campeonato Metropolitano 1976
 14/07/1976,Juárez,neutral,victoria,4,2,San Lorenzo de Almagro,6° fecha (Fase Final) del Campeonato Metropolitano 1976
 17/07/1976,Juárez,neutral,victoria,2,1,Colón (Santa Fe),7° fecha (Fase Final) del Campeonato Metropolitano 1976
-26/07/1976,Juárez,neutral,Victoria,2,0,Newell's Old Boys,8° fecha (Fase Final) del Campeonato Metropolitano 1976
+26/07/1976,Juárez,neutral,victoria,2,0,Newell's Old Boys (Rosario),8° fecha (Fase Final) del Campeonato Metropolitano 1976
 01/08/1976,Juárez,neutral,derrota,0,1,Boca Juniors,9° fecha (Fase Final) del Campeonato Metropolitano 1976
 06/08/1976,Juárez,neutral,victoria,2,1,Quilmes,10° fecha (Fase Final) del Campeonato Metropolitano 1976
 08/08/1976,Juárez,neutral,empate,0,0,River Plate,11° fecha (Fase Final) del Campeonato Metropolitano 1976
@@ -635,7 +635,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 16/10/1977,Frutos,visitante,victoria,3,2,Platense,38° fecha del Campeonato Metropolitano 1977
 19/10/1977,Frutos,local,victoria,1,0,Chacarita Juniors,39° fecha del Campeonato Metropolitano 1977
 21/10/1977,Frutos,visitante,derrota,0,1,Racing Club,40° fecha del Campeonato Metropolitano 1977
-26/10/1977,Frutos,local,victoria,3,1,Newell's Old Boys,41° fecha del Campeonato Metropolitano 1977
+26/10/1977,Frutos,local,victoria,3,1,Newell's Old Boys (Rosario),41° fecha del Campeonato Metropolitano 1977
 30/10/1977,Frutos,visitante,derrota,0,2,Argentinos Juniors,42° fecha del Campeonato Metropolitano 1977
 02/11/1977,Frutos,local,victoria,3,1,Unión (Santa Fe) ,43° fecha del Campeonato Metropolitano 1977
 06/11/1977,Frutos,visitante,derrota,1,2,River Plate,44° fecha del Campeonato Metropolitano 1977
@@ -733,7 +733,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 17/06/1979,Cayetano,local,victoria,1,0,Racing Club,14° fecha del Campeonato Metropolitano 1979
 23/06/1979,Cayetano,visitante,derrota,2,3,Argentinos Juniors,15° fecha del Campeonato Metropolitano 1979
 01/07/1979,Cayetano,local,victoria,3,1,Platense,16° fecha del Campeonato Metropolitano 1979
-08/07/1979,Cayetano,visitante,derrota,1,5,Newell's Old Boys,17° fecha del Campeonato Metropolitano 1979
+08/07/1979,Cayetano,visitante,derrota,1,5,Newell's Old Boys (Rosario),17° fecha del Campeonato Metropolitano 1979
 15/07/1979,Cayetano,local,derrota,0,1,Vélez Sarsfield,18° fecha del Campeonato Metropolitano 1979
 10/08/1979,Cayetano,neutral,empate,0,0,Valencia (España),Semifinal de la Copa Mundial (amistoso),Nagai (Osaka),-,"Jesús Borzi; Abelardo Cheves, Víctor Longo, José Galván y Jorge Carrascosa; Miguel Brindisi (46 Ojeda), Miguel Gallardo (46 Demarta) y Carlos Babington; René Houseman (46 Romano), Jorge Sanabria y Dante Sanabria.","Pereira; Domingo (46 Saura), Palmer, Cerveró (Pepe Carrete) y Dani Cabezas; Higinio García (46 Botubot), Arias y Castellanos; Vilarrodá (46 Felman), Mario Kempes y José Albiol (46 Jiménez).",foto,1° Tiempo: Huracán 0x0 Valencia,45,90
 13/08/1979,Cayetano,neutral,derrota,3,4,Valencia (España),Semifinal -desempate- de la Copa Mundial (amistoso),Karakuen Park (Tokio),-,"Jesús Borzi; Abelardo Cheves, Víctor Longo, José Galván y Jorge Carrascosa; Miguel Brindisi, Miguel Gallardo y Carlos Babington; René Houseman, Jorge Sanabria y Dante Sanabria.","Pereira; Palmer, Cerveró, Dani Cabezas y Arias; Higinio García, Castellanos y Saura; Vilarrodá, Jiménez y Mario Kempes.",foto,27 GOL Saura (VAL) </br>39 GOL Carlos Babington (HUR)</br>51 GOL Miguel Brindisi (HUR)</br>55 GOL Saura (VAL)</br>60 GOL René Houseman (HUR)</br>65 GOL Saura (VAL)</br>73 Jiménez (VAL)
@@ -758,7 +758,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 02/03/1980,Vigo,local,victoria,3,2,All Boys,4° fecha del Campeonato de 1° 'A' 1980
 06/03/1980,Vigo,visitante,empate,0,0,Unión (Santa Fe),5° fecha del Campeonato de 1° 'A' 1980
 09/03/1980,Vigo,local,empate,0,0,Quilmes,6° fecha del Campeonato de 1° 'A' 1980
-16/03/1980,Vigo,visitante,derrota,1,5,Newell's Old Boys,7° fecha del Campeonato de 1° 'A' 1980
+16/03/1980,Vigo,visitante,derrota,1,5,Newell's Old Boys (Rosario),7° fecha del Campeonato de 1° 'A' 1980
 19/03/1980,Vigo,local,victoria,3,2,River Plate,8° fecha del Campeonato de 1° 'A' 1980
 23/03/1980,Vigo,visitante,victoria,5,2,Tigre,9° fecha del Campeonato de 1° 'A' 1980
 31/03/1980,Vigo,local,victoria,3,1,Independiente,10° fecha del Campeonato de 1° 'A' 1980
@@ -776,7 +776,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 15/06/1980,Vigo,visitante,victoria,4,1,All Boys,23° fecha del Campeonato de 1° 'A' 1980
 19/06/1980,Vigo,local,derrota,1,2,Unión (Santa Fe),24° fecha del Campeonato de 1° 'A' 1980
 22/06/1980,Vigo,visitante,empate,1,1,Quilmes,25° fecha del Campeonato de 1° 'A' 1980
-29/06/1980,Vigo,local,empate,1,1,Newell's Old Boys,26° fecha del Campeonato de 1° 'A' 1980
+29/06/1980,Vigo,local,empate,1,1,Newell's Old Boys (Rosario),26° fecha del Campeonato de 1° 'A' 1980
 02/07/1980,Vigo,visitante,victoria,1,0,River Plate,27° fecha del Campeonato de 1° 'A' 1980
 06/07/1980,Vigo,local,victoria,5,1,Tigre,28° fecha del Campeonato de 1° 'A' 1980
 08/07/1980,Vigo,visitante,empate,1,1,Independiente,29° fecha del Campeonato de 1° 'A' 1980
@@ -829,7 +829,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 14/06/1981,Celoria,visitante,derrota,0,2,Sarmiento (Junín),23° fecha del Campeonato de 1° 'A' 1981
 21/06/1981,Celoria,local,empate,1,1,Unión (Santa Fe),24° fecha del Campeonato de 1° 'A' 1981
 24/06/1981,Celoria,visitante,victoria,1,0,San Lorenzo de Almagro,25° fecha del Campeonato de 1° 'A' 1981
-26/06/1981,Celoria,local,Victoria,2,0,Newell's Old Boys,26° fecha del Campeonato de 1° 'A' 1981
+26/06/1981,Celoria,local,victoria,2,0,Newell's Old Boys (Rosario),26° fecha del Campeonato de 1° 'A' 1981
 05/07/1981,Celoria,visitante,empate,0,0,Independiente,27° fecha del Campeonato de 1° 'A' 1981
 09/07/1981,Celoria,local,derrota,1,3,River Plate,28° fecha del Campeonato de 1° 'A' 1981
 12/07/1981,Celoria,visitante,victoria,4,0,Vélez Sarsfield,29° fecha del Campeonato de 1° 'A' 1981
@@ -874,7 +874,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 08/08/1982,Varacka,visitante,victoria,2,0,Sarmiento (Junín),4° fecha del Campeonato de 1° 'A' 1982
 14/08/1982,Varacka,local,empate,0,0,Instituto (Córdoba),5° fecha del Campeonato de 1° 'A' 1982
 17/08/1982,Varacka,visitante,victoria,2,0,Nueva Chicago,6° fecha del Campeonato de 1° 'A' 1982
-22/08/1982,Varacka,local,victoria,2,0,Newell's Old Boys,7° fecha del Campeonato de 1° 'A' 1982
+22/08/1982,Varacka,local,victoria,2,0,Newell's Old Boys (Rosario),7° fecha del Campeonato de 1° 'A' 1982
 29/08/1982,Varacka,visitante,empate,1,1,Argentinos Juniors,8° fecha del Campeonato de 1° 'A' 1982
 05/09/1982,Varacka,local,empate,0,0River Plate,9° fecha del Campeonato de 1° 'A' 1982
 08/09/1982,Varacka,visitante,empate,0,0,Racing Club,10° fecha del Campeonato de 1° 'A' 1982
