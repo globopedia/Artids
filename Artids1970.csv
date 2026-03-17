@@ -60,12 +60,50 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 20/12/1963,Zoppi,visitante,victoria,5,1,Selección de Colombia Juvenil,Gira por América (amistoso),Municipal (Girardot),Lires López,"Osvaldo Ayala; Pedro Cubilla, Carlos Arredondo, Castillo y Miguel Vidal; Fernández y Juan C Sarnari; Néstor Canevari, Juan J Rodríguez, Sarmiento y Jorge Diz.","Luna; Ortega, Castillo, Galiria y Herrera; Collantes y González; Toscano, Arcia, Pineros y Buitrago.",8 GOL Juan C Sarnari (HUR)</br>25 GOL Fernández (HUR)</br>38 GOL Diz (HUR)</br>75 GOL Toscano (HUR)</br>77 GOL Canaveri (HUR)</br>85 GOL Canevari (HUR),45,90
 22/12/1963,Zoppi,visitante,derrota,0,1,Millonarios (Colombia),Gira por América (amistoso),El Campín (Bogotá),Reynal (Colombia),-,-,36 GOL Gamboa (MIL)</br>36 EXP Canevari (HUR)</br>36 EXP Devoto (HUR)</br>36 EXP Rodríguez (HUR)</br>36 EXP Sarmiento (HUR) -se le permitió reingresar-,45,90
 16/04/1964,Spinetto,local,victoria,6,0,Flamengo RS (Brasil),Amistoso,Tomás A. Ducó,José Praddaude,"Osvaldo Ayala; Juan C Devoto, Jorge Ginarte, Juan C Schneider y Miguel Vidal; Alberto Rendo y Sebastián Viberti (Roberto Hiriart); Héctor Facundo (Carlos Santana), Oscar López, Arsenio Valdez y Roberto Brookes.","Sachet (Caliduro); Souza, Bastos, Olivera y Pescuma; Tonieto y Almeida; Moraes, Tomiello, (Guimaraes), Alves y Bacarel (Trindade).",foto,13 GOL Alberto Rendo (HUR)</br>26 GOL Arsenio Valdez (HUR)</br>31 GOL Héctor Facundo (HUR)</br>39 GOL Héctor Facundo (HUR)</br>44 GOL Héctor Facundo (HUR)</br>81 GOL Roberto Hiriart (HUR),45,90
+06/03/1966,Baldonedo,visitante,Victoria,4,3,Argentinos Juniors,1° fecha del Campeonato 1966,La Paternal
+13/03/1966,Baldonedo,local,victoria,3,1,Ferro C. Oeste,2° fecha del Campeonato 1966,Tomás A. Ducó
+20/03/1966,Baldonedo,visitante,empate,0,0,Rosario Central,3° fecha del Campeonato 1966,Arroyito (Rosario)
+27/03/1966,Baldonedo,local,victoria,1,0,Colón	(Santa Fe),4° fecha del Campeonato 1966,Tomás A. Ducó
+03/04/1966,Baldonedo,visitante,derrota,1,5,Lanús,5° fecha del Campeonato 1966,Lanús
+10/04/1966,Baldonedo,local,victoria,1,0,Platense,6° fecha del Campeonato 1966,Tomás A. Ducó
+17/04/1966,Baldonedo,visitante,empate,2,2,Boca Juniors,7° fecha del Campeonato 1966,La Bombonera
+24/04/1966,Baldonedo,local,derrota,1,2,Gimnasia y Esgrima (La Plata),8° fecha del Campeonato 1966,Tomás A. Ducó
+01/05/1966,Baldonedo,visitante,derrota,0,2,Racing	Club,9° fecha del Campeonato 1966,El Cilindro
+08/05/1966,Baldonedo,local,derrota,1,2,San Lorenzo de Almagro,10° fecha del Campeonato 1966,Tomás A. Ducó
+15/05/1966,Baldonedo,visitante,derrota,0,7,Atlanta,11° fecha del Campeonato 1966,Atlanta
+22/05/1966,Lúpiz,local,victoria,4,0,Vélez Sarsfield,12° fecha del Campeonato 1966,Tomás A. Ducó
+29/05/1966,Lúpiz,visitante,derrota,0,1,Newell's Old Boys (Rosario),13° fecha del Campeonato 1966,Parque Independencia (Rosario)
+05/06/1966,Lúpiz,local,victoria,1,0,Quilmes,14° fecha del Campeonato 1966,Tomás A. Ducó
+12/06/1966,Lúpiz,visitante,derrota,1,4,Banfield,15° fecha del Campeonato 1966,Florencio Sola
+19/06/1966,Lúpiz,local,derrota,0,1,Chacarita Juniors,16° fecha del Campeonato 1966,Tomás A. Ducó
+26/06/1966,Acosta,visitante,derrota,0,3,River Plate,17° fecha del Campeonato 1966,Monumental
+03/07/1966,Acosta,local,victoria,2,1,Estudiantes (La Plata),18° fecha del Campeonato 1966,Tomás A. Ducó
+17/07/1966,Acosta,visitante,derrota,0,1,Independiente,19° fecha del Campeonato 1966,Doble Visera
+24/07/1966,Acosta,local,victoria,2,0,Argentinos Juniors,20° fecha del Campeonato 1966,Tomás A. Ducó
+31/07/1966,Acosta,visitante,empate,1,1,Ferro C. Oeste,21° fecha del Campeonato 1966,Ferro
+07/08/1966,Acosta,local,derrota,0,1,Rosario Central,22° fecha del Campeonato 1966,Tomás A. Ducó
+14/08/1966,Acosta,visitante,derrota,0,1,Colón (Santa Fe),23° fecha del Campeonato 1966,Cementerio de Elefantes (Santa Fe)
+21/08/1966,Acosta,local,derrota,1,2,Lanús,24° fecha del Campeonato 1966,Tomás A. Ducó
+28/08/1966,Acosta,visitante,empate,1,1,Platense,25° fecha del Campeonato 1966,Pedraza y Cramer
+04/09/1966,Acosta,local,victoria,3,0,Boca Juniors,26° fecha del Campeonato 1966,Tomás A. Ducó
+11/09/1966,Acosta,visitante,derrota,0,3,Gimnasia y Esgrima (La Plata),27° fecha del Campeonato 1966,El Bosque (La Plata)	
+18/09/1966,Acosta,local,empate,2,2,Racing Club,28° fecha del Campeonato 1966,Tomás A. Ducó
+25/09/1966,Acosta,visitante,derrota,1,4,San Lorenzo de Almagro,29° fecha del Campeonato 1966,Gasómetro
+02/10/1966,Acosta,local,victoria,2,1,Atlanta,30° fecha del Campeonato 1966,Tomás A. Ducó
+09/10/1966,Acosta,visitante,derrota,1,2,Vélez Sarsfield,31° fecha del Campeonato 1966,José Amalfitani
+16/10/1966,Acosta,local,empate,0,0,Newell's Old Boys,32° fecha del Campeonato 1966,Tomás A. Ducó
+23/10/1966,Acosta,visitante,derrota,0,2,Quilmes,33° fecha del Campeonato 1966,Quilmes
+30/10/1966,Acosta,local,empate,1,1,Banfield,34° fecha del Campeonato 1966,Tomás A. Ducó
+13/11/1966,Acosta,visitante,empate,1,1,Chacarita Juniors,35° fecha del Campeonato 1966,San Martín
+20/11/1966,Acosta,local,empate,1,1,River Plate,36° fecha del Campeonato 1966,Tomás A. Ducó
+25/11/1966,Acosta,visitante,empate,1,1,Estudiantes (La Plata),37° fecha del Campeonato 1966,Uno (La Plata)
 27/11/1966,Acosta,visitante,victoria,1,0,Internacional SC (Brasil),Inauguración del Vermelhao (amistoso),Vermelhao (Lages),Bezerra,"Raúl Navarro; Eduardo Tarchini, Ernesto Jáuregui, Jorge Ginarte, y Juan C Devoto; Tito Gómez y Sebastián Viberti; Hugo Tedesco, Zárate (Nogara), Poncio y Alberto Cabaleiro.","Batista; Setembrino, Nicodemus, Dair y Leoquídio; Zezé y Carlinhos; Osvaldo (Roberto Caramuru), Ricardo, Puskas y Anacleto (Abílio).",foto,80 GOL Alberto Cabaleiro (HUR),45,90
-05/03/1967,local,derrota,1,2,Estudiantes (La Plata),1° fecha del Campeonato Metropolitano 1967,Tomás A. Ducó
-12/03/1967,local,derrota,0,2,San Lorenzo de Almagro,2° fecha -interzonal- del Campeonato Metropolitano 1967,Tomás A. Ducó
-19/03/1967,visitante,victoria,3,2,Lanús,3° fecha del Campeonato Metropolitano 1967,Lanús
-26/03/1967,local,victoria,3,1,Atlanta,4° fecha del Campeonato Metropolitano 1967,Tomás A. Ducó
-04/03/1967,visitante,derrota,2,3,Boca Juniors,5° fecha del Campeonato Metropolitano 1967,La Bombonera
+02/12/1966,Acosta,local,empate,1,1,Independiente,38° fecha del Campeonato 1966,Tomás A. Ducó
+05/03/1967,Acosta,local,derrota,1,2,Estudiantes (La Plata),1° fecha del Campeonato Metropolitano 1967,Tomás A. Ducó
+12/03/1967,Acosta,local,derrota,0,2,San Lorenzo de Almagro,2° fecha -interzonal- del Campeonato Metropolitano 1967,Tomás A. Ducó
+19/03/1967,Acosta,visitante,victoria,3,2,Lanús,3° fecha del Campeonato Metropolitano 1967,Lanús
+26/03/1967,Acosta,local,victoria,3,1,Atlanta,4° fecha del Campeonato Metropolitano 1967,Tomás A. Ducó
+04/03/1967,Acosta,visitante,derrota,2,3,Boca Juniors,5° fecha del Campeonato Metropolitano 1967,La Bombonera
 09/04/1967,Baldonedo,local,derrota,1,4,Racing Club,6° fecha del Campeonato Metropolitano 1967,Tomás A. Ducó
 16/04/1967,Baldonedo,visitante,victoria,2,1,Vélez Sarsfield,7° fecha del Campeonato Metropolitano 1967,José Amalfitani
 23/04/1967,Baldonedo,local,victoria,3,1,Newell's Old Boys (Rosario),8° fecha del Campeonato Metropolitano 1967,Gasómetro
