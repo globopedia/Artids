@@ -1,68 +1,68 @@
 Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,Árbitro,Huracán,Rival,Foto,Incidencias,Fin1T,Fin2T
-06/02/1985,Guerra,local,empate,2,2,Los Andes,Amistoso
-08/02/1985,Guerra,visitante,victoria,1,0,Andes Talleres (Mendoza),Amistoso
-10/02/1985,Guerra,visitante,victoria,2,1,Huracán (Mendoza),Amistoso
+06/02/1985,Guerra,local,empate,2,2,Los Andes,Amistoso,-,-,-,-,foto,sin datos,45,90
+08/02/1985,Guerra,visitante,victoria,1,0,Andes Talleres (Mendoza),Amistoso,-,-,-,-,foto,sin datos,45,90
+10/02/1985,Guerra,visitante,victoria,2,1,Huracán (Mendoza),Amistoso,-,-,-,-,foto,sin datos,45,90
 17/02/1985,Guerra,local,empate,1,1,Guaraní A. Franco (Posadas),1° fecha del Campeonato Nacional 'Gral. San Martín',Tomás A. Ducó,-,-,-,foto,GOL Claudio Morresi (HUR),45,90
 24/02/1985,Guerra,local,empate,1,1,Talleres (Córdoba),2° fecha del Campeonato Nacional 'Gral. San Martín',Tomás A. Ducó,-,-,-,foto,GOL Claudio Morresi (HUR),45,90
-27/02/1985,Guerra,visitante,empate,1,1,Atl. Santa Rosa,Amistoso
-03/03/1985,Guerra,visitante,empate,1,1,Independiente,3° fecha del Campeonato Nacional 'Gral. San Martín',Doble Visera,-,-,-,foto,GOL Claudio Morresi (HUR)
-06/03/1985,Guerra,visitante,derrota,0,1,Talleres (Córdoba),4° fecha del Campeonato Nacional 'Gral. San Martín',Mundialista (Córdoba)
-10/03/1985,Guerra,local,victoria,4,3,Independiente,5° fecha del Campeonato Nacional 'Gral. San Martín',Tomás A. Ducó,-,-,-,foto,GOL Claudio Morresi (HUR)<br>GOL Mendoza (HUR)<br>GOL Claudio García (HUR)
-17/03/1985,Guerra,visitante,derrota,1,2,Guaraní A. Franco (Posadas),6° fecha del Campeonato Nacional 'Gral. San Martín',Guaraní (Posadas),-,-,-,foto,GOL Claudio García (HUR)
-20/03/1985,Guerra,local,victoria,2,1,Racing (Córdoba),2° fase del Campeonato Nacional 'Gral. San Martín',Tomás A. Ducó,-,-,-,foto,GOL Claudio García (HUR)<br>GOL Claudio Morresi (HUR)
-24/03/1985,Guerra,visitante,empate,1,1,Racing (Córdoba),2° fase del Nacional 'Gral. San Martín',Nueva Italia (Córdoba),-,-,-,foto,GOL Néstor Candedo (HUR)
-31/03/1985,Guerra,neutral,empate,0,0,Chacarita Juniors,Rueda Perdedores del Campeonato Nacional 'Gral. San Martín',Atlanta,
-18/04/1985,Varacka,visitante,derrota,1,3,Gimnasia y Esgrima (La Plata),Amistoso
-12/05/1985,Varacka,local,empate,4,4,River Plate,Amistoso
+27/02/1985,Guerra,visitante,empate,1,1,Atl. Santa Rosa,Amistoso,-,-,-,-,foto,sin datos,45,90
+03/03/1985,Guerra,visitante,empate,1,1,Independiente,3° fecha del Campeonato Nacional 'Gral. San Martín',Doble Visera,-,-,-,foto,GOL Claudio Morresi (HUR),45,90
+06/03/1985,Guerra,visitante,derrota,0,1,Talleres (Córdoba),4° fecha del Campeonato Nacional 'Gral. San Martín',Mundialista (Córdoba),-,-,-,foto,sin datos,45,90
+10/03/1985,Guerra,local,victoria,4,3,Independiente,5° fecha del Campeonato Nacional 'Gral. San Martín',Tomás A. Ducó,-,-,-,foto,GOL Claudio Morresi (HUR)<br>GOL Mendoza (HUR)<br>GOL Claudio García (HUR),45,90
+17/03/1985,Guerra,visitante,derrota,1,2,Guaraní A. Franco (Posadas),6° fecha del Campeonato Nacional 'Gral. San Martín',Guaraní (Posadas),-,-,-,foto,GOL Claudio García (HUR),45,.90
+20/03/1985,Guerra,local,victoria,2,1,Racing (Córdoba),2° fase del Campeonato Nacional 'Gral. San Martín',Tomás A. Ducó,-,-,-,foto,GOL Claudio García (HUR)<br>GOL Claudio Morresi (HUR),45,90
+24/03/1985,Guerra,visitante,empate,1,1,Racing (Córdoba),2° fase del Nacional 'Gral. San Martín',Nueva Italia (Córdoba),-,-,-,foto,GOL Néstor Candedo (HUR),45,90
+31/03/1985,Guerra,neutral,empate,0,0,Chacarita Juniors,Rueda Perdedores del Campeonato Nacional 'Gral. San Martín',Atlanta,-,-,-,foto,sin datos,45,90
+18/04/1985,Varacka,visitante,derrota,1,3,Gimnasia y Esgrima (La Plata),Amistoso,-,-,-,-,foto,sin datos,45,90
+12/05/1985,Varacka,local,empate,4,4,River Plate,Amistoso,-,-,-,-,foto,sin datos,45,90
 02/06/1985,Varacka,neutral,victoria,1,0,Selección de Tailandia,1° fecha de la Copa del Presidente (amistoso),Dongdaemun (Seúl),45,90
 04/06/1985,Varacka,visitante,empate,1,1,Selección de Corea del Sur,2° fecha de la Copa del Presidente (amistoso),Dongdaemun (Seúl),-,-,-,foto,21 GOL Claudio García (HUR)<br>75 GOL Baek Jong-Chul (COR),45,90
 09/06/1985,Varacka,visitante,derrota,1,4,Selección de Corea del Sur B,1° fecha de la Copa del Presidente (amistoso),Mudeung (Gwangju),-,-,-,foto,22 GOL Kim Jong-Boo (COR)<br>27 GOL Kim Joo-Sung,45,90 (COR)<br>58 GOL Lee Kee-Keun (COR)<br>75 GOL Darío Labaroni (HUR)<br>77 GOL Noh Soo-Jin (COR),45,90,
 11/06/1985,Varacka,neutral,derrota,2,5,Selección de Irak,2° fecha de la Copa del Presidente (amistoso),Civil (Daegu),-,Adrián Janin,-,foto,5 GOL Karim Allawi (IRA)<br>17 GOL Ahmad Radhi (IRA)<br>55 GOL Claudio (HUR)<br>61 GOL Adrián Janin (HUR)<br>67 GOL Ahmad Radhi (IRA)<br>75 GOL Basil Gorgis (IRA)<br>85 GOL Karim Saddam (IRA),45,90
 13/06/1985,Varacka,neutral,derrota,1,2,Selección de Canadá,3° fecha de la Copa del Presidente (amistoso),Dongdaemun (Seúl),-,-,-,foto,GOL Mark Karpun (CAN)<br>GOL Mark Karpun (CAN),45,90
-02/07/1985,Varacka,visitante,derrota,1,3,Estudiantes (La Plata),Amistoso
-06/07/1985,Varacka,local,derrota,0,1,Argentinos Juniors,1° fecha del Campeonato de 1° 'A' 1985/86
-14/07/1985,Varacka,visitante,victoria,2,1,Independiente,2° fecha del Campeonato de 1° 'A' 1985/86
-21/07/1985,Varacka,local,derrota,0,1,River Plate,3° fecha del Campeonato de 1° 'A' 1985/86
-28/07/1985,Varacka,visitante,empate,0,0,Chacarita Juniors,4° fecha del Campeonato de 1° 'A' 1985/86
-04/08/1985,Varacka,local,empate,1,1,Talleres (Córdoba),5° fecha del Campeonato de 1° 'A' 1985/86
-11/08/1985,Varacka,visitante,derrota,0,3,Racing (Córdoba),6° fecha del Campeonato de 1° 'A' 1985/86
-18/08/1985,Varacka,local,derrota,0,1,Newell's Old Boys (Rosario),7° fecha del Campeonato de 1° 'A' 1985/86
-25/08/1985,Varacka,visitante,derrota,0,2,Vélez Sarsfield,8° fecha del Campeonato de 1° 'A' 1985/86
-01/09/1985,Varacka,local,empate,1,1,Gimnasia y Esgrima (La Plata),9° fecha del Campeonato de 1° 'A' 1985/86
-08/09/1985,Varacka,visitante,derrota,1,2,Español,10° fecha del Campeonato de 1° 'A' 1985/86
-15/09/1985,Varacka,local,derrota,1,2,Boca Juniors,11° fecha del Campeonato de 1° 'A' 1985/86
-22/09/1985,Varacka,visitante,2,2,Ferro C. Oeste,12° fecha del Campeonato de 1° 'A' 1985/86
-29/09/1985,Varacka,local,derrota,1,2,Platense,13° fecha del Campeonato de 1° 'A' 1985/86
-06/10/1985,Varacka,visitante,empate,1,1,Temperley,14° fecha del Campeonato de 1° 'A' 1985/86
-13/10/1985,Varacka,local,empate,1,1,Instituto (Córdoba),15° fecha del Campeonato de 1° 'A' 1985/86
-27/10/1985,Varacka,visitante,victoria,1,0,Unión (Santa Fe) ,17° fecha del Campeonato de 1° 'A' 1985/86
-04/11/1985,Varacka,local,derrota,1,3,Estudiantes (La Plata) ,18° fecha del Campeonato de 1° 'A' 1985/86
-09/11/1985,Varacka,visitante,empate,0,0,San Lorenzo de Almagro,19° fecha del Campeonato de 1° 'A' 1985/86
-24/11/1985,Varacka,visitante,empate,0,0,Argentinos Juniors,20° fecha del Campeonato de 1° 'A' 1985/86
-01/12/1985,Varacka,local,derrota,1,2,Independiente,21° fecha del Campeonato de 1° 'A' 1985/86
-08/12/1985,Varacka,visitante,empate,0,0,River Plate,22° fecha del Campeonato de 1° 'A' 1985/86
-15/12/1985,Varacka,local,victoria,2,0,Chacarita Juniors,23° fecha del Campeonato de 1° 'A' 1985/86
-18/12/1985,Varacka,visitante,victoria,3,1,Talleres (Córdoba),24° fecha del Campeonato de 1° 'A' 1985/86
-19/01/1986,Varacka,local,victoria,3,0,Racing (Córdoba),25° fecha del Campeonato de 1° 'A' 1985/86
-26/01/1986,Varacka,visitante,0,4,Newell's Old Boys (Rosario),26° fecha del Campeonato de 1° 'A' 1985/86
-02/02/1986,Dellacha,local,empate,0,0,Vélez Sarsfield,27° fecha del Campeonato de 1° 'A' 1985/86
-09/02/1986,Dellacha,visitante,victoria,2,1,Gimnasia y Esgrima (La Plata),28° fecha del Campeonato de 1° 'A' 1985/86
-16/02/1986,Dellacha,local,victoria,4,0,Español,29° fecha del Campeonato de 1° 'A' 1985/86
-23/02/1986,Dellacha,visitante,derrota,3,4,Boca Juniors,30° fecha del Campeonato de 1° 'A' 1985/86
-26/02/1986,Dellacha,local,empate,3,3,Ferro C. Oeste,31° fecha del Campeonato de 1° 'A' 1985/86
-02/03/1986,Dellacha,visitante,derrota,1,3,Platense,32° fecha del Campeonato de 1° 'A' 1985/86
-09/03/1986,Dellacha,local,victoria,2,1,Temperley,33° fecha del Campeonato de 1° 'A' 1985/86
-16/03/1986,Dellacha,visitante,victoria,3,0,Instituto,34° fecha del Campeonato de 1° 'A' 1985/86
-06/04/1986,Dellacha,local,derrota,0,1,Unión (Santa Fe),36° fecha del Campeonato de 1° 'A' 1985/86
-13/04/1986,Dellacha,visitante,victoria,3,2,Estudiantes (La Plata),37° fecha del Campeonato de 1° 'A' 1985/86
-20/04/1986,Dellacha,local,empate,1,1,San Lorenzo de Almagro,38° fecha del Campeonato de 1° 'A' 1985/86
-04/06/1986,Dellacha,local,victoria,2,0,Lanús,4to de final del Reducido 1986,Ferro,Pérez,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina (80 Carrizo), Claudio Cabrera y Claudio García; José Iglesias, Labaroni y Héctor Herrero.","Osvaldo Santos; Antonio Váttimos, Luis Sánchez Sotelo, Ricardo Demagistris y Juan C Ramírez; Rolando Bertolini, Ángel Mamberto y Héctor Vicente (70 Hugo Lacava Schell); Sergio Saturno, Leonardo Rodríguez y Gilmar Villagrán (51 Rubén Rojas).",foto,44 GOL Héctor Herrero (HUR)</br>51 GOL Claudio García (HUR)
-07/06/1986,Dellacha,visitante,victoria,3,2,Lanús,4to de final del Reducido 1986,Monumental,Carlos Mastrángelo,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina (73 José Zuttión), Claudio Cabrera y Claudio García; José Iglesias, Labaroni y Héctor Herrero.","Osvaldo Santos; Juan C Ramírez, Luis Sánchez Sotelo, Ricardo Demagistris y José Serrizuela; Rolando Bertolini, Ángel Mamberto (46 Oscar Lebioso), Néstor Sicher; Sergio Saturno, Rubén Rojas y Leonardo Rodríguez (61 Hugo Lacava Schell).",foto,23 GOL Daniel Messina (HUR) </br>27 GOL Claudio García (HUR)</br>55 GOL Héctor Herrero (HUR)</br>73 GOL Rojas (LAN) </br>77 GOL José Serrizuela (LAN)
-11/06/1986,Dellacha,local,victoria,1,0,Los Andes,Semifinal del Reducido 1986,José Amalfitani,Jorge Borrelli,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni.","Panciroli; Escobedo, Cuffaro Russo, Medina y Meza; Pizzo, Castro y Galloni, Ariel Paolorossi, Alarcón y Cuellos.",foto,11 GOL Claudio García (HUR).
-14/06/1986,Dellacha,visitante,victoria,3,1,Los Andes,Semifinal del Reducido 1986,Independiente,Manuel Jácome,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni (73 Carrizo).","Panciroli; Escobedo, Ariel Cuffaro Russo, Medina y Meza; Pizzo, Castro y Galloni (69 Lanzidei); Ariel Paolorossi, Alarcón (62 Díaz) y Cuellos.",foto,24 GOL Escobedo (AND)</br>40 GOL Eduardo Papa (HUR)</br>58 EXP Castro (AND)</br>59 GOL Carlos Torino (HUR)</br>65 GOL José Iglesias (HUR).
-18/06/1986,Dellacha,visitante,derrota,0,1,Italiano,Final del Reducido 1986,Ferro,Pérez,"Carlos Gay; Oscar López Turitich (23 Bottari), Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni (43 Gustavo Carrizo).","Lanari; Gioffré, Bianculli, Díaz y Albariño (65 Álvarez); Capocetti, Pereyra y Gómez; Salas (65 Sthelik), Godoy y Héctor Rivoira.",foto,68 GOL Gómez (ITA)</br>89 EXP Daniel Messina (HUR)</br>89 EXP Gómez (ITA)
-21/06/1986,Dellacha,local,victoria,2,1,Italiano,Final del Reducido 1986,José Amalfitani,Jorge Borrelli,"Carlos Gay; Oscar López Turitich (50 Bottari), Romero, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Vázquez (89 José Zuttión); Claudio García, José Iglesias y Héctor Herrero.","Lanari; Gioffré, Bianculli, Díaz y Albariño (64 Sthelik); Capocetti, Álvarez y Gómez; Salas (64 Lucero), Godoy y Héctor Rivoira.",foto,10 GOL Eduardo Papa (HUR)</br>61 GOL José Iglesias (HUR)</br>80 GOL Lucero (ITA)</br>89 EXP Héctor Herrero (HUR)
-24/06/1986,Dellacha,neutral,empate,2,2,Italiano,Final (desempate) del Reducido 1986,José Amalfitani,Patricio Sinnott,"Carlos Gay; Bottari, Romero, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Vázquez (80 Gustavo Carrizo); Claudio García, José Iglesias y José Zuttión (106 Corrado).","Lanari; Álvarez, Bianculli, Díaz y Gioffré; Héctor Rivoira (46 Kopriva), Capocetti (24 Albariño) y Gómez; Salas, Godoy y Lucero.",foto, <b>1° Tiempo: Huracán 0x0 Italiano</b></br>52 GOL Eduardo Papa (HUR)</br>55 GOL Díaz (ITA)</br>Se juega Tiempo Extra de 30 minutos</br>97 GOL Claudio García (HUR)</br>117 GOL Lucero (ITA)</br>120 EXP José Iglesias (HUR)</br><b>PEN Penales: Huracán 2x4 Italiano</b>
+02/07/1985,Varacka,visitante,derrota,1,3,Estudiantes (La Plata),Amistoso,-,-,-,-,foto,sin datos,45,90
+06/07/1985,Varacka,local,derrota,0,1,Argentinos Juniors,1° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+14/07/1985,Varacka,visitante,victoria,2,1,Independiente,2° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+21/07/1985,Varacka,local,derrota,0,1,River Plate,3° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+28/07/1985,Varacka,visitante,empate,0,0,Chacarita Juniors,4° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+04/08/1985,Varacka,local,empate,1,1,Talleres (Córdoba),5° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+11/08/1985,Varacka,visitante,derrota,0,3,Racing (Córdoba),6° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+18/08/1985,Varacka,local,derrota,0,1,Newell's Old Boys (Rosario),7° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+25/08/1985,Varacka,visitante,derrota,0,2,Vélez Sarsfield,8° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+01/09/1985,Varacka,local,empate,1,1,Gimnasia y Esgrima (La Plata),9° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+08/09/1985,Varacka,visitante,derrota,1,2,Español,10° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+15/09/1985,Varacka,local,derrota,1,2,Boca Juniors,11° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+22/09/1985,Varacka,visitante,2,2,Ferro C. Oeste,12° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+29/09/1985,Varacka,local,derrota,1,2,Platense,13° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+06/10/1985,Varacka,visitante,empate,1,1,Temperley,14° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+13/10/1985,Varacka,local,empate,1,1,Instituto (Córdoba),15° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+27/10/1985,Varacka,visitante,victoria,1,0,Unión (Santa Fe) ,17° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+04/11/1985,Varacka,local,derrota,1,3,Estudiantes (La Plata) ,18° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+09/11/1985,Varacka,visitante,empate,0,0,San Lorenzo de Almagro,19° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+24/11/1985,Varacka,visitante,empate,0,0,Argentinos Juniors,20° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+01/12/1985,Varacka,local,derrota,1,2,Independiente,21° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+08/12/1985,Varacka,visitante,empate,0,0,River Plate,22° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+15/12/1985,Varacka,local,victoria,2,0,Chacarita Juniors,23° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+18/12/1985,Varacka,visitante,victoria,3,1,Talleres (Córdoba),24° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+19/01/1986,Varacka,local,victoria,3,0,Racing (Córdoba),25° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+26/01/1986,Varacka,visitante,0,4,Newell's Old Boys (Rosario),26° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+02/02/1986,Dellacha,local,empate,0,0,Vélez Sarsfield,27° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+09/02/1986,Dellacha,visitante,victoria,2,1,Gimnasia y Esgrima (La Plata),28° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+16/02/1986,Dellacha,local,victoria,4,0,Español,29° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+23/02/1986,Dellacha,visitante,derrota,3,4,Boca Juniors,30° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+26/02/1986,Dellacha,local,empate,3,3,Ferro C. Oeste,31° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+02/03/1986,Dellacha,visitante,derrota,1,3,Platense,32° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+09/03/1986,Dellacha,local,victoria,2,1,Temperley,33° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+16/03/1986,Dellacha,visitante,victoria,3,0,Instituto,34° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+06/04/1986,Dellacha,local,derrota,0,1,Unión (Santa Fe),36° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+13/04/1986,Dellacha,visitante,victoria,3,2,Estudiantes (La Plata),37° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+20/04/1986,Dellacha,local,empate,1,1,San Lorenzo de Almagro,38° fecha del Campeonato de 1° 'A' 1985/86,-,-,-,-,foto,sin datos,45,90
+04/06/1986,Dellacha,local,victoria,2,0,Lanús,4to de final del Reducido 1986,Ferro,Pérez,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina (80 Carrizo), Claudio Cabrera y Claudio García; José Iglesias, Labaroni y Héctor Herrero.","Osvaldo Santos; Antonio Váttimos, Luis Sánchez Sotelo, Ricardo Demagistris y Juan C Ramírez; Rolando Bertolini, Ángel Mamberto y Héctor Vicente (70 Hugo Lacava Schell); Sergio Saturno, Leonardo Rodríguez y Gilmar Villagrán (51 Rubén Rojas).",foto,44 GOL Héctor Herrero (HUR)</br>51 GOL Claudio García (HUR),45,90
+07/06/1986,Dellacha,visitante,victoria,3,2,Lanús,4to de final del Reducido 1986,Monumental,Carlos Mastrángelo,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina (73 José Zuttión), Claudio Cabrera y Claudio García; José Iglesias, Labaroni y Héctor Herrero.","Osvaldo Santos; Juan C Ramírez, Luis Sánchez Sotelo, Ricardo Demagistris y José Serrizuela; Rolando Bertolini, Ángel Mamberto (46 Oscar Lebioso), Néstor Sicher; Sergio Saturno, Rubén Rojas y Leonardo Rodríguez (61 Hugo Lacava Schell).",foto,23 GOL Daniel Messina (HUR) </br>27 GOL Claudio García (HUR)</br>55 GOL Héctor Herrero (HUR)</br>73 GOL Rojas (LAN) </br>77 GOL José Serrizuela (LAN),45,90
+11/06/1986,Dellacha,local,victoria,1,0,Los Andes,Semifinal del Reducido 1986,José Amalfitani,Jorge Borrelli,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni.","Panciroli; Escobedo, Cuffaro Russo, Medina y Meza; Pizzo, Castro y Galloni, Ariel Paolorossi, Alarcón y Cuellos.",foto,11 GOL Claudio García (HUR),45,90
+14/06/1986,Dellacha,visitante,victoria,3,1,Los Andes,Semifinal del Reducido 1986,Independiente,Manuel Jácome,"Carlos Gay; Oscar López Turitich, Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni (73 Carrizo).","Panciroli; Escobedo, Ariel Cuffaro Russo, Medina y Meza; Pizzo, Castro y Galloni (69 Lanzidei); Ariel Paolorossi, Alarcón (62 Díaz) y Cuellos.",foto,24 GOL Escobedo (AND)</br>40 GOL Eduardo Papa (HUR)</br>58 EXP Castro (AND)</br>59 GOL Carlos Torino (HUR)</br>65 GOL José Iglesias (HUR),45,90
+18/06/1986,Dellacha,visitante,derrota,0,1,Italiano,Final del Reducido 1986,Ferro,Pérez,"Carlos Gay; Oscar López Turitich (23 Bottari), Corrado, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Héctor Herrero; Claudio García, José Iglesias y Darío Labaroni (43 Gustavo Carrizo).","Lanari; Gioffré, Bianculli, Díaz y Albariño (65 Álvarez); Capocetti, Pereyra y Gómez; Salas (65 Sthelik), Godoy y Héctor Rivoira.",foto,68 GOL Gómez (ITA)</br>89 EXP Daniel Messina (HUR)</br>89 EXP Gómez (ITA),45,90
+21/06/1986,Dellacha,local,victoria,2,1,Italiano,Final del Reducido 1986,José Amalfitani,Jorge Borrelli,"Carlos Gay; Oscar López Turitich (50 Bottari), Romero, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Vázquez (89 José Zuttión); Claudio García, José Iglesias y Héctor Herrero.","Lanari; Gioffré, Bianculli, Díaz y Albariño (64 Sthelik); Capocetti, Álvarez y Gómez; Salas (64 Lucero), Godoy y Héctor Rivoira.",foto,10 GOL Eduardo Papa (HUR)</br>61 GOL José Iglesias (HUR)</br>80 GOL Lucero (ITA)</br>89 EXP Héctor Herrero (HUR),45,90
+24/06/1986,Dellacha,neutral,empate,2,2,Italiano,Final (desempate) del Reducido 1986,José Amalfitani,Patricio Sinnott,"Carlos Gay; Bottari, Romero, Eduardo Papa y Carlos Torino; Daniel Messina, Claudio Cabrera y Vázquez (80 Gustavo Carrizo); Claudio García, José Iglesias y José Zuttión (106 Corrado).","Lanari; Álvarez, Bianculli, Díaz y Gioffré; Héctor Rivoira (46 Kopriva), Capocetti (24 Albariño) y Gómez; Salas, Godoy y Lucero.",foto, <b>1° Tiempo: Huracán 0x0 Italiano</b></br>52 GOL Eduardo Papa (HUR)</br>55 GOL Díaz (ITA)</br>Se juega Tiempo Extra de 30 minutos</br>97 GOL Claudio García (HUR)</br>117 GOL Lucero (ITA)</br>120 EXP José Iglesias (HUR)</br><b>PEN Penales: Huracán 2x4 Italiano</b>,45,90
 19/07/1986,Cappa,visitante,empate,0,0,Central Norte (Salta),1° fecha del Nacional B 1986/87,Central Norte (Salta),Manuel Jácome,"Carlos Gay; Eugenio Gentile, Sergio Govagnoli, Hugo Álves y Carlos Torino; Carrizo, Rinaldi (70 Marcelo Barticiotto), Hebert Birriel y Claudio Messina; Alfredo Torres y Víctor Delgado.","Zurita; Sánchez, Rodríguez, Robles y Tejeda; Godoy (76 Barrios), Roldán y Agüero (76 Alegre); Zingariello, Mattei y Carrazana."
 26/07/1986,Cappa,local,victoria,2,0,Dep. Maipú (Mendoza),2° fecha del Nacional B 1986/87,Tomás A. Ducó,Carlos Mastrángelo,"Carlos Gay; Gentile, Sergio Govagnoli, Hugo Álves y Carlos Torino; Rinaldi (50 Papa), Hebert Birriel, Héctor Herrero (76 Claudio Mir) y Daniel Messina; Ariel Paolorrosi y Alfredo Torres.","Murcia; Lamolla, Scivoletto, Fóppoli y Barragán; Rogel (69 Olmos), Pralong y Gómez (45 Subase); Gauto, Corró y Bernio.",foto,24 GOL Hugo Alves (HUR)</br>40 GOL Alfredo Torres (HUR)</br>41 EXP Pralong (MAI)</br>46 EXP Carlos Torino (MAI)
 02/08/1986,Cappa,visitante,derrota,1,2,Atl. Concepción (Tucumán),3° fecha del Nacional B 1986/87,Concepción (Tucumán),Carlos Coradina,"Carlos Gay; Hugo Álves, Eugenio Gentile, Papa (80 Papa) y Sergio Govagnoli; Rinaldi (46 Mir), Birriel, Herrero y Messina; Paolorrosi y Alfredo Torres.","Ibáñez; Medina, Villafañe, Nievas y Acuña; Fanjul, Elizeche y Jerez; Celaya (88 Ferreyra), Coria y Ruiz (75 Santos).",foto,24 GOL Rinaldi (HUR)</br>41 GOL Ruiz (CON)</br>56 GOL Elizeche (CON)</br>80 EXP Giovagnoli (HUR)</br>90 EXP Hugo Álves (HUR)
