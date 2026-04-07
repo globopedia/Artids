@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const url = "https://raw.githubusercontent.com/globopedia/Rivales-Huracan/main/clubes.csv";
+  const url = "https://raw.githubusercontent.com/globopedia/Rivales-Huracan/main/Artids2015.csv";
 
   try {
     const response = await fetch(url);
