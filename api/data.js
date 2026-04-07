@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const file = req.query.file;
 
   const archivos = {
-    lubs: { repo: "Lubs", path: "Lubs.csv" },
+    lubs: { repo: "Lubs", path: "Ivals.csv" },
     utbolists: { repo: "Utbolists", path: "Utbolists.csv" },
     rbits: { repo: "Rbits", path: "Rbits.csv" },
 
