@@ -164,13 +164,13 @@ let debounceTimer;
 
     // Cargar todos los CSVs (clubes y encuentros)
  Promise.all([
-  fetch(clubesURL).then(r => r.text()).then(t => atob(t)),
-  fetch(partidosURL).then(r => r.text()).then(t => atob(t)),
-  fetch(partidosURL2).then(r => r.text()).then(t => atob(t)),
-  fetch(partidosURL3).then(r => r.text()).then(t => atob(t)),
-  fetch(partidosURL4).then(r => r.text()).then(t => atob(t)),
-  fetch(partidosURL5).then(r => r.text()).then(t => atob(t)),
-  fetch(partidosURL6).then(r => r.text()).then(t => atob(t))
+  fetch(clubesURL).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t)))),
+  fetch(partidosURL).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t)))),
+  fetch(partidosURL2).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t)))),
+  fetch(partidosURL3).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t)))),
+  fetch(partidosURL4).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t)))),
+  fetch(partidosURL5).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t)))),
+  fetch(partidosURL6).then(r => r.text()).then(t => decodeURIComponent(escape(atob(t))))
 ])
 
 .then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6]) => {
