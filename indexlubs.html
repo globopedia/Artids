@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clubes y Estadísticas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'MuseoModerno', sans-serif; background:#fff; color:#222; margin:20px; }
+    h1 { color:#FF0000; text-align:center; }
+    .logo { display:block; margin:0 auto 10px; width:100px; }
+    select { padding:8px; border-radius:8px; border:2px solid #FF0000; font-size:16px; margin-bottom:20px; }
+    .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:30px auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    .club-header { display:flex; align-items:center; gap:15px; border-bottom:2px solid #FF0000; padding-bottom:10px; margin-bottom:10px; }
+    .club-header img { width:70px; height:70px; object-fit:contain; }
+    h2 { margin:0; color:#FF0000; font-size:22px; }
+    .stats { margin-top:20px; }
+    .stat-group { margin-bottom:20px; padding:12px; border:1px solid #FF0000; border-radius:12px; background:#fff5f5; }
+    .stat-title { font-weight:bold; color:#FF0000; margin-bottom:6px; }
+    .hr { border:none; border-top:1px solid #FF0000; margin:8px 0; }
+    .partido-card { border:1px solid #ccc; border-radius:6px; padding:6px; margin:4px 0; background:#fafafa; font-size:14px; text-align: center; }
+    .acordeon { border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; background: #fefefe; }
+    .acordeon-header { background: #eee; padding: 4px 8px; cursor: pointer; font-size: 14px; text-align: right; position: relative; padding-right: 20px; }
+    .acordeon-header::after { content: "▾"; position: absolute; right: 0; transition: transform 0.3s; }
+    .acordeon-header.abierto::after { transform: rotate(180deg); }
+    .acordeon-body { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease; padding: 8px; }
+    .acordeon-body.cerrado { max-height: 0; padding: 0 8px; }
+    .resultado1-box, .resultado2-box {
+      display: inline-block; width: 16px; height: 28px; font-size: 32px; font-weight: bold;
+      line-height: 28px; text-align: center; margin: 2px; padding: 10px 10px;
+      border: 3px solid #FF0000; border-radius: 6px; background: #fff5f5;
+      vertical-align: middle; min-width: 26px;
+    }
+    .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
+    .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.autocomplete-item {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px;
+  cursor:pointer;
+}
+
+.autocomplete-item:hover {
+  background:#ffdddd;
+}
+.autocomplete-item.activo {
+  background:#ffdddd;
+}
+.escudo-autocomplete {
+  width: 44px;              /* el doble */
+  height: 44px;
+  object-fit: cover;
+  border-radius: 50%;       /* círculo */
+  border: 2px solid #FF0000;
+  background: white;        /* opcional, queda más prolijo */
+  padding: 4px;             /* aire interno */
+}
+
+ .autocomplete-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  cursor:pointer;
+}
+  </style>
+</head>
+<body>
+  <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
+  <h1>📜 Historiales</h1>
+  <div style="text-align:center; position:relative;">
+  <label for="clubSearch">Seleccionar club: </label><br>
+
+<input type="text" id="clubSearch"
+  placeholder="Buscá el club..."
+  autocomplete="off"
+  style="
+    padding:8px;
+    border-radius:8px;
+    border:2px solid #FF0000;
+    font-size:16px;
+    margin-top:8px;
+    width:400px;
+    max-width:90%;
+  ">
+
+  <!-- mantenemos el select original pero oculto -->
+  <select id="clubSelect" style="display:none;"></select>
+
+  <ul id="clubAutocompleteList"
+    style="position:absolute;left:50%;transform:translateX(-50%);
+    background:white;
+    border:1px solid #ccc;
+    border-radius:8px;
+    width:400px;
+    max-width:90%;
+    max-height:220px;
+    overflow:auto;
+    list-style:none;
+    padding:0;
+    margin-top:2px;
+    z-index:1000;">
+  </ul>
+</div>
+  <div id="clubInfo" class="club-card" style="display:none;"></div>
+
+  <script>
+const clubesURL = "https://artids.vercel.app/api/data?file=lubs";
+const partidosURL = "https://artids.vercel.app/api/data?file=artids1940";
+const partidosURL2 = "https://artids.vercel.app/api/data?file=artids1955";
+const partidosURL3 = "https://artids.vercel.app/api/data?file=artids1970";
+const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1985";
+const partidosURL5 = "https://artids.vercel.app/api/data?file=artids2000";
+const partidosURL6 = "https://artids.vercel.app/api/data?file=artids2015";
+    
+    let clubes = [];
+    let encuentros = [];
+
+   // Normalizaciones y utilidades
+const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+
+function plural(n, singular, plural) {
+  return n === 1 ? singular : plural;
+}
+
+function capitalizarPrimera(frase) {
+  if (!frase) return "";
+  return frase.charAt(0).toUpperCase() + frase.slice(1);
+}
+function conjY(palabra) {
+  const p = palabra.toLowerCase().trim();
+  if (p.startsWith("i") || p.startsWith("hi")) {
+    return "e";
+  }
+  return "y";
+}
+    function bucketCompetencia(torneo) {
+      const t = norm(torneo);
+      if (t.includes("copa libertadores")) return "Copa Libertadores";
+      if (t.includes("sudamericana")) return "Copa Sudamericana";
+      if (t.includes("conmebol")) return "Copa Conmebol";
+      if (t.includes("argentina")) return "Copa Argentina";
+      if (t.includes("superliga")) return "Copa Superliga";
+      if (t.includes("competencia")) return "Copa Competencia";
+      if (t.includes("maradona")) return "Copa Maradona 2020";
+      if (t.includes("suecia")) return "Copa Suecia 1958";
+      if (t.includes("supercopa")) return "Supercopa";
+      if (t.includes("b nacional") || t.includes("nacional b") || t.includes("reducido") || t.includes("bn") || t.includes("nb")) return "2° Categoría";
+      if (t.includes("campeonato") || t.includes("promocion") || t.includes("torneo") || t.includes("descenso") || t.includes("pre-libertadores")) return "1° División";
+      if (t.includes("amistoso")) return "Amistosos";
+      return "Otros"
+    }
+
+    const ORDEN_COMPETENCIAS = ["Copa Libertadores","Copa Sudamericana","Copa Conmebol","1° División","Copa Argentina","Copa Superliga","Copa Competencia","Supercopa","Copa Maradona 2020","Copa Suecia 1958","2° Categoría","Amistosos"];
+    const CONDICIONES = ["Local","Neutral","Visitante"];
+    const SITUACIONES = ["Victoria","Empate","Derrota"];
+
+let selectedIndex = -1;
+let debounceTimer;
+
+    // Cargar todos los CSVs (clubes y encuentros)
+ Promise.all([
+  fetch(clubesURL).then(r => r.text()).then(t => atob(t)),
+  fetch(partidosURL).then(r => r.text()).then(t => atob(t)),
+  fetch(partidosURL2).then(r => r.text()).then(t => atob(t)),
+  fetch(partidosURL3).then(r => r.text()).then(t => atob(t)),
+  fetch(partidosURL4).then(r => r.text()).then(t => atob(t)),
+  fetch(partidosURL5).then(r => r.text()).then(t => atob(t)),
+  fetch(partidosURL6).then(r => r.text()).then(t => atob(t))
+])
+
+.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6]) => {
+        clubes = Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.map(c => ({
+        id: (c.id ?? "").toString().trim(),
+        club: (c.Club ?? c.club ?? "").toString().trim(),
+        nombre: c.Nombre ?? c.nombre ?? "",
+        fundacion: c.Fundacion ?? c.fundacion ?? "",
+        direccion: c.Direccion ?? c.direccion ?? "",
+        web: c.Web ?? c.web ?? "",
+        colores: c.Colores ?? c.colores ?? "",
+        titulos: c.Titulos ?? c.titulos ?? "",
+        estadio: c.Estadio ?? c.estadio ?? "",
+        curiosidades: c.Curiosidades ?? c.curiosidades ?? "",
+        escudo: c.Escudo ?? c.escudo ?? ""
+      }));
+      
+      const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
+      const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
+      const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
+      const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
+      const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
+      const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
+
+encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6].map(p => ({
+        Fecha: (p.Fecha ?? "").trim(),
+        Técnico: (p.Técnico ?? "").trim(),
+        Condición: (p.Condición ?? "").trim(),
+        Situación: (p.Situación ?? "").trim(),
+        Resultado1: (p.Resultado1 ?? "").trim(),
+        Resultado2: (p.Resultado2 ?? "").trim(),
+        Club: (p.Club ?? "").trim(),
+        Torneo: (p.Torneo ?? "").trim(),
+        Estadio: (p.Estadio ?? "").trim(),
+        Árbitro: (p.Árbitro ?? "").trim(),
+        Huracán: (p.Huracán ?? "").trim(),
+        Rival: (p.Rival ?? "").trim(),
+        Foto: (p.Foto ?? "").trim(),
+        Incidencias: (p.Incidencias ?? "").trim()
+      }));
+
+      llenarSelectClubes();
+      activarBuscadorClubes();
+  })
+  .catch(err => {
+      console.error("Error cargando CSVs:", err);
+      alert("No pude cargar los CSV. Revisá las URLs o el formato en la consola.");
+    });
+
+  const clubSearchInput = document.getElementById("clubSearch");
+
+clubSearchInput.addEventListener(
+  "input",
+  debounce(e => filtrarClubes(e.target.value), 200)
+);
+    function llenarSelectClubes() {
+      const sel = document.getElementById("clubSelect");
+      sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
+      clubes.forEach(club => {
+        if (club.id && club.club) {
+          const opt = document.createElement("option");
+          opt.value = club.id;
+          opt.textContent = club.club;
+          sel.appendChild(opt);
+        }
+      });
+      sel.addEventListener("change", mostrarClub);
+    }
+ 
+function activarBuscadorClubes() {
+  const clubSearchInput = document.getElementById("clubSearch");
+  const clubSuggestionsList = document.getElementById("clubAutocompleteList");
+
+  clubSearchInput.addEventListener("input", function(e) {
+    const texto = e.target.value.toLowerCase();
+    clubSuggestionsList.innerHTML = "";
+
+    if (!texto) return;
+
+    const filtrados = clubes
+      .filter(c => c.club && c.club.toLowerCase().includes(texto))
+      .slice(0, 15);
+
+    filtrados.forEach(c => {
+      const li = document.createElement("li");
+      li.style.padding = "6px";
+      li.style.cursor = "pointer";
+      li.style.display = "flex";
+      li.style.alignItems = "center";
+      li.style.gap = "8px";
+
+      li.innerHTML = `
+        <img src="${c.escudo}" class="escudo-autocomplete">
+        <span>${c.club}</span>
+      `;
+
+      li.onclick = function() {
+        seleccionarClub(c.id);
+      };
+
+      clubSuggestionsList.appendChild(li);
+    });
+  });
+}
+
+function seleccionarClub(id) {
+  const select = document.getElementById("clubSelect");
+  const input = document.getElementById("clubSearch");
+
+  select.value = id;
+  select.dispatchEvent(new Event("change"));
+
+  input.value = clubes.find(c => c.id === id)?.club || "";
+
+  document.getElementById("clubAutocompleteList").innerHTML = "";
+
+  // 👇 magia UX
+  input.focus();
+
+  setTimeout(() => {
+    input.select();
+  }, 0);
+}
+function mostrarClub() {
+      const clubId = document.getElementById("clubSelect").value;
+      const club = clubes.find(c => (c.id||"").trim() === (clubId||"").trim());
+      if (!club) {
+        alert("No se encontró el club seleccionado");
+        return;
+      }
+      const cont = document.getElementById("clubInfo");
+      cont.style.display = "block";
+      cont.innerHTML = `
+        <div class="club-header">
+          <img src="${club.escudo}" alt="escudo" />
+          <h2>${club.nombre}</h2>
+        </div>
+        <p><b>Fundación:</b> ${club.fundacion}</p>
+        <p><b>Dirección:</b> ${club.direccion}</p>
+        <p><b>Web:</b> ${club.web}</p>
+        <p><b>Colores:</b> ${club.colores}</p>
+        <p><b>Títulos:</b> ${club.titulos}</p>
+        <p><b>Estadio:</b> ${club.estadio}</p>
+        <p><b>Curiosidades:</b> ${club.curiosidades}</p>
+        <div class="stats">
+          <h3 style="color:#FF0000;">📊 Historial desde 1949</h3>
+          ${renderEstadisticas(club.club)}
+        </div>
+      `;
+    }
+
+    function renderEstadisticas(nombreClub) {
+      const clubNorm = norm(nombreClub);
+      const delClub = encuentros.filter(p => norm(p.Club) === clubNorm);
+      const agg = {};
+      for (const e of delClub) {
+        const comp = bucketCompetencia(e.Torneo);
+        const cond = cap(norm(e.Condición));
+        const sit = cap(norm(e.Situación));
+        if (!agg[comp]) agg[comp] = {};
+        if (!agg[comp][cond]) agg[comp][cond] = { Victoria:0, Empate:0, Derrota:0 };
+        if (SITUACIONES.includes(sit)) {
+          agg[comp][cond][sit] += 1;
+        }
+      }
+      let html = "";
+      for (const comp of ORDEN_COMPETENCIAS) {
+        if (!agg[comp]) continue;
+// Partidos reales de esta competencia
+const partidosComp = delClub.filter(p =>
+  bucketCompetencia(p.Torneo) === comp
+);
+
+// A
+const A = partidosComp.length;
+
+// B, C, E
+let B = 0, C = 0, E = 0;
+
+for (const cond of CONDICIONES) {
+  const bucket = agg[comp][cond] || { Victoria:0, Empate:0, Derrota:0 };
+  B += bucket.Victoria;
+  C += bucket.Empate;
+  E += bucket.Derrota;
+}
+
+// F y G
+let F = 0, G = 0;
+partidosComp.forEach(p => {
+  F += parseInt(p.Resultado1) || 0;
+  G += parseInt(p.Resultado2) || 0;
+});
+
+// Frase resumen
+let partesResultados = [];
+
+if (B > 0) partesResultados.push(`Huracán ganó ${B}`);
+if (C > 0) partesResultados.push(`empataron ${C}`);
+if (E > 0) partesResultados.push(`${nombreClub} venció en ${E}`);
+
+let fraseResultados = "";
+if (partesResultados.length === 1) {
+  fraseResultados = partesResultados[0] + ".";
+} else if (partesResultados.length === 2) {
+ const conj = conjY(nombreClub);
+fraseResultados = partesResultados[0] + " " + conj + " " + partesResultados[1] + ".";
+} else if (partesResultados.length === 3) {
+const conj = conjY(nombreClub);
+fraseResultados = partesResultados[0] + ", " + partesResultados[1] + " " + conj + " " + partesResultados[2] + ".";
+}
+
+fraseResultados = capitalizarPrimera(fraseResultados);
+let partesGoles = [];
+
+if (F > 0) partesGoles.push(`El Globito anotó ${F} ${plural(F, "gol", "goles")}`);
+if (G > 0) partesGoles.push(`${nombreClub} marcó ${G}`);
+
+let fraseGoles = "";
+if (partesGoles.length === 1) {
+  fraseGoles = partesGoles[0] + ".";
+} else if (partesGoles.length === 2) {
+  const conj = conjY(nombreClub);
+  fraseGoles = partesGoles[0] + " " + conj + " " + partesGoles[1] + ".";
+}
+
+const resumenHTML = `
+  <p style="margin:6px 0; font-weight:500;">
+    Jugaron ${A} ${plural(A, "partido", "partidos")}.
+    ${fraseResultados} 
+    ${fraseGoles}
+  </p>
+`;
+        let compHTML = "";
+        CONDICIONES.forEach((cond, idx) => {
+          const bucket = agg[comp][cond] || { Victoria:0, Empate:0, Derrota:0 };
+          const tot = bucket.Victoria + bucket.Empate + bucket.Derrota;
+          if (tot === 0) return;
+          let bloque = `<div class="stat-title">📍 ${cond}</div><ul>`;
+          ["Victoria","Empate","Derrota"].forEach(tipo => {
+            const cantidad = bucket[tipo];
+            if (cantidad > 0) {
+              const icono = tipo==="Victoria"?"✅":tipo==="Empate"?"🤝":"❌";
+              bloque += `
+                <li>
+                  <label>
+                    <input type="checkbox" class="chkPartidos" data-comp="${comp}" data-cond="${cond}" data-sit="${tipo}" data-club="${nombreClub}">
+                    ${icono} ${tipo}s: ${cantidad}
+                  </label>
+                  <div class="partidos-lista" style="display:none; margin-left:20px;"></div>
+                </li>
+              `;
+            }
+          });
+          bloque += "</ul>";
+          compHTML += bloque;
+          if (idx < CONDICIONES.length - 1) compHTML += `<div class="hr"></div>`;
+        });
+        if (compHTML) {
+html += `
+  <div class="stat-group">
+    <div class="stat-title">🏆 ${comp}</div>
+    ${resumenHTML}
+    ${compHTML}
+  </div>
+`;
+        }
+      }
+      return html || "<p>Sin datos disponibles</p>";
+    }
+
+    // Manejador de checkboxes (muestra partidos por filtro)
+    document.addEventListener("change", function(e) {
+      if (!e.target.classList.contains("chkPartidos")) return;
+      const contenedor = e.target.closest("li").querySelector(".partidos-lista");
+      contenedor.innerHTML = "";
+      if (e.target.checked) {
+        const { comp, cond, sit, club } = e.target.dataset;
+        const partidos = encuentros.filter(p =>
+          norm(p.Club) === norm(club) &&
+          bucketCompetencia(p.Torneo) === comp &&
+          cap(norm(p.Condición)) === cond &&
+          cap(norm(p.Situación)) === sit
+        );
+        if (partidos.length) {
+          partidos.forEach(p => {
+            let bloqueHTML = "";
+            if ((p.Condición || "").toLowerCase() === "visitante") {
+              bloqueHTML = `
+                <div class="partido-card">
+                  ${getTorneoImage(p.Torneo)}
+                  <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                  <div class="resultado2-box">${p.Resultado2}</div>
+                  <div class="resultado1-box">${p.Resultado1}</div>
+                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" class="escudo-huracan">
+                  <div><b>${p.Torneo}</b></div>
+                  <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+                  <div>
+  ${ p.Estadio && getEstadioImage(p.Estadio)
+      ? `<img src="${getEstadioImage(p.Estadio)}" alt="${p.Estadio}" style="max-height:40px; display:block; margin:4px auto;">`
+      : ""
+  }
+</div>
+<div><b>${p.Club}:</b> ${p.Rival}</div>
+                  <div><b>Huracán:</b> ${p.Huracán}</div>
+${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                  <div>${renderIncidencias(p.Incidencias)}</div>
+                </div>
+              `;
+            } else {
+              bloqueHTML = `
+                <div class="partido-card">
+                  ${getTorneoImage(p.Torneo)}
+                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" class="escudo-huracan">
+                  <div class="resultado1-box">${p.Resultado1}</div>
+                  <div class="resultado2-box">${p.Resultado2}</div>
+                  <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                  <div><b>${p.Torneo}</b></div>
+                  <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+                  <div>${ p.Estadio && getEstadioImage(p.Estadio)
+      ? `<img src="${getEstadioImage(p.Estadio)}" alt="${p.Estadio}" style="max-height:40px; display:block; margin:4px auto;">`
+      : ""
+  }
+</div>
+<div><b>Huracán:</b> ${p.Huracán}</div>
+                  <div><b>${p.Club}:</b> ${p.Rival}</div>
+                ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                  <div>${renderIncidencias(p.Incidencias)}</div>
+              `;
+            }
+            contenedor.innerHTML += `
+              <div class="acordeon">
+                <div class="acordeon-header">${p.Fecha}</div>
+                <div class="acordeon-body cerrado">${bloqueHTML}</div>
+              </div>
+            `;
+          });
+        } else {
+          contenedor.innerHTML = "<i>No hay partidos registrados</i>";
+        }
+        contenedor.style.display = "block";
+      } else {
+        contenedor.style.display = "none";
+      }
+    });
+
+    // Toggle acordeón
+    document.addEventListener("click", function(e) {
+      if (e.target.classList.contains("acordeon-header")) {
+        const body = e.target.nextElementSibling;
+        body.classList.toggle("cerrado");
+        e.target.classList.toggle("abierto");
+      }
+    });
+
+    function getEscudo(nombreClub) {
+      if (!nombreClub) return "";
+      try {
+        return "https://globopedia.github.io/Artids/escudos/" + encodeURIComponent(nombreClub.trim()) + ".png";
+      } catch (err) {
+        const fileName = nombreClub.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\./g, "").replace(/\s+/g, "") + ".png";
+        return "https://globopedia.github.io/Artids/escudos/" + fileName;
+      }
+    }
+
+    function renderIncidencias(texto) {
+      if (!texto) return "";
+      return texto
+        .replace(/GOL/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgi3GyVjBR-e_IN4mWVAuZofChVOj763GApXwzanoEJDUTysF1K9gf3N5qBCoDJ-ahi8wRkrZ3FCbl0ovTEjXyjFjFEWYF1MZ7YvHrq0bD5eQ7GsJPOkpLSC-k4zpZ1CbnyKVtoYlb6JWXByKkd0VAHuN1hy8P9LBz2fhn5e3Um_X-m4U9WLo9pQP428Fj4/s320/GolR.png' alt='gol' style='width:20px;height:20px;'>")
+        .replace(/EXP/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgx8a6PCkGhKR9WTnh2NNWLMBDOIKWsNisSChpxN2NayjM5Z6YBIZmv52PvduZawIBBh_g5Pq56LdvjG8X1gSCud2q6NYS_NGOh7nAPaxUy_nC1YCcZJOgy2DeTZPRkqRgb1_HbpJshh-7o3MoW8Z3h8tBa8UZ153n5CzriOyvsSIxM6FsCbn-n115KC5Ln/s320/Roja.png' alt='expulsión' style='width:20px;height:20px;'>")
+        .replace(/ATA/g, "<img src='https://blogger.googleusercontent.com/img/a/AVvXsEjygOwijhQ1dRIh6BPFrQu7EKOUShS0RLEVmPhCJSANGWOaNzvVmcbV03ZW0ZF5Npefl5r3P8iU6WjXRaSL80QYazspsJ4-nzA8pv4FqBwgu1Jr0wDw2iEPMvnVgK0nvRLeZmGYuVW8epSVTyyND28aoQRd9wD9yxKJWBuPOhOoVz-cUgpbM702W2ZlpsF7=w95-h79' alt='golh' style='width:20px;height:20px;'>")
+        .replace(/PEN/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEho-erXGKkNZ7MaZWOtZw-ru0AnJwAlzHqnl5fKLmUAn_QtAMAbXgGMsqh21htJ2XSePyqAMAq4Xce1RkwkrqrA4Hw312mYcXhXMVW-m64vRS_lKTNgnBNvCzPZsPV3eEk_QclWiNZ9n9pvAQSiscTyp94vbN_h6aMeQ_nwTdBSdXGn5B3HW3A-sj_4Bw1j/s320/Penales.png' alt='pen' style='width:20px;height:20px;'>");
+    }
+
+    function getEstadioImage(estadio) {
+      if (!estadio) return "";
+      // Limpiamos nombre para intentar coincidir con archivos en la carpeta Estadios
+      const fileName = estadio
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\./g, "")
+        .replace(/\s+/g, "") + ".png";
+      return "https://globopedia.github.io/Artids/Estadios/" + fileName;
+    }
+
+    function getTorneoImage(nombreTorneo) {
+      if (!nombreTorneo) return "";
+      const texto = nombreTorneo.toLowerCase();
+      const torneosDisponibles = [
+        "Apertura Nacional B 2006", "Clausura Nacional B 2007","Apertura 2007","Clausura 2008", "Apertura 2008", "Clausura 2009",
+        "Apertura 2009", "Clausura 2010", "Apertura 2010", "Clausura 2011","Promoción",
+        "Nacional B 11-12", "Copa Argentina 2012","Copa Argentina 2013","Copa Argentina 2014",
+        "Copa Argentina 2015","Copa Argentina 2016","Copa Argentina 2017","Copa Argentina 2018",
+        "Copa Argentina 2019","Copa Argentina 2020","Copa Argentina 2022","Copa Argentina 2023",
+        "Copa Argentina 2024","Copa Argentina 2025", "Nacional B 12-13", "Nacional B 13-14",
+        "Nacional B 2014", "Supercopa 2015", "Campeonato 2015", "Libertadores 2015",
+        "Sudamericana 2015", "Campeonato 2016", "Libertadores 2016", "Campeonato 16-17",
+        "Sudamericana 2017", "SAF 17-18", "SAF 18-19", "SAF 19-20", "Copa Maradona 2020",
+        "Libertadores 2019", "Sudamericana 2020", "Torneo-LPF 2021", "Torneo-LPF 2022", "Torneo-LPF 2023",
+        "Copa-LPF 2021", "Copa-LPF 2022", "Copa-LPF 2023", "Copa-LPF 2024", "Torneo-LPF 2024",
+        "Apertura-LPF 2024", "Clausura-LPF 2025", "Libertadores 2023", "Sudamericana 2023", "Sudamericana 2025"
+      ];
+      for (const t of torneosDisponibles) {
+        if (texto.includes(t.toLowerCase())) {
+          const fileName = encodeURIComponent(t) + ".png";
+          return `<img src="https://globopedia.github.io/Artids/Torneos/${fileName}" alt="${t}" style="max-height:40px; display:block; margin:4px auto;">`;
+        }
+      }
+      return "";
+    }
+
+  // Envía la altura al padre
+  function postAltura() {
+    const altura = document.documentElement.scrollHeight || document.body.scrollHeight;
+    parent.postMessage({ type: 'ajustarAltura', altura: altura }, '*');
+  }
+
+  // Envío inicial y en resize
+  window.addEventListener('load', postAltura);
+  window.addEventListener('resize', postAltura);
+
+  // Detecta cambios dinámicos en el DOM (ej. menus, contenido que aparece)
+  const mo = new MutationObserver(() => {
+    postAltura();
+  });
+  mo.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
+
+  // Asegura recalcular cuando cargan imágenes
+  document.querySelectorAll('img').forEach(img => {
+    if (!img.complete) img.addEventListener('load', postAltura);
+  });
+
+  // Opcional: reenvío periódico corto como fallback
+  let contador = 0;
+  const fallback = setInterval(() => {
+    postAltura();
+    if (++contador > 10) clearInterval(fallback); // 10 envíos y corta
+  }, 500);
+
+function debounce(func, delay) {
+  return function(...args) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+function filtrarClubes(termino) {
+  const texto = norm(termino);
+  const suggestionsList = document.getElementById("clubAutocompleteList");
+  suggestionsList.innerHTML = "";
+  selectedIndex = -1;
+
+  if (!texto) return;
+
+ const resultados = clubes
+  .filter(c => norm(c.club).includes(texto))
+  .slice(0, 15);
+
+  resultados.forEach(r => {
+    const li = document.createElement("li");
+    li.className = "autocomplete-item";
+
+    li.innerHTML = `
+      ${r.escudo
+        ? `<img src="${r.escudo}" class="escudo-autocomplete">`
+        : `<div style="width:22px;height:22px;"></div>`}
+      <span>${r.club}</span>
+    `;
+
+    li.addEventListener("click", () => {
+      seleccionarClub(r.id);
+    });
+
+    suggestionsList.appendChild(li);
+  });
+}
+
+clubSearchInput.addEventListener("keydown", function(e) {
+  const suggestionsList = document.getElementById("clubAutocompleteList");
+  const items = suggestionsList.querySelectorAll("li");
+  if (!items.length) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    selectedIndex = (selectedIndex + 1) % items.length;
+    actualizarSeleccion(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+    actualizarSeleccion(items);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (selectedIndex >= 0 && selectedIndex < items.length) {
+      items[selectedIndex].click();
+    }
+  } else {
+    selectedIndex = -1;
+  }
+});
+function actualizarSeleccion(items) {
+  const suggestionsList = document.getElementById("clubAutocompleteList");
+
+  items.forEach((item, i) => {
+    const activo = i === selectedIndex;
+    item.classList.toggle("activo", activo);
+  });
+
+  const selectedItem = items[selectedIndex];
+  if (selectedItem) {
+    const containerTop = suggestionsList.scrollTop;
+    const containerBottom = containerTop + suggestionsList.offsetHeight;
+    const itemTop = selectedItem.offsetTop;
+    const itemBottom = itemTop + selectedItem.offsetHeight;
+
+    if (itemTop < containerTop) {
+      suggestionsList.scrollTop = itemTop;
+    } else if (itemBottom > containerBottom) {
+      suggestionsList.scrollTop = itemBottom - suggestionsList.offsetHeight;
+    }
+  }
+}
+clubSearchInput.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    document.getElementById("clubAutocompleteList").innerHTML = "";
+    selectedIndex = -1;
+  }
+});
+document.addEventListener("click", function(e) {
+  const input = document.getElementById("clubSearch");
+  const list = document.getElementById("clubAutocompleteList");
+
+  if (!input.contains(e.target) && !list.contains(e.target)) {
+    list.innerHTML = "";
+    selectedIndex = -1;
+  }
+});
+
+  </script>
+</body>
+</html>
