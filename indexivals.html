@@ -144,18 +144,19 @@ function conjY(palabra) {
       if (t.includes("sudamericana")) return "Copa Sudamericana";
       if (t.includes("conmebol")) return "Copa Conmebol";
       if (t.includes("argentina") || t.includes("republica")) return "Copa Argentina (+ Copa República)";
+      if (t.includes("competencia") || t.includes("superliga")) return "Copa Competencia (+ Copa SAF) de 1° División";
       if (t.includes("supercopa")) return "Supercopa";
-      if (t.includes("competencia") || t.includes("superliga")) return "Copa Competencia (+ Copa Superliga)";
       if (t.includes("escobar")) return "Copa Escobar";
-      if (t.includes("maradona")) return "Copa Maradona 2020";
       if (t.includes("suecia")) return "Copa Suecia 1958";
+      if (t.includes("centenario")) return "Copa Centenario 1993";
+      if (t.includes("maradona")) return "Copa Maradona 2020";
       if (t.includes("b nacional") || t.includes("nacional b") || t.includes("reducido") || t.includes("bn") || t.includes("nb")) return "2° Categoría";
       if (t.includes("campeonato") || t.includes("promocion") || t.includes("torneo") || t.includes("descenso") || t.includes("pre-libertadores")) return "Campeonato de 1° División";
       if (t.includes("amistoso")) return "No oficiales";
       return "Otros"
     }
 
-    const ORDEN_COMPETENCIAS = ["Copa Libertadores","Copa Sudamericana","Copa Conmebol","Campeonato de 1° División","Copa Argentina (+ Copa República)","Supercopa","Copa Competencia (+ Copa Superliga) de 1° División","Copa Escobar","Copa Suecia 1958","Copa Maradona 2020","2° Categoría","No oficiales"];
+    const ORDEN_COMPETENCIAS = ["Copa Libertadores","Copa Sudamericana","Copa Conmebol","Campeonato de 1° División","Copa Argentina (+ Copa República)","Competencia (+ Copa SAF) de 1° División","Supercopa","Copa Escobar","Copa Suecia 1958","Copa Centenario 1993","Copa Maradona 2020","2° Categoría","No oficiales"];
     const CONDICIONES = ["Local","Neutral","Visitante"];
     const SITUACIONES = ["Victoria","Empate","Derrota"];
 
