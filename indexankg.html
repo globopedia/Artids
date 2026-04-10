@@ -1770,34 +1770,17 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 </script>
-  <script id="2q9s8k">
-function sonidoClick() {
-  const audio = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
-  audio.volume = 0.2;
-  audio.play();
-}
-</script>
 <script>
-const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
-clickSound.volume = 0.2;
-
-function sonidoClick() {
-  clickSound.currentTime = 0; // reinicia para clicks rápidos
-  clickSound.play().catch(() => {});
-}
-</script>
-  <script>
-const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
+let clickSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 clickSound.volume = 0.3;
 
-// 🔥 engancha TODOS los clicks reales en checkboxes
+// 🔊 sonido cuando cambia cualquier checkbox
 document.addEventListener("change", function(e) {
   if (e.target.type === "checkbox") {
     clickSound.currentTime = 0;
     clickSound.play().catch(() => {});
   }
 });
-new Audio("https://www.soundjay.com/switch/switch-1.mp3").play()
-  </script>
+</script>
 </body>
 </html>
