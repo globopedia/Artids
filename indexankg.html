@@ -221,9 +221,9 @@ Hasta: <input type="date" id="fechaHasta">
 </div>
   
 <div style="text-align:center; margin-bottom:15px;">
-  <label class="led-label"><input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()"><span class="led-ui"></span><span>SÓLO EXTRANJEROS</span></label>
+  <label class="led-label"><input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()" onclick="sonidoClick()"><span class="led-ui"></span><span>SÓLO EXTRANJEROS</span></label>
   &nbsp;&nbsp;
-  <label class="led-label"><input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()"><span class="led-ui"></span><span>SÓLO INFERIORES</span></label>
+  <label class="led-label"><input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()" onclick="sonidoClick()"><span class="led-ui"></span><span>SÓLO INFERIORES</span></label>
 </div>
   
 <div style="text-align:center; margin-top:15px;">
@@ -1760,6 +1760,13 @@ const observer = new MutationObserver(() => {
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
+</script>
+  <script id="2q9s8k">
+function sonidoClick() {
+  const audio = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
+  audio.volume = 0.2;
+  audio.play();
+}
 </script>
 </body>
 </html>
