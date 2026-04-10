@@ -1535,6 +1535,12 @@ function cambiarColumnas() {
       filas[i].cells[j].style.display = "none";
     }
 
+    const col = mapaColumnas[criterioSeleccionado];
+
+if (col !== undefined) {
+  filas[i].cells[col].style.display = "";
+}
+    
     const colMostrar = mapaColumnas[seleccion];
     filas[i].cells[colMostrar].style.display = "";
   }
