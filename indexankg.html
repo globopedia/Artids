@@ -1768,5 +1768,14 @@ function sonidoClick() {
   audio.play();
 }
 </script>
+<script>
+const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
+clickSound.volume = 0.2;
+
+function sonidoClick() {
+  clickSound.currentTime = 0; // reinicia para clicks rápidos
+  clickSound.play().catch(() => {});
+}
+</script>
 </body>
 </html>
