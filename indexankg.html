@@ -246,7 +246,6 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="efectividad">EFECTIVIDAD DE PUNTOS</option>
 <option value="vallasInvictas">MÁS VALLAS INVICTAS</option>
 <option value="inactividad">MÁS TIEMPO SIN JUGAR</option>
-<option value="tiempoActivo">MÁS TIEMPO ACTIVO</option>
 <option value="rachaSinGoles">MÁS MINUTOS SIN GOLES EN CONTRA</option>
 </select>
 </div>
@@ -578,24 +577,7 @@ function calcularGolesFutbolista(nombre, encuentros) {
 
   return totalGoles;
 }
-function calcularTiempoActivo(nombre, partidos) {
-
-  const partidosJugador = partidos
-    .filter(p => (p.Huracán || "").toLowerCase().includes(nombre.toLowerCase()))
-    .sort((a,b) => convertirFecha(a.Fecha) - convertirFecha(b.Fecha));
-
-  if (partidosJugador.length === 0) return 0;
-
-  const primeraFecha = convertirFecha(partidosJugador[0].Fecha);
-  const ultimaFecha = convertirFecha(partidosJugador[partidosJugador.length - 1].Fecha);
-
-  const diferenciaMs = ultimaFecha - primeraFecha;
-
-  const dias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
-
-  return dias;
-}
-    function calcularExpulsionesFutbolista(nombre, partidos) {
+function calcularExpulsionesFutbolista(nombre, partidos) {
 
   const nombreNormalizado = norm(nombre);
   let expulsiones = 0;
@@ -1371,7 +1353,7 @@ if (matches) {
     const efectividad = ((j.victorias * 3 + j.empates) * 100 / (j.partidos * 3)) || 0;
     const inactividadMs = calcularMayorInactividad(j.fechas);
     const inactividadTexto = formatearTiempo(inactividadMs);
-    const tiempoActivo = calcularTiempoActivo(j.nombre, todosLosPartidos);
+ 
 const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
 
 j.rachaSinGoles = racha.minutos;
@@ -1399,8 +1381,7 @@ if (racha.inicio && racha.fin) {
  efectividad: Number(efectividad.toFixed(1)),
  globopedia: Number(j.globopedia.toFixed(1)),
  inactividad: inactividadMs,
- inactividadTexto: inactividadTexto,
- tiempoActivo: tiempoActivo
+ inactividadTexto: inactividadTexto
 };
 
   }).sort((a, b) => b.globopedia - a.globopedia);
@@ -1460,7 +1441,6 @@ function renderRanking(ranking) {
             <td>${r.globopedia}</td>
             <td>${r.inactividadTexto}</td>
             <td>${r.rachaTexto}</td>
-            <td>${r.tiempoActivo} días</td>
           </tr>
         `).join("")}
       </table>
@@ -1517,11 +1497,10 @@ function cambiarColumnas() {
   expulsiones: 5,
   vallasInvictas: 6,
   efectividad: 7,
-  minutos: 8,
-  globopedia: 9,
-  inactividad: 10,
-  rachaSinGoles: 11,
-  tiempoActivo: 12
+  minutos: 8,      // ✔ correcto
+  globopedia: 9,    // ✔ correcto
+  inactividad: 10,   // 👈 NUEVO
+  rachaSinGoles: 11
 };
 
   const tabla = document.querySelector("#ranking table");
@@ -1531,18 +1510,12 @@ function cambiarColumnas() {
 
   for (let i = 0; i < filas.length; i++) {
 
-    for (let j = 3; j <= 12; j++) {
+    for (let j = 3; j <= 11; j++) {
       filas[i].cells[j].style.display = "none";
     }
 
-const col = mapaColumnas[seleccion];
-
-if (col !== undefined) {
-  filas[i].cells[col].style.display = "";
-}
-
-const colMostrar = mapaColumnas[seleccion];
-filas[i].cells[colMostrar].style.display = "";
+    const colMostrar = mapaColumnas[seleccion];
+    filas[i].cells[colMostrar].style.display = "";
   }
 
 }
@@ -1797,18 +1770,33 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 </script>
+  <script id="2q9s8k">
+function sonidoClick() {
+  const audio = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
+  audio.volume = 0.2;
+  audio.play();
+}
+</script>
 <script>
-let clickSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
+clickSound.volume = 0.2;
+
+function sonidoClick() {
+  clickSound.currentTime = 0; // reinicia para clicks rápidos
+  clickSound.play().catch(() => {});
+}
+</script>
+  <script>
+const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
 clickSound.volume = 0.3;
 
-// 🔊 sonido cuando cambia cualquier checkbox
+// 🔥 engancha TODOS los clicks reales en checkboxes
 document.addEventListener("change", function(e) {
   if (e.target.type === "checkbox") {
     clickSound.currentTime = 0;
     clickSound.play().catch(() => {});
   }
 });
-console.log("JS cargado");
 </script>
 </body>
 </html>
