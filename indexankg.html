@@ -246,6 +246,7 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="efectividad">EFECTIVIDAD DE PUNTOS</option>
 <option value="vallasInvictas">MÁS VALLAS INVICTAS</option>
 <option value="inactividad">MÁS TIEMPO SIN JUGAR</option>
+<option value="tiempoActivo">MÁS TIEMPO ACTIVO</option>
 <option value="rachaSinGoles">MÁS MINUTOS SIN GOLES EN CONTRA</option>
 </select>
 </div>
@@ -577,7 +578,24 @@ function calcularGolesFutbolista(nombre, encuentros) {
 
   return totalGoles;
 }
-function calcularExpulsionesFutbolista(nombre, partidos) {
+function calcularTiempoActivo(nombre, partidos) {
+
+  const partidosJugador = partidos
+    .filter(p => (p.Huracán || "").toLowerCase().includes(nombre.toLowerCase()))
+    .sort((a,b) => convertirFecha(a.Fecha) - convertirFecha(b.Fecha));
+
+  if (partidosJugador.length === 0) return 0;
+
+  const primeraFecha = convertirFecha(partidosJugador[0].Fecha);
+  const ultimaFecha = convertirFecha(partidosJugador[partidosJugador.length - 1].Fecha);
+
+  const diferenciaMs = ultimaFecha - primeraFecha;
+
+  const dias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+
+  return dias;
+}
+    function calcularExpulsionesFutbolista(nombre, partidos) {
 
   const nombreNormalizado = norm(nombre);
   let expulsiones = 0;
@@ -1353,7 +1371,7 @@ if (matches) {
     const efectividad = ((j.victorias * 3 + j.empates) * 100 / (j.partidos * 3)) || 0;
     const inactividadMs = calcularMayorInactividad(j.fechas);
     const inactividadTexto = formatearTiempo(inactividadMs);
- 
+    const tiempoActivo = calcularTiempoActivo(j.nombre, todosLosPartidos);
 const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
 
 j.rachaSinGoles = racha.minutos;
@@ -1381,7 +1399,8 @@ if (racha.inicio && racha.fin) {
  efectividad: Number(efectividad.toFixed(1)),
  globopedia: Number(j.globopedia.toFixed(1)),
  inactividad: inactividadMs,
- inactividadTexto: inactividadTexto
+ inactividadTexto: inactividadTexto,
+ tiempoActivo: tiempoActivo
 };
 
   }).sort((a, b) => b.globopedia - a.globopedia);
