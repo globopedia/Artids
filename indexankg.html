@@ -222,9 +222,17 @@ Hasta: <input type="date" id="fechaHasta">
 </div>
   
 <div style="text-align:center; margin-bottom:15px;">
-  <label class="led-label" onclick="sonidoClick()"><input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()"><span class="led-ui"></span><span>SÓLO EXTRANJEROS</span></label>
-  &nbsp;&nbsp;
-  <label class="led-label" onclick="sonidoClick()"><input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()" onclick="sonidoClick()"><span class="led-ui"></span><span>SÓLO INFERIORES</span></label>
+<label class="led-label">
+  <input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()">
+  <span class="led-ui"></span>
+  <span>SÓLO EXTRANJEROS</span>
+</label>
+
+<label class="led-label">
+  <input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()">
+  <span class="led-ui"></span>
+  <span>SÓLO INFERIORES</span>
+</label>
 </div>
   
 <div style="text-align:center; margin-top:15px;">
@@ -1777,6 +1785,18 @@ function sonidoClick() {
   clickSound.currentTime = 0; // reinicia para clicks rápidos
   clickSound.play().catch(() => {});
 }
+</script>
+  <script>
+const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
+clickSound.volume = 0.3;
+
+// 🔥 engancha TODOS los clicks reales en checkboxes
+document.addEventListener("change", function(e) {
+  if (e.target.type === "checkbox") {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+  }
+});
 </script>
 </body>
 </html>
