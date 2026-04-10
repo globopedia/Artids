@@ -1535,18 +1535,14 @@ function cambiarColumnas() {
       filas[i].cells[j].style.display = "none";
     }
 
-for (let i = 0; i < filas.length; i++) {
+const col = mapaColumnas[seleccion];
 
-  for (let j = 3; j <= 12; j++) {
-    filas[i].cells[j].style.display = "none";
-  }
-
-  const col = mapaColumnas[seleccion];
-
-  if (col !== undefined && filas[i].cells[col]) {
-    filas[i].cells[col].style.display = "";
-  }
+if (col !== undefined) {
+  filas[i].cells[col].style.display = "";
 }
+
+const colMostrar = mapaColumnas[seleccion];
+filas[i].cells[colMostrar].style.display = "";
   }
 
 }
