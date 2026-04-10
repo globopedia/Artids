@@ -112,6 +112,27 @@ tr:hover .foto-jugador{
 html, body {
   height: auto;
 }
+  background: #300000;
+  border: 2px solid #900;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+/* estado encendido */
+.led-check:checked {
+  background: #ff0000;
+  border-color: #ff4d4d;
+  box-shadow: 
+    0 0 6px #ff0000,
+    0 0 12px #ff0000,
+    inset 0 0 4px #fff;
+}
+
+/* efecto “apagado pero vivo” */
+.led-check:not(:checked):hover {
+  box-shadow: 0 0 4px #ff0000;
+}
 </style>
 </head>
 
@@ -158,12 +179,12 @@ Hasta: <input type="date" id="fechaHasta">
   
 <div style="text-align:center; margin-bottom:15px;">
   <label>
-    <input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()">
+   <input type="checkbox" class="led-check" id="soloExtranjeros" onchange="aplicarFiltros()">
     SÓLO EXTRANJEROS
   </label>
   &nbsp;&nbsp;
   <label>
-    <input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()">
+   <input type="checkbox" class="led-check" id="soloInferiores" onchange="aplicarFiltros()">
     SÓLO INFERIORES
   </label>
 </div>
