@@ -61,10 +61,12 @@ table tr:hover td {
   color:#7d0101;
 }
 
-  /* 🔴 CHECKBOX TIPO LED */
+/* 🔴 CHECKBOX TIPO LED (FIX REAL) */
 .led-check {
-  appearance: none;
-  -webkit-appearance: none;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -73,6 +75,7 @@ table tr:hover td {
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease-in-out;
+  display: inline-block;
 }
 
 /* estado encendido */
@@ -85,8 +88,8 @@ table tr:hover td {
     inset 0 0 4px #fff;
 }
 
-/* efecto “apagado pero vivo” */
-.led-check:not(:checked):hover {
+/* hover */
+.led-check:hover {
   box-shadow: 0 0 4px #ff0000;
 }
   .jugador {
