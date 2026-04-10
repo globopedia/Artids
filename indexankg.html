@@ -94,7 +94,28 @@ table tr:hover td {
   label {
   cursor: pointer;
 }
-  
+#filtroPosiciones label,
+.led-label {
+  display: inline-block;
+  padding: 6px 10px;
+  margin: 4px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  transition: all 0.2s ease;
+}
+
+#filtroPosiciones label:hover,
+.led-label:hover {
+  background: #ffe5e5;
+  border-color: #ff0000;
+  cursor: pointer;
+}
+  #filtroPosiciones input:checked + span,
+.led-label input:checked + .led-ui + span {
+  color: #ff0000;
+  font-weight: bold;
+}
   .jugador {
   display:flex;
   align-items:center;
