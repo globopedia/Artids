@@ -1460,6 +1460,7 @@ function renderRanking(ranking) {
             <td>${r.globopedia}</td>
             <td>${r.inactividadTexto}</td>
             <td>${r.rachaTexto}</td>
+            <td>${j.tiempoActivo} días</td>
           </tr>
         `).join("")}
       </table>
@@ -1520,6 +1521,7 @@ function cambiarColumnas() {
   globopedia: 9,    // ✔ correcto
   inactividad: 10,   // 👈 NUEVO
   rachaSinGoles: 11
+  tiempoActivo: 12
 };
 
   const tabla = document.querySelector("#ranking table");
@@ -1529,7 +1531,7 @@ function cambiarColumnas() {
 
   for (let i = 0; i < filas.length; i++) {
 
-    for (let j = 3; j <= 11; j++) {
+    for (let j = 3; j <= 12; j++) {
       filas[i].cells[j].style.display = "none";
     }
 
