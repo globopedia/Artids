@@ -155,7 +155,19 @@ Hasta: <input type="date" id="fechaHasta">
   <label><input type="checkbox" value="Volante izquierdo" checked onchange="aplicarFiltros()"> Volante izquierdo</label></br>
   <label><input type="checkbox" value="Delantero" checked onchange="aplicarFiltros()"> Delantero</label>
 </div>
-
+  
+<div style="text-align:center; margin-bottom:15px;">
+  <label>
+    <input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()">
+    SÓLO EXTRANJEROS
+  </label>
+  &nbsp;&nbsp;
+  <label>
+    <input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()">
+    SÓLO INFERIORES
+  </label>
+</div>
+  
 <div style="text-align:center; margin-top:15px;">
 <select id="selectorEstadistica" onchange="cambiarEstadistica()">
 
@@ -235,7 +247,17 @@ function aplicarFiltros() {
   ranking = ranking.filter(j =>
     posicionesActivas.includes(j.posicion)
   );
+// 🌍 FILTRO EXTRANJEROS
+const soloExtranjeros = document.getElementById("soloExtranjeros").checked;
+if (soloExtranjeros) {
+  ranking = ranking.filter(j => esExtranjero(j.nombre));
+}
 
+// 🏠 FILTRO INFERIORES
+const soloInferiores = document.getElementById("soloInferiores").checked;
+if (soloInferiores) {
+  ranking = ranking.filter(j => esDeInferiores(j.nombre));
+}
   // 📈 ORDEN
   ranking.sort((a, b) =>
     b[ordenActual.campo] - a[ordenActual.campo]
@@ -1053,7 +1075,25 @@ function obtenerFoto(nombre) {
   return jugador ? jugador["Foto1"] : "";
 }
 
-function construirIndiceEstadisticas(partidos) {
+function esExtranjero(nombre) {
+  const jugador = indiceUtbolistas[norm(nombre)];
+  if (!jugador) return false;
+
+  const paisRaw = jugador["País"] || "";
+  const paises = paisRaw.split("/").map(p => p.trim().toLowerCase());
+
+  return paises.length > 0 && paises[0] !== "argentina";
+}
+
+function esDeInferiores(nombre) {
+  const jugador = indiceUtbolistas[norm(nombre)];
+  if (!jugador) return false;
+
+  return (jugador["Procedencia"] || "")
+    .toLowerCase()
+    .includes("divisiones inferiores");
+}
+    function construirIndiceEstadisticas(partidos) {
 
   const estadisticas = {};
 
