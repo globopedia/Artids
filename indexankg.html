@@ -61,7 +61,35 @@ table tr:hover td {
   color:#7d0101;
 }
 
-.jugador {
+  /* 🔴 CHECKBOX TIPO LED */
+.led-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #300000;
+  border: 2px solid #900;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+/* estado encendido */
+.led-check:checked {
+  background: #ff0000;
+  border-color: #ff4d4d;
+  box-shadow: 
+    0 0 6px #ff0000,
+    0 0 12px #ff0000,
+    inset 0 0 4px #fff;
+}
+
+/* efecto “apagado pero vivo” */
+.led-check:not(:checked):hover {
+  box-shadow: 0 0 4px #ff0000;
+}
+  .jugador {
   display:flex;
   align-items:center;
   gap:10px;
@@ -111,35 +139,6 @@ tr:hover .foto-jugador{
 }
 html, body {
   height: auto;
-}
-
-  /* 🔴 CHECKBOX TIPO LED */
-.led-check {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #300000;
-  border: 2px solid #900;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease-in-out;
-}
-
-/* estado encendido */
-.led-check:checked {
-  background: #ff0000;
-  border-color: #ff4d4d;
-  box-shadow: 
-    0 0 6px #ff0000,
-    0 0 12px #ff0000,
-    inset 0 0 4px #fff;
-}
-
-/* efecto “apagado pero vivo” */
-.led-check:not(:checked):hover {
-  box-shadow: 0 0 4px #ff0000;
 }
 </style>
 </head>
