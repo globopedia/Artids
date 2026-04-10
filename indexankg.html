@@ -60,37 +60,38 @@ table tr:hover td {
   color:#7d0101;
 }
 
-/* 🔴 CHECKBOX TIPO LED (FIX REAL) */
-.led-check {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
+.led-label input {
+  display: none;
+}
 
-  width: 15px;
-  height: 15px;
+.led-ui {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #300000;
   border: 2px solid #900;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease-in-out;
   display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+  transition: all 0.2s ease;
 }
 
-/* estado encendido */
-.led-check:checked {
+/* 🔴 LED encendido */
+.led-label input:checked + .led-ui {
   background: #ff0000;
   border-color: #ff4d4d;
-  box-shadow: 
+  box-shadow:
     0 0 6px #ff0000,
     0 0 12px #ff0000,
     inset 0 0 4px #fff;
 }
 
-/* hover */
-.led-check:hover {
-  box-shadow: 0 0 4px #ff0000;
+/* ✍️ texto activo */
+.led-label input:checked + .led-ui + span {
+  color: #ff0000;
+  font-weight: bold;
 }
+  
   label {
   cursor: pointer;
 }
@@ -212,9 +213,9 @@ Hasta: <input type="date" id="fechaHasta">
 </div>
   
 <div style="text-align:center; margin-bottom:15px;">
-  <label class="led-label"><input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()"><span>SÓLO EXTRANJEROS</span></label>
+  <label class="led-label"><input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()"><span class="led-ui"></span><span>SÓLO EXTRANJEROS</span></label>
   &nbsp;&nbsp;
-  <label class="led-label"><input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()"><span>SÓLO INFERIORES</span></label>
+  <label class="led-label"><input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()"><span class="led-ui"></span><span>SÓLO INFERIORES</span></label>
 </div>
   
 <div style="text-align:center; margin-top:15px;">
