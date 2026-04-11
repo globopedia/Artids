@@ -1,4 +1,4 @@
-Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,Árbitro,Huracán,Rival,Foto,Incidencias,Fin1T,Fin2T
+Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,Árbitro,Huracán,Rival,Foto,Incidencias,Fin1T,Fin2T,Fin1E,Fin2E
 06/02/1985,Guerra,local,empate,2,2,Los Andes,Amistoso,-,-,-,-,foto,sin datos,45,90
 08/02/1985,Guerra,visitante,victoria,1,0,Andes Talleres (Mendoza),Amistoso,-,-,-,-,foto,sin datos,45,90
 10/02/1985,Guerra,visitante,victoria,2,1,Huracán (Mendoza),Amistoso,-,-,-,-,foto,sin datos,45,90
@@ -264,6 +264,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 07/12/1990,Babington,local,empate,0,0,Lanús,17° fecha Apertura del Campeonato 1990/91
 14/12/1990,Babington,visitante,victoria,2,1,Talleres (Córdoba),18° fecha Apertura del Campeonato 1990/91
 23/12/1990,Babington,local,empate,0,0,Racing Club,19° fecha Apertura del Campeonato 1990/91
+14/02/1991,Babington,local,empate,0,0,Rosario Central,Amistoso 1991/92,Tomás A. Ducó,Manuel Jácome,"Gabriel Puentedura; Maciel, Héctor Cúper (80 Marcelo Asteggiano), Ariel Wiktor y Szulz; Carlos Amodeo, Fernando Quiroz (80 Montero), Javier López y Miranda; Sergio Saturno, Héctor Herrero.","Lanari; Daniele, Cuffaro Russo, Trivisono y Boggio; Andrade, Cornaglia, Itabel (60 Forletta) y García (85 Ceba-llos); Uliambre y Gambier.",foto,1° Tiempo: Huracán 0x0 Central,45,90,0,0
 08/02/1991,Babington,neutral,victoria,3,1,San Lorenzo de Almagro,1° fecha de Copa Amistad 1991 (amistoso)
 10/02/1991,Babington,visitante,derrota,0,1,Vélez Sarsfield,1° fecha de Copa Amistad 1991 (amistoso)
 24/02/1991,Babington,local,derrota,0,2,Mandiyú (Corrientes),1° fecha Clausura del Campeonato 1990/91
