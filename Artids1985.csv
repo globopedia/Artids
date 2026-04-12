@@ -351,8 +351,8 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 06/12/1992,Trossero,visitante,victoria,3,2,Argentinos Juniors,17° fecha del Campeonato Apertura 1992,estadio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 13/12/1992,Trossero,local,victoria,3,2,Rosario Central,18° fecha del Campeonato Apertura 1992,estadio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 20/12/1992,Trossero,visitante,derrota,0,1,Estudiantes (La Plata),19° fecha del Campeonato Apertura 1992,estadio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-17/01/1993,Trossero,local,derrota,0,1,Nacional (Uruguay),1° fecha de Copa Libertad 1993,Tomás A. Ducó,-,-,-,foto,-,23,46
-17/01/1993,Trossero,local,derrota,0,1,Newell's Old Boys (Rosario),2° fecha de Copa Libertad 1993,Tomás A. Ducó,-,-,-,foto,-,23,46
+17/01/1993,Trossero,local,derrota,0,1,Nacional (Uruguay),1° fecha de Copa Libertad 1993,Tomás A. Ducó,-,-,-,foto,-,23,46.0,0
+17/01/1993,Trossero,local,derrota,0,1,Newell's Old Boys (Rosario),2° fecha de Copa Libertad 1993,Tomás A. Ducó,-,-,-,foto,-,23,46,0,0
 30/01/1993,Trossero,visitante,victoria,1,0,Vélez Sarsfield,1° fecha de Copa Libertad 1993 III,estadio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 30/01/1993,Trossero,neutral,derrota,0,3,Flamengo RS (Brasil),2° fecha de Copa Libertad 1993 III,estadio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 20/02/1993,Trossero,visitante,derrota,1,3,Independiente,1° fecha del Campeonato Clausura 1993,estadio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
