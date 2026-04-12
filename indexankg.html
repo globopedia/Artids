@@ -283,7 +283,7 @@ function clasificarTorneo(torneo) {
   return "OTRO";
 }
 function aplicarFiltros() {
-  let partidos = [...datosArtids2015, ...datosArtids2000];
+  let partidos = [...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
 
   // 📅 FILTRO FECHA
   const desde = document.getElementById("fechaDesde").value;
@@ -1558,6 +1558,10 @@ function construirPeriodos(anios){
    CARGA DEL CSV
 ========================= */
 
+let datosArtids1940 = null;
+let datosArtids1955 = null;
+let datosArtids1970 = null;
+let datosArtids1985 = null;
 let datosArtids2000 = null;
 let datosArtids2015 = null;
 let datosUtbolistas = null;
@@ -1565,7 +1569,7 @@ let indiceUtbolistas = {};
 let estadisticasJugadores = {};
 
 function intentarGenerarRanking() {
-  if (!datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
+  if (!datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
 
   ordenActual = { campo: "globopedia", asc: true };
 
@@ -1576,7 +1580,7 @@ function generarRankingPorFecha() {
   const desdeValor = document.getElementById("fechaDesde").value;
   const hastaValor = document.getElementById("fechaHasta").value;
 
-  const todosLosPartidos = [...datosArtids2015, ...datosArtids2000];
+  const todosLosPartidos = [...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
 
   const desde = desdeValor ? new Date(desdeValor) : new Date("1900-01-01");
   const hasta = hastaValor ? new Date(hastaValor) : new Date();
@@ -1611,6 +1615,58 @@ function convertirFecha(fechaStr) {
   .forEach(cb => {
     cb.addEventListener("change", aplicarFiltroPosicion);
   });
+
+Papa.parse(
+  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1940.csv",
+  {
+    download: true,
+    header: true,
+    complete: res => {
+      datosArtids1940 = res.data;
+      console.log("CSV Artids1940 cargado:", datosArtids1940.length);
+      intentarGenerarRanking();
+    }
+  }
+);
+
+Papa.parse(
+  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1955.csv",
+  {
+    download: true,
+    header: true,
+    complete: res => {
+      datosArtids1955 = res.data;
+      console.log("CSV Artids1955 cargado:", datosArtids1955.length);
+      intentarGenerarRanking();
+    }
+  }
+);
+
+Papa.parse(
+  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1970.csv",
+  {
+    download: true,
+    header: true,
+    complete: res => {
+      datosArtids1970 = res.data;
+      console.log("CSV Artids1970 cargado:", datosArtids1970.length);
+      intentarGenerarRanking();
+    }
+  }
+);
+
+Papa.parse(
+  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1985.csv",
+  {
+    download: true,
+    header: true,
+    complete: res => {
+      datosArtids1985 = res.data;
+      console.log("CSV Artids1985 cargado:", datosArtids1985.length);
+      intentarGenerarRanking();
+    }
+  }
+);
 
 Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids2000.csv",
