@@ -46,37 +46,37 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 03/02/1956,Pedernera,neutral,empate,2,2,Tigre,Gira por América 1956 (amistoso),Antillas Holandesas (Willemstad),-,-,-,foto,GOL Aguilar (TIG)</br>GOL Sánchez García (TIG),45,90,0,0
 14/02/1956,Pedernera,visitante,empate,0,0,Independiente Medellín (Colombia),Gira por América 1956 (amistoso),Atanasio Girardot (Medellín),-,"Edgardo Madinabeytia; Sherl y Zuluaga; Urquijo, Rodríguez y Ardanaz; Félix Respuela, Rossi, Adolfo Pedernera, Ricardo Infante y Onzari","Sánchez; Lauro y Caicedo; Pacheco, Calonga y Retamoso; Larraz, Seghini, Pizarro, Arango y Moreno.",foto,<b>1° Tiempo: Independiente Medellín 0x0 Huracán</b>,45,90,0,0
 15/02/1956,Pedernera,neutral,empate,1,1,Nacional (Colombia),Gira por América 1956 (amistoso),Coloso (Ibagué),-,-,-,foto,00 GOL Lanza (NAC) y GOL Oscar Rossi (HUR),45,90,0,0
-00/03/1956,Pedernera,neutral,derrota,1,3,San Lorenzo de Almagro,Semifinal de la Copa Cincuentenario de Talleres,Remedios de Escalada
-15/04/1956,Peucelle,visitante,empate,1,1,Ferro C. Oeste,1° fecha del Campeonato 1956,Caballito
-22/04/1956,Peucelle,visitante,derrota,0,1,Vélez Sarsfield,2° fecha del Campeonato 1956,José Amalfitani
-28/04/1956,Peucelle,local,empate,1,1,River Plate,3° fecha del Campeonato 1956,José Amalfitani
-06/05/1956,Peucelle,visitante,victoria,1,0,Newell's Old Boys (Rosario),4° fecha del Campeonato 1956,Parque Independencia (Rosario)
-13/05/1956,Peucelle,local,empate,1,1,Gimnasia y Esgrima (La Plata),5° fecha del Campeonato 1956,Gasómetro
-20/05/1956,Peucelle,visitante,empate,1,1,Racing Club,6° fecha del Campeonato 1956,El Cilindro
-27/05/1956,Peucelle,local,derrota,2,4,Lanús,7° fecha del Campeonato 1956,Gasómetro
-03/06/1956,Peucelle,visitante,victoria,6,0,Argentinos Juniors,8° fecha del Campeonato 1956,Caballito
-09/06/1956,Peucelle,local,derrota,2,4,San Lorenzo de Almagro,9° fecha del Campeonato 1956,José Amalfitani
-15/07/1956,Lúpiz,visitante,empate,0,0,Chacarita Juniors,10° fecha del Campeonato 1956,San Martín
-22/07/1956,Lúpiz,local,victoria,2,1,Tigre,11° fecha del Campeonato 1956,El Palacio
-29/07/1956,Lúpiz,visitante,derrota,1,5,Rosario Central,12° fecha del Campeonato 1956,Arroyito (Rosario)
-05/08/1956,Lúpiz,local,empate,1,1,Estudiantes (La Plata),13° fecha del Campeonato 1956,El Palacio
-12/08/1956,Lúpiz,visitante,derrota,0,3,Independiente,14° fecha del Campeonato 1956,Doble Visera
-26/08/1956,Lúpiz,local,derrota,1,2,Boca Juniors,15° fecha del Campeonato 1956,El Palacio
-02/09/1956,Lúpiz,local,derrota,0,1,Ferro C. Oeste,16° fecha del Campeonato 1956,El Palacio
-09/09/1956,Lúpiz,local,derrota,1,2,Vélez Sarsfield,17° fecha del Campeonato 1956,El Palacio
-16/09/1956,Lúpiz,visitante,derrota,0,3,River Plate,18° fecha del Campeonato 1956,Monumental
-23/09/1956,Pedernera,local,empate,2,2,Newell's Old Boys (Rosario),19° fecha del Campeonato 1956,El Palacio
-30/09/1956,Pedernera,visitante,empate,2,2,Gimnasia y Esgrima (La Plata),20° fecha del Campeonato 1956,El Bosque (La Plata)
-07/10/1956,Pedernera,local,derrota,1,3,Racing Club,21° fecha del Campeonato 1956,El Palacio
-14/10/1956,Pedernera,visitante,derrota,1,4,Lanús,22° fecha del Campeonato 1956,Lanús
-21/10/1956,Pedernera,local,victoria,5,3,Argentinos Juniors,23° fecha del Campeonato 1956,El Palacio
-28/10/1956,Pedernera,visitante,victoria,1,0,San Lorenzo de Almagro,24° fecha del Campeonato 1956,Gasómetro
-01/11/1956,Pedernera,local,victoria,3,1,Chacarita Juniors,25° fecha del Campeonato 1956,El Palacio
-04/11/1955,Pedernera,visitante,victoria,3,2,Tigre,26° fecha del Campeonato 1956,José Dellagiovanna
-11/11/1956,Pedernera,local,victoria,3,1,Rosario Central,27° fecha del Campeonato 1956,El Palacio
-18/11/1956,Pedernera,visitante,derrota,2,4,Estudiantes (La Plata),28° fecha del Campeonato 1956,Uno (La Plata)
-25/11/1956,Pedernera,local,empate,1,1,Independiente,29° fecha del Campeonato 1956,El Palacio
-02/12/1956,Pedernera,visitante,derrota,1,4,Boca Juniors,30° fecha del Campeonato 1956,La Bombonera
+00/03/1956,Pedernera,neutral,derrota,1,3,San Lorenzo de Almagro,Semifinal de la Copa Cincuentenario de Talleres,Remedios de Escalada,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+15/04/1956,Peucelle,visitante,empate,1,1,Ferro C. Oeste,1° fecha del Campeonato 1956,Caballito,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+22/04/1956,Peucelle,visitante,derrota,0,1,Vélez Sarsfield,2° fecha del Campeonato 1956,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+28/04/1956,Peucelle,local,empate,1,1,River Plate,3° fecha del Campeonato 1956,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+06/05/1956,Peucelle,visitante,victoria,1,0,Newell's Old Boys (Rosario),4° fecha del Campeonato 1956,Parque Independencia (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+13/05/1956,Peucelle,local,empate,1,1,Gimnasia y Esgrima (La Plata),5° fecha del Campeonato 1956,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+20/05/1956,Peucelle,visitante,empate,1,1,Racing Club,6° fecha del Campeonato 1956,El Cilindro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+27/05/1956,Peucelle,local,derrota,2,4,Lanús,7° fecha del Campeonato 1956,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+03/06/1956,Peucelle,visitante,victoria,6,0,Argentinos Juniors,8° fecha del Campeonato 1956,Caballito,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+09/06/1956,Peucelle,local,derrota,2,4,San Lorenzo de Almagro,9° fecha del Campeonato 1956,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+15/07/1956,Lúpiz,visitante,empate,0,0,Chacarita Juniors,10° fecha del Campeonato 1956,San Martín,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+22/07/1956,Lúpiz,local,victoria,2,1,Tigre,11° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+29/07/1956,Lúpiz,visitante,derrota,1,5,Rosario Central,12° fecha del Campeonato 1956,Arroyito (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+05/08/1956,Lúpiz,local,empate,1,1,Estudiantes (La Plata),13° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+12/08/1956,Lúpiz,visitante,derrota,0,3,Independiente,14° fecha del Campeonato 1956,Doble Visera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+26/08/1956,Lúpiz,local,derrota,1,2,Boca Juniors,15° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+02/09/1956,Lúpiz,local,derrota,0,1,Ferro C. Oeste,16° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+09/09/1956,Lúpiz,local,derrota,1,2,Vélez Sarsfield,17° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+16/09/1956,Lúpiz,visitante,derrota,0,3,River Plate,18° fecha del Campeonato 1956,Monumental,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+23/09/1956,Pedernera,local,empate,2,2,Newell's Old Boys (Rosario),19° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+30/09/1956,Pedernera,visitante,empate,2,2,Gimnasia y Esgrima (La Plata),20° fecha del Campeonato 1956,El Bosque (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+07/10/1956,Pedernera,local,derrota,1,3,Racing Club,21° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+14/10/1956,Pedernera,visitante,derrota,1,4,Lanús,22° fecha del Campeonato 1956,Lanús,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+21/10/1956,Pedernera,local,victoria,5,3,Argentinos Juniors,23° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+28/10/1956,Pedernera,visitante,victoria,1,0,San Lorenzo de Almagro,24° fecha del Campeonato 1956,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+01/11/1956,Pedernera,local,victoria,3,1,Chacarita Juniors,25° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+04/11/1955,Pedernera,visitante,victoria,3,2,Tigre,26° fecha del Campeonato 1956,José Dellagiovanna,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+11/11/1956,Pedernera,local,victoria,3,1,Rosario Central,27° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+18/11/1956,Pedernera,visitante,derrota,2,4,Estudiantes (La Plata),28° fecha del Campeonato 1956,Uno (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+25/11/1956,Pedernera,local,empate,1,1,Independiente,29° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+02/12/1956,Pedernera,visitante,derrota,1,4,Boca Juniors,30° fecha del Campeonato 1956,La Bombonera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 05/05/1957,Pedernera,visitante,derrota,0,2,Independiente,1° fecha del Campeonato 1957,Davies,Doble Visera,"Edgardo Madinabeytia; Orlando Peloso y Juan M Filgueiras; Carlos Arredondo, Jorge Turco y Oscar Villano; Julio Boreni, Norberto Méndez, Miguel Romero, Roberto Bellomo y Julio Marcarián.","Julio Cozzi; Mousegne y Bendazzi; Britos, Rodríguez y Varacka; Cervino, Abeledo, Bonelli, Grillo y Cruz.",foto,8 GOL Cervino (IND)</br>88 GOL Grillo (IND),45,90,0,0
 12/05/1957,Pedernera,local,victoria,3,0,Atlanta,2° fecha del Campeonato 1957,El Palacio,Fuster,"Edgardo Madinabeytia; Orlando Peloso y Juan M Filgueiras; Carlos Arredondo, Jorge Ruiz y Oscar Villano; Julio Boreni, Norberto Méndez, Miguel Romero, Roberto Bellomo y Julio Marcarián.","Rocha; Colman y Etchegaray; Desanzo, Griguol y Bettinotti; Martínez, Guenzatti, Bravo, Fazzolari y Fernández Den.",foto,57 GOL Roberto Bellomo (HUR)</br>60 GOL Miguel Romero (HUR)</br>84 GOL Norberto Méndez (HUR),45,90,0,0
 19/05/1957,Pedernera,visitante,victoria,1,0,3° fecha del Campeonato 1957,Vélez,Brozzi,"Edgardo Madinabeytia; Orlando Peloso y Juan M Filgueiras; Carlos Arredondo, Jorge Ruiz y Oscar Villano; Julio Boreni, Oscar Rossi, Miguel Romero, Roberto Bellomo y Julio Marcarián.","Marapodi; Allegri y García Fierro; Simeone, Gallo y J García; Navarro, Avio, Ferraro, López Espinosa y Manzi.",foto,71 Julio Boreni (HUR),45,90,0,0
@@ -84,39 +84,39 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 02/06/1957,Sbarra,visitante,victoria,2,1,Rosario Central,5° fecha del Campeonato 1957,Arroyito (Rosario),Hiegger,"Edgardo Madinabeytia; Orlando Peloso y Juan M Filgueiras; Carlos Arredondo, Jorge Ruiz y Oscar Villano; Julio Boreni, Norberto Méndez, Miguel Romero, Roberto Bellomo y Julio Marcarián.","Juan C Bertoldi; Biagioli y Cardoso; Álvarez, Ducca y Poi; Converti, Taibo, Miguel Juárez, Ramírez y Giménez.",foto,27 GOL Orlando Peloso (HUR)</br>28 GOL Roberto Bellomo (HUR)</br>39 GOL Miguel Juárez (RCE),45,90,0,0
 09/06/1957,Sbarra,local,victoria,4,1,Lanús,6° fecha del Campeonato 1957,El Palacio,Fuster,"Edgardo Madinabeytia; Orlando Peloso y Juan M Filgueiras; Carlos Arredondo, Jorge Ruiz y Rodolfo González; Julio Boreni, Norberto Méndez, Miguel Romero, Roberto Bellomo y Julio Marcarián.","Álvarez Vega; Ramos Delgado y Beltrán; Daponte, Guidi y Nazionale; Carranza, Zavorra, Fernández, Rojas y Moyano.",foto,1 GOL Orlando Peloso (HUR)</br>20 GOL Moyano (ATL) -penal-</br>33 GOL Julio Boreni (HUR)</br>42 GOL Julio Marcarián (HUR)</br>66 GOL Miguel Romero (HUR),45,90,0,0
 16/06/1957,Sbarra,visitante,empate,2,2,River Plate,7° fecha del Campeonato 1957,Monumental,Turner,"Edgardo Madinabeytia; Orlando Peloso y Juan M Filgueiras; Carlos Arredondo, Jorge Ruiz y Rodolfo González; Julio Boreni, Norberto Méndez, Miguel Romero, Roberto Bellomo y Julio Marcarián.","Amadeo Carrizo; Pérez y Vairo; Mantegari, Rossi y Urriolabeitia; De Bourgoing, Prado, Norberto Menéndez, Ángel Labruna y Zárate.",foto,5 GOL Ángel Labruna (RPL)</br>33 GOL Orlando Peloso (HUR) -penal-</br>52 GOL Ángel Labruna (RPL)</br>66 GOL Roberto Bellomo (HUR),45,90,0,0
-23/06/1957,Sbarra,local,empate,1,1,Racing Club,8° fecha del Campeonato 1957,El Palacio
-30/06/1957,Sbarra,visitante,victoria,2,0,Argentinos Juniors,9° fecha del Campeonato 1957,La Bombonera
-21/07/1957,Sbarra,local,victoria,4,0,Ferro C. Oeste,10° fecha del Campeonato 1957,El Palacio
-27/07/1957,Sbarra,visitante,victoria,1,0,Gimnasia y Esgrima (La Plata),11° fecha del Campeonato 1957,El Bosque (La Plata)
-04/08/1957,Sbarra,visitante,derrota,1,2,Newell's Old Boys (Rosario),12° fecha del Campeonato 1957,Parque Independencia (Rosario)
-11/08/1957,Sbarra,local,victoria,4,1,Estudiantes (La Plata),13° fecha del Campeonato 1957,El Palacio
-15/08/1957,Sbarra,visitante,empate,0,0,Boca Juniors,14° fecha del Campeonato 1957,La Bombonera,
-18/08/1957,Sbarra,local,victoria,4,1,Tigre,15° fecha del Campeonato 1957,El Palacio
-25/08/1957,Sbarra,local,victoria,1,0,Independiente,16° fecha del Campeonato 1957,El Palacio
-01/09/1957,Sbarra,visitante,derrota,1,3,Atlanta,17° fecha del Campeonato 1957,Villa Crespo
-08/09/1957,Sbarra,local,empate,1,1,Vélez Sarsfield,18° fecha del Campeonato 1957,El Palacio
-15/09/1957,Sbarra,visitante,derrota,0,1,San Lorenzo de Almagro,19° fecha del Campeonato 1957,Gasómetro
-22/09/1957,Sbarra,local,victoria,2,0,Rosario Central,20° fecha del Campeonato 1957,El Palacio
-29/09/1957,Sbarra,visitante,derrota,0,2,Lanús,21° fecha del Campeonato 1957,Lanús
-03/11/1957,Peucelle,local,empate,0,0,River Plate,22° fecha del Campeonato 1957,El Palacio
-10/11/1957,Peucelle,visitante,derrota,0,5,Racing Club,23° fecha del Campeonato 1957,El Cilindro
-17/11/1957,Peucelle,local,derrota,1,4,Argentinos Juniors,24° fecha del Campeonato 1957,El Palacio
-24/11/1957,Peucelle,visitante,victoria,5,2,Ferro C. Oeste,25° fecha del Campeonato 1957,Caballito
-01/12/1957,Peucelle,local,derrota,0,2,Gimnasia y Esgrima (La Plata),26° fecha del Campeonato 1957,El Palacio
-04/12/1957,Peucelle,local,victoria,1,0,Newell's Old Boys,27° fecha del Campeonato 1957,El Palacio
-08/12/1957,Peucelle,visitante,derrota,0,1,Estudiantes (La Plata),28° fecha del Campeonato 1957,Uno (La Plata)
-11/12/1957,Peucelle,local,victoria,1,0,Boca Juniors,29° fecha del Campeonato 1957,El Palacio
-15/12/1957,Peucelle,visitante,derrota,1,2,Tigre,30° fecha del Campeonato 1957,José Dellagiovanna
-25/12/1957,Peucelle,visitante,victoria,3,0,Alajuelense (Costa Rica),Amistoso
-27/12/1957,Peucelle,visitante,victoria,1,0,Saprissa (Costa Rica),Amistoso
-01/01/1958,Peucelle,neutral,victoria,3,0,Botafogo (Brasil),3° fecha del San José (amistoso),Nacional (San José),Crawford,"Edgardo Madinabeytia; Carlos Arredondo, Orlando Peloso y Juan M Filgueiras; Luis Bellatti y Villano; Félix Respuela (46 Osvaldo Crosta), Romero, Oscar Rossi, Julio Marcarián y Violi.","Adalberto; Beto, Thomé, Servílio y Nilton Santos; Pampolini y Édison (Ney); Garrincha, Paulo Valentim, Didí y Quarentinha.",foto,12 GOL Félix Respuela (HUR)</br>56 GOL Romero (HUR)</br>80 GOL Romero (HUR),45,90
-17/01/1958,Peucelle,visitante,victoria,2,0,Dep. Quindío (Colombia),Gira por América (amistoso),Londoño (Manizales),-,-,-,foto,43 GOL Romero (HUR)</br>63 GOL Bruno (HUR),45,90
-26/01/1958,Peucelle,visitante,victoria,4,1,Independiente Medellín (Colombia),Gira por América (amistoso),Atanasio Girardot (Medellín),-,-,-,foto,sin detalles,45,90
-31/01/1958,Peucelle,visitante,derrota,1,2,Nacional (Colombia),Gira por América (amistoso),Atanasio Girardot (Medellín),-,-,-,foto,sin detalles,45,90
-02/02/1958,Peucelle,visitante,victoria,3,2,Independiente Santa Fe (Colombia),Gira por América (amistoso),El Campín (Bogotá),-,-,-,foto,-,45,90
-09/02/1958,Peucelle,neutral,victoria,5,0,Liga de Cundinamarca (Colombia),Gira por América (amistoso),Pascual Guerrero (Cali),-,-,-,foto,-,45,90
-13/02/1958,Peucelle,visitante,victoria,5,0,Selección de Colombia,Gira por América (amistoso),Pascual Guerrero (Cali),-,x,x,foto,-,45,90
-16/02/1958,Peucelle,visitante,victoria,2,0,Liga de Valle (Colombia),Gira por América (Amistoso),Pascual Guerrero (Colombia),-,-,-,foto,-,45,90
+23/06/1957,Sbarra,local,empate,1,1,Racing Club,8° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+30/06/1957,Sbarra,visitante,victoria,2,0,Argentinos Juniors,9° fecha del Campeonato 1957,La Bombonera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+21/07/1957,Sbarra,local,victoria,4,0,Ferro C. Oeste,10° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+27/07/1957,Sbarra,visitante,victoria,1,0,Gimnasia y Esgrima (La Plata),11° fecha del Campeonato 1957,El Bosque (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+04/08/1957,Sbarra,visitante,derrota,1,2,Newell's Old Boys (Rosario),12° fecha del Campeonato 1957,Parque Independencia (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+11/08/1957,Sbarra,local,victoria,4,1,Estudiantes (La Plata),13° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+15/08/1957,Sbarra,visitante,empate,0,0,Boca Juniors,14° fecha del Campeonato 1957,La Bombonera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+18/08/1957,Sbarra,local,victoria,4,1,Tigre,15° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+25/08/1957,Sbarra,local,victoria,1,0,Independiente,16° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+01/09/1957,Sbarra,visitante,derrota,1,3,Atlanta,17° fecha del Campeonato 1957,Villa Crespo,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+08/09/1957,Sbarra,local,empate,1,1,Vélez Sarsfield,18° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+15/09/1957,Sbarra,visitante,derrota,0,1,San Lorenzo de Almagro,19° fecha del Campeonato 1957,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+22/09/1957,Sbarra,local,victoria,2,0,Rosario Central,20° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+29/09/1957,Sbarra,visitante,derrota,0,2,Lanús,21° fecha del Campeonato 1957,Lanús,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+03/11/1957,Peucelle,local,empate,0,0,River Plate,22° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+10/11/1957,Peucelle,visitante,derrota,0,5,Racing Club,23° fecha del Campeonato 1957,El Cilindro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+17/11/1957,Peucelle,local,derrota,1,4,Argentinos Juniors,24° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+24/11/1957,Peucelle,visitante,victoria,5,2,Ferro C. Oeste,25° fecha del Campeonato 1957,Caballito,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+01/12/1957,Peucelle,local,derrota,0,2,Gimnasia y Esgrima (La Plata),26° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+04/12/1957,Peucelle,local,victoria,1,0,Newell's Old Boys,27° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+08/12/1957,Peucelle,visitante,derrota,0,1,Estudiantes (La Plata),28° fecha del Campeonato 1957,Uno (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+11/12/1957,Peucelle,local,victoria,1,0,Boca Juniors,29° fecha del Campeonato 1957,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+15/12/1957,Peucelle,visitante,derrota,1,2,Tigre,30° fecha del Campeonato 1957,José Dellagiovanna,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+25/12/1957,Peucelle,visitante,victoria,3,0,Alajuelense (Costa Rica),1° fecha del Cuadrangular de Costa Rica 1957 (amistoso),Nacional (Costa Rica)
+27/12/1957,Peucelle,visitante,victoria,1,0,Saprissa (Costa Rica),2° fecha del Cuadrangular de Costa Rica 1957 (amistoso),Nacional (Costa Rica)
+01/01/1958,Peucelle,neutral,victoria,3,0,Botafogo (Brasil),3° fecha del San José 1957 (amistoso),Nacional (Costa Rica),Crawford,"Edgardo Madinabeytia; Carlos Arredondo, Orlando Peloso y Juan M Filgueiras; Luis Bellatti y Villano; Félix Respuela (46 Osvaldo Crosta), Romero, Oscar Rossi, Julio Marcarián y Violi.","Adalberto; Beto, Thomé, Servílio y Nilton Santos; Pampolini y Édison (Ney); Garrincha, Paulo Valentim, Didí y Quarentinha.",foto,12 GOL Félix Respuela (HUR)</br>56 GOL Romero (HUR)</br>80 GOL Romero (HUR),45,90
+17/01/1958,Peucelle,visitante,victoria,2,0,Dep. Quindío (Colombia),Gira por América 1958 (amistoso),Londoño (Manizales),-,-,-,foto,43 GOL Romero (HUR)</br>63 GOL Bruno (HUR),45,90
+26/01/1958,Peucelle,visitante,victoria,4,1,Independiente Medellín (Colombia),Gira por América 1958 (amistoso),Atanasio Girardot (Medellín),-,-,-,foto,sin detalles,45,90
+31/01/1958,Peucelle,visitante,derrota,1,2,Nacional (Colombia),Gira por América 1958 (amistoso),Atanasio Girardot (Medellín),-,-,-,foto,sin detalles,45,90
+02/02/1958,Peucelle,visitante,victoria,3,2,Independiente Santa Fe (Colombia),Gira por América 1958 (amistoso),El Campín (Bogotá),-,-,-,foto,-,45,90
+09/02/1958,Peucelle,neutral,victoria,5,0,Liga de Cundinamarca (Colombia),Gira por América 1958 (amistoso),Pascual Guerrero (Cali),-,-,-,foto,-,45,90
+13/02/1958,Peucelle,visitante,victoria,5,0,Selección de Colombia,Gira por América 1958 (amistoso),Pascual Guerrero (Cali),-,x,x,foto,-,45,90
+16/02/1958,Peucelle,visitante,victoria,2,0,Liga de Valle (Colombia),Gira por América 1958 (Amistoso),Pascual Guerrero (Colombia),-,-,-,foto,-,45,90
 23/03/1958,Spinetto,visitante,derrota,1,5,Estudiantes (La Plata),1° fecha del Campeonato 1958,Uno (La Plata),-,-,-,foto,sin datos,45,90,0,0,
 30/03/1958,Spinetto,local,derrota,1,3,Boca Juniors,2° fecha del Campeonato 1958,El Palacio,-,-,-,foto,sin datos,45,90,0,0,
 06/04/1958,Spinetto,visitante,victoria,2,0,Tigre,3° fecha del Campeonato 1958,Tigre,-,-,-,foto,sin datos,45,90,0,0,
