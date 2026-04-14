@@ -14,7 +14,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 14/08/1955,Pedernera,visitante,victoria,3,0,Estudiantes (La Plata),13° fecha del Campeonato 1955,Uno (La Plata),-,-,-,foto,sin datos,45,90,0,0
 17/08/1955,Pedernera,local,victoria,4,1,Rosario Central,14° fecha del Campeonato 1955,Gasómetro,-,-,-,foto,sin datos,45,90,0,0
 21/08/1955,Pedernera,visitante,empate,0,0,San Lorenzo de Almagro,15° fecha del Campeonato 1955,Gasómetro,-,-,-,foto,sin datos,45,90,0,0
-28/08/1955,Pedernera,visitante,derrota,1,2,Vélez Sarsfield,16° fecha del Campeonato 1955,José Amalfitani,-,-,-,foto,sin datos,45,90,0,0
+28/08/1955,Pedernera,visitante,derrota,1,2,Vélez Sarsfield,16° fecha del Campeonato 1955,Vélez Sarsfield,-,-,-,foto,sin datos,45,90,0,0
 04/09/1955,Pedernera,local,empate,1,1,Boca Juniors,17° fecha del Campeonato 1955,Gasómetro,-,-,-,foto,sin datos,45,90,0,0
 11/09/1955,Pedernera,visitante,derrota,1,2,Racing Club,18° fecha del Campeonato 1955,El Cilindro,-,-,-,foto,sin datos,45,90,0,0
 25/09/1955,Pedernera,local,victoria,2,0,Tigre,19° fecha del Campeonato 1955,Gasómetro,-,-,-,foto,sin datos,45,90,0,0
@@ -48,14 +48,14 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 15/02/1956,Pedernera,neutral,empate,1,1,Nacional (Colombia),Gira por América 1956 (amistoso),Coloso (Ibagué),-,-,-,foto,00 GOL Lanza (NAC) y GOL Oscar Rossi (HUR),45,90,0,0
 00/03/1956,Pedernera,neutral,derrota,1,3,San Lorenzo de Almagro,Semifinal de la Copa Cincuentenario de Talleres,Remedios de Escalada,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 15/04/1956,Peucelle,visitante,empate,1,1,Ferro C. Oeste,1° fecha del Campeonato 1956,Caballito,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-22/04/1956,Peucelle,visitante,derrota,0,1,Vélez Sarsfield,2° fecha del Campeonato 1956,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-28/04/1956,Peucelle,local,empate,1,1,River Plate,3° fecha del Campeonato 1956,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+22/04/1956,Peucelle,visitante,derrota,0,1,Vélez Sarsfield,2° fecha del Campeonato 1956,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+28/04/1956,Peucelle,local,empate,1,1,River Plate,3° fecha del Campeonato 1956,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 06/05/1956,Peucelle,visitante,victoria,1,0,Newell's Old Boys (Rosario),4° fecha del Campeonato 1956,Parque Independencia (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 13/05/1956,Peucelle,local,empate,1,1,Gimnasia y Esgrima (La Plata),5° fecha del Campeonato 1956,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 20/05/1956,Peucelle,visitante,empate,1,1,Racing Club,6° fecha del Campeonato 1956,El Cilindro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 27/05/1956,Peucelle,local,derrota,2,4,Lanús,7° fecha del Campeonato 1956,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 03/06/1956,Peucelle,visitante,victoria,6,0,Argentinos Juniors,8° fecha del Campeonato 1956,Caballito,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-09/06/1956,Peucelle,local,derrota,2,4,San Lorenzo de Almagro,9° fecha del Campeonato 1956,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+09/06/1956,Peucelle,local,derrota,2,4,San Lorenzo de Almagro,9° fecha del Campeonato 1956,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 15/07/1956,Lúpiz,visitante,empate,0,0,Chacarita Juniors,10° fecha del Campeonato 1956,San Martín,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 22/07/1956,Lúpiz,local,victoria,2,1,Tigre,11° fecha del Campeonato 1956,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 29/07/1956,Lúpiz,visitante,derrota,1,5,Rosario Central,12° fecha del Campeonato 1956,Arroyito (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -126,7 +126,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 11/05/1958,Spinetto,local,derrota,1,2,Newell's Old Boys (Rosario),4° fecha de la Copa Suecia 1958,El Palacio,José Praddaude,"Edgardo Madinabeytia; Federico Pizarro y Juan M Filgueiras; Carlos Arredondo, Enrique Brunetti y Jorge Benegas; Manuel Iñigo, Norberto Méndez, Juan A Chena, Julio Marcarián y Alberto Violi.","Vladimiro Tarnawsky; Jorge Griffa y José Echeverría; Rubén Galván, Manuel Pilan y Ángel Echeverría; Luis Pereyra, Rubén Merighi, Manuel Barrionuevo, Nicolás Di Lonardo y Jacinto Merayo.",foto,12 GOL Nicolás Di Lonardo (NOB)</br>18 GOL Rubén Merighi (NOB)</br>49 GOL Norberto Méndez (HUR) -corrió y remató cruzado-</br>70 ATA Pizarro desvió un penal,45,90,0,0
 18/05/1958,Spinetto,visitante,victoria,3,1,Boca Juniors,5° fecha de la Copa Suecia 1958,La Bombonera,Ángel Coerezza,"Edgardo Madinabeytia; Federico Pizarro y Juan M Filgueiras; Carlos Arredondo, Enrique Brunetti y Jorge Benegas; Manuel Iñigo, Norberto Méndez, Oscar Rossi, Julio Marcarián y Alberto Violi.","Héctor Giambartolomei; Luis Cardoso y José Poi; Héctor García, Antonio Rattín y Juan C Barberis; Herminio González, Miguel Basílico, José Borello, Juan J Rodríguez y Raúl Pérez.",foto,19 GOL Julio Marcarián (HUR) con remate cruzado -asistencia de Norberto Méndez (HUR)-</br>55 GOL José Borello (BJU) con disparo bajo -asistencia de González-</br>56 EXP Juan C Barberis (BJU)</br>56 EXP Enrique Brunetti (HUR)</br>67 GOL Norberto Méndez (HUR) -tiro suave sobre el arquero-</br>82 GOL Norberto Méndez (HUR) -media vuelta en el área asistencia de Violi-,45,90,0,0
 01/06/1958,Spinetto,local,empate,0,0,Racing Club,6° fecha de la Copa Suecia 1958,El Palacio,Alfonso Rodríguez,"Edgardo Madinabeytia; Federico Pizarro y Juan M Filgueiras; Carlos Arredondo, Enrique Brunetti y Oscar Villano; Manuel Iñigo, Oscar Rossi, Alberto Flamini, Julio Marcarián y Alberto Violi.","Osvaldo Negri; Norberto Anido y Juan C Murúa; Néstor De Vicente, Arnaldo Balay y Vladislao Cap; Evaristo Sande, Rubén Sosa, Juan J Pizzuti, Urbano Reynoso y Raúl Belén.",foto,1° Tiempo: Huracán 0x0 Racing,45,90,0,0
-05/06/1958,Spinetto,visitante,empate,1,1,Vélez Sarsfield,7° fecha de la Copa Suecia 1958,José Amalfitani,Robert Turner,"Edgardo Madinabeytia; Federico Pizarro y Juan M Filgueiras; Carlos Arredondo, Enrique Brunetti y Jorge Benegas; Osvaldo Crosta, Norberto Méndez, Oscar Rossi, Héctor Aramendi y Julio Marcarián.","Floreal Rodríguez; Ángel Allegri y Héctor Otero; Carmelo Simeone, Ricardo Cielinski y Rafael García Fierro; Ernesto Sansone, Aníbal Mosca, Juan C Sánchez, Norberto Conde y Luis Manzi.",foto,82 GOL Norberto Conde (VEL) de media vuelta tras centro -asistencia de Manzi-</br>90 GOL Jorge Benegas (HUR) con disparo tras peloteo,45,90,0,0
+05/06/1958,Spinetto,visitante,empate,1,1,Vélez Sarsfield,7° fecha de la Copa Suecia 1958,Vélez Sarsfield,Robert Turner,"Edgardo Madinabeytia; Federico Pizarro y Juan M Filgueiras; Carlos Arredondo, Enrique Brunetti y Jorge Benegas; Osvaldo Crosta, Norberto Méndez, Oscar Rossi, Héctor Aramendi y Julio Marcarián.","Floreal Rodríguez; Ángel Allegri y Héctor Otero; Carmelo Simeone, Ricardo Cielinski y Rafael García Fierro; Ernesto Sansone, Aníbal Mosca, Juan C Sánchez, Norberto Conde y Luis Manzi.",foto,82 GOL Norberto Conde (VEL) de media vuelta tras centro -asistencia de Manzi-</br>90 GOL Jorge Benegas (HUR) con disparo tras peloteo,45,90,0,0
 08/06/1958,Spinetto,local,victoria,3,1,Central Córdoba (Rosario),8° fecha de la Copa Suecia 1958,El Palacio,José Praddaude,"Edgardo Madinabeytia; Federico Pizarro y Juan M Filgueiras; Carlos Arredondo, Enrique Brunetti y Jorge Benegas; Manuel Iñigo, Oscar Rossi, Juan A Chena, Héctor Aramendi y Alberto Violi.","Alfonso Palminteri; Guillermo Mandigorra y Rodolfo Rivoiro; Rodolfo Valenti, Raúl Fruttero y Osvaldo Leonetti; Ricardo Raccaro, Alberto Costantino, Alberto Federico, Luis Vizzo y Antonio Delogu.",foto,23 GOL Héctor Aramendi (HUR)</br>29 GOL Héctor Aramendi (HUR) con tiro cruzado -asistencia de Iñigo (HUR)-</br>38 GOL Héctor Aramendi (HUR) de cabezazo en corner -asistencia de Violi (HUR)-</br>57 GOL Ricardo Raccaro (CCR)</br>71 Praddaude es impactado por piedrazo - Continúa dirigiendo un juez de línea,45,90,0,0
 14/06/1958,Spinetto,visitante,derrota,2,4,Estudiantes (La Plata),9° fecha de la Copa Suecia 1958,Uno (La Plata),Miguel Padrón,"Edgardo Madinabeytia; Federico Pizarro y Miguel Vidal; Carlos Arredondo, Enrique Brunetti y Jorge Benegas; Manuel Iñigo, Oscar Rossi, Juan A Chena, Héctor Ricardo Aramendi y Alberto Violi.","José Castro; José Silvero y Ricardo Fernández; Miguel Mieres, Héctor Zapa y Roberto Moreno; Perfecto Rodríguez, Rubén Koroch, Felipe Bracamonte, Héctor Antonio y Félix Loustau.",foto,4 GOL Rubén Koroch (ELP)</br>41 GOL Alberto Violi (HUR) tras un centro -asistencia de Iñigo (HUR)-</br>45 LES Héctor Aramendi (HUR)</br>53 GOL Rubén Koroch (ELP)62 GOL Héctor Antonio (ELP)</br>75 GOL Rubén Koroch (ELP) de cabezazo</br>84 GOL Oscar Rossi (HUR) -asistencia de Violi (HUR)-,45,90,0,0
 29/06/1958,Spinetto,visitante,derrota,1,3,Newell's Old Boys (Rosario),11° fecha de la Copa Suecia 1958,Parque Independencia (Rosario),Ángel Coerezza,"Edgardo Madinabeytia; Federico Pizarro y Miguel Vidal; Carlos Arredondo, José Sanez y Jorge Benegas; Manuel Iñigo, Norberto Méndez, Oscar Rossi, Alberto Flamini y Alberto Violi.","Vladimiro Tarnawsky; David Bianchini y José Echeverría; Rubén Galván, Jorge Griffa y Ángel Echeverría; Luis Pereyra, Rubén Merighi, José Tagle, Nicolás Di Lonardo y Jacinto Merayo.",foto,25 GOL Jacinto Merayo (NOB)</br>68 GOL Luis Pereyra (NOB) de tiro libre</br>70 GOL Manuel Iñigo (HUR) -asistencia de Oscar Rossi (HUR)-</br>78 GOL Luis Pereyra (NOB) con fuerte disparo que pegó en Sanez,45,90,0,0
@@ -155,7 +155,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 16/11/1958,Spinetto,local,derrota,2,4,Racing Club,23° fecha del Campeonato 1958,El Palacio,-,-,-,foto,sin datos,45,90,0,0
 19/11/1958,Spinetto,visitante,derrota,1,2,Gimnasia y Esgrima (La Plata),24° fecha del Campeonato 1958,El Bosque (La Plata),-,-,-,foto,sin datos,45,90,0,0
 23/11/1958,Spinetto,local,victoria,3,0,Lanús,25° fecha del Campeonato 1958,El Palacio,-,-,-,foto,sin datos,45,90,0,0
-03/12/1958,Spinetto,visitante,derrota,0,1,Vélez Sarsfield,26° fecha del Campeonato 1958,José Amalfitani,-,-,-,foto,sin datos,45,90,0,0
+03/12/1958,Spinetto,visitante,derrota,0,1,Vélez Sarsfield,26° fecha del Campeonato 1958,Vélez Sarsfield,-,-,-,foto,sin datos,45,90,0,0
 07/12/1958,Spinetto,local,derrota,2,4,San Lorenzo de Almagro,27° fecha del Campeonato 1958,El Palacio,-,-,-,foto,sin datos,45,90,0,0
 13/12/1958,Spinetto,visitante,victoria,2,1,Newell's Old Boys (Rosario),28° fecha del Campeonato 1958,Parque Independencia (Rosario),-,-,-,foto,sin datos,45,90,0,0
 21/12/1958,Spinetto,local,victoria,2,1,Atlanta,29° fecha del Campeonato 1958,El Palacio,-,-,-,foto,sin datos,45,90,0,0
@@ -172,7 +172,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 14/06/1959,N Rossi,local,victoria,3,1,Gimnasia y Esgrima (La Plata),8° fecha del Campeonato 1959,El Palacio,-,-,-,foto,sin datos,45,90,0,0
 21/06/1959,N Rossi,visitante,derrota,0,4,Independiente,9° fecha del Campeonato 1959,Doble Visera,-,-,-,foto,sin datos,45,90,0,0
 28/06/1959,N Rossi,local,empate,2,2,Atlanta,10° fecha del Campeonato 1959,El Palacio,-,-,-,foto,sin datos,45,90,0,0
-05/07/1959,N Rossi,visitante,victoria,2,1,Vélez Sarsfield,11° fecha del Campeonato 1959,José Amalfitani,-,-,-,foto,sin datos,45,90,0,0
+05/07/1959,N Rossi,visitante,victoria,2,1,Vélez Sarsfield,11° fecha del Campeonato 1959,Vélez Sarsfield,-,-,-,foto,sin datos,45,90,0,0
 24/07/1959,N Rossi,visitante,empate,2,2,Barcelona (Ecuador),1° fecha del Cuadrangular de Guayaquil 1959 (amistoso),Modelo (Guayaquil),-,-,-,foto,sin datos,45,90,0,0
 26/07/1959,N Rossi,local,derrota,1,4,San Lorenzo de Almagro,12° fecha del Campeonato 1959,El Palacio,-,-,-,foto,sin datos,45,90,0,0
 26/07/1959,N Rossi,visitante,victoria,3,0,Emelec (Ecuador),2° fecha del Cuadrangular de Guayaquil 1959 (amistoso),Modelo (Guayaquil),-,-,-,foto,sin datos,45,90,0,0
@@ -227,7 +227,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 25/10/1960,N Rossi,local,empate,1,1,Boca Juniors,23° fecha del Campeonato 1960,El Palacio,-,-,-,foto,sin datos,45,90,0,0
 29/10/1960,N Rossi,visitante,derrota,1,5,Rosario Central,24° fecha del Campeonato 1960,Arroyito (Rosario),-,-,-,foto,sin datos,45,90,0,0
 01/11/1960,N Rossi,local,empate,1,1,Atlanta,25° fecha del Campeonato 1960,El Palacio,-,-,-,foto,sin datos,45,90,0,0
-06/11/1960,N Rossi,visitante,derrota,0,1,Vélez Sarsfield,26° fecha del Campeonato 1960,José Amalfitani,-,-,-,foto,sin datos,45,90,0,0
+06/11/1960,N Rossi,visitante,derrota,0,1,Vélez Sarsfield,26° fecha del Campeonato 1960,Vélez Sarsfield,-,-,-,foto,sin datos,45,90,0,0
 11/11/1960,N Rossi,local,derrota,2,4,San Lorenzo de Almagro,27° fecha del Campeonato 1960,El Palacio,-,-,-,foto,sin datos,45,90,0,0
 16/11/1960,N Rossi,visitante,victoria,2,1,Estudiantes (La Plata),28° fecha del Campeonato 1960,Uno (La Plata),-,-,-,foto,sin datos,45,90,0,0
 20/11/1960,N Rossi,local,victoria,2,0,Lanús,29° fecha del Campeonato 1960,El Palacio,-,-,-,foto,sin datos,45,90,0,0
@@ -257,7 +257,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 20/08/1961,Zoppi,visitante,derrota,1,2,Lanús,14° fecha del Campeonato 1961,Lanús,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 15/08/1961,Zoppi,local,empate,0,0,River Plate,15° fecha del Campeonato 1961,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 03/09/1961,Zoppi,local,empate,1,1,Atlanta,16° fecha del Campeonato 1961,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-10/09/1961,Zoppi,visitante,victoria,1,0,Vélez Sarsfield,17° fecha del Campeonato 1961,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+10/09/1961,Zoppi,visitante,victoria,1,0,Vélez Sarsfield,17° fecha del Campeonato 1961,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 17/09/1961,Zoppi,local,empate,0,0,San Lorenzo de Almagro,18° fecha del Campeonato 1961,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 24/09/1961,Zoppi,visitante,empate,3,3,Atlanta,19° fecha del Campeonato 1961,El Bosque (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 01/10/1961,Zoppi,local,empate,1,1,Racing Club,20° fecha del Campeonato 1961,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -287,7 +287,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 19/08/1962,Ferreyra,visitante,empate,0,0,Estudiantes (La Plata),13° fecha del Campeonato 1962,Uno (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 26/08/1962,Ferreyra,local,derrota,0,1,Chacarita Juniors,14° fecha del Campeonato 1962,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 02/09/1962,Ferreyra,visitante,derrota,0,1,Independiente,15° fecha del Campeonato 1962,Doble Visera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-09/09/1962,Ferreyra,visitante,victoria,2,1,Vélez Sarsfield,16° fecha del Campeonato 1962,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+09/09/1962,Ferreyra,visitante,victoria,2,1,Vélez Sarsfield,16° fecha del Campeonato 1962,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 26/09/1962,Ferreyra,local,derrota,1,4,Atlanta,17° fecha del Campeonato 1962,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 30/09/1962,Ferreyra,visitante,empate,2,2,San Lorenzo de Almagro,18° fecha del Campeonato 1962,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 07/10/1962,Ferreyra,local,victoria,2,1,Rosario Central,19° fecha del Campeonato 1962,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -308,7 +308,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 00/00/1963,Giúdice,neutral,derrota,2,3,Independiente,5° fecha del Hexagonal Serio (amistoso),Atlanta,-,-,-,foto,sin datos,45,90,0,0
 28/04/1963,Giúdice,local,derrota,1,4,Atlanta,1° fecha del Campeonato 1963,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 05/05/1963,Giúdice,visitante,empate,2,2,Boca Juniors,2° fecha del Campeonato 1963,La Bombonera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-12/05/1963,Giúdice,visitante,empate,0,0,Vélez Sarsfield,3° fecha del Campeonato 1963,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+12/05/1963,Giúdice,visitante,empate,0,0,Vélez Sarsfield,3° fecha del Campeonato 1963,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 19/05/1963,Giúdice,local,empate,2,2,Banfield,4° fecha del Campeonato 1963,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 26/05/1963,Giúdice,visitante,victoria,1,0,Gimnasia y Esgrima (La Plata),5° fecha del Campeonato 1963,El Bosque (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 02/06/1963,Giúdice,local,empate,1,1,Independiente,6° fecha del Campeonato 1963,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -360,7 +360,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 26/07/1964,Spinetto,visitante,victoria,3,0,Atlanta,11° fecha del Campeonato 1964,Atlanta,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 29/07/1964,Spinetto,visitante,derrota,0,1,Boca Juniors,Amistoso 1964,La Bombonera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 02/08/1964,Spinetto,local,empate,0,0,San Lorenzo de Almagro,12° fecha del Campeonato 1964,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-09/08/1964,Spinetto,visitante,derrota,2,3,Vélez Sarsfield,13° fecha del Campeonato 1964,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+09/08/1964,Spinetto,visitante,derrota,2,3,Vélez Sarsfield,13° fecha del Campeonato 1964,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 16/08/1964,Spinetto,local,empate,2,2,Rosario Central,14° fecha del Campeonato 1964,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 23/08/1964,Spinetto,visitante,derrota,1,2,Racing Club,15° fecha del Campeonato 1964,El Cilindro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 30/08/1964,Spinetto,visitante,empate,1,1,Estudiantes (La Plata),16° fecha del Campeonato 1964,Uno (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -379,7 +379,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 29/11/1964,Spinetto,visitante,derrota,0,2,Rosario Central,29° fecha del Campeonato 1964,Arroyito (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 03/12/1964,Spinetto,local,empate,1,1,Racing Club,30° fecha del Campeonato 1964,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 18/04/1965,Cucchiaroni,local,victoria,3,1,Atlanta,1° fecha del Campeonato 1965,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-25/04/1965,Cucchiaroni,visitante,derrota,1,2,Vélez Sarsfield,2° fecha del Campeonato 1965,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+25/04/1965,Cucchiaroni,visitante,derrota,1,2,Vélez Sarsfield,2° fecha del Campeonato 1965,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 29/04/1965,Cucchiaroni,local,empate,1,1,Independiente,3° fecha del Campeonato 1965,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 02/05/1965,Cucchiaroni,visitante,empate,1,1,Rosario Central,4° fecha del Campeonato 1965,Arroyito (Rosario),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 09/05/1965,Cucchiaroni,local,derrota,1,4,Estudiantes (La Plata),5° fecha del Campeonato 1965,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -443,7 +443,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 18/09/1966,Acosta,local,empate,2,2,Racing Club,28° fecha del Campeonato 1966,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 25/09/1966,Acosta,visitante,derrota,1,4,San Lorenzo de Almagro,29° fecha del Campeonato 1966,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 02/10/1966,Acosta,local,victoria,2,1,Atlanta,30° fecha del Campeonato 1966,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-09/10/1966,Acosta,visitante,derrota,1,2,Vélez Sarsfield,31° fecha del Campeonato 1966,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+09/10/1966,Acosta,visitante,derrota,1,2,Vélez Sarsfield,31° fecha del Campeonato 1966,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 16/10/1966,Acosta,local,empate,0,0,Newell's Old Boys (Rosario),32° fecha del Campeonato 1966,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 23/10/1966,Acosta,visitante,derrota,0,2,Quilmes,33° fecha del Campeonato 1966,Quilmes,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 30/10/1966,Acosta,local,empate,1,1,Banfield,34° fecha del Campeonato 1966,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -458,7 +458,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 26/03/1967,Acosta,local,victoria,3,1,Atlanta,4° fecha del Campeonato Metropolitano 1967,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 04/03/1967,Acosta,visitante,derrota,2,3,Boca Juniors,5° fecha del Campeonato Metropolitano 1967,La Bombonera,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 09/04/1967,Baldonedo,local,derrota,1,4,Racing Club,6° fecha del Campeonato Metropolitano 1967,El Palacio,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-16/04/1967,Baldonedo,visitante,victoria,2,1,Vélez Sarsfield,7° fecha del Campeonato Metropolitano 1967,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+16/04/1967,Baldonedo,visitante,victoria,2,1,Vélez Sarsfield,7° fecha del Campeonato Metropolitano 1967,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 23/04/1967,Baldonedo,local,victoria,3,1,Newell's Old Boys (Rosario),8° fecha del Campeonato Metropolitano 1967,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 30/04/1967,Baldonedo,visitante,empate,2,2,Quilmes,9° fecha del Campeonato Metropolitano 1967,Quilmes,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 05/05/1967,Baldonedo,local,empate,2,2,Argentinos Juniors,10° fecha del Campeonato Metropolitano 1967,Gasómetro,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
@@ -496,7 +496,7 @@ Fecha,Técnico,Condición,Situación,Resultado1,Resultado2,Club,Torneo,Estadio,�
 17/03/1968,N Rossi,local,victoria,1,0,River Plate,3° fecha del Campeonato Metropolitano 1968,Tomás A. Ducó,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 25/03/1968,N Rossi,visitante,victoria,2,1,Gimnasia y Esgrima (La Plata),4° fecha del Campeonato Metropolitano 1968,El Bosque (La Plata),árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 31/03/1968,N Rossi,local,victoria,2,1,Independiente,5° fecha del Campeonato Metropolitano 1968,Tomás A. Ducó,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
-07/04/1968,N Rossi,visitante,derrota,1,2,Vélez Sarsfield,6° fecha del Campeonato Metropolitano 1968,José Amalfitani,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
+07/04/1968,N Rossi,visitante,derrota,1,2,Vélez Sarsfield,6° fecha del Campeonato Metropolitano 1968,Vélez Sarsfield,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 14/04/1968,N Rossi,local,victoria,1,0,Quilmes,7° fecha del Campeonato Metropolitano 1968,Tomás A. Ducó,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 19/04/1968,N Rossi,visitante,empate,1,1,Los Andes,8° fecha del Campeonato Metropolitano 1968,Florencio Sola,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
 28/04/1968,N Rossi,local,victoria,1,0,Rosario Central,9° fecha del Campeonato Metropolitano 1968,Tomás A. Ducó,árbitro,Huracán,rival,foto,sin datos,45,90,0,0
