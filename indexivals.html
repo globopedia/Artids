@@ -109,12 +109,13 @@
 
   <script>
 const clubesURL = "https://artids.vercel.app/api/data?file=lubs";
-const partidosURL = "https://artids.vercel.app/api/data?file=artids1940";
-const partidosURL2 = "https://artids.vercel.app/api/data?file=artids1955";
-const partidosURL3 = "https://artids.vercel.app/api/data?file=artids1970";
-const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1985";
-const partidosURL5 = "https://artids.vercel.app/api/data?file=artids2000";
-const partidosURL6 = "https://artids.vercel.app/api/data?file=artids2015";
+const partidosURL = "https://artids.vercel.app/api/data?file=artids1925";
+const partidosURL2 = "https://artids.vercel.app/api/data?file=artids1940";
+const partidosURL3 = "https://artids.vercel.app/api/data?file=artids1955";
+const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1970";
+const partidosURL5 = "https://artids.vercel.app/api/data?file=artids1985";
+const partidosURL6 = "https://artids.vercel.app/api/data?file=artids2000";
+const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2015";
     
     let clubes = [];
     let encuentros = [];
@@ -193,10 +194,14 @@ let debounceTimer;
   fetch(partidosURL6).then(r => r.text()).then(t => {
     const b = atob(t);
     return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
+  }),
+  fetch(partidosURL7).then(r => r.text()).then(t => {
+    const b = atob(t);
+    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
   })
 ])
 
-.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6]) => {
+.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7]) => {
         clubes = Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.id ?? "").toString().trim(),
         club: (c.Club ?? c.club ?? "").toString().trim(),
@@ -217,8 +222,9 @@ let debounceTimer;
       const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
       const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
       const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
+      const partidos7 = Papa.parse(csvPartidos7, { header:true, skipEmptyLines:true }).data;
 
-encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6].map(p => ({
+encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7].map(p => ({
         Fecha: (p.Fecha ?? "").trim(),
         Técnico: (p.Técnico ?? "").trim(),
         Condición: (p.Condición ?? "").trim(),
