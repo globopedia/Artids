@@ -7,6 +7,7 @@ export default async function handler(req, res) {
     utbolists: { repo: "Utbolists", path: "Utbolists.csv" },
     rbits: { repo: "Artids", path: "Rbits.csv" },
     ankg: { repo: "Artids", path: "Ankg.csv" },
+    artids1925: { repo: "Artids", path: "Artids1925.csv" },
     artids1940: { repo: "Artids", path: "Artids1940.csv" },
     artids1955: { repo: "Artids", path: "Artids1955.csv" },
     artids1970: { repo: "Artids", path: "Artids1970.csv" },
