@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Futbolistas — Huracán</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Candara', arial-black; background:#fff; color:#222; margin:20px; }
+    h1 { color:#FF0000; text-align:center; }
+    .logo { display:block; margin:0 auto 10px; width:100px; }
+    select { padding:8px; border-radius:8px; border:2px solid #FF0000; font-size:16px; margin-bottom:20px; }
+    .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:0 auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    .club-header { display:flex; align-items:center; gap:15px; border-bottom:2px solid #FF0000; padding-bottom:10px; margin-bottom:10px; }
+    h2 { margin:0; color:#FF0000; font-size:22px; }
+    .stats { margin-top:20px; }
+    .stat-group { margin-bottom:20px; padding:12px; border:1px solid #FF0000; border-radius:12px; background:#fff5f5; }
+    .stat-title { font-weight:bold; color:#FF0000; margin-bottom:6px; }
+    .hr { border:none; border-top:1px solid #FF0000; margin:8px 0; }
+    .partido-card { border:1px solid #ccc; border-radius:6px; padding:6px; margin:4px 0; background:#fafafa; font-size:14px; text-align: center; }
+    .acordeon { border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; background: #fefefe; }
+    .acordeon-header { background: #eee; padding: 4px 8px; cursor: pointer; font-size: 14px; text-align: right; position: relative; padding-right: 20px; }
+    .acordeon-header::after { content: "▾"; position: absolute; right: 0; transition: transform 0.3s; }
+    .acordeon-header.abierto::after { transform: rotate(180deg); }
+    .acordeon-body { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease; padding: 8px; }
+    .acordeon-body.cerrado { max-height: 0; padding: 0 8px; }
+    .resultado1-box, .resultado2-box {
+      display: inline-block; width: 16px; height: 28px; font-size: 32px; font-weight: bold;
+      line-height: 28px; text-align: center; margin: 2px; padding: 10px 10px;
+      border: 3px solid #FF0000; border-radius: 6px; background: #fff5f5;
+      vertical-align: middle; min-width: 26px;
+    }
+    .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
+    .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; }
+    .stat-title small { color:#666; font-weight:normal; margin-left:6px; }
+
+ .autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.autocomplete-item img {
+  width: 32px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+ .bandera {
+  height: 30px;
+  margin: 6px;
+  border-radius: 5px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+  vertical-align: middle;
+}
+#autocompleteList li:hover {
+  background-color: #ffdddd;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
+  transition: all 0.2s;
+}    
+  </style>
+</head>
+<body>
+  <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
+  <h1>📜 Futbolistas</h1>
+
+<div style="text-align:center; position:relative;">
+  <label for="futbolistaSearch">Buscá futbolista: </label>
+  <input type="text" id="futbolistaSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px;"><select id="futbolistaSelect" style="display:none;"></select>
+  <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;"></ul>
+</div>
+
+  <div id="futbolistaInfo" class="club-card" style="display:none;"></div>
+
+  <script>
+    const futbolistasURL = "https://globopedia.github.io/Utbolists/Utbolists.csv?v=" + Date.now();
+    const partidosURL = "https://globopedia.github.io/Artids/Artids1940.csv?v=" + Date.now();
+    const partidosURL2 = "https://globopedia.github.io/Artids/Artids1955.csv?v=" + Date.now();
+    const partidosURL3 = "https://globopedia.github.io/Artids/Artids1970.csv?v=" + Date.now();
+    const partidosURL4 = "https://globopedia.github.io/Artids/Artids1985.csv?v=" + Date.now();
+    const partidosURL5 = "https://globopedia.github.io/Artids/Artids2000.csv?v=" + Date.now();
+    const partidosURL6 = "https://globopedia.github.io/Artids/Artids2015.csv?v=" + Date.now();
+
+    let futbolistas = [];
+    let encuentros = [];
+
+    const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+    const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+
+    const ORDEN_COMPETENCIAS = ["Campeonato 1940","Campeonato 1941","Campeonato 1942","Campeonato 1943","Campeonato 1944",
+                                "Campeonato 1945","Campeonato 1946","Campeonato 1947","Campeonato 1948","Campeonato 1949",
+                                "Campeonato 1950","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Campeonato 1953","Campeonato 1954",
+                                "Campeonato 1955","Campeonato 1956","Campeonato 1957","Campeonato 1958","Copa Suecia 1958","Campeonato 1959",
+                                "Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
+                                "Campeonato 1965","Campeonato 1966","Campeonato Metropolitano 1967","Torneo Minas Gerais 1967","Torneo Negrao de Lima 1967","Torneo Promocional 1967","Campeonato Metropolitano 1968","Gira por Europa 1968","Trofeo San Sebastián 1968","Campeonato Nacional 1968","Copa Argentina 1969","Campeonato Metropolitano 1969","Campeonato Nacional 1969",
+                                "Copa Argentina 1970","Campeonato Metropolitano 1970","Petit Torneo 1970","Torneo Reclasificatorio 1970","Campeonato Metropolitano 1971","Campeonato Nacional 1971","Campeonato Metropolitano 1972","Campeonato Nacional 1972","Copa de Oro 1973","Campeonato Metropolitano 1973","Campeonato Nacional 1973","Copa Libertadores 1974","Campeonato Metropolitano 1974","Campeonato Nacional 1974",
+                                "Campeonato Metropolitano 1975","Campeonato Nacional 1975","Clasificación 1975 Pre-Libertadores","Campeonato Metropolitano 1976","Campeonato Nacional 1976","Clasificación 1976 Pre-Libertadores","Campeonato Metropolitano 1977","Campeonato Nacional 1977","Campeonato Metropolitano 1978","Trofeo Costa del Sol 1978","Trofeo Naranja 1978","Campeonato Nacional 1978","Campeonato Metropolitano 1979","Campeonato Nacional 1979",
+                                "Copa Santiago 1980","Primera División 1980","Campeonato Nacional 1980","Primera División 1981","Campeonato Nacional 1981","Campeonato Nacional 1982","Primera División 1982","Trofeo Cartagena de Indias 1983","Amistosos 1983","Campeonato Nacional 1983","Primera División 1983","Campeonato Nacional 1984","Primera División 1984","Trofeo Ciudad de Badajoz 1984",
+                                "Campeonato Nacional 1985","Primera División 1985/86","Nacional B 1986/87","Segundo Ascenso 1987","Nacional B 1987/88","Segundo Ascenso 1988","Nacional B 1988/89","Segundo Ascenso 1989","Nacional B 1989/90",
+                                "Campeonato 1990/91","Copa Libertad 1992","Apertura 1991","Clausura 1992","Liguilla Pre-Libertadores 1992","Copa Libertad 1992","Copa Ciudad de Buenos Aires 1992","Amistosos 1992","Apertura 1992","Clausura 1993","Apertura 1993","Clausura 1994","Apertura 1994",
+                                "Clausura 1995","Apertura 1995","Clausura 1996","Copa Amistad 1996","Apertura 1996","Clausura 1997","Apertura 1997","Clausura 1998","Apertura 1998","Clausura 1999","1°B Nacional 1999/2000","Apertura 2000","Clausura 2001","Apertura 2001","Clausura 2002","Apertura 2002","Clausura 2003","Apertura BN 2003","Clausura BN 2004","Apertura BN 2004",
+                                "Clausura BN 2005","Segundo Ascenso 2005","Promoción 2005","Apertura BN 2005","Clausura BN 2006","Reducido BN 2006","Promoción 2006","Apertura BN 2006","Clausura BN 2007","Segundo Ascenso 2007","Promoción 2007","Gira por México 2007","Apertura 2007","Clausura 2008","Copa Cafam 2008","Apertura 2008","Clausura 2009","Apertura 2009",
+                                "Despedida de Marcelinho Carioca 2010","Clausura 2010","Apertura 2010","Clausura 2011","Desempate Descenso 2011","Campeonato B Nacional 2011/12","Copa Argentina 2012","Copa de Clásicos 2012","Campeonato B Nacional 2012/13","Copa Argentina 2013","Campeonato B Nacional 2013/14","Desempate 3° Ascenso BN 2013/14","Copa Argentina 2014","Desempate 3° Ascenso BN 2013/14","Campeonato B Nacional 2014","Desempate 5° Puesto NB 2014",
+                                "Copa Libertadores 2015","Campeonato 2015","Supercopa 2015","Copa Argentina 2015","Copa Sudamericana 2015","Copa Ciudad de Buenos Aires 2016","Copa Libertadores 2016","Campeonato 2016","Copa Argentina 2016","Campeonato 2016/17","Copa Sudamericana 2017","Copa Argentina 2017","Superliga 2017/18","Copa Schneider 2018","Copa Argentina 2018","Superliga 2018/19","Copa Libertadores 2019","Copa Superliga 2019","Copa Argentina 2019","Superliga 2019/20",
+                                "Copa San Juan 2020","Copa Sudamericana 2020","Copa Superliga 2020","Copa Maradona 2020","Copa-LPF 2021","Copa Argentina 2020","Torneo-LPF 2021","Amistosos 2022","Copa-LPF 2022","Copa Argentina 2022","Torneo-LPF 2022","Torneo-LPF 2023","Copa Argentina 2023","Copa Libertadores 2023","Copa Sudamericana 2023","Copa-LPF 2023","Copa Agustín Peña 2024","Serie Río de la Plata 2024","Copa-LPF 2024","Copa Argentina 2024","Torneo-LPF 2024",
+                                "Serie Río de la Plata 2025","Apertura-LPF 2025","Copa Argentina 2025","Copa Sudamericana 2025","Clausura-LPF 2025","Amistosos","Otros"];
+
+    const CONDICIONES = ["Local","Neutral","Visitante"];
+    const SITUACIONES = ["Victoria","Empate","Derrota"];
+
+// === COEFICIENTES DE RENDIMIENTO ===
+
+const COEF_BASE = {
+  Victoria:   { Visitante: 0.5,  Neutral:  0.4,  Local:  0.3 },
+  Empate:     { Visitante: 0.1,  Neutral:  0,  Local:  -0.1 },
+  Derrota:    { Visitante: -0.3,  Neutral: -0.4,  Local:  -0.5 }
+};
+
+function esInternacional(torneo) {
+  const t = norm(torneo);
+  return t.includes("libertadores") ||
+         t.includes("sudamericana") ||
+         t.includes("conmebol");
+}
+
+function esNacionalB(torneo) {
+  const t = norm(torneo);
+  return t.includes("nacional b") ||
+         t.includes("primera b nacional") ||
+         t.includes("bn");
+}
+
+const CLASICOS = [
+  { club: "San Isidro", desde: "1914-01", hasta: "1916-12" },
+  { club: "Racing Club", desde: "1914-01", hasta: "1919-08" },
+  { club: "Racing Club", desde: "1927-01", hasta: "1934-12" },
+  { club: "Racing Club", desde: "1936-07", hasta: "1937-12" },
+  { club: "Racing Club", desde: "1949-07", hasta: "1951-12" },
+  { club: "Racing Club", desde: "1993-07", hasta: "1994-06" },
+  { club: "Racing Club", desde: "1995-07", hasta: "1996-06" },
+  { club: "Racing Club", desde: "1997-01", hasta: "1997-06" },
+  { club: "Racing Club", desde: "1998-07", hasta: "1999-06" },
+  { club: "Racing Club", desde: "2001-07", hasta: "2002-06" },
+  { club: "Racing Club", desde: "2005-01", hasta: "2005-12" },
+  { club: "Racing Club", desde: "2015-01", hasta: "2021-06" },
+  { club: "Racing Club", desde: "2022-07", hasta: "2023-06" },
+  { club: "Racing Club", desde: "2024-07", hasta: "2025-06" },
+  { club: "Estudiantes", desde: "1914-01", hasta: "1915-12" },
+  { club: "Estudiantes (La Plata)", desde: "1915-01", hasta: "1915-12" },
+  { club: "Estudiantes (La Plata)", desde: "1928-01", hasta: "1932-12" },
+  { club: "Estudiantes (La Plata)", desde: "1944-01", hasta: "1945-12" },
+  { club: "Estudiantes (La Plata)", desde: "1948-01", hasta: "1949-12" },
+  { club: "Estudiantes (La Plata)", desde: "2006-07", hasta: "2008-12" },
+  { club: "Estudiantes (La Plata)", desde: "2010-07", hasta: "2011-06" },
+  { club: "Estudiantes (La Plata)", desde: "2016-01", hasta: "2018-06" },
+  { club: "Estudiantes (La Plata)", desde: "2022-01", hasta: "2023-12" },
+  { club: "River Plate", desde: "1915-01", hasta: "1919-08" },
+  { club: "River Plate", desde: "1929-10", hasta: "1933-12" },
+  { club: "River Plate", desde: "1936-07", hasta: "1950-12" },
+  { club: "River Plate", desde: "1990-07", hasta: "1998-06" },
+  { club: "River Plate", desde: "1999-01", hasta: "2005-06" },
+  { club: "River Plate", desde: "2006-01", hasta: "2007-06" },
+  { club: "River Plate", desde: "2008-01", hasta: "2008-12" },
+  { club: "River Plate", desde: "2011-07", hasta: "2013-06" },
+  { club: "River Plate", desde: "2016-07", hasta: "2025-06" },
+  { club: "Porteño", desde: "1915-01", hasta: "1916-12" },
+  { club: "Platense", desde: "1916-01", hasta: "1917-12" },
+  { club: "Platense", desde: "1927-01", hasta: "1927-12" },
+  { club: "Platense", desde: "1949-01", hasta: "1950-12" },
+  { club: "Platense", desde: "1999-07", hasta: "2000-06" },
+  { club: "Platense", desde: "2006-07", hasta: "2007-06" },
+  { club: "Gimnasia (La Plata)", desde: "1916-01", hasta: "1917-12" },
+  { club: "Gimnasia (La Plata)", desde: "1929-10", hasta: "1930-12" },
+  { club: "Gimnasia (La Plata)", desde: "1995-01", hasta: "1996-12" },
+  { club: "Gimnasia (La Plata)", desde: "1998-01", hasta: "1999-06" },
+  { club: "Gimnasia (La Plata)", desde: "2000-07", hasta: "2001-06" },
+  { club: "Gimnasia (La Plata)", desde: "2002-01", hasta: "2002-12" },
+  { club: "Gimnasia (La Plata)", desde: "2005-07", hasta: "2006-06" },
+  { club: "Gimnasia (La Plata)", desde: "2012-07", hasta: "2014-06" },
+  { club: "Boca Juniors", desde: "1918-01", hasta: "1938-12" },
+  { club: "Boca Juniors", desde: "1943-01", hasta: "1948-12" },
+  { club: "Boca Juniors", desde: "1950-01", hasta: "1951-12" },
+  { club: "Boca Juniors", desde: "1990-07", hasta: "1994-06" },
+  { club: "Boca Juniors", desde: "1996-07", hasta: "1996-12" },
+  { club: "Boca Juniors", desde: "1997-07", hasta: "2004-12" },
+  { club: "Boca Juniors", desde: "2005-07", hasta: "2009-06" },
+  { club: "Boca Juniors", desde: "2015-01", hasta: "2023-06" },
+  { club: "Boca Juniors", desde: "2025-01", hasta: "2026-06" },
+  { club: "Banfield", desde: "1920-01", hasta: "1921-12" },
+  { club: "Banfield", desde: "2003-07", hasta: "2004-06" },
+  { club: "Banfield", desde: "2005-01", hasta: "2005-12" },
+  { club: "Banfield", desde: "2007-07", hasta: "2008-06" },
+  { club: "Banfield", desde: "2009-07", hasta: "2010-06" },
+  { club: "Banfield", desde: "2013-07", hasta: "2014-12" },
+  { club: "Banfield", desde: "2016-07", hasta: "2018-06" },
+  { club: "Del Plata", desde: "1921-01", hasta: "1924-12" },
+  { club: "Nueva Chicago", desde: "1923-01", hasta: "1926-12" },
+  { club: "Nueva Chicago", desde: "2004-07", hasta: "2005-06" },
+  { club: "Nueva Chicago", desde: "2006-01", hasta: "2006-12" },
+  { club: "Sp. Palermo", desde: "1922-01", hasta: "1923-12" },
+  { club: "Sp. Barracas", desde: "1923-01", hasta: "1924-12" },
+  { club: "Sp. Dock Sud", desde: "1923-01", hasta: "1925-12" },
+  { club: "Temperley", desde: "1924-01", hasta: "1926-12" },
+  { club: "All Boys", desde: "1924-01", hasta: "1925-12" },
+  { club: "El Porvenir", desde: "1925-01", hasta: "1926-12" },
+  { club: "Argentinos Juniors", desde: "1926-01", hasta: "1927-12" },
+  { club: "Argentinos Juniors", desde: "2004-01", hasta: "2004-12" },
+  { club: "Argentinos Juniors", desde: "2010-07", hasta: "2010-12" },
+  { club: "Argentinos Juniors", desde: "2024-01", hasta: "2025-12" },
+  { club: "San Lorenzo", desde: "1927-01", hasta: "1939-12" },
+  { club: "San Lorenzo", desde: "1941-01", hasta: "1944-12" },
+  { club: "San Lorenzo", desde: "1946-01", hasta: "1947-12" },
+  { club: "San Lorenzo", desde: "1991-06", hasta: "1993-06" },
+  { club: "San Lorenzo", desde: "1994-07", hasta: "1996-06" },
+  { club: "San Lorenzo", desde: "1998-01", hasta: "1998-06" },
+  { club: "San Lorenzo", desde: "1999-01", hasta: "1999-12" },
+  { club: "San Lorenzo", desde: "2001-01", hasta: "2001-12" },
+  { club: "San Lorenzo", desde: "2003-07", hasta: "2004-06" },
+  { club: "San Lorenzo", desde: "2007-07", hasta: "2009-06" },
+  { club: "San Lorenzo", desde: "2015-01", hasta: "2016-06" },
+  { club: "San Lorenzo", desde: "2017-07", hasta: "2019-06" },
+  { club: "San Lorenzo", desde: "2023-01", hasta: "2023-12" },
+  { club: "Lanús", desde: "1927-01", hasta: "1930-12" },
+  { club: "Lanús", desde: "1995-07", hasta: "1998-12" },
+  { club: "Lanús", desde: "2006-01", hasta: "2006-12" },
+  { club: "Lanús", desde: "2007-07", hasta: "2008-06" },
+  { club: "Lanús", desde: "2009-01", hasta: "2009-12" },
+  { club: "Lanús", desde: "2011-01", hasta: "2011-12" },
+  { club: "Lanús", desde: "2016-01", hasta: "2017-06" },
+  { club: "Lanús", desde: "2023-01", hasta: "2023-12" },
+  { club: "Ferro C. Oeste", desde: "1927-01", hasta: "1928-12" },
+  { club: "Independiente", desde: "1927-01", hasta: "1929-12" },
+  { club: "Independiente", desde: "1932-01", hasta: "1936-06" },
+  { club: "Independiente", desde: "1937-01", hasta: "1940-12" },
+  { club: "Independiente", desde: "1945-01", hasta: "1949-12" },
+  { club: "Independiente", desde: "1950-01", hasta: "1951-12" },
+  { club: "Independiente", desde: "1990-07", hasta: "1991-12" },
+  { club: "Independiente", desde: "1993-01", hasta: "1995-06" },
+  { club: "Independiente", desde: "1996-07", hasta: "1998-06" },
+  { club: "Independiente", desde: "2000-01", hasta: "2000-12" },
+  { club: "Independiente", desde: "2002-07", hasta: "2003-06" },
+  { club: "Independiente", desde: "2013-07", hasta: "2016-12" },
+  { club: "Talleres", desde: "1930-01", hasta: "1931-12" },
+  { club: "Newell's Old Boys (Rosario)", desde: "1941-01", hasta: "1942-12" },
+  { club: "Newell's Old Boys (Rosario)", desde: "1990-07", hasta: "1992-12" },
+  { club: "Newell's Old Boys (Rosario)", desde: "1997-01", hasta: "1997-12" },
+  { club: "Newell's Old Boys (Rosario)", desde: "2004-07", hasta: "2005-06" },
+  { club: "Newell's Old Boys (Rosario)", desde: "2009-07", hasta: "2010-06" },
+  { club: "Vélez Sarsfield", desde: "1992-01", hasta: "1997-06" },
+  { club: "Vélez Sarsfield", desde: "1998-01", hasta: "1998-12" },
+  { club: "Vélez Sarsfield", desde: "2003-01", hasta: "2003-12" },
+  { club: "Vélez Sarsfield", desde: "2004-07", hasta: "2006-06" },
+  { club: "Vélez Sarsfield", desde: "2009-01", hasta: "2009-12" },
+  { club: "Vélez Sarsfield", desde: "2010-07", hasta: "2011-12" },
+  { club: "Vélez Sarsfield", desde: "2019-07", hasta: "2021-12" },
+  { club: "Vélez Sarsfield", desde: "2024-07", hasta: "2025-06" },
+  { club: "Español", desde: "1992-07", hasta: "1993-06" },
+  { club: "Rosario Central", desde: "1994-01", hasta: "1994-12" },
+  { club: "Rosario Central", desde: "1995-07", hasta: "1995-12" },
+  { club: "Rosario Central", desde: "1997-07", hasta: "1998-06" },
+  { club: "Rosario Central", desde: "1999-07", hasta: "2000-06" },
+  { club: "Rosario Central", desde: "2012-07", hasta: "2014-06" },
+  { club: "Rosario Central", desde: "2015-01", hasta: "2016-06" },
+  { club: "Colón (Santa Fe)", desde: "1997-01", hasta: "1997-12" },
+  { club: "Colón (Santa Fe)", desde: "2000-01", hasta: "2000-12" },
+  { club: "Talleres (Córdoba)", desde: "2004-01", hasta: "2004-12" },
+  { club: "Talleres (Córdoba)", desde: "2017-07", hasta: "2019-06" },
+  { club: "Talleres (Córdoba)", desde: "2021-07", hasta: "2022-06" },
+  { club: "Talleres (Córdoba)", desde: "2023-01", hasta: "2023-12" },
+  { club: "Talleres (Córdoba)", desde: "2024-07", hasta: "2025-06" },
+  { club: "Quilmes", desde: "1999-07", hasta: "2000-06" },
+  { club: "Quilmes", desde: "2011-07", hasta: "2013-06" },
+  { club: "Los Andes", desde: "1999-07", hasta: "2000-06" },
+  { club: "Instituto (Córdoba)", desde: "2003-07", hasta: "2004-06" },
+  { club: "Instituto (Córdoba)", desde: "2011-07", hasta: "2013-06" },
+  { club: "Belgrano (Córdoba)", desde: "2003-07", hasta: "2004-06" },
+  { club: "Belgrano (Córdoba)", desde: "2006-01", hasta: "2006-12" },
+  { club: "San Martín (Mendoza)", desde: "2003-07", hasta: "2004-06" },
+  { club: "Almagro", desde: "2004-01", hasta: "2004-12" },
+  { club: "Almagro", desde: "2005-07", hasta: "2006-06" },
+  { club: "Huracán (Tres Arroyos)", desde: "2004-01", hasta: "2004-12" },
+  { club: "Tiro Federal (Rosario)", desde: "2004-07", hasta: "2005-06" },
+  { club: "Gimnasia (Jujuy)", desde: "2005-01", hasta: "2005-12" },
+  { club: "CAI (Cro. Rivadavia)", desde: "2005-01", hasta: "2005-12" },
+  { club: "Atl. Rafaela", desde: "2005-01", hasta: "2005-12" },
+  { club: "Godoy Cruz (Mendoza)", desde: "2005-07", hasta: "2006-06" },
+  { club: "Godoy Cruz (Mendoza)", desde: "2010-07", hasta: "2011-12" },
+  { club: "Godoy Cruz (Mendoza)", desde: "2017-07", hasta: "2019-06" },
+  { club: "Chacarita Juniors", desde: "2005-07", hasta: "2006-06" },
+  { club: "San Martín (San Juan)", desde: "2006-01", hasta: "2006-12" },
+  { club: "Olimpo (Bahía Blanca)", desde: "2006-07", hasta: "2007-12" },
+  { club: "Olimpo (Bahía Blanca)", desde: "2012-07", hasta: "2014-06" },
+  { club: "Tigre", desde: "2006-07", hasta: "2009-06" },
+  { club: "Defensa y Justicia", desde: "2007-01", hasta: "2007-12" },
+  { club: "Defensa y Justicia", desde: "2013-07", hasta: "2014-12" },
+  { club: "Defensa y Justicia", desde: "2018-07", hasta: "2020-07" },
+  { club: "Defensa y Justicia", desde: "2021-07", hasta: "2022-06" },
+  { club: "Arsenal", desde: "2010-07", hasta: "2011-06" },
+  { club: "Unión (Santa Fe)", desde: "2014-07", hasta: "2014-12" },
+  { club: "Unión (Santa Fe)", desde: "2025-07", hasta: "2026-06" },
+  { club: "Crucero del Norte (Posadas)", desde: "2014-07", hasta: "2014-12" },
+  { club: "Atl. Tucumán", desde: "2022-07", hasta: "2023-06" }
+];
+
+function ymToIndex(ym) {
+  const [y, m] = ym.split("-").map(Number);
+  return y * 12 + m;
+}
+function esClasico(rival, fecha) {
+  if (!rival || !fecha) return false;
+
+  // fecha viene como "dd/mm/yyyy"
+  const partes = fecha.split("/");
+  const d = Number(partes[0]);
+  const m = Number(partes[1]);
+  const y = Number(partes[2]);
+
+  const partidoIndex = y * 12 + m;
+  const rivalNorm = rival.toLowerCase();
+
+  return CLASICOS.some(c => {
+    const desde = ymToIndex(c.desde);
+    const hasta = ymToIndex(c.hasta);
+
+    return (
+      rivalNorm.includes(c.club.toLowerCase()) &&
+      partidoIndex >= desde &&
+      partidoIndex <= hasta
+    );
+  });
+}
+function calcularPuntosPartido(p, minutos) {
+  const situacion = cap(norm(p.Situación));   // Victoria / Empate / Derrota
+  const condicion = cap(norm(p.Condición));   // Local / Neutral / Visitante
+
+  let coef = COEF_BASE[situacion]?.[condicion] ?? 0;
+
+  if (esInternacional(p.Torneo)) coef += 0.2;
+  if (esClasico(p.Rival, p.Fecha)) coef += 0.2;
+  if (esNacionalB(p.Torneo)) coef -= 0.1;
+
+  return minutos * coef;
+}    function bucketCompetencia(torneo) {
+      const t = norm(torneo || "");
+      if (t.includes("campeonato 1940")) return "Campeonato 1940";
+      if (t.includes("campeonato 1941")) return "Campeonato 1941";
+      if (t.includes("campeonato 1942")) return "Campeonato 1942";
+      if (t.includes("campeonato 1943")) return "Campeonato 1943";
+      if (t.includes("campeonato 1944")) return "Campeonato 1944";
+      if (t.includes("campeonato 1945")) return "Campeonato 1945";
+      if (t.includes("campeonato 1946")) return "Campeonato 1946";
+      if (t.includes("campeonato 1947")) return "Campeonato 1947";
+      if (t.includes("campeonato 1948")) return "Campeonato 1948";
+      if (t.includes("campeonato 1949")) return "Campeonato 1949";
+      if (t.includes("campeonato 1950")) return "Campeonato 1950";
+      if (t.includes("campeonato 1951")) return "Campeonato 1951";
+      if (t.includes("eva peron")) return "Campeonato 1952";
+      if (t.includes("campeonato 1953")) return "Campeonato 1953";
+      if (t.includes("campeonato 1954")) return "Campeonato 1954";
+      if (t.includes("campeonato 1955")) return "Campeonato 1955";
+      if (t.includes("campeonato 1956")) return "Campeonato 1956";
+      if (t.includes("campeonato 1957")) return "Campeonato 1957";
+      if (t.includes("campeonato 1958")) return "Campeonato 1958";
+      if (t.includes("campeonato 1959")) return "Campeonato 1959";
+      if (t.includes("campeonato 1960")) return "Campeonato 1960";
+      if (t.includes("campeonato 1961")) return "Campeonato 1961";
+      if (t.includes("campeonato 1962")) return "Campeonato 1962";
+      if (t.includes("campeonato 1963")) return "Campeonato 1963";
+      if (t.includes("newbery")) return "Copa Jorge Newbery 1964";
+      if (t.includes("campeonato 1964")) return "Campeonato 1964";
+      if (t.includes("campeonato 1965")) return "Campeonato 1965";
+      if (t.includes("campeonato 1966")) return "Campeonato 1966";
+      if (t.includes("metropolitano 1967")) return "Campeonato Metropolitano 1967";
+      if (t.includes("gerais 1967")) return "Torneo Minas Gerais 1967";
+      if (t.includes("lima 1967")) return "Torneo Negrao de Lima 1967";
+      if (t.includes("promocional")) return "Torneo Promocional 1967";
+      if (t.includes("metropolitano 1968")) return "Campeonato Metropolitano 1968";
+      if (t.includes("europa 1968")) return "Gira por Europa 1968";
+      if (t.includes("sebastian 1968")) return "Trofeo San Sebastián 1968";
+      if (t.includes("nacional 1968")) return "Campeonato Nacional 1968";
+      if (t.includes("argentina 1969")) return "Copa Argentina 1969";
+      if (t.includes("metropolitano 1969")) return "Campeonato Metropolitano 1969";
+      if (t.includes("nacional 1969")) return "Campeonato Nacional 1969";
+      if (t.includes("argentina 1970")) return "Copa Argentina 1970";
+      if (t.includes("metropolitano 1970")) return "Campeonato Metropolitano 1970";
+      if (t.includes("petit")) return "Petit Torneo 1970";
+      if (t.includes("reclasificatorio")) return "Torneo Reclasificatorio 1970";
+      if (t.includes("metropolitano 1971")) return "Campeonato Metropolitano 1971";
+      if (t.includes("nacional 1971")) return "Campeonato Nacional 1971";
+      if (t.includes("metropolitano 1972")) return "Campeonato Metropolitano 1972";
+      if (t.includes("nacional 1972")) return "Campeonato Nacional 1972";
+      if (t.includes("copa de oro 1973")) return "Copa de Oro 1973";
+      if (t.includes("metropolitano 1973")) return "Campeonato Metropolitano 1973";
+      if (t.includes("nacional 1973")) return "Campeonato Nacional 1973";
+      if (t.includes("libertadores 1974")) return "Copa Libertadores 1974";
+      if (t.includes("metropolitano 1974")) return "Campeonato Metropolitano 1974";
+      if (t.includes("nacional 1974")) return "Campeonato Nacional 1974";
+      if (t.includes("metropolitano 1975")) return "Campeonato Metropolitano 1975";
+      if (t.includes("nacional 1975")) return "Campeonato Nacional 1975";
+      if (t.includes("1975 pre")) return "Clasificación 1975 Pre-Libertadores";
+      if (t.includes("metropolitano 1976")) return "Campeonato Metropolitano 1976";
+      if (t.includes("nacional 1976")) return "Campeonato Nacional 1976";
+      if (t.includes("1976 pre")) return "Clasificación 1976 Pre-Libertadores";
+      if (t.includes("metropolitano 1977")) return "Campeonato Metropolitano 1977";
+      if (t.includes("nacional 1977")) return "Campeonato Nacional 1977";
+      if (t.includes("metropolitano 1978")) return "Campeonato Metropolitano 1978";
+      if (t.includes("costa del sol")) return "Trofeo Costa del Sol 1978";
+      if (t.includes("naranja")) return "Trofeo Naranja 1978";
+      if (t.includes("nacional 1978")) return "Campeonato Nacional 1978";
+      if (t.includes("metropolitano 1979")) return "Campeonato Metropolitano 1979";
+      if (t.includes("nacional 1979")) return "Campeonato Nacional 1979";
+      if (t.includes("santiago 1980")) return "Copa Santiago 1980";
+      if (t.includes("'a' 1980")) return "Primera División 1980";
+      if (t.includes("nacional 1980")) return "Campeonato Nacional 1980";
+      if (t.includes("'a' 1981")) return "Primera División 1981";
+      if (t.includes("nacional 1981")) return "Campeonato Nacional 1981";
+      if (t.includes("nacional 1982")) return "Campeonato Nacional 1982";
+      if (t.includes("'a' 1982")) return "Primera División 1982";
+      if (t.includes("cartagena de indias 1983")) return "Trofeo Cartagena de Indias 1983";
+      if (t.includes("nacional 1983")) return "Campeonato Nacional 1983";
+      if (t.includes("'a' 1983")) return "Primera División 1983";
+      if (t.includes("nacional 1984")) return "Campeonato Nacional 1984";
+      if (t.includes("badajoz 1984")) return "Trofeo Ciudad de Badajoz 1984";
+      if (t.includes("1° 'a' 1984")) return "Primera División 1984";
+      if (t.includes("nacional 1985")) return "Campeonato Nacional 1985";
+      if (t.includes("'a' 1985")) return "Primera División 1985/86";
+      if (t.includes("nacional b 1986/87")) return "Nacional B 1986/87";
+      if (t.includes("octogonal nb 1987")) return "Segundo Ascenso 1987";
+      if (t.includes("nacional b 1987/88")) return "Nacional B 1987/88";
+      if (t.includes("dodecagonal nb 1988")) return "Segundo Ascenso 1988";
+      if (t.includes("nacional b 1988/89")) return "Nacional B 1988/89";
+      if (t.includes("dodecagonal nb 1989")) return "Segundo Ascenso 1989";
+      if (t.includes("nacional b 1989/90")) return "Nacional B 1989/90";
+      if (t.includes("campeonato 1990/91")) return "Campeonato 1990/91";
+      if (t.includes("libertad 1991")) return "Copa Libertad 1991";
+      if (t.includes("apertura 1991")) return "Apertura 1991";
+      if (t.includes("clausura 1992")) return "Clausura 1992";
+      if (t.includes("liguilla")) return "Liguilla Pre-Libertadores 1992";
+      if (t.includes("copa libertad 1992")) return "Copa Libertad 1992";
+      if (t.includes("buenos aires 1992")) return "Copa Ciudad de Buenos Aires 1992";
+      if (t.includes("amistoso 1992")) return "Amistosos 1992";
+      if (t.includes("apertura 1992")) return "Apertura 1992";
+      if (t.includes("clausura 1993")) return "Clausura 1993";
+      if (t.includes("apertura 1993")) return "Apertura 1993";
+      if (t.includes("clausura 1994")) return "Clausura 1994";
+      if (t.includes("apertura 1994")) return "Apertura 1994";
+      if (t.includes("clausura 1995")) return "Clausura 1995";
+      if (t.includes("apertura 1995")) return "Apertura 1995";
+      if (t.includes("clausura 1996")) return "Clausura 1996";
+      if (t.includes("amistad 1996")) return "Copa Amistad 1996";
+      if (t.includes("apertura 1996")) return "Apertura 1996";
+      if (t.includes("clausura 1997")) return "Clausura 1997";
+      if (t.includes("apertura 1997")) return "Apertura 1997";
+      if (t.includes("clausura 1998")) return "Clausura 1998";
+      if (t.includes("apertura 1998")) return "Apertura 1998";
+      if (t.includes("clausura 1999")) return "Clausura 1999";
+      if (t.includes("nacional b 1999/2000")) return "1°B Nacional 1999/2000";
+      if (t.includes("amistoso 1983")) return "Amistosos 1983";
+      if (t.includes("apertura 2000")) return "Apertura 2000";
+      if (t.includes("clausura 2001")) return "Clausura 2001";
+      if (t.includes("apertura 2001")) return "Apertura 2001";
+      if (t.includes("clausura 2002")) return "Clausura 2002";
+      if (t.includes("apertura 2002")) return "Apertura 2002";
+      if (t.includes("clausura 2003")) return "Clausura 2003";
+      if (t.includes("apertura b nacional 2003")) return "Apertura BN 2003";
+      if (t.includes("clausura b nacional 2004")) return "Clausura BN 2004";
+      if (t.includes("apertura b nacional 2004")) return "Apertura BN 2004";
+      if (t.includes("clausura b nacional 2005")) return "Clausura BN 2005";
+      if (t.includes("2° ascenso b nacional 2005")) return "Segundo Ascenso 2005";
+      if (t.includes("promocion 2005")) return "Promoción 2005";
+      if (t.includes("apertura b nacional 2005")) return "Apertura BN 2005";
+      if (t.includes("clausura b nacional 2006")) return "Clausura BN 2006";
+      if (t.includes("reducido 2006")) return "Reducido BN 2006";
+      if (t.includes("promocion 2006")) return "Promoción 2006";
+      if (t.includes("apertura b nacional 2006")) return "Apertura BN 2006";
+      if (t.includes("clausura b nacional 2007")) return "Clausura BN 2007";
+      if (t.includes("2° ascenso b nacional 2007")) return "Segundo Ascenso 2007";
+      if (t.includes("promocion 2007")) return "Promoción 2007";
+      if (t.includes("mexico 2007")) return "Gira por México 2007";
+      if (t.includes("apertura 2007")) return "Apertura 2007";
+      if (t.includes("clausura 2008")) return "Clausura 2008";
+      if (t.includes("cafam 2008")) return "Copa Cafam 2008";
+      if (t.includes("apertura 2008")) return "Apertura 2008";
+      if (t.includes("clausura 2009")) return "Clausura 2009";
+      if (t.includes("apertura 2009")) return "Apertura 2009";
+      if (t.includes("carioca 2010")) return "Despedida de Marcelinho Carioca 2010";
+      if (t.includes("clausura 2010")) return "Clausura 2010";
+      if (t.includes("apertura 2010")) return "Apertura 2010";
+      if (t.includes("clausura 2011")) return "Clausura 2011";
+      if (t.includes("campeonato 10-11")) return "Desempate Descenso 2011";
+      if (t.includes("nacional b 11-12")) return "Campeonato B Nacional 2011/12";
+      if (t.includes("copa argentina 2012")) return "Copa Argentina 2012";
+      if (t.includes("clasicos 2012")) return "Copa de Clásicos 2012";
+      if (t.includes("nacional b 12-13")) return "Campeonato B Nacional 2012/13";
+      if (t.includes("copa argentina 2013")) return "Copa Argentina 2013";
+      if (t.includes("nacional b 13-14")) return "Campeonato B Nacional 2013/14";
+      if (t.includes("copa argentina 2014")) return "Copa Argentina 2014";
+      if (t.includes("nb 13-14")) return "Desempate 3° Ascenso BN 2013/14";
+      if (t.includes("nacional b 2014")) return "Campeonato B Nacional 2014";
+      if (t.includes("nb 2014")) return "Desempate 5° Ascenso NB 2014";
+      if (t.includes("libertadores 2015")) return "Copa Libertadores 2015";
+      if (t.includes("campeonato 2015")) return "Campeonato 2015";
+      if (t.includes("supercopa 2015")) return "Supercopa 2015";
+      if (t.includes("copa argentina 2015")) return "Copa Argentina 2015";
+      if (t.includes("sudamericana 2015")) return "Copa Sudamericana 2015";
+      if (t.includes("buenos aires 2016")) return "Copa Ciudad de Buenos Aires 2016";
+      if (t.includes("libertadores 2016")) return "Copa Libertadores 2016";
+      if (t.includes("campeonato 2016")) return "Campeonato 2016";
+      if (t.includes("copa argentina 2016")) return "Copa Argentina 2016";
+      if (t.includes("campeonato 16-17")) return "Campeonato 2016/17";
+      if (t.includes("sudamericana 2017")) return "Copa Sudamericana 2017";
+      if (t.includes("copa argentina 2017")) return "Copa Argentina 2017";
+      if (t.includes("saf 17-18")) return "Superliga 2017/18";
+      if (t.includes("schneider 2018")) return "Copa Schneider 2018";
+      if (t.includes("copa argentina 2018")) return "Copa Argentina 2018";
+      if (t.includes("saf 18-19")) return "Superliga 2018/19";
+      if (t.includes("libertadores 2019")) return "Copa Libertadores 2019";
+      if (t.includes("superliga 2019")) return "Copa Superliga 2019";
+      if (t.includes("copa argentina 2019")) return "Copa Argentina 2019";
+      if (t.includes("saf 19-20")) return "Superliga 2019/20";
+      if (t.includes("san juan 2020")) return "Copa San Juan 2020";
+      if (t.includes("sudamericana 2020")) return "Copa Sudamericana 2020";
+      if (t.includes("superliga 2020")) return "Copa Superliga 2020";
+      if (t.includes("copa maradona 2020")) return "Copa Maradona 2020";
+      if (t.includes("copa-lpf 2021")) return "Copa-LPF 2021";
+      if (t.includes("copa argentina 2020")) return "Copa Argentina 2020";
+      if (t.includes("torneo-lpf 2021")) return "Torneo-LPF 2021";
+      if (t.includes("amistosos 2022")) return "Amistosos 2022";
+      if (t.includes("copa-lpf 2022")) return "Copa-LPF 2022";
+      if (t.includes("copa argentina 2022")) return "Copa Argentina 2022";
+      if (t.includes("torneo-lpf 2022")) return "Torneo-LPF 2022";
+      if (t.includes("torneo-lpf 2023")) return "Torneo-LPF 2023";
+      if (t.includes("copa argentina 2023")) return "Copa Argentina 2023";
+      if (t.includes("libertadores 2023")) return "Copa Libertadores 2023";
+      if (t.includes("sudamericana 2023")) return "Copa Sudamericana 2023";
+      if (t.includes("copa-lpf 2023")) return "Copa-LPF 2023";
+      if (t.includes("peña 2024")) return "Copa Agustín Peña 2024";
+      if (t.includes("plata 2024")) return "Serie Río de la Plata 2024";
+      if (t.includes("copa-lpf 2024")) return "Copa-LPF 2024";
+      if (t.includes("copa argentina 2024")) return "Copa Argentina 2024";
+      if (t.includes("torneo-lpf 2024")) return "Torneo-LPF 2024";
+      if (t.includes("plata 2025")) return "Serie Río de la Plata 2025";
+      if (t.includes("apertura-lpf 2025")) return "Apertura-LPF 2025";
+      if (t.includes("copa argentina 2025")) return "Copa Argentina 2025";
+      if (t.includes("sudamericana 2025")) return "Copa Sudamericana 2025";
+      if (t.includes("clausura-lpf 2025")) return "Clausura-LPF 2025";
+      return "Otros";
+    }
+
+Promise.all([
+  fetch(futbolistasURL).then(r => { if(!r.ok) throw new Error("Futbolistas CSV no disponible"); return r.text(); }),
+  fetch(partidosURL).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
+  fetch(partidosURL2).then(r => { if(!r.ok) throw new Error("Partidos CSV 2 no disponible"); return r.text(); }),
+  fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
+  fetch(partidosURL4).then(r => { if(!r.ok) throw new Error("Partidos CSV 4 no disponible"); return r.text(); }),
+  fetch(partidosURL5).then(r => { if(!r.ok) throw new Error("Partidos CSV 5 no disponible"); return r.text(); }),
+  fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); })
+])
+.then(([csvFutbolistas, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6]) => {
+      
+    futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
+        id: (c.ID ?? "").toString().trim(),
+        futbolista: (c["Futbolista"] ?? "").toString().trim(),
+        nombre: (c.Nombre ?? "").toString().trim(),
+        posicion: (c.Posición ?? "").toString().trim(),
+        fechanac: (c.FechaNac?? "").toString().trim(),
+        lugarnac: (c.LugarNac?? "").toString().trim(),
+        pais: (c.País ?? c.Pais ?? "").toString().trim(),
+        fechamuerte: (c.FechaMuerte ?? "").toString().trim(),
+        lugarmuerte: (c.LugarMuerte ?? "").toString().trim(),
+        peso: (c.Peso ?? "").toString().trim(),
+        altura: (c.Altura ?? "").toString().trim(),
+        procedencia: (c.Procedencia ?? "").toString().trim(),
+        destino: (c.Destino ?? "").toString().trim(),
+        trayectoria: (c.Trayectoria ?? "").toString().trim(),
+        biografía: (c.Biografía ?? "").toString().trim(),
+        foto1: (c.Foto1 ?? "").toString().trim(),
+        foto2: (c.Foto2 ?? "").toString().trim()
+      }));
+
+     const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
+     const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
+     const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
+     const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
+     const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
+     const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
+
+encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6].map(p => ({
+        Fecha: (p.Fecha ?? "").trim(),
+        Técnico: (p.Técnico ?? "").trim(),
+        Condición: (p.Condición ?? "").trim(),
+        Situación: (p.Situación ?? "").trim(),
+        Resultado1: (p.Resultado1 ?? "").trim(),
+        Resultado2: (p.Resultado2 ?? "").trim(),
+        Club: (p.Club ?? "").trim(),
+        Torneo: (p.Torneo ?? "").trim(),
+        Estadio: (p.Estadio ?? "").trim(),
+        Árbitro: (p.Árbitro ?? "").trim(),
+        Huracán: (p.Huracán ?? "").trim(),
+        Rival: (p.Rival ?? "").trim(),
+        Foto: (p.Foto ?? "").trim(),
+        Incidencias: (p.Incidencias ?? "").trim(),
+        Fin1T: (p.Fin1T ?? "").trim(),
+        Fin2T: (p.Fin2T ?? "").trim(),
+        Fin1E: (p.Fin1E ?? "").trim(),
+        Fin2E: (p.Fin2E ?? "").trim()
+      }));
+
+      llenarSelectFutbolistas();
+    });
+
+    function llenarSelectFutbolistas() {
+      const sel = document.getElementById("futbolistaSelect");
+      sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
+      futbolistas.forEach(a => {
+        if (a.futbolista) {
+          const opt = document.createElement("option");
+          opt.value = a.futbolista;
+          opt.textContent = InvertirNombre(a.futbolista);
+          sel.appendChild(opt);
+        }
+      });
+      sel.addEventListener("change", mostrarFutbolistas);
+    }
+
+function mostrarFutbolistas() {
+  const futbolistaId = document.getElementById("futbolistaSelect").value;
+  const futbolista = futbolistas.find(a => a.futbolista === futbolistaId);
+  if (!futbolista) {
+    document.getElementById("futbolistaInfo").style.display = "none";
+    return;
+  }
+
+      const cont = document.getElementById("futbolistaInfo");
+      cont.style.display = "block";
+      cont.innerHTML = `
+        <div class="club-header">
+${futbolista.foto1 ? 
+  `<img src="${futbolista.foto1}" 
+        alt="${futbolista.futbolista}" 
+        style="width:105px;height:140px;object-fit:cover;border-radius:8px;" 
+        onerror="this.style.display='none'">` 
+  : ""}
+      <div style="text-align:center;">
+  <h2>${futbolista.futbolista}</h2>
+  <div style="font-size:14px; color:black; font-family:Helvetica, sans-serif;">
+    ${getResumenCarrera(futbolista.futbolista)}
+  </div>
+  ${futbolista.pais
+  ? futbolista.pais
+      .split(/[\(\),.;\/]|(?:\)\s*)|(?:\s*\()|(?:\s*\d+\s*)/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0)
+      .map(p => `<img src="https://globopedia.github.io/Artids/Banderas/${encodeURIComponent(p)}.png" alt="${p}" title="${p}" class="bandera">`)
+      .join("")
+  : ""}
+  <div class="trayectoria-escudos">
+    ${renderTrayectoriaEscudos(futbolista.trayectoria)}
+  </div>
+  <!-- 🔥 RENDIMIENTO GENERAL -->
+  ${getResumenRendimientoFutbolista(futbolista.futbolista)}
+
+  </div>
+  </div>
+    <p><b>Nombre:</b> ${futbolista.nombre}</p>
+    <p><b>Posición:</b> ${futbolista.posicion}</p>
+    <p><b>Procedencia:</b> ${futbolista.procedencia}</p>
+    <p><b>Nacimiento:</b> ${futbolista.fechanac}, en ${futbolista.lugarnac}</p>
+    <p><b>Muerte:</b> ${futbolista.fechamuerte}, en ${futbolista.lugarmuerte}</p>
+    <p><b>Peso:</b> ${futbolista.peso} kg — <b>Altura:</b> ${futbolista.altura} m</p>
+    <p><b>Destino:</b> ${futbolista.destino}</p>
+    <p><b>Biografía:</b> ${futbolista.biografía}</p>
+    <div style="text-align:center;">
+    ${futbolista.foto2 ? 
+  `<img src="${futbolista.foto2}" 
+        alt="${futbolista.futbolista}" 
+        style="width:280px;height:360px;object-fit:cover;border-radius:8px;" 
+        onerror="this.style.display='none'">` 
+  : ""}
+</div>
+<div class="stats">
+
+  <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
+  ${renderEstadisticas(futbolista.futbolista)}
+
+</div>
+      `;
+  }
+function limpiarNombreJugador(s) {
+  if (!s) return "";
+  return String(s)
+    .replace(/\u00A0/g, " ")               // NBSP → espacio
+    .replace(/^\s*\(?\d+\)?\s*/, "")       // quita "(48 " o "48)"
+    .replace(/[.,;:)\s]+$/, "")            // quita .,;:) al final
+    .replace(/^[\s(]+/, "")                // quita espacios o paréntesis al inicio
+    .trim();
+}
+    
+function obtenerMinutoIngreso(texto, futbolista) {
+  const regex = new RegExp(`\\((\\d+(?:\\+\\d+)?)\\s*${futbolista}`, "i");
+  const match = texto.match(regex);
+  if (!match) return null;
+
+  const m = match[1];
+  return m.includes("+")
+    ? m.split("+").map(Number).reduce((a,b)=>a+b)
+    : Number(m);
+}
+function obtenerMinutoSalida(texto, futbolista) {
+  const regex = new RegExp(
+    `${futbolista}\\s*\\(\\s*(\\d+(?:\\+\\d+)?)\\s+[^()]+`,
+    "i"
+  );
+
+  const match = texto.match(regex);
+  if (!match) return null;
+
+  const m = match[1];
+  return m.includes("+")
+    ? m.split("+").map(Number).reduce((a,b)=>a+b)
+    : Number(m);
+}
+function getResumenRendimientoFutbolista(nombreFutbolista) {
+
+  const delFutbolista = encuentros.filter(p => {
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+
+    return jugadores.some(j => norm(j) === norm(nombreFutbolista));
+  });
+
+  if (!delFutbolista.length) return "";
+
+  const total = delFutbolista.length;
+  const victorias = delFutbolista.filter(p => norm(p.Situación) === "victoria").length;
+  const empates   = delFutbolista.filter(p => norm(p.Situación) === "empate").length;
+  const derrotas  = delFutbolista.filter(p => norm(p.Situación) === "derrota").length;
+
+  const efectividad = ((victorias * 3 + empates) * 100 / (total * 3)).toFixed(1);
+
+  let color;
+  if (efectividad < 30) color = "#e74c3c";
+  else if (efectividad < 45) color = "#f1c40f";
+  else color = "#2ecc71";
+
+  const fechas = delFutbolista
+    .map(p => {
+      const [d, m, a] = p.Fecha.split("/");
+      return new Date(`${a}-${m}-${d}`);
+    })
+    .sort((a,b) => a - b);
+
+  const desde = fechas[0].getFullYear();
+  const hasta = fechas[fechas.length - 1].getFullYear();
+
+  return `
+    <div style="margin-bottom:10px;">
+    <!-- <div>${total} ${total === 1 ? "partido" : "partidos"} (${desde}-${hasta})</div> -->
+      <div>
+        <span style="
+          background:${color};
+          color:white;
+          padding:4px 8px;
+          border-radius:6px;
+          font-weight:bold;
+          font-size:15px;
+        ">
+          ${efectividad}%</span>
+        <span>de efectividad</span>
+      </div>
+    </div>
+  `;
+}
+function renderEstadisticas(nombreFutbolista) {
+  const delFutbolista = encuentros.filter(p => {
+ const jugadores = (p.Huracán || "")
+  // 1️⃣ convertir paréntesis en comas (sin regex anidada)
+  .replace(/[()]/g, ",")
+
+  // 2️⃣ eliminar minutos: 45, 45+1, 90+3, etc.
+  .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+
+  // 3️⃣ normalización
+  .replace(/\.+/g, "")
+  .replace(/\s+y\s+/gi, ",")
+  .replace(/\s+e\s+/gi, ",")
+  .replace(/,,+/g, ",")
+  .replace(/\s+,/g, ",")
+  .replace(/,\s+/g, ",")
+  .replace(/\s+/g, " ")
+
+  // 4️⃣ separar jugadores
+  .split(/[,;]+/)
+  .map(j => j.trim())
+  .filter(j => j.length > 1);
+    return jugadores.some(j => norm(j) === norm(nombreFutbolista));
+  });
+
+  const agg = {};
+  for (const e of delFutbolista) {
+    const comp = bucketCompetencia(e.Torneo);
+    const sit = cap(norm(e.Situación));
+    if (!agg[comp]) agg[comp] = { Victoria:0, Empate:0, Derrota:0, Goles:0 };
+    if (SITUACIONES.includes(sit)) {
+      agg[comp][sit] += 1;
+    }
+
+    // ✅ contar TODAS las menciones de “GOL jugador (HUR)”
+    const textoIncidencias = norm(e.Incidencias || "");
+    const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}\\s*\\(hur\\)`, "g");
+    const golesEnEstePartido = (textoIncidencias.match(patron) || []).length;
+    agg[comp].Goles += golesEnEstePartido;
+  }
+
+  let html = "";
+  for (const comp of ORDEN_COMPETENCIAS) {
+    if (!agg[comp]) continue;
+    const bucket = agg[comp];
+    const total = bucket.Victoria + bucket.Empate + bucket.Derrota;
+    if (total === 0) continue;
+
+    const resumen = `G${bucket.Victoria}-E${bucket.Empate}-P${bucket.Derrota}`;
+    const goles = bucket.Goles || 0;
+
+    html += `
+      <div class="stat-group">
+        <div class="stat-title">🏆 ${comp}</div>
+        <ul>
+          <li>
+            <label>
+              <input type="checkbox" class="chkPartidos"
+                data-comp="${comp}"
+                data-sit="todos"
+                data-futbolista="${nombreFutbolista}">
+              📊 ${total} ${total === 1 ? "partido" : "partidos"} (${resumen}) – ⚽ ${goles} ${goles === 1 ? "gol" : "goles"}
+            </label>
+            <div class="partidos-lista" style="display:none; margin-left:20px;"></div>
+          </li>
+        </ul>
+      </div>
+    `;
+  }
+  return html || "<p>Sin datos disponibles</p>";
+}
+  // Manejador de checkboxes (muestra partidos por filtro)
+document.addEventListener("change", function(e) {
+  if (!e.target.classList.contains("chkPartidos")) return;
+  const contenedor = e.target.closest("li").querySelector(".partidos-lista");
+  contenedor.innerHTML = "";
+  if (e.target.checked) {
+    const { comp, sit, futbolista } = e.target.dataset;
+
+    // filtrar partidos del futbolista
+    const partidos = encuentros.filter(p => {
+      // el jugador aparece en la celda de Huracán
+const jugadores = (p.Huracán || "")
+  // 1️⃣ convertir paréntesis en comas (sin regex anidada)
+  .replace(/[()]/g, ",")
+
+  // 2️⃣ eliminar minutos: 45, 45+1, 90+3, etc.
+  .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+
+  // 3️⃣ normalización
+  .replace(/\.+/g, "")
+  .replace(/\s+y\s+/gi, ",")
+  .replace(/\s+e\s+/gi, ",")
+  .replace(/,,+/g, ",")
+  .replace(/\s+,/g, ",")
+  .replace(/,\s+/g, ",")
+  .replace(/\s+/g, " ")
+
+  // 4️⃣ separar jugadores
+  .split(/[,;]+/)
+  .map(j => j.trim())
+  .filter(j => j.length > 1);
+      return jugadores.some(j => norm(j) === norm(futbolista)) &&
+             bucketCompetencia(p.Torneo) === comp &&
+          (sit === "todos" || cap(norm(p.Situación)) === sit);
+    });
+
+    if (partidos.length) {
+      partidos.forEach(p => {
+        let bloqueHTML = "";
+
+        if ((p.Condición || "").toLowerCase() === "visitante") {
+          bloqueHTML = `
+            <div class="partido-card">
+              ${getTorneoImage(p.Torneo)}
+              <div><b>${p.Fecha}</b></div>
+              <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+              <div class="resultado2-box">${p.Resultado2}</div>
+              <div class="resultado1-box">${p.Resultado1}</div>
+              <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+              <div><b>${p.Torneo}</b></div>
+              <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+              <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
+              <div><b>${p.Club}:</b> ${p.Rival}</div>
+              <div><b>Huracán:</b> ${p.Huracán}</div>
+              ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+              <div>${renderIncidencias(p.Incidencias)}</div>
+            </div>
+          `;
+        } else {
+          bloqueHTML = `
+            <div class="partido-card">
+              ${getTorneoImage(p.Torneo)}
+              <div><b>${p.Fecha}</b></div>
+              <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+              <div class="resultado1-box">${p.Resultado1}</div>
+              <div class="resultado2-box">${p.Resultado2}</div>
+              <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+              <div><b>${p.Torneo}</b></div>
+              <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+              <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
+              <div><b>Huracán:</b> ${p.Huracán}</div>
+              <div><b>${p.Club}:</b> ${p.Rival}</div>
+              ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+              <div>${renderIncidencias(p.Incidencias)}</div>
+            </div>
+          `;
+        }
+
+// --- TITULAR / SUPLENTE + MINUTOS (DEFINITIVO) ---
+
+const texto = p.Huracán || "";
+const jugador = futbolista; // ← el nombre que ya usás en el index
+let condicion = "Titular";
+
+function parseMinuto(valor, fallback = 0) {
+  if (valor == null || valor === "") return fallback;
+
+  const limpio = String(valor).trim();
+
+  if (limpio.includes("+")) {
+    const [base, extra] = limpio.split("+").map(Number);
+    return (base || 0) + (extra || 0);
+  }
+
+  const n = Number(limpio);
+  return isNaN(n) ? fallback : n;
+}
+
+console.log("Objeto partido completo:", p);
+console.log("Fin2T leído:", p.Fin2T);
+let finReal = 0;
+
+if (p.Fin2E && p.Fin2E !== "0") {
+  // hubo tiempo extra → usar Fin2E
+  finReal = parseMinuto(p.Fin2E, 120);
+} else {
+  // partido normal → usar Fin2T
+  finReal = parseMinuto(p.Fin2T, 90);
+}
+
+let minutosJugados = finReal;
+
+// patrón: "Jugador (73 Otro)"
+const saleRegex = new RegExp(`${jugador}\\s*\\((\\d+(?:\\+\\d+)?)`, "i");
+
+// patrón: "(73 Jugador)"
+const entraRegex = new RegExp(`\\((\\d+(?:\\+\\d+)?)\\s*${jugador}`, "i");
+
+let ingreso = obtenerMinutoIngreso(texto, futbolista);
+let salida  = obtenerMinutoSalida(texto, futbolista);
+
+ingreso = ajustarMinuto(ingreso, p);
+salida  = ajustarMinuto(salida, p);
+
+if (ingreso !== null) {
+  // 👉 siempre suplente si tiene minuto de ingreso
+  condicion = "Suplente";
+
+ let finJugador = finReal;
+
+if (salida !== null) {
+  finJugador = salida - 1;
+}
+
+minutosJugados = Math.max(0, finJugador - ingreso + 1);
+
+  minutosJugados = Math.max(0, finReal - ingreso + 1);
+
+} else if (salida !== null) {
+  // 👉 titular que fue reemplazado
+  condicion = "Titular";
+  minutosJugados = Math.max(0, salida - 1);
+
+} else {
+  // 👉 titular que jugó todo el partido
+  minutosJugados = finReal;
+}
+// --- EXPULSIONES ---
+const incidencias = p.Incidencias || "";
+
+// ejemplo: "73 EXP Joaquín Larrivey"
+const expulsionRegex = new RegExp(
+  `(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${futbolista}`,
+  "i"
+);
+
+let fueExpulsado = false;
+if (expulsionRegex.test(incidencias)) {
+  fueExpulsado = true;
+  const m = incidencias.match(expulsionRegex)[1];
+
+  let minutoExpulsion = m.includes("+")
+    ? m.split("+").map(Number).reduce((a, b) => a + b)
+    : Number(m);
+
+  if (condicion === "Titular") {
+    // jugó hasta el minuto anterior a la expulsión
+    minutosJugados = Math.max(0, minutoExpulsion - 1);
+  }
+ else {
+    // suplente expulsado
+    // ingreso = fin del partido - minutos jugados + 1
+    const fin = finReal;
+    const minutoIngreso = fin - minutosJugados + 1;
+    minutosJugados = Math.max(0, minutoExpulsion - minutoIngreso + 1);
+  }
+}
+// --- GOLES ---
+let golesJugador = 0;
+
+const golRegex = new RegExp(
+  `(\\d+(?:\\+\\d+)?)\\s+GOL\\s+${futbolista}\\s*\\(HUR\\)`,
+  "gi"
+);
+
+const golesMatch = incidencias.match(golRegex);
+
+if (golesMatch) {
+  golesJugador = golesMatch.length;
+}
+
+let iconoGol = "";
+
+if (golesJugador > 0) {
+  iconoGol = "⚽".repeat(golesJugador);
+}
+const puntosPartido = calcularPuntosPartido(p, minutosJugados);
+
+       contenedor.innerHTML += `
+          <div class="acordeon">
+          <div class="acordeon-header">
+${fueExpulsado ? `
+<span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
+  <svg width="12" height="16" viewBox="0 0 12 16">
+    <rect x="1" y="1" width="10" height="14" rx="2" ry="2"
+          fill="#d40000" stroke="#8b0000" stroke-width="1"/>
+  </svg>
+</span>
+` : ""}${iconoGol ? iconoGol + " " : ""}${condicion} (${minutosJugados}’) ·
+${p.Resultado1}-${p.Resultado2}
+<span style="font-weight:bold; margin-left:6px;
+             color:${puntosPartido >= 0 ? '#006400' : '#8B0000'}">
+  (${puntosPartido.toFixed(1)})
+</span>
+  <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
+       style="height:22px; vertical-align:middle; margin:0 6px;">
+  [${p.Técnico}]
+</div>
+            <div class="acordeon-body cerrado">${bloqueHTML}</div>
+          </div>
+        `;
+      });
+    } else {
+      contenedor.innerHTML = "<i>No hay partidos registrados</i>";
+    }
+    contenedor.style.display = "block";
+  } else {
+    contenedor.style.display = "none";
+  }
+});
+
+    document.addEventListener("click", function(e) {
+      if (e.target.classList.contains("acordeon-header")) {
+        const body = e.target.nextElementSibling;
+        body.classList.toggle("cerrado");
+        e.target.classList.toggle("abierto");
+      }
+    });
+
+function getResumenCarrera(nombreFutbolista) {
+  const delFutbolista = encuentros.filter(p => {
+  const jugadores = (p.Huracán || "")
+  // 1️⃣ convertir paréntesis en comas (sin regex anidada)
+  .replace(/[()]/g, ",")
+
+  // 2️⃣ eliminar minutos: 45, 45+1, 90+3, etc.
+  .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+
+  // 3️⃣ normalización
+  .replace(/\.+/g, "")
+  .replace(/\s+y\s+/gi, ",")
+  .replace(/\s+e\s+/gi, ",")
+  .replace(/,,+/g, ",")
+  .replace(/\s+,/g, ",")
+  .replace(/,\s+/g, ",")
+  .replace(/\s+/g, " ")
+
+  // 4️⃣ separar jugadores
+  .split(/[,;]+/)
+  .map(j => j.trim())
+  .filter(j => j.length > 1);
+    return jugadores.some(j => norm(j) === norm(nombreFutbolista));
+  });
+
+  if (!delFutbolista.length) return "";
+
+  // ✅ Total de partidos
+  const total = delFutbolista.length;
+
+  // ✅ Contar TODAS las menciones de “GOL jugador (HUR)” en todo el CSV
+  const totalGoles = encuentros.reduce((acc, p) => {
+    const texto = norm(p.Incidencias || "");
+    const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}\\s*\\(hur\\)`, "g");
+    const coincidencias = texto.match(patron);
+    return acc + (coincidencias ? coincidencias.length : 0);
+  }, 0);
+
+  // ✅ Fechas para obtener el primer y último año
+  const fechasOrdenadas = delFutbolista
+    .map(p => p.Fecha)
+    .map(f => {
+      const [d, m, a] = f.split("/");
+      return new Date(`${a}-${m}-${d}`);
+    })
+    .sort((a, b) => a - b);
+
+  const primerAnio = fechasOrdenadas[0].getFullYear();
+  const ultimoAnio = fechasOrdenadas[fechasOrdenadas.length - 1].getFullYear();
+
+  return `${total} ${total === 1 ? "partido" : "partidos"} – ${totalGoles} ${totalGoles === 1 ? "gol" : "goles"} (${primerAnio}-${ultimoAnio})`;
+}
+    function getEscudo(nombreClub) {
+  if (!nombreClub) return "";
+  const club = nombreClub.trim();
+      return `https://globopedia.github.io/Artids/escudos/${encodeURIComponent(club)}.png`;
+}
+    function renderIncidencias(texto) {
+      if (!texto) return "";
+      return texto
+        .replace(/GOL/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgi3GyVjBR-e_IN4mWVAuZofChVOj763GApXwzanoEJDUTysF1K9gf3N5qBCoDJ-ahi8wRkrZ3FCbl0ovTEjXyjFjFEWYF1MZ7YvHrq0bD5eQ7GsJPOkpLSC-k4zpZ1CbnyKVtoYlb6JWXByKkd0VAHuN1hy8P9LBz2fhn5e3Um_X-m4U9WLo9pQP428Fj4/s320/GolR.png' style='width:20px;height:20px;'>")
+        .replace(/EXP/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgx8a6PCkGhKR9WTnh2NNWLMBDOIKWsNisSChpxN2NayjM5Z6YBIZmv52PvduZawIBBh_g5Pq56LdvjG8X1gSCud2q6NYS_NGOh7nAPaxUy_nC1YCcZJOgy2DeTZPRkqRgb1_HbpJshh-7o3MoW8Z3h8tBa8UZ153n5CzriOyvsSIxM6FsCbn-n115KC5Ln/s320/Roja.png' style='width:20px;height:20px;'>")
+        .replace(/ATA/g, "<img src='https://blogger.googleusercontent.com/img/a/AVvXsEjygOwijhQ1dRIh6BPFrQu7EKOUShS0RLEVmPhCJSANGWOaNzvVmcbV03ZW0ZF5Npefl5r3P8iU6WjXRaSL80QYazspsJ4-nzA8pv4FqBwgu1Jr0wDw2iEPMvnVgK0nvRLeZmGYuVW8epSVTyyND28aoQRd9wD9yxKJWBuPOhOoVz-cUgpbM702W2ZlpsF7=w95-h79' style='width:20px;height:20px;'>")
+        .replace(/PEN/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEho-erXGKkNZ7MaZWOtZw-ru0AnJwAlzHqnl5fKLmUAn_QtAMAbXgGMsqh21htJ2XSePyqAMAq4Xce1RkwkrqrA4Hw312mYcXhXMVW-m64vRS_lKTNgnBNvCzPZsPV3eEk_QclWiNZ9n9pvAQSiscTyp94vbN_h6aMeQ_nwTdBSdXGn5B3HW3A-sj_4Bw1j/s320/Penales.png' style='width:20px;height:20px;'>");
+    }
+
+    function getEstadioImage(estadio) {
+      if (!estadio) return "";
+      const fileName = estadio.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\./g, "").replace(/\s+/g, "") + ".png";
+      return "https://globopedia.github.io/Artids/Estadios/" + fileName;
+    }
+
+    function getTorneoImage(nombreTorneo) {
+      if (!nombreTorneo) return "";
+      const texto = nombreTorneo.toLowerCase();
+      const torneosDisponibles = [
+        "Apertura Nacional B 2006","Clausura Nacional B 2007","2° Puesto Nacional B 2007","Promoción 2007",
+        "Apertura 2007","Clausura 2008","Apertura 2008","Clausura 2009",
+        "Apertura 2009","Clausura 2010","Apertura 2010","Clausura 2011",
+        "Nacional B 11-12", "Copa Argentina 2012","Copa Argentina 2013","Copa Argentina 2014",
+        "Copa Argentina 2015","Copa Argentina 2016","Copa Argentina 2017","Copa Argentina 2018",
+        "Copa Argentina 2019","Copa Argentina 2020","Copa Argentina 2022","Copa Argentina 2023",
+        "Copa Argentina 2024","Copa Argentina 2025", "Nacional B 12-13", "Nacional B 13-14",
+        "Nacional B 2014", "Supercopa 2015", "Campeonato 2015", "Libertadores 2015",
+        "Sudamericana 2015", "Campeonato 2016", "Libertadores 2016", "Campeonato 16-17",
+        "Sudamericana 2017", "SAF 17-18", "SAF 18-19", "SAF 19-20", "Copa Maradona 2020",
+        "Libertadores 2019", "Sudamericana 2020", "Torneo-LPF 2021", "Torneo-LPF 2022", "Torneo-LPF 2023",
+        "Copa-LPF 2021", "Copa-LPF 2022", "Copa-LPF 2023", "Copa-LPF 2024", "Torneo-LPF 2024",
+        "Apertura-LPF 2025", "Clausura-LPF 2025", "Libertadores 2023", "Sudamericana 2023", "Sudamericana 2025"
+      ];
+      for (const t of torneosDisponibles) {
+        if (texto.includes(t.toLowerCase())) {
+          return `<img src="https://globopedia.github.io/Artids/Torneos/${encodeURIComponent(t)}.png" style="max-height:40px; display:block; margin:4px auto;">`;
+        }
+      }
+      return "";
+    }
+
+function renderTrayectoriaEscudos(trayectoria) {
+  if (!trayectoria) return "";
+
+  const clubes = trayectoria.split(",").map(c => c.trim()).filter(Boolean);
+
+  return clubes.map(club => `
+    <img 
+      src="${getEscudo(club)}" 
+      alt="${club}" 
+      title="${club}" 
+      style="height:30px; margin:5px;" 
+      onerror="this.style.display='none'">
+  `).join("");
+}
+  function InvertirNombre(nombre) {
+  const partes = nombre.trim().split(" ");
+  if (partes.length < 2) return nombre;
+
+  if (partes.length === 2) {
+    // Caso simple: Nombre + Apellido
+    const [nombre1, apellido] = partes;
+    return apellido + ", " + nombre1;
+  }
+
+  // Lista de conectores/apellidos compuestos en minúscula
+  const conectores = ["de", "del", "de la", "de los", "la", "las", "los", "san", "santa"];
+
+  // Unir las últimas palabras y ver si forman parte de un apellido compuesto
+  let i = partes.length - 1;
+  let apellido = partes[i];
+  while (i > 0) {
+    const posible = partes[i - 1].toLowerCase();
+    if (conectores.includes(posible)) {
+      apellido = partes[i - 1] + " " + apellido;
+      i--;
+    } else {
+      break;
+    }
+  }
+
+  const nombres = partes.slice(0, i).join(" ");
+  return apellido + ", " + nombres;
+}
+// --- AUTOCOMPLETADO CON DEBOUNCE --- //
+const searchInput = document.getElementById("futbolistaSearch");
+const suggestionsList = document.getElementById("autocompleteList");
+let debounceTimer;
+
+function debounce(func, delay) {
+  return function(...args) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+function filtrarFutbolistas(termino) {
+  const termNorm = norm(termino);
+  suggestionsList.innerHTML = "";
+  selectedIndex = -1;
+
+  if (!termNorm) return;
+
+  const resultados = futbolistas
+    .filter(a => norm(a.futbolista).includes(termNorm))
+    .slice(0, 15);
+
+  resultados.forEach(r => {
+    const li = document.createElement("li");
+    li.className = "autocomplete-item";
+
+    li.innerHTML = `
+      ${r.foto1
+        ? `<img src="${r.foto1}" onerror="this.style.display='none'">`
+        : `<div style="width:32px;height:42px;"></div>`}
+      <span>${InvertirNombre(r.futbolista)}</span>
+    `;
+
+    li.addEventListener("click", () => {
+      seleccionarFutbolista(r.futbolista);
+    });
+
+    suggestionsList.appendChild(li);
+  });
+}
+
+searchInput.addEventListener("input", debounce(e => filtrarFutbolistas(e.target.value), 200));
+
+function seleccionarFutbolista(nombre) {
+  searchInput.value = InvertirNombre(nombre);
+  suggestionsList.innerHTML = "";
+  const hiddenSelect = document.getElementById("futbolistaSelect");
+  hiddenSelect.innerHTML = `<option value="${nombre}" selected></option>`;
+  hiddenSelect.value = nombre;
+  mostrarFutbolistas();
+}
+  // --- Navegación con teclado en el autocompletado --- //
+let selectedIndex = -1;
+
+searchInput.addEventListener("keydown", function(e) {
+  const items = suggestionsList.querySelectorAll("li");
+  if (!items.length) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    selectedIndex = (selectedIndex + 1) % items.length;
+    actualizarSeleccion(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+    actualizarSeleccion(items);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (selectedIndex >= 0 && selectedIndex < items.length) {
+      items[selectedIndex].click();
+    }
+  } else {
+    selectedIndex = -1; // reset si escribe algo nuevo
+  }
+});
+
+function actualizarSeleccion(items) {
+  items.forEach((item, i) => {
+    const activo = i === selectedIndex;
+    item.style.background = activo ? "#ffdddd" : "white";
+    if (activo) {
+      // 👉 Mostrar texto completo en el input (typeahead visual)
+      const texto = item.textContent.trim();
+      searchInput.value = texto;
+    }
+  });
+
+  // desplazamiento automático si el ítem está fuera de vista
+  const selectedItem = items[selectedIndex];
+  if (selectedItem) {
+    const containerTop = suggestionsList.scrollTop;
+    const containerBottom = containerTop + suggestionsList.offsetHeight;
+    const itemTop = selectedItem.offsetTop;
+    const itemBottom = itemTop + selectedItem.offsetHeight;
+    if (itemTop < containerTop) {
+      suggestionsList.scrollTop = itemTop;
+    } else if (itemBottom > containerBottom) {
+      suggestionsList.scrollTop = itemBottom - suggestionsList.offsetHeight;
+    }
+  }
+}
+// --- Cerrar autocompletado con ESC --- //
+searchInput.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    suggestionsList.innerHTML = "";
+    selectedIndex = -1;
+    searchInput.blur(); // opcional: quita el foco del input
+  }
+});
+// --- Cerrar autocompletado al hacer clic fuera --- //
+document.addEventListener("click", function(e) {
+  const esClickEnInput = searchInput.contains(e.target);
+  const esClickEnLista = suggestionsList.contains(e.target);
+  if (!esClickEnInput && !esClickEnLista) {
+    suggestionsList.innerHTML = "";
+    selectedIndex = -1;
+  }
+});
+// --- Reabrir sugerencias si el input tiene texto y se hace clic --- //
+searchInput.addEventListener("focus", function(e) {
+  const texto = searchInput.value.trim();
+  if (texto.length > 0 && suggestionsList.innerHTML === "") {
+    filtrarFutbolistas(texto);
+  }
+
+  // 🪄 Truco: seleccionar todo el texto después de un clic o foco
+  setTimeout(() => {
+    if (document.activeElement === searchInput) {
+      searchInput.select();
+    }
+  }, 150);
+});
+
+function ajustarMinuto(minuto, p) {
+  if (minuto == null) return null;
+
+  let m = minuto;
+
+  if (typeof m === "string" && m.includes("+")) {
+    m = m.split("+").map(Number).reduce((a,b)=>a+b);
+  } else {
+    m = Number(m);
+  }
+
+  const finPT = Number(p.FinPT) || 45;
+
+  // 👉 si es ST (tu convención: >= 46)
+  if (m >= 46) {
+    return m + (finPT - 45);
+  }
+
+  return m;
+}
+function parseMinuto(minutoStr) {
+  if (!minutoStr) return 0;
+
+  if (minutoStr.includes("+")) {
+    const [base, extra] = minutoStr.split("+").map(Number);
+    return base + extra;
+  }
+
+  return Number(minutoStr);
+}
+</script>
+</body>
+</html>
