@@ -124,7 +124,8 @@ const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1970";
 const partidosURL5 = "https://artids.vercel.app/api/data?file=artids1985";
 const partidosURL6 = "https://artids.vercel.app/api/data?file=artids2000";
 const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2015";
-    
+const transfersURL = "https://artids.vercel.app/api/data?file=utbolists";
+    let transfers = [];
     let clubes = [];
     let encuentros = [];
 
@@ -146,6 +147,60 @@ function conjY(palabra) {
     return "e";
   }
   return "y";
+}
+
+function parseFecha(fecha) {
+  if (!fecha) return null;
+  const [d,m,a] = fecha.split("/");
+  return new Date(a, m-1, d);
+}
+
+function formatMesAnio(date) {
+  const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  return meses[date.getMonth()] + date.getFullYear();
+}
+
+function sumarUnMes(date) {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + 1);
+  return d;
+}
+
+function obtenerTransferencias(nombreClub) {
+  const lista = [];
+
+transfers.forEach(t => {
+ const periodos = obtenerPeriodosJugador(t.jugador);
+if (!periodos.length) return;
+
+  // desde el rival hacia Huracán
+  if (norm(t.procedencia) === norm(nombreClub)) {
+    const periodo = periodos[0];
+
+    lista.push({
+      jugador: t.jugador,
+      foto: t.foto,
+      tipo: "llega",
+      fecha: formatMesAnio(periodo.primera),
+      fechaObj: periodo.primera
+  });
+  }
+
+  // desde Huracán hacia el rival
+  if (norm(t.destino) === norm(nombreClub)) {
+    const periodo = periodos[periodos.length - 1];
+
+    lista.push({
+      jugador: t.jugador,
+      foto: t.foto,
+      tipo: "sale",
+      fecha: formatMesAnio(sumarUnMes(periodo.ultima)),
+      fechaObj: sumarUnMes(periodo.ultima)
+   });
+  }
+});
+
+  return lista.sort((a,b) => a.fechaObj - b.fechaObj);
 }
     function bucketCompetencia(torneo) {
       const t = norm(torneo);
@@ -206,10 +261,14 @@ let debounceTimer;
   fetch(partidosURL7).then(r => r.text()).then(t => {
     const b = atob(t);
     return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  })
+  }),
+  fetch(transfersURL).then(r => r.text()).then(t => {
+  const b = atob(t);
+  return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
+})
 ])
 
-.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7]) => {
+.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvTransfers]) => {
         clubes = Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.id ?? "").toString().trim(),
         club: (c.Club ?? c.club ?? "").toString().trim(),
@@ -224,6 +283,17 @@ let debounceTimer;
         escudo: c.Escudo ?? c.escudo ?? ""
       }));
       
+const transfersCSV = Papa.parse(csvTransfers, { header:true, skipEmptyLines:true }).data;
+
+transfers = transfersCSV
+  .filter(t => t.Foto1 && t.Foto1.startsWith("http")) // 🔥 limpia basura
+  .map(t => ({
+    jugador: (t.Futbolista || "").trim(),
+    procedencia: (t.Procedencia || "").trim(),
+    destino: (t.Destino || "").trim(),
+    foto: (t.Foto1 || "").trim()
+  }));
+console.log("TRANSFERS:", transfers);
       const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
       const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
       const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
@@ -665,6 +735,34 @@ html += `
 `;
         }
       }
+const transfersData = obtenerTransferencias(nombreClub);
+
+const htmlTransfers = `
+  <div class="stat-group">
+    <div class="stat-title">🔄 TRANSFERENCIAS</div>
+
+    <ul>
+      ${transfersData.map(t => `
+<li style="display:flex;align-items:center;gap:10px;">
+  
+  <img src="${t.foto}"
+       style="width:41px;height:42px;border-radius:50%;object-fit:cover;">➡️
+  <img src="${
+    t.tipo === "llega"
+      ? "https://globopedia.github.io/Artids/escudos/Huracán.png"
+      : getEscudo(nombreClub)
+  }"
+  style="width:30px;height:30px;object-fit:contain;">
+  <span>
+  ${t.jugador} (${t.fecha})
+  </span>
+
+</li>
+      `).join("")}
+    </ul>
+
+  </div>
+`;
 const htmlGoleadores = `
     <hr style="margin:15px 0; border-color:#FF0000;">
   <div class="stat-group">
@@ -696,7 +794,7 @@ const htmlGoleadores = `
     ${resumenAMISTOSOS}
   `,
   html: html 
-  ? html + htmlGoleadores 
+  ? html + htmlGoleadores + htmlTransfers
   : "<p>Sin datos disponibles</p>",
   ganados,
   empatados,
@@ -738,7 +836,7 @@ const htmlGoleadores = `
 </div>
 <div><b>${p.Club}:</b> ${p.Rival}</div>
                   <div><b>Huracán:</b> ${p.Huracán}</div>
-${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+${ p.Foto1 ? `<div style="margin:6px 0;"><img src="${p.Foto1}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
                 </div>
               `;
@@ -759,7 +857,7 @@ ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" s
 </div>
 <div><b>Huracán:</b> ${p.Huracán}</div>
                   <div><b>${p.Club}:</b> ${p.Rival}</div>
-                ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                ${ p.Foto1 ? `<div style="margin:6px 0;"><img src="${p.Foto1}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
               `;
             }
@@ -972,6 +1070,57 @@ let slicesGlobal = [];
 let datosGlobal = [];
 let hoverIndex = -1;
 
+function obtenerPeriodosJugador(nombreJugador) {
+  try {
+    const partidosJugador = encuentros.filter(p =>
+      p.Huracán && p.Huracán.toLowerCase().includes(nombreJugador.toLowerCase())
+    );
+
+    if (!partidosJugador.length) return [];
+
+    // Ordenamos por fecha
+    const partidosOrdenados = partidosJugador
+      .map(p => ({
+        ...p,
+        fechaObj: parseFecha(p.Fecha)
+      }))
+      .filter(p => p.fechaObj instanceof Date && !isNaN(p.fechaObj))
+      .sort((a, b) => a.fechaObj - b.fechaObj);
+
+    const periodos = [];
+    let inicio = partidosOrdenados[0].fechaObj;
+    let anterior = inicio;
+
+    for (let i = 1; i < partidosOrdenados.length; i++) {
+      const actual = partidosOrdenados[i].fechaObj;
+
+      // Si hay un salto grande (ej: más de 6 meses), cortamos etapa
+      const diffMeses = (actual - anterior) / (1000 * 60 * 60 * 24 * 30);
+
+      if (diffMeses > 6) {
+        periodos.push({
+          primera: inicio,
+          ultima: anterior
+        });
+        inicio = actual;
+      }
+
+      anterior = actual;
+    }
+
+    // último período
+    periodos.push({
+      primera: inicio,
+      ultima: anterior
+    });
+
+    return periodos;
+
+  } catch (err) {
+    console.error("Error en obtenerPeriodosJugador:", nombreJugador, err);
+    return [];
+  }
+}
 function dibujarTorta(ganados, empatados, perdidos) {
   const canvas = document.getElementById("graficoResumen");
   if (!canvas) return;
