@@ -1693,25 +1693,23 @@ Papa.parse(
     }
   }
 );
-Papa.parse(
-  "https://raw.githubusercontent.com/globopedia/Artids/main/Utbolists.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
+fetch("https://artids.vercel.app/api/data?file=utbolists")
+  .then(res => res.json())
+  .then(data => {
 
-      datosUtbolistas = res.data;
+    datosUtbolistas = data;
 
-      datosUtbolistas.forEach(j => {
-        indiceUtbolistas[norm(j["Futbolista"])] = j;
-      });
+    datosUtbolistas.forEach(j => {
+      indiceUtbolistas[norm(j["Futbolista"])] = j;
+    });
 
-      console.log("CSV Utbolists cargado:", datosUtbolistas.length);
-      intentarGenerarRanking();
-    }
-  }
-);
+    console.log("Utbolists desde API:", datosUtbolistas.length);
 
+    intentarGenerarRanking();
+  })
+  .catch(err => {
+    console.error("Error cargando Utbolists desde API:", err);
+  });
 function parseMinuto(valor, fallback = 0) {
   if (!valor || valor === "0") return fallback;
 
