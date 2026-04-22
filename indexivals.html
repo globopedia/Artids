@@ -230,7 +230,6 @@ let debounceTimer;
 
     // Cargar todos los CSVs (clubes y encuentros)
  Promise.all([
-Promise.all([
   fetch(clubesURL).then(r => r.text()),
   fetch(partidosURL).then(r => r.text()),
   fetch(partidosURL2).then(r => r.text()),
