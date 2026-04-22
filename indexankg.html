@@ -1693,23 +1693,25 @@ Papa.parse(
     }
   }
 );
-fetch("https://artids.vercel.app/api/data?file=utbolists")
-  .then(res => res.json())
-  .then(data => {
+Papa.parse(
+  "https://artids.vercel.app/api/data?file=utbolists",
+  {
+    download: true,
+    header: true,
+    complete: res => {
 
-    datosUtbolistas = data;
+      datosUtbolistas = res.data;
 
-    datosUtbolistas.forEach(j => {
-      indiceUtbolistas[norm(j["Futbolista"])] = j;
-    });
+      datosUtbolistas.forEach(j => {
+        indiceUtbolistas[norm(j["Futbolista"])] = j;
+      });
 
-    console.log("Utbolists desde API:", datosUtbolistas.length);
+      console.log("CSV Utbolists cargado:", datosUtbolistas.length);
+      intentarGenerarRanking();
+    }
+  }
+);
 
-    intentarGenerarRanking();
-  })
-  .catch(err => {
-    console.error("Error cargando Utbolists desde API:", err);
-  });
 function parseMinuto(valor, fallback = 0) {
   if (!valor || valor === "0") return fallback;
 
@@ -1831,15 +1833,6 @@ function sonidoClick() {
   audio.play();
 }
 </script>
-<script>
-const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
-clickSound.volume = 0.2;
-
-function sonidoClick() {
-  clickSound.currentTime = 0; // reinicia para clicks rápidos
-  clickSound.play().catch(() => {});
-}
-</script>
   <script>
 const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
 clickSound.volume = 0.3;
@@ -1854,3 +1847,4 @@ document.addEventListener("change", function(e) {
 </script>
 </body>
 </html>
+
