@@ -230,42 +230,16 @@ let debounceTimer;
 
     // Cargar todos los CSVs (clubes y encuentros)
  Promise.all([
-  fetch(clubesURL).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL2).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL3).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL4).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL5).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL6).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(partidosURL7).then(r => r.text()).then(t => {
-    const b = atob(t);
-    return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-  }),
-  fetch(transfersURL).then(r => r.text()).then(t => {
-  const b = atob(t);
-  return new TextDecoder("utf-8").decode(Uint8Array.from(b, c => c.charCodeAt(0)));
-})
+Promise.all([
+  fetch(clubesURL).then(r => r.text()),
+  fetch(partidosURL).then(r => r.text()),
+  fetch(partidosURL2).then(r => r.text()),
+  fetch(partidosURL3).then(r => r.text()),
+  fetch(partidosURL4).then(r => r.text()),
+  fetch(partidosURL5).then(r => r.text()),
+  fetch(partidosURL6).then(r => r.text()),
+  fetch(partidosURL7).then(r => r.text()),
+  fetch(transfersURL).then(r => r.text())
 ])
 
 .then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvTransfers]) => {
