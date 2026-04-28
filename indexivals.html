@@ -209,14 +209,18 @@ if (!periodos.length) return;
       if (t.includes("conmebol")) return "Copa Conmebol";
       if (t.includes("argentina") || t.includes("republica")) return "Copa Argentina";
       if (t.includes("competencia") || t.includes("superliga")) return "Copa Competencia";
+      if (t.includes("honor")) return "Copa de Honor";
       if (t.includes("varela")) return "Campeonato Béccar Varela";
       if (t.includes("supercopa")) return "Supercopa";
       if (t.includes("escobar")) return "Copa Escobar";
       if (t.includes("suecia")) return "Copa Suecia 1958";
-      if (t.includes("centenario")) return "Copa Centenario 1993";
+      if (t.includes("copa centenario")) return "Copa Centenario 1993";
       if (t.includes("maradona")) return "Copa Maradona 2020";
       if (t.includes("b nacional") || t.includes("nacional b") || t.includes("reducido") || t.includes("bn") || t.includes("nb")) return "2° Categoría";
       if (t.includes("campeonato") || t.includes("promocion") || t.includes("torneo") || t.includes("descenso") || t.includes("pre-libertadores")) return "Campeonato de 1° División";
+      if (t.includes("Liga Anglo")) return "Liga Anglo-Argentina";
+      if (t.includes("Liga 43")) return "Liga 43";
+      if (t.includes("centenario 1909")) return "Liga Centenario";
       if (t.includes("amistoso")) return "No oficiales";
       return "Otros"
     }
