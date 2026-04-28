@@ -554,70 +554,78 @@ function calcularPuntosPartido(p, minutos) {
       return "Otros";
     }
 
-Promise.all([
-  fetch(futbolistasURL).then(r => { if(!r.ok) throw new Error("Futbolistas CSV no disponible"); return r.text(); }),
-  fetch(partidosURL).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
-  fetch(partidosURL2).then(r => { if(!r.ok) throw new Error("Partidos CSV 2 no disponible"); return r.text(); }),
-  fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
-  fetch(partidosURL4).then(r => { if(!r.ok) throw new Error("Partidos CSV 4 no disponible"); return r.text(); }),
-  fetch(partidosURL5).then(r => { if(!r.ok) throw new Error("Partidos CSV 5 no disponible"); return r.text(); }),
-  fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); }),
-  fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); })
+const partidosURLs = [
+  partidosURL,
+  partidosURL2,
+  partidosURL3,
+  partidosURL4,
+  partidosURL5,
+  partidosURL6,
+  partidosURL7
+];
+  Promise.all([
+  fetch(futbolistasURL).then(r => {
+    if (!r.ok) throw new Error("Futbolistas CSV no disponible");
+    return r.text();
+  }),
+  ...partidosURLs.map((url, i) =>
+    fetch(url).then(r => {
+      if (!r.ok) throw new Error(`Partidos CSV ${i + 1} no disponible`);
+      return r.text();
+    })
+  )
 ])
-.then(([csvFutbolistas, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7]) => {
-      
-    futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
-        id: (c.ID ?? "").toString().trim(),
-        futbolista: (c["Futbolista"] ?? "").toString().trim(),
-        nombre: (c.Nombre ?? "").toString().trim(),
-        posicion: (c.Posición ?? "").toString().trim(),
-        fechanac: (c.FechaNac?? "").toString().trim(),
-        lugarnac: (c.LugarNac?? "").toString().trim(),
-        pais: (c.País ?? c.Pais ?? "").toString().trim(),
-        fechamuerte: (c.FechaMuerte ?? "").toString().trim(),
-        lugarmuerte: (c.LugarMuerte ?? "").toString().trim(),
-        peso: (c.Peso ?? "").toString().trim(),
-        altura: (c.Altura ?? "").toString().trim(),
-        procedencia: (c.Procedencia ?? "").toString().trim(),
-        destino: (c.Destino ?? "").toString().trim(),
-        trayectoria: (c.Trayectoria ?? "").toString().trim(),
-        biografía: (c.Biografía ?? "").toString().trim(),
-        foto1: (c.Foto1 ?? "").toString().trim(),
-        foto2: (c.Foto2 ?? "").toString().trim()
-      }));
+.then(([csvFutbolistas, ...csvPartidos]) => {
 
-     const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
-     const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
-     const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
-     const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
-     const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
-     const partidos7 = Papa.parse(csvPartidos7, { header:true, skipEmptyLines:true }).data;
+  futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
+    id: (c.ID ?? "").toString().trim(),
+    futbolista: (c["Futbolista"] ?? "").toString().trim(),
+    nombre: (c.Nombre ?? "").toString().trim(),
+    posicion: (c.Posición ?? "").toString().trim(),
+    fechanac: (c.FechaNac?? "").toString().trim(),
+    lugarnac: (c.LugarNac?? "").toString().trim(),
+    pais: (c.País ?? c.Pais ?? "").toString().trim(),
+    fechamuerte: (c.FechaMuerte ?? "").toString().trim(),
+    lugarmuerte: (c.LugarMuerte ?? "").toString().trim(),
+    peso: (c.Peso ?? "").toString().trim(),
+    altura: (c.Altura ?? "").toString().trim(),
+    procedencia: (c.Procedencia ?? "").toString().trim(),
+    destino: (c.Destino ?? "").toString().trim(),
+    trayectoria: (c.Trayectoria ?? "").toString().trim(),
+    biografía: (c.Biografía ?? "").toString().trim(),
+    foto1: (c.Foto1 ?? "").toString().trim(),
+    foto2: (c.Foto2 ?? "").toString().trim()
+  }));
 
-encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7].map(p => ({
-        Fecha: (p.Fecha ?? "").trim(),
-        Técnico: (p.Técnico ?? "").trim(),
-        Condición: (p.Condición ?? "").trim(),
-        Situación: (p.Situación ?? "").trim(),
-        Resultado1: (p.Resultado1 ?? "").trim(),
-        Resultado2: (p.Resultado2 ?? "").trim(),
-        Club: (p.Club ?? "").trim(),
-        Torneo: (p.Torneo ?? "").trim(),
-        Estadio: (p.Estadio ?? "").trim(),
-        Árbitro: (p.Árbitro ?? "").trim(),
-        Huracán: (p.Huracán ?? "").trim(),
-        Rival: (p.Rival ?? "").trim(),
-        Foto: (p.Foto ?? "").trim(),
-        Incidencias: (p.Incidencias ?? "").trim(),
-        Fin1T: (p.Fin1T ?? "").trim(),
-        Fin2T: (p.Fin2T ?? "").trim(),
-        Fin1E: (p.Fin1E ?? "").trim(),
-        Fin2E: (p.Fin2E ?? "").trim()
-      }));
+  const partidosParseados = csvPartidos.map(csv =>
+    Papa.parse(csv, { header: true, skipEmptyLines: true }).data
+  );
 
-      llenarSelectFutbolistas();
-    });
+  encuentros = partidosParseados
+    .flat()
+    .map(p => ({
+      Fecha: (p.Fecha ?? "").trim(),
+      Técnico: (p.Técnico ?? "").trim(),
+      Condición: (p.Condición ?? "").trim(),
+      Situación: (p.Situación ?? "").trim(),
+      Resultado1: (p.Resultado1 ?? "").trim(),
+      Resultado2: (p.Resultado2 ?? "").trim(),
+      Club: (p.Club ?? "").trim(),
+      Torneo: (p.Torneo ?? "").trim(),
+      Estadio: (p.Estadio ?? "").trim(),
+      Árbitro: (p.Árbitro ?? "").trim(),
+      Huracán: (p.Huracán ?? "").trim(),
+      Rival: (p.Rival ?? "").trim(),
+      Foto: (p.Foto ?? "").trim(),
+      Incidencias: (p.Incidencias ?? "").trim(),
+      Fin1T: (p.Fin1T ?? "").trim(),
+      Fin2T: (p.Fin2T ?? "").trim(),
+      Fin1E: (p.Fin1E ?? "").trim(),
+      Fin2E: (p.Fin2E ?? "").trim()
+    }));
 
+  llenarSelectFutbolistas();
+});
     function llenarSelectFutbolistas() {
       const sel = document.getElementById("futbolistaSelect");
       sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
