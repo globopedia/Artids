@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     artids1970: { repo: "Artids", path: "Artids1970.csv" },
     artids1985: { repo: "Artids", path: "Artids1985.csv" },
     artids2000: { repo: "Artids", path: "Artids2000.csv" },
-    artids2015: { repo: "Artids", path: "Artids2015.csv" }
+    artids2015: { repo: "Artids", path: "Artids2015.csv" },
   };
 
   if (!archivos[file]) {
