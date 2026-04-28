@@ -79,14 +79,14 @@
   <div id="futbolistaInfo" class="club-card" style="display:none;"></div>
 
   <script>
-    const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolists";
-const partidosURL = "https://artids.vercel.app/api/data?file=artids1925";
-const partidosURL2 = "https://artids.vercel.app/api/data?file=artids1940";
-const partidosURL3 = "https://artids.vercel.app/api/data?file=artids1955";
-const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1970";
-const partidosURL5 = "https://artids.vercel.app/api/data?file=artids1985";
-const partidosURL6 = "https://artids.vercel.app/api/data?file=artids2000";
-const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2015";
+  const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolists";
+  const partidosURL = "https://artids.vercel.app/api/data?file=artids1925";
+  const partidosURL2 = "https://artids.vercel.app/api/data?file=artids1940";
+  const partidosURL3 = "https://artids.vercel.app/api/data?file=artids1955";
+  const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1970";
+  const partidosURL5 = "https://artids.vercel.app/api/data?file=artids1985";
+  const partidosURL6 = "https://artids.vercel.app/api/data?file=artids2000";
+  const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2015";
 
     let futbolistas = [];
     let encuentros = [];
@@ -561,9 +561,10 @@ Promise.all([
   fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
   fetch(partidosURL4).then(r => { if(!r.ok) throw new Error("Partidos CSV 4 no disponible"); return r.text(); }),
   fetch(partidosURL5).then(r => { if(!r.ok) throw new Error("Partidos CSV 5 no disponible"); return r.text(); }),
-  fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); })
+  fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); }),
+  fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); })
 ])
-.then(([csvFutbolistas, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6]) => {
+.then(([csvFutbolistas, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7]) => {
       
     futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
         id: (c.ID ?? "").toString().trim(),
@@ -591,8 +592,9 @@ Promise.all([
      const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
      const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
      const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
+     const partidos7 = Papa.parse(csvPartidos7, { header:true, skipEmptyLines:true }).data;
 
-encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6].map(p => ({
+encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7].map(p => ({
         Fecha: (p.Fecha ?? "").trim(),
         Técnico: (p.Técnico ?? "").trim(),
         Condición: (p.Condición ?? "").trim(),
