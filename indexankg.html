@@ -1499,18 +1499,15 @@ function aplicarFiltroPosicion() {
 }
 
 function cambiarEstadistica() {
-
   const seleccion = document.getElementById("selectorEstadistica").value;
-
-  ordenarPor(seleccion);
-
-  cambiarColumnas();
-
+  // 🔥 actualizar criterio global
+  ordenActual.campo = seleccion;
+  // 🔥 reaplicar filtros ya ordenados
+  aplicarFiltrosLivianos();
 }
+    
 function cambiarColumnas() {
-
-  const seleccion = document.getElementById("selectorEstadistica").value;
-
+ const seleccion = document.getElementById("selectorEstadistica").value;
  const mapaColumnas = {
   partidos: 3,
   goles: 4,
