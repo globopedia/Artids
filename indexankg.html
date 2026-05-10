@@ -1477,15 +1477,7 @@ function renderRanking(ranking) {
     cambiarColumnas();
 }
 
-function ordenarPor(campo) {
-  ordenActual.campo = campo;
-  ordenActual.asc = false;
-  rankingActual.sort((a, b) => b[campo] - a[campo]);
-  aplicarFiltroPosicion(); // 🔥 SOLO esto
-}
-
 function aplicarFiltroPosicion() {
-
   const seleccionadas = new Set(
     [...document.querySelectorAll("#filtroPosiciones input:checked")]
       .map(cb => cb.value)
