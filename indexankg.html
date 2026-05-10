@@ -343,10 +343,9 @@ if (soloInferiores) {
 aplicarFiltrosLivianos();
 cambiarColumnas(); // 🔥 MUY IMPORTANTE
 }
+function aplicarFiltrosLivianos() {
 
- ranking = ranking.filter(j =>
-    posicionesActivas.has(j.posicion)
-  );
+  let ranking = [...rankingBase];
 
   // 🌍 EXTRANJEROS
   if (document.getElementById("soloExtranjeros").checked) {
@@ -358,7 +357,7 @@ cambiarColumnas(); // 🔥 MUY IMPORTANTE
     ranking = ranking.filter(j => esDeInferiores(j.nombre));
   }
 
-  // 🔥 ORDENAR OTRA VEZ
+  // 🔥 REORDENAR
   ranking.sort((a, b) =>
     b[ordenActual.campo] - a[ordenActual.campo]
   );
@@ -367,7 +366,7 @@ cambiarColumnas(); // 🔥 MUY IMPORTANTE
 
   renderRanking(rankingActual);
 }
-
+    
 /* =========================
    FUNCIONES BASE
 ========================= */
