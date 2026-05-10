@@ -292,7 +292,7 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
         Árbitro: (p.Árbitro ?? "").trim(),
         Huracán: (p.Huracán ?? "").trim(),
         Rival: (p.Rival ?? "").trim(),
-        Foto: (p.Foto ?? "").trim(),
+        FotoB: (p.FotoB ?? "").trim(),
         Incidencias: (p.Incidencias ?? "").trim()
       }));
 
@@ -813,7 +813,7 @@ const htmlGoleadores = `
 </div>
 <div><b>${p.Club}:</b> ${p.Rival}</div>
                   <div><b>Huracán:</b> ${p.Huracán}</div>
-${ p.Foto1 ? `<div style="margin:6px 0;"><img src="${p.Foto1}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
                 </div>
               `;
@@ -834,7 +834,7 @@ ${ p.Foto1 ? `<div style="margin:6px 0;"><img src="${p.Foto1}" alt="Incidencias"
 </div>
 <div><b>Huracán:</b> ${p.Huracán}</div>
                   <div><b>${p.Club}:</b> ${p.Rival}</div>
-                ${ p.Foto1 ? `<div style="margin:6px 0;"><img src="${p.Foto1}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
               `;
             }
