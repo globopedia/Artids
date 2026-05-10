@@ -344,17 +344,7 @@ aplicarFiltrosLivianos();
 cambiarColumnas(); // 🔥 MUY IMPORTANTE
 }
 
-function aplicarFiltrosLivianos() {
-
-  let ranking = [...rankingBase];
-
-  // 🧍 POSICIONES
-  const posicionesActivas = new Set(
-    [...document.querySelectorAll('#filtroPosiciones input:checked')]
-      .map(c => c.value)
-  );
-
-  ranking = ranking.filter(j =>
+ ranking = ranking.filter(j =>
     posicionesActivas.has(j.posicion)
   );
 
@@ -367,6 +357,11 @@ function aplicarFiltrosLivianos() {
   if (document.getElementById("soloInferiores").checked) {
     ranking = ranking.filter(j => esDeInferiores(j.nombre));
   }
+
+  // 🔥 ORDENAR OTRA VEZ
+  ranking.sort((a, b) =>
+    b[ordenActual.campo] - a[ordenActual.campo]
+  );
 
   rankingActual = ranking;
 
