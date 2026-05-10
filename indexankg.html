@@ -185,7 +185,7 @@ html, body {
 <div style="text-align:center; margin-bottom:10px;">
   <img src="https://raw.githubusercontent.com/globopedia/Artids/main/logo_globopedia.png"
        style="height:80px; margin-bottom:10px;">
-  <h2 style="margin:0;">📊 Rendimiento de Futbolistas 2000-2026</h2>
+  <h2 style="margin:0;">📊 Rendimiento de Futbolistas 2000-2025</h2>
 </div>
 
 <div style="text-align:center; margin:15px 0;">
@@ -200,16 +200,18 @@ Hasta: <input type="date" id="fechaHasta">
   <option value="TODOS">Todos</option>
   <option value="LIBERTADORES">Copa Libertadores</option>
   <option value="SUDAMERICANA">Copa Sudamericana</option>
+  <option value="CONMEBOL">Copa Conmebol</option>
   <option value="CAMPEONATO">Campeonato</option>
   <option value="COPA ARGENTINA">Copa Argentina</option>
   <option value="COPA SUPERLIGA">Copa Superliga</option>
-  <option value="COPA MARADONA">Copa Maradona</option>
+  <option value="COPA CENTENARIO">Copa Centenario 1993</option>
+  <option value="COPA MARADONA">Copa Maradona 2020</option>
   <option value="SUPERCOPA">Supercopa</option>
   <option value="B NACIONAL">B Nacional</option>
   <option value="AMISTOSO">Amistosos</option>
 </select>
 
-<div id="filtroPosiciones" style="text-align:center; margin-bottom:8px;">
+<div id="filtroPosiciones" style="text-align:center; margin-bottom:13px;">
   <label><input type="checkbox" value="Arquero" checked onchange="aplicarFiltros()"><span>ARQUERO</span></label></br>
   <label><input type="checkbox" value="Lateral derecho" checked onchange="aplicarFiltros()"><span>LATERAL DER</span></label>
   <label><input type="checkbox" value="Defensor central" checked onchange="aplicarFiltros()"><span>ZAGUERO</span></label>
@@ -268,8 +270,10 @@ function clasificarTorneo(torneo) {
 
   if (t.includes("libertadores")) return "LIBERTADORES";
   if (t.includes("sudamericana")) return "SUDAMERICANA";
+  if (t.includes("conmebol")) return "CONMEBOL";
   if (t.includes("copa argentina")) return "COPA ARGENTINA";
   if (t.includes("superliga")) return "COPA SUPERLIGA";
+  if (t.includes("copa centenario")) return "COPA CENTENARIO";
   if (t.includes("maradona")) return "COPA MARADONA";
   if (t.includes("supercopa")) return "SUPERCOPA";
   if (t.includes("amistoso")) return "AMISTOSO";
