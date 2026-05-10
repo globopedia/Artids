@@ -229,13 +229,13 @@ Hasta: <input type="date" id="fechaHasta">
   
 <div style="text-align:center; margin-bottom:15px;">
 <label class="led-label">
-  <input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltros()">
+  <input type="checkbox" id="soloExtranjeros" onchange="aplicarFiltrosLivianos()">
   <span class="led-ui"></span>
   <span>SÓLO EXTRANJEROS</span>
 </label>
 
 <label class="led-label">
-  <input type="checkbox" id="soloInferiores" onchange="aplicarFiltros()">
+  <input type="checkbox" id="soloInferiores" onchange="aplicarFiltrosLivianos()">
   <span class="led-ui"></span>
   <span>SÓLO INFERIORES</span>
 </label>
@@ -260,6 +260,7 @@ Hasta: <input type="date" id="fechaHasta">
 
   <script>
 let rankingActual = [];
+let rankingBase = [];
 let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
 
@@ -338,10 +339,38 @@ if (soloInferiores) {
     b[ordenActual.campo] - a[ordenActual.campo]
   );
 
+  rankingBase = ranking;
+aplicarFiltrosLivianos();
+cambiarColumnas(); // 🔥 MUY IMPORTANTE
+}
+
+function aplicarFiltrosLivianos() {
+
+  let ranking = [...rankingBase];
+
+  // 🧍 POSICIONES
+  const posicionesActivas = new Set(
+    [...document.querySelectorAll('#filtroPosiciones input:checked')]
+      .map(c => c.value)
+  );
+
+  ranking = ranking.filter(j =>
+    posicionesActivas.has(j.posicion)
+  );
+
+  // 🌍 EXTRANJEROS
+  if (document.getElementById("soloExtranjeros").checked) {
+    ranking = ranking.filter(j => esExtranjero(j.nombre));
+  }
+
+  // 🏠 INFERIORES
+  if (document.getElementById("soloInferiores").checked) {
+    ranking = ranking.filter(j => esDeInferiores(j.nombre));
+  }
+
   rankingActual = ranking;
 
- renderRanking(rankingActual);
-cambiarColumnas(); // 🔥 MUY IMPORTANTE
+  renderRanking(rankingActual);
 }
 
 /* =========================
@@ -977,7 +1006,7 @@ const CLASICOS = [
   { club: "Huracán (Tres Arroyos)", desde: "2004-01", hasta: "2004-12" },
   { club: "Tiro Federal (Rosario)", desde: "2004-07", hasta: "2005-06" },
   { club: "Gimnasia (Jujuy)", desde: "2005-01", hasta: "2005-12" },
-  { club: "CAI (Cro. Rivadavia)", desde: "2005-01", hasta: "2005-12" },
+  { club: "CAI (Comodoro)", desde: "2005-01", hasta: "2005-12" },
   { club: "Atl. Rafaela", desde: "2005-01", hasta: "2005-12" },
   { club: "Godoy Cruz (Mendoza)", desde: "2005-07", hasta: "2006-06" },
   { club: "Godoy Cruz (Mendoza)", desde: "2010-07", hasta: "2011-12" },
@@ -1606,10 +1635,9 @@ function convertirFecha(fechaStr) {
 
   return new Date(anio, mes, dia);
 }
-  document.querySelectorAll("#filtroPosiciones input[type='checkbox']")
-
+ document.querySelectorAll("#filtroPosiciones input[type='checkbox']")
   .forEach(cb => {
-    cb.addEventListener("change", aplicarFiltroPosicion);
+    cb.addEventListener("change", aplicarFiltrosLivianos);
   });
 
 Papa.parse(
