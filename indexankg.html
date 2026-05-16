@@ -203,15 +203,15 @@ Hasta: <input type="date" id="fechaHasta">
   <option value="CONMEBOL">Copa Conmebol</option>
   <option value="CAMPEONATO">Campeonato</option>
   <option value="COPA ARGENTINA">Copa Argentina</option>
-  <option value="COPA COMPETENCIA">Copa Competencia</option>
+  <option value="SUPERCOPA">Supercopa</option>
   <option value="BÉCCAR VARELA">Béccar Varela</option>
-  <option value="COPA DE HONOR">Copa de Honor</option>
   <option value="COPA SUPERLIGA">Copa Superliga</option>
+  <option value="COPA COMPETENCIA">Copa Competencia</option>
+  <option value="COPA DE HONOR">Copa de Honor</option>
   <option value="ESTÍMULO 1920">Estímulo 1920</option>
   <option value="ESTÍMULO 1926">Estímulo 1926</option>
   <option value="COPA CENTENARIO">Copa Centenario 1993</option>
   <option value="COPA MARADONA">Maradona 2020</option>
-  <option value="SUPERCOPA">Supercopa</option>
   <option value="ESCOBAR">Copa Escobar</option>
   <option value="B NACIONAL">B Nacional</option>
   <option value="AMISTOSO">Amistosos</option>
@@ -279,11 +279,14 @@ function clasificarTorneo(torneo) {
   if (t.includes("sudamericana")) return "SUDAMERICANA";
   if (t.includes("conmebol")) return "CONMEBOL";
   if (t.includes("copa argentina")) return "COPA ARGENTINA";
-  if (t.includes("competencia")) return "COPA COMPETENCIA";
-  if (t.includes("superliga")) return "COPA SUPERLIGA";
+  if (t.includes("beccar varela")) return "BÉCCAR VARELA";
+  if (t.includes("copa de honor")) return "COPA DE HONOR";
+  if (t.includes("estimulo 1920")) return "ESTÍMULO 1920";
+  if (t.includes("estimulo 1926")) return "ESTÍMULO 1926";
   if (t.includes("copa centenario")) return "COPA CENTENARIO";
   if (t.includes("maradona")) return "COPA MARADONA";
   if (t.includes("supercopa")) return "SUPERCOPA";
+  if (t.includes("escobar")) return "COPA ESCOBAR";
   if (t.includes("amistoso")) return "AMISTOSO";
 
   if (
@@ -294,11 +297,14 @@ function clasificarTorneo(torneo) {
     t.includes("reducido")
   ) return "B NACIONAL";
 
+  if (t.includes("competencia")) return "COPA COMPETENCIA";
+  if (t.includes("superliga")) return "COPA SUPERLIGA";
   if (t.includes("campeonato")) return "CAMPEONATO";
 
   return "OTRO";
 }
-function aplicarFiltros() {
+
+  function aplicarFiltros() {
   let partidos = [...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
 
   // 📅 FILTRO FECHA
