@@ -203,7 +203,8 @@ Hasta: <input type="date" id="fechaHasta">
   <option value="CONMEBOL">Copa Conmebol</option>
   <option value="CAMPEONATO">Campeonato</option>
   <option value="COPA ARGENTINA">Copa Argentina</option>
-  <option value="COPA COMPETENCIA-SUPERLIGA">Copa Superliga</option>
+  <option value="COPA COMPETENCIA">Copa Competencia-Superliga</option>
+  <option value="COPA SUPERLIGA">Copa Competencia-Superliga</option>
   <option value="COPA CENTENARIO">Copa Centenario 1993</option>
   <option value="COPA MARADONA">Copa Maradona 2020</option>
   <option value="SUPERCOPA">Supercopa</option>
@@ -273,7 +274,8 @@ function clasificarTorneo(torneo) {
   if (t.includes("sudamericana")) return "SUDAMERICANA";
   if (t.includes("conmebol")) return "CONMEBOL";
   if (t.includes("copa argentina")) return "COPA ARGENTINA";
-  if (t.includes("superliga") || ("competencia")) return "COPA COMPETENCIA-SUPERLIGA";
+  if (t.includes("competencia")) return "COPA COMPETENCIA";
+  if (t.includes("superliga")) return "COPA SUPERLIGA";
   if (t.includes("copa centenario")) return "COPA CENTENARIO";
   if (t.includes("maradona")) return "COPA MARADONA";
   if (t.includes("supercopa")) return "SUPERCOPA";
