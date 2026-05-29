@@ -218,19 +218,19 @@ Hasta: <input type="date" id="fechaHasta">
 </select>
 
 <div id="filtroPosiciones" style="text-align:center; margin-bottom:13px;">
-  <label><input type="checkbox" value="Arquero" checked <span>ARQUERO</span></label></br>
-  <label><input type="checkbox" value="Lateral derecho" checked <span>LATERAL DER</span></label>
-  <label><input type="checkbox" value="Defensor central" checked <span>ZAGUERO</span></label>
-  <label><input type="checkbox" value="Lateral izquierdo" checked <span>LATERAL IZQ</span></label></br>
-  <label><input type="checkbox" value="Volante derecho" checked <span>VOLANTE DER</span></label>
-  <label><input type="checkbox" value="Volante central" checked <span>VOLANTE CEN</span></label>
-  <label><input type="checkbox" value="Volante izquierdo" checked <span>VOLANTE IZQ</span></label></br>
-  <label><input type="checkbox" value="Extremo derecho" checked <span>EXTREMO DER</span></label>
-  <label><input type="checkbox" value="Enganche" checked <span>ENGANCHE</span></label>
-  <label><input type="checkbox" value="Extremo izquierdo" checked <span>EXTREMO IZQ</span></label></br>
-  <label><input type="checkbox" value="Wing derecho" checked <span>WING DER</span></label>
-  <label><input type="checkbox" value="Delantero" checked <span>PUNTERO</span></label>
-  <label><input type="checkbox" value="Wing izquierdo" checked <span>WING IZQ</span></label>
+  <label><input type="checkbox" value="Arquero" checked><span>ARQUERO</span></label></br>
+  <label><input type="checkbox" value="Lateral derecho" checked><span>LATERAL DER</span></label>
+  <label><input type="checkbox" value="Defensor central" checked><span>ZAGUERO</span></label>
+  <label><input type="checkbox" value="Lateral izquierdo" checked><span>LATERAL IZQ</span></label></br>
+  <label><input type="checkbox" value="Volante derecho" checked><span>VOLANTE DER</span></label>
+  <label><input type="checkbox" value="Volante central" checked><span>VOLANTE CEN</span></label>
+  <label><input type="checkbox" value="Volante izquierdo" checked><span>VOLANTE IZQ</span></label></br>
+  <label><input type="checkbox" value="Extremo derecho" checked><span>EXTREMO DER</span></label>
+  <label><input type="checkbox" value="Enganche" checked><span>ENGANCHE</span></label>
+  <label><input type="checkbox" value="Extremo izquierdo" checked><span>EXTREMO IZQ</span></label></br>
+  <label><input type="checkbox" value="Wing derecho" checked><span>WING DER</span></label>
+  <label><input type="checkbox" value="Delantero" checked><span>PUNTERO</span></label>
+  <label><input type="checkbox" value="Wing izquierdo" checked><span>WING IZQ</span></label>
 </div>
   
 <div style="text-align:center; margin-bottom:15px;">
@@ -1828,6 +1828,9 @@ function cambiarFiltroTorneo(valor) {
   filtroTorneo = valor;
   aplicarFiltros();
 }
+document.querySelectorAll('#filtroPosiciones input').forEach(chk => {
+chk.addEventListener('change', aplicarFiltros);
+});
 </script>
 <script>
 function enviarAltura() {
