@@ -328,14 +328,6 @@ function clasificarTorneo(torneo) {
   // 📊 GENERAR RANKING
   let ranking = generarRanking(partidos);
 
-  // 🧍 FILTRO POSICIONES
-  const posicionesActivas = Array.from(
-    document.querySelectorAll('#filtroPosiciones input:checked')
-  ).map(c => c.value);
-
-  ranking = ranking.filter(j =>
-    posicionesActivas.includes(j.posicion)
-  );
 // 🌍 FILTRO EXTRANJEROS
 const soloExtranjeros = document.getElementById("soloExtranjeros").checked;
 if (soloExtranjeros) {
@@ -360,6 +352,15 @@ function aplicarFiltrosLivianos() {
 
   let ranking = [...rankingBase];
 
+  // 🧍 FILTRO POSICIONES
+  const posicionesActivas = Array.from(
+    document.querySelectorAll('#filtroPosiciones input:checked')
+  ).map(c => c.value);
+
+  ranking = ranking.filter(j =>
+    posicionesActivas.includes(j.posicion)
+  );
+  
   // 🌍 EXTRANJEROS
   if (document.getElementById("soloExtranjeros").checked) {
     ranking = ranking.filter(j => esExtranjero(j.nombre));
@@ -1829,7 +1830,7 @@ function cambiarFiltroTorneo(valor) {
   aplicarFiltros();
 }
 document.querySelectorAll('#filtroPosiciones input').forEach(chk => {
-chk.addEventListener('change', aplicarFiltros);
+  chk.addEventListener('change', aplicarFiltrosLivianos);
 });
 </script>
 <script>
