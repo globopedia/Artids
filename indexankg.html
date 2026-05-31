@@ -218,19 +218,19 @@ Hasta: <input type="date" id="fechaHasta">
 </select>
 
 <div id="filtroPosiciones" style="text-align:center; margin-bottom:13px;">
-  <label><input type="checkbox" value="Arquero" checked><span>ARQUERO</span></label></br>
-  <label><input type="checkbox" value="Lateral derecho" checked><span>LATERAL DER</span></label>
-  <label><input type="checkbox" value="Defensor central" checked><span>ZAGUERO</span></label>
-  <label><input type="checkbox" value="Lateral izquierdo" checked><span>LATERAL IZQ</span></label></br>
-  <label><input type="checkbox" value="Volante derecho" checked><span>VOLANTE DER</span></label>
-  <label><input type="checkbox" value="Volante central" checked><span>VOLANTE CEN</span></label>
-  <label><input type="checkbox" value="Volante izquierdo" checked><span>VOLANTE IZQ</span></label></br>
-  <label><input type="checkbox" value="Extremo derecho" checked><span>EXTREMO DER</span></label>
-  <label><input type="checkbox" value="Enganche" checked><span>ENGANCHE</span></label>
-  <label><input type="checkbox" value="Extremo izquierdo" checked><span>EXTREMO IZQ</span></label></br>
-  <label><input type="checkbox" value="Wing derecho" checked><span>WING DER</span></label>
-  <label><input type="checkbox" value="Delantero" checked><span>PUNTERO</span></label>
   <label><input type="checkbox" value="Wing izquierdo" checked><span>WING IZQ</span></label>
+  <label><input type="checkbox" value="Delantero" checked><span>PUNTERO</span></label>
+  <label><input type="checkbox" value="Wing derecho" checked><span>WING DER</span></label></br>
+  <label><input type="checkbox" value="Extremo izquierdo" checked><span>EXTREMO IZQ</span></label>
+  <label><input type="checkbox" value="Enganche" checked><span>ENGANCHE</span></label>
+  <label><input type="checkbox" value="Extremo derecho" checked><span>EXTREMO DER</span></label></br>
+  <label><input type="checkbox" value="Volante izquierdo" checked><span>VOLANTE IZQ</span></label>
+  <label><input type="checkbox" value="Volante central" checked><span>VOLANTE CEN</span></label>
+  <label><input type="checkbox" value="Volante derecho" checked><span>VOLANTE DER</span></label></br>
+  <label><input type="checkbox" value="Lateral izquierdo" checked><span>LATERAL IZQ</span></label>
+  <label><input type="checkbox" value="Defensor central" checked><span>ZAGUERO</span></label>
+  <label><input type="checkbox" value="Lateral derecho" checked><span>LATERAL DER</span></label></br>
+  <label><input type="checkbox" value="Arquero" checked><span>ARQUERO</span></label>
 </div>
   
 <div style="text-align:center; margin-bottom:15px;">
@@ -305,7 +305,7 @@ function clasificarTorneo(torneo) {
 }
 
   function aplicarFiltros() {
-  let partidos = [...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
+  let partidos = [...datosArtids1910, ...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
 
   // 📅 FILTRO FECHA
   const desde = document.getElementById("fechaDesde").value;
@@ -1580,6 +1580,7 @@ function construirPeriodos(anios){
    CARGA DEL CSV
 ========================= */
 
+let datosArtids1910 = null;
 let datosArtids1925 = null;
 let datosArtids1940 = null;
 let datosArtids1955 = null;
@@ -1592,7 +1593,7 @@ let indiceUtbolistas = {};
 let estadisticasJugadores = {};
 
 function intentarGenerarRanking() {
-  if (!datosArtids1925 || !datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
+  if (!datosArtids1910 || !datosArtids1925 || !datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
 
   ordenActual = { campo: "globopedia", asc: true };
 
@@ -1603,7 +1604,7 @@ function generarRankingPorFecha() {
   const desdeValor = document.getElementById("fechaDesde").value;
   const hastaValor = document.getElementById("fechaHasta").value;
 
-  const todosLosPartidos = [...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
+  const todosLosPartidos = [...datosArtids1910, ...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
 
   const desde = desdeValor ? new Date(desdeValor) : new Date("1900-01-01");
   const hasta = hastaValor ? new Date(hastaValor) : new Date();
@@ -1637,6 +1638,19 @@ function convertirFecha(fechaStr) {
   .forEach(cb => {
     cb.addEventListener("change", aplicarFiltrosLivianos);
   });
+
+Papa.parse(
+  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1910.csv",
+  {
+    download: true,
+    header: true,
+    complete: res => {
+      datosArtids1910 = res.data;
+      console.log("CSV Artids1910 cargado:", datosArtids1910.length);
+      intentarGenerarRanking();
+    }
+  }
+);
 
 Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1925.csv",
