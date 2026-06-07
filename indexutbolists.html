@@ -117,7 +117,7 @@
                                 "Despedida de Marcelinho Carioca 2010","Clausura 2010","Apertura 2010","Clausura 2011","Desempate Descenso 2011","Campeonato B Nacional 2011/12","Copa Argentina 2012","Copa de Clásicos 2012","Campeonato B Nacional 2012/13","Copa Argentina 2013","Campeonato B Nacional 2013/14","Desempate 3° Ascenso BN 2013/14","Copa Argentina 2014","Desempate 3° Ascenso BN 2013/14","Campeonato B Nacional 2014","Desempate 5° Puesto NB 2014",
                                 "Copa Libertadores 2015","Campeonato 2015","Supercopa 2015","Copa Argentina 2015","Copa Sudamericana 2015","Copa Ciudad de Buenos Aires 2016","Copa Libertadores 2016","Campeonato 2016","Copa Argentina 2016","Campeonato 2016/17","Copa Sudamericana 2017","Copa Argentina 2017","Superliga 2017/18","Copa Schneider 2018","Copa Argentina 2018","Superliga 2018/19","Copa Libertadores 2019","Copa Superliga 2019","Copa Argentina 2019","Superliga 2019/20",
                                 "Copa San Juan 2020","Copa Sudamericana 2020","Copa Superliga 2020","Copa Maradona 2020","Copa-LPF 2021","Copa Argentina 2020","Torneo-LPF 2021","Amistosos 2022","Copa-LPF 2022","Copa Argentina 2022","Torneo-LPF 2022","Torneo-LPF 2023","Copa Argentina 2023","Copa Libertadores 2023","Copa Sudamericana 2023","Copa-LPF 2023","Copa Agustín Peña 2024","Serie Río de la Plata 2024","Copa-LPF 2024","Copa Argentina 2024","Torneo-LPF 2024",
-                                "Serie Río de la Plata 2025","Apertura-LPF 2025","Copa Argentina 2025","Copa Sudamericana 2025","Clausura-LPF 2025","Amistosos","Otros"];
+                                "Serie Río de la Plata 2025","Apertura-LPF 2025","Copa Argentina 2025","Copa Sudamericana 2025","Clausura-LPF 2025","Apertura-LPF 2026","Clausura-LPF 2026","Amistosos","Otros"];
 
     const CONDICIONES = ["Local","Neutral","Visitante"];
     const SITUACIONES = ["Victoria","Empate","Derrota"];
@@ -574,7 +574,7 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("libertadores 2023")) return "Copa Libertadores 2023";
       if (t.includes("sudamericana 2023")) return "Copa Sudamericana 2023";
       if (t.includes("copa-lpf 2023")) return "Copa-LPF 2023";
-      if (t.includes("peña 2024")) return "Copa Agustín Peña 2024";
+      if (t.includes("copa agustin")) return "Copa Agustín Peña 2024";
       if (t.includes("plata 2024")) return "Serie Río de la Plata 2024";
       if (t.includes("copa-lpf 2024")) return "Copa-LPF 2024";
       if (t.includes("copa argentina 2024")) return "Copa Argentina 2024";
@@ -584,6 +584,8 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("copa argentina 2025")) return "Copa Argentina 2025";
       if (t.includes("sudamericana 2025")) return "Copa Sudamericana 2025";
       if (t.includes("clausura-lpf 2025")) return "Clausura-LPF 2025";
+      if (t.includes("apertura-lpf 2026")) return "Apertura-LPF 2026";
+      if (t.includes("clausura-lpf 2026")) return "Clausura-LPF 2026";
       return "Otros";
     }
 
