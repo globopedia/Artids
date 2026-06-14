@@ -1205,10 +1205,12 @@ function getResumenCarrera(nombreFutbolista) {
     function renderIncidencias(texto) {
       if (!texto) return "";
       return texto
-        .replace(/GOL/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgi3GyVjBR-e_IN4mWVAuZofChVOj763GApXwzanoEJDUTysF1K9gf3N5qBCoDJ-ahi8wRkrZ3FCbl0ovTEjXyjFjFEWYF1MZ7YvHrq0bD5eQ7GsJPOkpLSC-k4zpZ1CbnyKVtoYlb6JWXByKkd0VAHuN1hy8P9LBz2fhn5e3Um_X-m4U9WLo9pQP428Fj4/s320/GolR.png' style='width:20px;height:20px;'>")
-        .replace(/EXP/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgx8a6PCkGhKR9WTnh2NNWLMBDOIKWsNisSChpxN2NayjM5Z6YBIZmv52PvduZawIBBh_g5Pq56LdvjG8X1gSCud2q6NYS_NGOh7nAPaxUy_nC1YCcZJOgy2DeTZPRkqRgb1_HbpJshh-7o3MoW8Z3h8tBa8UZ153n5CzriOyvsSIxM6FsCbn-n115KC5Ln/s320/Roja.png' style='width:20px;height:20px;'>")
-        .replace(/ATA/g, "<img src='https://blogger.googleusercontent.com/img/a/AVvXsEjygOwijhQ1dRIh6BPFrQu7EKOUShS0RLEVmPhCJSANGWOaNzvVmcbV03ZW0ZF5Npefl5r3P8iU6WjXRaSL80QYazspsJ4-nzA8pv4FqBwgu1Jr0wDw2iEPMvnVgK0nvRLeZmGYuVW8epSVTyyND28aoQRd9wD9yxKJWBuPOhOoVz-cUgpbM702W2ZlpsF7=w95-h79' style='width:20px;height:20px;'>")
-        .replace(/PEN/g, "<img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEho-erXGKkNZ7MaZWOtZw-ru0AnJwAlzHqnl5fKLmUAn_QtAMAbXgGMsqh21htJ2XSePyqAMAq4Xce1RkwkrqrA4Hw312mYcXhXMVW-m64vRS_lKTNgnBNvCzPZsPV3eEk_QclWiNZ9n9pvAQSiscTyp94vbN_h6aMeQ_nwTdBSdXGn5B3HW3A-sj_4Bw1j/s320/Penales.png' style='width:20px;height:20px;'>");
+        .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:20px;height:20px;'>")
+        .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:20px;height:20px;'>")
+        .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:20px;height:20px;'>")
+        .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:20px;height:20px;'>")
+        .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:20px;height:20px;'>")
+        .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
     }
 
     function getEstadioImage(estadio) {
