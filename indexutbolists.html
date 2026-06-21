@@ -95,14 +95,14 @@
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
     const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
 
-    const ORDEN_COMPETENCIAS = ["Campeonato 1914",
-                                "Campeonato 1915","Campeonato 1916","Campeonato 1917","Campeonato 1918","Campeonato 1919",
-                                "Campeonato 1920","Campeonato Estímulo 1920","Campeonato 1921","Campeonato 1922","Campeonato 1923","Campeonato 1924",
-                                "Campeonato 1925","Campeonato 1926","Campeonato Estímulo 1926","Campeonato 1927","Campeonato 1928","Campeonato 1929",
-                                "Campeonato 1930","Campeonato 1931","Campeonato 1932","Campeonato Béccar Varela 1932","Campeonato 1933","Campeonato Béccar Varela 1933","Campeonato 1934",
-                                "Campeonato 1935","Torneo de Honor 1936","Torneo de Campeonato 1936","Campeonato 1937","Campeonato 1938","Campeonato 1939",
-                                "Campeonato 1940","Campeonato 1941","Campeonato 1942","Campeonato 1943","Campeonato 1944",
-                                "Campeonato 1945","Campeonato 1946","Campeonato 1947","Campeonato 1948","Campeonato 1949",
+    const ORDEN_COMPETENCIAS = ["Campeonato 1914","Copa Competencia 1914",
+                                "Campeonato 1915","Copa Competencia 1915","Copa de Honor 1916","Campeonato 1916","Copa Competencia 1916","Campeonato 1917","Copa Competencia 1917","Copa de Honor 1917","Campeonato 1918","Copa Competencia 1918","Copa de Honor 1918","Campeonato 1919","Copa Competencia 1919",
+                                "Campeonato 1920","Copa de Honor 1920","Campeonato Estímulo 1920","Campeonato 1921","Copa Competencia 1921","Campeonato 1922","Campeonato 1923","Campeonato 1924",
+                                "Campeonato 1925","Copa Competencia 1925","Campeonato 1926","Campeonato Estímulo 1926","Campeonato 1927","Campeonato 1928","Campeonato 1929",
+                                "Campeonato 1930","Campeonato 1931","Campeonato 1932","Copa Competencia 1932","Campeonato Béccar Varela 1932","Campeonato 1933","Copa Competencia 1933","Campeonato Béccar Varela 1933","Campeonato 1934",
+                                "Campeonato 1935","Torneo de Honor 1936","Torneo de Campeonato 1936","Campeonato 1937","Campeonato 1938","Campeonato 1939","Copa Escobar 1939",
+                                "Campeonato 1940","Campeonato 1941","Copa Escobar 1941","Campeonato 1942","Copa Escobar 1942","Campeonato 1943","Copa Escobar 1943","Campeonato 1944","Copa Competencia 1944","Copa Escobar 1944",
+                                "Campeonato 1945","Copa Competencia 1945","Campeonato 1946","Copa Competencia 1946","Campeonato 1947","Campeonato 1948","Copa Competencia 1948","Campeonato 1949",
                                 "Campeonato 1950","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Campeonato 1953","Campeonato 1954",
                                 "Campeonato 1955","Campeonato 1956","Campeonato 1957","Campeonato 1958","Copa Suecia 1958","Campeonato 1959",
                                 "Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
@@ -357,18 +357,31 @@ function calcularPuntosPartido(p, minutos) {
 }    function bucketCompetencia(torneo) {
       const t = norm(torneo || "");
       if (t.includes("campeonato 1914")) return "Campeonato 1914";
+      if (t.includes("competencia 1914")) return "Copa Competencia 1914";
       if (t.includes("campeonato 1915")) return "Campeonato 1915";
+      if (t.includes("competencia 1915")) return "Copa Competencia 1915";
+      if (t.includes("honor 1915")) return "Copa de Honor 1915";
       if (t.includes("campeonato 1916")) return "Campeonato 1916";
+      if (t.includes("competencia 1916")) return "Copa Competencia 1916";
+      if (t.includes("honor 1916")) return "Copa de Honor 1916";
       if (t.includes("campeonato 1917")) return "Campeonato 1917";
+      if (t.includes("competencia 1917")) return "Copa Competencia 1917";
+      if (t.includes("honor 1917")) return "Copa de Honor 1917";
       if (t.includes("campeonato 1918")) return "Campeonato 1918";
+      if (t.includes("competencia 1918")) return "Copa Competencia 1918";
+      if (t.includes("honor 1918")) return "Copa de Honor 1918";
       if (t.includes("campeonato 1919")) return "Campeonato 1919";
+      if (t.includes("competencia 1919")) return "Copa Competencia 1919";
       if (t.includes("campeonato 1920")) return "Campeonato 1920";
+      if (t.includes("honor 1920")) return "Copa de Honor 1920";
       if (t.includes("estimulo 1920")) return "Campeonato Estímulo 1920";
       if (t.includes("campeonato 1921")) return "Campeonato 1921";
+      if (t.includes("competencia 1921")) return "Copa Competencia 1921";
       if (t.includes("campeonato 1922")) return "Campeonato 1922";
       if (t.includes("campeonato 1923")) return "Campeonato 1923";
       if (t.includes("campeonato 1924")) return "Campeonato 1924";
       if (t.includes("campeonato 1925")) return "Campeonato 1925";
+      if (t.includes("competencia 1925")) return "Copa Competencia 1925";
       if (t.includes("campeonato 1926")) return "Campeonato 1926";
       if (t.includes("estimulo 1926")) return "Campeonato Estímulo 1926";
       if (t.includes("campeonato 1927")) return "Campeonato 1927";
@@ -377,8 +390,10 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("campeonato 1930")) return "Campeonato 1930";
       if (t.includes("campeonato 1931")) return "Campeonato 1931";
       if (t.includes("campeonato 1932")) return "Campeonato 1932";
+      if (t.includes("competencia 1932")) return "Copa Competencia 1932";
       if (t.includes("beccar varela 1932")) return "Campeonato Béccar Varela 1932";
       if (t.includes("campeonato 1933")) return "Campeonato 1933";
+      if (t.includes("competencia 1933")) return "Copa Competencia 1933";
       if (t.includes("beccar varela 1933")) return "Campeonato Béccar Varela 1933";
       if (t.includes("campeonato 1934")) return "Campeonato 1934";
       if (t.includes("campeonato 1935")) return "Campeonato 1935";
@@ -387,19 +402,29 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("campeonato 1937")) return "Campeonato 1937";
       if (t.includes("campeonato 1938")) return "Campeonato 1938";
       if (t.includes("campeonato 1939")) return "Campeonato 1939";
+      if (t.includes("escobar 1939")) return "Copa Escobar 1939";
       if (t.includes("campeonato 1940")) return "Campeonato 1940";
       if (t.includes("campeonato 1941")) return "Campeonato 1941";
+      if (t.includes("escobar 1941")) return "Copa Escobar 1941";
       if (t.includes("campeonato 1942")) return "Campeonato 1942";
+      if (t.includes("escobar 1942")) return "Copa Escobar 1942";
       if (t.includes("campeonato 1943")) return "Campeonato 1943";
+      if (t.includes("escobar 1943")) return "Copa Escobar 1943";
       if (t.includes("campeonato 1944")) return "Campeonato 1944";
+      if (t.includes("competencia 1944")) return "Copa Competencia 1944";
+      if (t.includes("escobar 1944")) return "Copa Escobar 1944";
       if (t.includes("campeonato 1945")) return "Campeonato 1945";
+      if (t.includes("competencia 1945")) return "Copa Competencia 1945";
       if (t.includes("campeonato 1946")) return "Campeonato 1946";
+      if (t.includes("competencia 1946")) return "Copa Competencia 1946";
       if (t.includes("campeonato 1947")) return "Campeonato 1947";
       if (t.includes("campeonato 1948")) return "Campeonato 1948";
+      if (t.includes("competencia 1948")) return "Copa Competencia 1948";
       if (t.includes("campeonato 1949")) return "Campeonato 1949";
       if (t.includes("campeonato 1950")) return "Campeonato 1950";
       if (t.includes("campeonato 1951")) return "Campeonato 1951";
       if (t.includes("eva peron")) return "Campeonato 1952";
+      if (t.includes("competencia 1952")) return "Copa Competencia 1952";
       if (t.includes("campeonato 1953")) return "Campeonato 1953";
       if (t.includes("campeonato 1954")) return "Campeonato 1954";
       if (t.includes("campeonato 1955")) return "Campeonato 1955";
