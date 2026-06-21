@@ -289,17 +289,15 @@ function clasificarTorneo(torneo) {
   if (t.includes("escobar")) return "COPA ESCOBAR";
   if (t.includes("amistoso")) return "AMISTOSO";
 
-  if (
-    t.includes("nacional b") ||
-    t.includes("b nacional") ||
-    t.includes("bn") ||
-    t.includes("nb") ||
-    t.includes("reducido")
-  ) return "B NACIONAL";
-
+  if (t.includes("nacional b") ||
+      t.includes("b nacional") ||
+      t.includes("bn") ||
+      t.includes("nb") ||
+      t.includes("reducido")) return "B NACIONAL";
   if (t.includes("competencia")) return "COPA COMPETENCIA";
   if (t.includes("superliga")) return "COPA SUPERLIGA";
-  if (t.includes("campeonato")) return "CAMPEONATO";
+  if (t.includes("campeonato") ||
+      t.includes("torneo de honor")) return "CAMPEONATO";
 
   return "OTRO";
 }
