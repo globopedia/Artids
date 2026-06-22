@@ -95,13 +95,13 @@
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
     const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
 
-    const ORDEN_COMPETENCIAS = ["Pretemporada 1914","Campeonato 1914","Copa Competencia 1914",
-                                "Pretemporada 1915","Campeonato 1915","Copa Competencia 1915","Pretemporada 1916","Copa de Honor 1916","Campeonato 1916","Copa Competencia 1916","Pretemporada 1917","Campeonato 1917","Copa Competencia 1917","Copa de Honor 1917","Pretemporada 1918","Campeonato 1918","Copa Competencia 1918","Copa de Honor 1918","Pretemporada 1919","Campeonato 1919","Copa Competencia 1919",
-                                "Pretemporada 1920","Campeonato 1920","Copa de Honor 1920","Campeonato Estímulo 1920","Pretemporada 1921","Campeonato 1921","Copa Competencia 1921","Pretemporada 1922","Campeonato 1922","Pretemporada 1923","Campeonato 1923","Pretemporada 1924","Campeonato 1924",
-                                "Pretemporada 1925","Campeonato 1925","Copa Competencia 1925","Pretemporada 1926","Campeonato 1926","Campeonato Estímulo 1926","Pretemporada 1927","Campeonato 1927","Pretemporada 1928","Campeonato 1928","Pretemporada 1929","Campeonato 1929",
-                                "Pretemporada 1930","Campeonato 1930","Gira por Brasil 1930","Pretemporada 1931","Campeonato 1931","Pretemporada 1932","Campeonato 1932","Copa Competencia 1932","Campeonato Béccar Varela 1932","Pretemporada 1933","Campeonato 1933","Copa Competencia 1933","Campeonato Béccar Varela 1933","Pretemporada 1934","Campeonato 1934",
-                                "Pretemporada 1935","Campeonato 1935","Gira por Brasil 1936","Pretemporada 1936","Torneo de Honor 1936","Torneo de Campeonato 1936","Pretemporada 1937","Campeonato 1937","Pretemporada 1938","Campeonato 1938","Gira por Brasil 1939","Pretemporada 1939","Campeonato 1939","Copa Escobar 1939",
-                                "Pretemporada 1940","Campeonato 1940","Gira por Chile 1940","Torneo Internacional 1941","Torneo Relámpago 1941","Campeonato 1941","Copa Escobar 1941","Gira por Chile 1941","Campeonato 1942","Copa Escobar 1942","Torneo Internacional 1943","Campeonato 1943","Copa de la República 1943","Copa Escobar 1943","Torneo Internacional 1944","Campeonato 1944","Copa Competencia 1944","Copa de la República 1944","Copa Escobar 1944",
+    const ORDEN_COMPETENCIAS = ["Pretemporada 1914","Campeonato 1914","Copa Competencia 1914","Amistosos 1914",
+                                "Pretemporada 1915","Campeonato 1915","Copa Competencia 1915","Amistosos 1915","Pretemporada 1916","Copa de Honor 1916","Campeonato 1916","Copa Competencia 1916","Amistosos 1916","Pretemporada 1917","Campeonato 1917","Copa Competencia 1917","Copa de Honor 1917","Amistosos 1917","Pretemporada 1918","Campeonato 1918","Copa Competencia 1918","Copa de Honor 1918","Amistosos 1918","Pretemporada 1919","Campeonato 1919","Copa Competencia 1919","Amistosos 1919",
+                                "Pretemporada 1920","Campeonato 1920","Copa de Honor 1920","Campeonato Estímulo 1920","Amistosos 1920","Pretemporada 1921","Campeonato 1921","Copa Competencia 1921","Amistosos 1921","Pretemporada 1922","Campeonato 1922","Amistosos 1922","Pretemporada 1923","Campeonato 1923","Amistosos 1923","Pretemporada 1924","Campeonato 1924","Amistosos 1924",
+                                "Pretemporada 1925","Campeonato 1925","Copa Competencia 1925","Amistosos 1925","Pretemporada 1926","Campeonato 1926","Campeonato Estímulo 1926","Amistosos 1926","Pretemporada 1927","Campeonato 1927","Amistosos 1927","Pretemporada 1928","Campeonato 1928","Amistosos 1928","Pretemporada 1929","Campeonato 1929","Amistosos 1929",
+                                "Pretemporada 1930","Campeonato 1930","Gira por Brasil 1930","Amistosos 1930","Pretemporada 1931","Campeonato 1931","Amistosos 1931","Pretemporada 1932","Campeonato 1932","Copa Competencia 1932","Campeonato Béccar Varela 1932","Amistosos 1932","Pretemporada 1933","Campeonato 1933","Copa Competencia 1933","Campeonato Béccar Varela 1933","Amistosos 1933","Pretemporada 1934","Campeonato 1934","Amistosos 1934",
+                                "Pretemporada 1935","Campeonato 1935","Amistosos 1935","Gira por Brasil 1936","Pretemporada 1936","Torneo de Honor 1936","Torneo de Campeonato 1936","Amistosos 1936","Pretemporada 1937","Campeonato 1937","Amistosos 1937","Pretemporada 1938","Campeonato 1938","Amistosos 1938","Gira por Brasil 1939","Pretemporada 1939","Campeonato 1939","Copa Escobar 1939","Amistosos 1939",
+                                "Pretemporada 1940","Campeonato 1940","Amistosos 1940","Gira por Chile 1940","Torneo Internacional 1941","Torneo Relámpago 1941","Campeonato 1941","Copa Escobar 1941","Gira por Chile 1941","Campeonato 1942","Copa Escobar 1942","Torneo Internacional 1943","Campeonato 1943","Copa de la República 1943","Copa Escobar 1943","Torneo Internacional 1944","Campeonato 1944","Copa Competencia 1944","Copa de la República 1944","Copa Escobar 1944",
                                 "Campeonato 1945","Copa Competencia 1945","Campeonato 1946","Copa Competencia 1946","Campeonato 1947","Campeonato 1948","Copa Competencia 1948","Campeonato 1949",
                                 "Campeonato 1950","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Campeonato 1953","Campeonato 1954",
                                 "Campeonato 1955","Campeonato 1956","Campeonato 1957","Campeonato 1958","Copa Suecia 1958","Campeonato 1959",
@@ -383,6 +383,33 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("pretemporada 1938")) return "Pretemporada 1938";
       if (t.includes("pretemporada 1939")) return "Pretemporada 1939";
       if (t.includes("pretemporada 1940")) return "Pretemporada 1940";
+      if (t.includes("amistoso 1914")) return "Amistosos 1914";
+      if (t.includes("amistoso 1915")) return "Amistosos 1915";
+      if (t.includes("amistoso 1916")) return "Amistosos 1916";
+      if (t.includes("amistoso 1917")) return "Amistosos 1917";
+      if (t.includes("amistoso 1918")) return "Amistosos 1918";
+      if (t.includes("amistoso 1919")) return "Amistosos 1919";
+      if (t.includes("amistoso 1920")) return "Amistosos 1920";
+      if (t.includes("amistoso 1921")) return "Amistosos 1921";
+      if (t.includes("amistoso 1922")) return "Amistosos 1922";
+      if (t.includes("amistoso 1923")) return "Amistosos 1923";
+      if (t.includes("amistoso 1924")) return "Amistosos 1924";
+      if (t.includes("amistoso 1925")) return "Amistosos 1925";
+      if (t.includes("amistoso 1926")) return "Amistosos 1926";
+      if (t.includes("amistoso 1927")) return "Amistosos 1927";
+      if (t.includes("amistoso 1928")) return "Amistosos 1928";
+      if (t.includes("amistoso 1929")) return "Amistosos 1929";
+      if (t.includes("amistoso 1930")) return "Amistosos 1930";
+      if (t.includes("amistoso 1931")) return "Amistosos 1931";
+      if (t.includes("amistoso 1932")) return "Amistosos 1932";
+      if (t.includes("amistoso 1933")) return "Amistosos 1933";
+      if (t.includes("amistoso 1934")) return "Amistosos 1934";
+      if (t.includes("amistoso 1935")) return "Amistosos 1935";
+      if (t.includes("amistoso 1936")) return "Amistosos 1936";
+      if (t.includes("amistoso 1937")) return "Amistosos 1937";
+      if (t.includes("amistoso 1938")) return "Amistosos 1938";
+      if (t.includes("amistoso 1939")) return "Amistosos 1939";
+      if (t.includes("amistoso 1940")) return "Amistosos 1940";
       if (t.includes("campeonato 1914")) return "Campeonato 1914";
       if (t.includes("competencia 1914")) return "Copa Competencia 1914";
       if (t.includes("campeonato 1915")) return "Campeonato 1915";
