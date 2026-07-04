@@ -1566,37 +1566,6 @@ function cambiarEstadistica() {
   aplicarFiltrosLivianos();
 }
     
-function cambiarColumnas() {
- const seleccion = document.getElementById("selectorEstadistica").value;
-const mapaColumnas = {
-  partidos: 3,
-  duco: 4,
-  goles: 5,
-  expulsiones: 6,
-  vallasInvictas: 7,
-  efectividad: 8,
-  minutos: 9,
-  globopedia: 10,
-  inactividad: 11,
-  rachaSinGoles: 12
-};
-
-  const tabla = document.querySelector("#ranking table");
-  if (!tabla) return;
-
-  const filas = tabla.rows;
-
-  for (let i = 0; i < filas.length; i++) {
-
-    for (let j = 3; j <= 12; j++) {
-      filas[i].cells[j].style.display = "none";
-    }
-
-    const colMostrar = mapaColumnas[seleccion];
-    filas[i].cells[colMostrar].style.display = "";
-  }
-
-}
 function construirPeriodos(anios){
 
   if(anios.length===0) return "";
