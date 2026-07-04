@@ -72,14 +72,16 @@ td.nombre {
   font-weight:bold;
 }
 
-/* Hover de toda la fila */
-table tbody tr:hover {
-  background: #b31111;
+table tbody tr {
   transition: background 0.15s ease;
 }
+  /* Hover de toda la fila */
+table tbody tr:hover {
+  background: #b31111;
+  cursor: pointer;
+  }
 
 table tbody tr:hover td {
-  transition: background 0.15s ease;
   color: white;
 }
 
