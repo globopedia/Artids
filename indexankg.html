@@ -72,9 +72,14 @@ td.nombre {
   font-weight:bold;
 }
 
-/* Hover real */
-table tr:hover td {
-  color:#7d0101;
+/* Hover de toda la fila */
+table tbody tr:hover {
+  background: #b31111;
+  transition: background 0.15s ease;
+}
+
+table tbody tr:hover td {
+  color: white;
 }
 
 .led-label input {
