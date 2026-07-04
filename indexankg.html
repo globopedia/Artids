@@ -289,45 +289,44 @@ let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
 const CONFIG_ESTADISTICAS = {
 
-  globopedia: {titulo: "Globopedia",
-    campo: "globopedia",
+  globopedia: {titulo: "HALL GLOBOPEDIA",
+    campo: "Globopedia",
     formato: r => r.globopedia},
 
-  partidos: {titulo: "Partidos",
-    campo: "partidos",
+  partidos: {titulo: "MÁS PARTIDOS JUGADOS",
+    campo: "Partidos",
     formato: r => r.partidos},
 
-  partidos: {titulo: "En el Ducó",
-    campo: "duco",
-    formato: r => r.duco
-  },
+  partidos: {titulo: "MÁS PARTIDOS EN EL DUCÓ",
+    campo: "Partidos",
+    formato: r => r.duco},
 
-  goles: {titulo: "Goles",
-    campo: "goles",
+  goles: {titulo: "MÁXIMOS GOLEADORES",
+    campo: "Goles",
     formato: r => r.goles},
 
-  expulsiones: {titulo: "Expulsiones",
-    campo: "expulsiones",
+  expulsiones: {titulo: "MÁS EXPULSIONES",
+    campo: "Expulsiones",
     formato: r => r.expulsiones},
 
-  vallasInvictas: {titulo: "Vallas Invictas",
-    campo: "vallasInvictas",
+  vallasInvictas: {titulo: "MÁS VALLAS INVICTAS",
+    campo: "Partidos Invicto",
     formato: r => r.vallasInvictas},
 
-  efectividad: {titulo: "Efectividad",
-    campo: "efectividad",
+  efectividad: {titulo: "EFECTIVIDAD DE PUNTOS",
+    campo: "Efectividad",
     formato: r => r.efectividad + "%"},
 
-  minutos: {titulo: "Minutos",
-    campo: "minutos",
+  minutos: {titulo: "MÁS MINUTOS JUGADOS",
+    campo: "Minutos",
     formato: r => r.minutos.toLocaleString("es-AR")},
 
-  inactividad: {titulo: "Inactividad",
-    campo: "inactividad",
+  inactividad: {titulo: "MÁS TIEMPO SIN JUGAR",
+    campo: "Tiempo",
     formato: r => r.inactividadTexto},
 
-  rachaSinGoles: {titulo: "Racha",
-    campo: "rachaSinGoles",
+  rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
+    campo: "Minutos",
     formato: r => r.rachaTexto}
 
 };
