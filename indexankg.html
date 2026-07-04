@@ -289,65 +289,46 @@ let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
 const CONFIG_ESTADISTICAS = {
 
-  globopedia: {
-    titulo: "HALL GLOBOPEDIA",
+  globopedia: {titulo: "Globopedia",
     campo: "globopedia",
-    formato: r => r.globopedia
-  },
+    formato: r => r.globopedia},
 
-  partidos: {
-    titulo: "MÁS PARTIDOS JUGADOS",
+  partidos: {titulo: "MÁS PARTIDOS JUGADOS",
     campo: "partidos",
-    formato: r => r.partidos
-  },
+    formato: r => r.partidos},
 
-  partidos: {
-    titulo: "MÁS PARTIDOS EN EL DUCÓ",
+  partidos: {titulo: "MÁS PARTIDOS EN EL DUCÓ",
     campo: "duco",
     formato: r => r.duco
   },
 
-  goles: {
-    titulo: "MÁXIMOS GOLEADORES",
+  goles: {titulo: "MÁXIMOS GOLEADORES",
     campo: "goles",
-    formato: r => r.goles
-  },
+    formato: r => r.goles},
 
-  expulsiones: {
-    titulo: "MÁS EXPULSIONES",
+  expulsiones: {titulo: "MÁS EXPULSIONES",
     campo: "expulsiones",
-    formato: r => r.expulsiones
-  },
+    formato: r => r.expulsiones},
 
-  vallasInvictas: {
-    titulo: "MÁS VALLAS INVICTAS",
+  vallasInvictas: {titulo: "MÁS VALLAS INVICTAS",
     campo: "vallasInvictas",
-    formato: r => r.vallasInvictas
-  },
+    formato: r => r.vallasInvictas},
 
-  efectividad: {
-    titulo: "EFECTIVIDAD DE PUNTOS",
+  efectividad: {titulo: "EFECTIVIDAD DE PUNTOS",
     campo: "efectividad",
-    formato: r => r.efectividad + "%"
-  },
+    formato: r => r.efectividad + "%"},
 
-  minutos: {
-    titulo: "MÁS MINUTOS JUGADOS",
+  minutos: {titulo: "MÁS MINUTOS JUGADOS",
     campo: "minutos",
-    formato: r => r.minutos.toLocaleString("es-AR")
-  },
+    formato: r => r.minutos.toLocaleString("es-AR")},
 
-  inactividad: {
-    titulo: "MAYOR INACTIVIDAD",
+  inactividad: {titulo: "MAYOR INACTIVIDAD",
     campo: "inactividad",
-    formato: r => r.inactividadTexto
-  },
+    formato: r => r.inactividadTexto},
 
-  rachaSinGoles: {
-    titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
+  rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
     campo: "rachaSinGoles",
-    formato: r => r.rachaTexto
-  }
+    formato: r => r.rachaTexto}
 
 };
 function clasificarTorneo(torneo) {
