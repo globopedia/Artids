@@ -1899,9 +1899,6 @@ function cambiarFiltroTorneo(valor) {
   filtroTorneo = valor;
   aplicarFiltros();
 }
-document.querySelectorAll('#filtroPosiciones input').forEach(chk => {
-  chk.addEventListener('change', aplicarFiltrosLivianos);
-});
 </script>
 <script>
 function enviarAltura() {
