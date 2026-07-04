@@ -905,7 +905,37 @@ const COEF_BASE = {
   Derrota:    { Visitante:  0,  Neutral:  -0.1,  Local:  -0.2 }
 };
 
-function esInternacional(torneo) {
+function construirCacheRachas(partidos) {
+
+  cacheRachas = {};
+
+  const nombres = new Set();
+
+  partidos.forEach(p => {
+
+    (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1)
+      .forEach(j => nombres.add(j));
+
+  });
+
+  nombres.forEach(nombre => {
+    cacheRachas[norm(nombre)] =
+      calcularRachaSinGoles(nombre, partidos);
+  });
+
+}
+    function esInternacional(torneo) {
   const t = norm(torneo);
   return t.includes("libertadores") ||
          t.includes("sudamericana") ||
