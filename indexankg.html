@@ -1432,12 +1432,17 @@ if (matches) {
     const inactividadMs = calcularMayorInactividad(j.fechas);
     const inactividadTexto = formatearTiempo(inactividadMs);
  
-const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
+const racha = cacheRachas[norm(j.nombre)] || {
+  minutos: 0,
+  inicio: null,
+  fin: null
+};
 
 j.rachaSinGoles = racha.minutos;
 
 if (racha.inicio && racha.fin) {
-  j.rachaTexto = `${racha.minutos} min. -${formatearFecha(racha.inicio)} al ${formatearFecha(racha.fin)}-`;
+  j.rachaTexto =
+    `${racha.minutos} min. -${formatearFecha(racha.inicio)} al ${formatearFecha(racha.fin)}-`;
 } else {
   j.rachaTexto = `${racha.minutos} min.`;
 }
@@ -1581,11 +1586,26 @@ let indiceUtbolistas = {};
 let cacheRachas = {};
     
 function intentarGenerarRanking() {
+
   if (!datosArtids1910 || !datosArtids1925 || !datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
+
+  const todosLosPartidos = [
+    ...datosArtids1910,
+    ...datosArtids1925,
+    ...datosArtids1940,
+    ...datosArtids1955,
+    ...datosArtids1970,
+    ...datosArtids1985,
+    ...datosArtids2000,
+    ...datosArtids2015
+  ];
+
+  // ✅ Construye la caché una sola vez
+  construirCacheRachas(todosLosPartidos);
 
   ordenActual = { campo: "globopedia", asc: true };
 
-  aplicarFiltros(); // 👈 ESTE es el cambio clave
+  aplicarFiltros();
 }
 function generarRankingPorFecha() {
 
