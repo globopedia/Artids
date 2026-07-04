@@ -40,10 +40,27 @@ th, td {
 }
 /* ancho de columnas */
 
-th:nth-child(1), td:nth-child(1) { width:30px; font-weight: bold;}   /* número */
-th:nth-child(2), td:nth-child(2) { width:455px; font-weight: bold;}  /* futbolista */
-th:nth-child(3), td:nth-child(3) { width:245px; font-weight: bold;}  /* período */
-th:nth-child(4), td:nth-child(4) { width:135px; font-weight: bold;}  /* estadística */
+/* ancho de columnas */
+
+.col-numero{
+  width:30px;
+  font-weight:bold;
+}
+
+.col-jugador{
+  width:455px;
+  font-weight:bold;
+}
+
+.col-periodo{
+  width:245px;
+  font-weight:bold;
+}
+
+.col-estadistica{
+  width:135px;
+  font-weight:bold;
+}
 
 th {
   background:#eee;
@@ -1510,16 +1527,16 @@ const obtenerValor = config.formato;
   
     cont.innerHTML = `
       <table>
-      <tr>
-  <th>N°</th>
-  <th>Futbolista</th>
-  <th>Período</th>
-  <th>${tituloColumna}</th>
+     <tr>
+  <th class="col-numero">N°</th>
+  <th class="col-jugador">Futbolista</th>
+  <th class="col-periodo">Período</th>
+  <th class="col-estadistica">${tituloColumna}</th>
 </tr>
         ${ranking.slice(0,40).map((r, i) => `
           <tr>
-            <td>${i + 1}</td>
-            <td class="nombre">
+            <td class="col-numero">${i+1}</td>
+            <td class="nombre col-jugador">
               <div class="jugador">
                 <img src="${r.foto}" class="foto-jugador">
                 <div class="jugador-info">
@@ -1531,8 +1548,8 @@ const obtenerValor = config.formato;
                 </div>
               </div>
             </td>
-            <td>${r.periodo}</td>
-            <td>${obtenerValor(r)}</td>
+            <td class="col-periodo">${r.periodo}</td>
+            <td class="col-estadistica">${obtenerValor(r)}</td>
           </tr>
         `).join("")}
       </table>
