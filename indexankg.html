@@ -257,6 +257,7 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="expulsiones">MÁS EXPULSIONES</option>
 <option value="efectividad">EFECTIVIDAD DE PUNTOS</option>
 <option value="vallasInvictas">MÁS VALLAS INVICTAS</option>
+<option value="duco">MÁS PARTIDOS EN EL DUCÓ</option>
 <option value="inactividad">MÁS TIEMPO SIN JUGAR</option>
 <option value="rachaSinGoles">MÁS MINUTOS SIN GOLES EN CONTRA</option>
 </select>
@@ -1334,6 +1335,7 @@ if (!estadisticas[key]) {
  estadisticas[key] = {
   nombre: nombre,
   partidos: 0,
+  duco: 0,
   goles: 0,
   expulsiones: 0,
   vallasInvictas: 0,
@@ -1355,7 +1357,15 @@ if (!estadisticas[key]) {
       
       j.partidos++;
 j.fechas.push(convertirFecha(p.Fecha));
-const resultado = norm(p.Situación);
+const estadio = norm(p.Estadio);
+
+if (
+    estadio === "huracan" ||
+    estadio.includes("duco")
+) {
+    j.duco++;
+}
+      const resultado = norm(p.Situación);
 
 if (resultado === "victoria") j.victorias++;
 if (resultado === "empate") j.empates++;
@@ -1415,6 +1425,7 @@ if (racha.inicio && racha.fin) {
  foto: obtenerFoto(j.nombre),
  periodo: periodo,
  partidos: j.partidos,
+ duco: j.duco,
  goles: j.goles,
  expulsiones: j.expulsiones,
  vallasInvictas: j.vallasInvictas,
@@ -1445,6 +1456,7 @@ function renderRanking(ranking) {
       <th id="col-nombre">Futbolista</th>
       <th id="col-periodo">Período</th>
       <th id="col-partidos">Partidos</th>
+      <th id="col-duco">Ducó</th>
       <th id="col-goles">Goles</th>
       <th id="col-expulsiones">Expulsiones</th>
       <th id="col-vallas">Valla Invicta</th>
@@ -1471,6 +1483,7 @@ function renderRanking(ranking) {
             </td>
             <td>${r.periodo}</td>
             <td>${r.partidos}</td>
+            <td>${r.duco}</td>
             <td>${r.goles}</td>
             <td>${r.expulsiones}</td>
             <td>${r.vallasInvictas}</td>
@@ -1511,16 +1524,17 @@ function cambiarEstadistica() {
     
 function cambiarColumnas() {
  const seleccion = document.getElementById("selectorEstadistica").value;
- const mapaColumnas = {
+const mapaColumnas = {
   partidos: 3,
-  goles: 4,
-  expulsiones: 5,
-  vallasInvictas: 6,
-  efectividad: 7,
-  minutos: 8,      // ✔ correcto
-  globopedia: 9,    // ✔ correcto
-  inactividad: 10,   // 👈 NUEVO
-  rachaSinGoles: 11
+  duco: 4,
+  goles: 5,
+  expulsiones: 6,
+  vallasInvictas: 7,
+  efectividad: 8,
+  minutos: 9,
+  globopedia: 10,
+  inactividad: 11,
+  rachaSinGoles: 12
 };
 
   const tabla = document.querySelector("#ranking table");
@@ -1530,7 +1544,7 @@ function cambiarColumnas() {
 
   for (let i = 0; i < filas.length; i++) {
 
-    for (let j = 3; j <= 11; j++) {
+    for (let j = 3; j <= 12; j++) {
       filas[i].cells[j].style.display = "none";
     }
 
