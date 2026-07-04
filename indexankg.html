@@ -904,7 +904,8 @@ const COEF_BASE = {
   Empate:     { Visitante:  0.2,  Neutral:  0.1,  Local:  0 },
   Derrota:    { Visitante:  0,  Neutral:  -0.1,  Local:  -0.2 }
 };
-    function esInternacional(torneo) {
+
+function esInternacional(torneo) {
   const t = norm(torneo);
   return t.includes("libertadores") ||
          t.includes("sudamericana") ||
@@ -1261,6 +1262,69 @@ function esDeInferiores(nombre) {
     .toLowerCase()
     .includes("divisiones inferiores");
 }
+    function construirIndiceEstadisticas(partidos) {
+
+  const estadisticas = {};
+
+  partidos.forEach(p => {
+
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+
+    jugadores.forEach(j => {
+
+      const clave = norm(j);
+
+      if (!estadisticas[clave]) {
+        estadisticas[clave] = {
+          goles: 0,
+          expulsiones: 0,
+          vallasInvictas: 0
+        };
+      }
+
+ const expRegex = new RegExp(
+  `EXP\\s+${j.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\(HUR\\)`,
+  "gi"
+);
+
+const matches = (p.Incidencias || "").match(expRegex);
+
+if (matches) {
+  estadisticas[clave].expulsiones += matches.length;
+}
+
+const golRegex = new RegExp(
+  `GOL\\s+${j.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\(HUR\\)`,
+  "gi"
+);
+
+const goles = (p.Incidencias || "").match(golRegex);
+
+if (goles) {
+  estadisticas[clave].goles += goles.length;
+}
+
+      if (Number(p.GolesRival) === 0) {
+        estadisticas[clave].vallasInvictas++;
+      }
+
+    });
+
+  });
+
+  return estadisticas;
+}
 function calcularMayorInactividad(fechas) {
   if (!fechas || fechas.length < 2) return 0;
 
@@ -1401,17 +1465,12 @@ if (matches) {
     const inactividadMs = calcularMayorInactividad(j.fechas);
     const inactividadTexto = formatearTiempo(inactividadMs);
  
-const racha = cacheRachas[norm(j.nombre)] || {
-  minutos: 0,
-  inicio: null,
-  fin: null
-};
+const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
 
 j.rachaSinGoles = racha.minutos;
 
 if (racha.inicio && racha.fin) {
-  j.rachaTexto =
-    `${racha.minutos} min. -${formatearFecha(racha.inicio)} al ${formatearFecha(racha.fin)}-`;
+  j.rachaTexto = `${racha.minutos} min. -${formatearFecha(racha.inicio)} al ${formatearFecha(racha.fin)}-`;
 } else {
   j.rachaTexto = `${racha.minutos} min.`;
 }
@@ -1552,18 +1611,13 @@ let datosArtids2000 = null;
 let datosArtids2015 = null;
 let datosUtbolistas = null;
 let indiceUtbolistas = {};
-    
+
 function intentarGenerarRanking() {
   if (!datosArtids1910 || !datosArtids1925 || !datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
 
   ordenActual = { campo: "globopedia", asc: true };
 
-  aplicarFiltros();
-}
-
-  ordenActual = { campo: "globopedia", asc: true };
-
-  aplicarFiltros();
+  aplicarFiltros(); // 👈 ESTE es el cambio clave
 }
 function generarRankingPorFecha() {
 
@@ -1861,4 +1915,3 @@ document.addEventListener("change", function(e) {
 </script>
 </body>
 </html>
-
