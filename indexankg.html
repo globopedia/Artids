@@ -904,37 +904,6 @@ const COEF_BASE = {
   Empate:     { Visitante:  0.2,  Neutral:  0.1,  Local:  0 },
   Derrota:    { Visitante:  0,  Neutral:  -0.1,  Local:  -0.2 }
 };
-
-function construirCacheRachas(partidos) {
-
-  cacheRachas = {};
-
-  const nombres = new Set();
-
-  partidos.forEach(p => {
-
-    (p.Huracán || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\s+y\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1)
-      .forEach(j => nombres.add(j));
-
-  });
-
-  nombres.forEach(nombre => {
-    cacheRachas[norm(nombre)] =
-      calcularRachaSinGoles(nombre, partidos);
-  });
-
-}
     function esInternacional(torneo) {
   const t = norm(torneo);
   return t.includes("libertadores") ||
@@ -1583,21 +1552,14 @@ let datosArtids2000 = null;
 let datosArtids2015 = null;
 let datosUtbolistas = null;
 let indiceUtbolistas = {};
-let cacheRachas = {};
     
-  const todosLosPartidos = [
-    ...datosArtids1910,
-    ...datosArtids1925,
-    ...datosArtids1940,
-    ...datosArtids1955,
-    ...datosArtids1970,
-    ...datosArtids1985,
-    ...datosArtids2000,
-    ...datosArtids2015
-  ];
+function intentarGenerarRanking() {
+  if (!datosArtids1910 || !datosArtids1925 || !datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
 
-  // ✅ Construye la caché una sola vez
-  construirCacheRachas(todosLosPartidos);
+  ordenActual = { campo: "globopedia", asc: true };
+
+  aplicarFiltros();
+}
 
   ordenActual = { campo: "globopedia", asc: true };
 
