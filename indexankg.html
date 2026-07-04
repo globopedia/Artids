@@ -404,7 +404,6 @@ if (soloInferiores) {
 
   rankingBase = ranking;
 aplicarFiltrosLivianos();
-cambiarColumnas(); // 🔥 MUY IMPORTANTE
 }
 function aplicarFiltrosLivianos() {
 
@@ -1540,9 +1539,6 @@ const obtenerValor = config.formato;
         `).join("")}
       </table>
     `;
-
-    // 🔻 PASO 2: aplicás columnas (MUY IMPORTANTE)
-   // cambiarColumnas();
 }
 
 function aplicarFiltroPosicion() {
@@ -1643,7 +1639,6 @@ function generarRankingPorFecha() {
   // ✅ TODO ESTO VA ADENTRO
   renderRanking(rankingActual);
   ordenarPor("globopedia");
-  cambiarColumnas();
 }
 
 function convertirFecha(fechaStr) {
