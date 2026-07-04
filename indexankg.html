@@ -289,7 +289,7 @@ let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
 const CONFIG_ESTADISTICAS = {
 
-  globopedia: {titulo: "Globopedia",
+  globopedia: {titulo: "HALL GLOBOPEDIA",
     campo: "globopedia",
     formato: r => r.globopedia},
 
@@ -1509,7 +1509,7 @@ function renderRanking(ranking) {
 
   const cont = document.getElementById("ranking");
 const config = CONFIG_ESTADISTICAS[ordenActual.campo];
-const tituloColumna = config.titulo;
+const tituloColumna = config.campo;
 const obtenerValor = config.formato;
   
     cont.innerHTML = `
