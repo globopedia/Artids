@@ -270,7 +270,63 @@ let rankingActual = [];
 let rankingBase = [];
 let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
+const CONFIG_ESTADISTICAS = {
 
+  globopedia: {
+    titulo: "HALL GLOBOPEDIA",
+    campo: "globopedia",
+    formato: r => r.globopedia
+  },
+
+  partidos: {
+    titulo: "MÁS PARTIDOS JUGADOS",
+    campo: "partidos",
+    formato: r => r.partidos
+  },
+
+  goles: {
+    titulo: "MÁXIMOS GOLEADORES",
+    campo: "goles",
+    formato: r => r.goles
+  },
+
+  expulsiones: {
+    titulo: "MÁS EXPULSIONES",
+    campo: "expulsiones",
+    formato: r => r.expulsiones
+  },
+
+  vallasInvictas: {
+    titulo: "MÁS VALLAS INVICTAS",
+    campo: "vallasInvictas",
+    formato: r => r.vallasInvictas
+  },
+
+  efectividad: {
+    titulo: "EFECTIVIDAD DE PUNTOS",
+    campo: "efectividad",
+    formato: r => r.efectividad + "%"
+  },
+
+  minutos: {
+    titulo: "MÁS MINUTOS JUGADOS",
+    campo: "minutos",
+    formato: r => r.minutos.toLocaleString("es-AR")
+  },
+
+  inactividad: {
+    titulo: "MAYOR INACTIVIDAD",
+    campo: "inactividad",
+    formato: r => r.inactividadTexto
+  },
+
+  rachaSinGoles: {
+    titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
+    campo: "rachaSinGoles",
+    formato: r => r.rachaTexto
+  }
+
+};
 function clasificarTorneo(torneo) {
   if (!torneo) return "OTRO";
 
@@ -1448,24 +1504,18 @@ if (racha.inicio && racha.fin) {
 function renderRanking(ranking) {
 
   const cont = document.getElementById("ranking");
-
+const config = CONFIG_ESTADISTICAS[ordenActual.campo];
+const tituloColumna = config.titulo;
+const obtenerValor = config.formato;
+  
     cont.innerHTML = `
       <table>
       <tr>
-      <th id="col-numero">N°</th>
-      <th id="col-nombre">Futbolista</th>
-      <th id="col-periodo">Período</th>
-      <th id="col-partidos">Partidos</th>
-      <th id="col-duco">Ducó</th>
-      <th id="col-goles">Goles</th>
-      <th id="col-expulsiones">Expulsiones</th>
-      <th id="col-vallas">Valla Invicta</th>
-      <th id="col-efectividad">Efectividad</th>
-      <th id="col-minutos">Minutos</th>
-      <th id="col-globopedia">Globopedia</th>
-      <th id="col-inactividad">Inactividad</th>
-      <th id="col-racha">Imbatibilidad</th>
-      </tr>
+  <th>N°</th>
+  <th>Futbolista</th>
+  <th>Período</th>
+  <th>${tituloColumna}</th>
+</tr>
         ${ranking.slice(0,40).map((r, i) => `
           <tr>
             <td>${i + 1}</td>
@@ -1482,23 +1532,14 @@ function renderRanking(ranking) {
               </div>
             </td>
             <td>${r.periodo}</td>
-            <td>${r.partidos}</td>
-            <td>${r.duco}</td>
-            <td>${r.goles}</td>
-            <td>${r.expulsiones}</td>
-            <td>${r.vallasInvictas}</td>
-            <td>${r.efectividad}%</td>
-            <td>${r.minutos.toLocaleString("es-AR")}</td>
-            <td>${r.globopedia}</td>
-            <td>${r.inactividadTexto}</td>
-            <td>${r.rachaTexto}</td>
+            <td>${obtenerValor(r)}</td>
           </tr>
         `).join("")}
       </table>
     `;
 
     // 🔻 PASO 2: aplicás columnas (MUY IMPORTANTE)
-    cambiarColumnas();
+   // cambiarColumnas();
 }
 
 function aplicarFiltroPosicion() {
