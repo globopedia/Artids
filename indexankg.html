@@ -466,22 +466,9 @@ function aplicarFiltrosLivianos() {
     ranking = ranking.filter(j => esDeInferiores(j.nombre));
   }
 
-  // 🔥 REORDENAR
-if (ordenActual.campo === "pataduras") {
-
-  ranking.sort((a, b) => a.globopedia - b.globopedia);
-
-} else {
-
-  ranking.sort((a, b) =>
-    b[ordenActual.campo] - a[ordenActual.campo]
-  );
-
-}
-
-rankingActual = ranking;
-renderRanking(rankingActual);
-}
+// 🔥 REORDENAR
+  ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo] );
+  rankingActual = ranking; renderRanking(rankingActual); }
   
 /* =========================
    FUNCIONES BASE
