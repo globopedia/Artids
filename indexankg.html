@@ -1546,7 +1546,7 @@ if (j.nombre === "Cristian Tavio") {
 ========================= */
 
 function renderRanking(ranking) {
-  
+console.log(ordenActual.campo, ranking[0].partidos);  
   // 👇 Sólo mostrar jugadores con más de 20 partidos
   if (ordenActual.campo === "efectividad") {
     ranking = ranking.filter(j => j.partidos > 20);
