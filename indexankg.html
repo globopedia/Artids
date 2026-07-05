@@ -384,12 +384,20 @@ function clasificarTorneo(torneo) {
   const desde = document.getElementById("fechaDesde").value;
   const hasta = document.getElementById("fechaHasta").value;
 
-  if (desde) {
-    partidos = partidos.filter(p => new Date(p.Fecha) >= new Date(desde));
-  }
-  if (hasta) {
-    partidos = partidos.filter(p => new Date(p.Fecha) <= new Date(hasta));
-  }
+const fechaDesde = desde ? new Date(desde) : null;
+const fechaHasta = hasta ? new Date(hasta) : null;
+
+if (fechaDesde) {
+  partidos = partidos.filter(p =>
+    convertirFecha(p.Fecha) >= fechaDesde
+  );
+}
+
+if (fechaHasta) {
+  partidos = partidos.filter(p =>
+    convertirFecha(p.Fecha) <= fechaHasta
+  );
+}
 
   // 🏆 FILTRO TORNEO
   if (filtroTorneo !== "TODOS") {
