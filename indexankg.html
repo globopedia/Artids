@@ -467,16 +467,15 @@ function aplicarFiltrosLivianos() {
   }
 
 // 🔥 REORDENAR
-const campo = (ordenActual.campo === "pataduras")
-    ? "globopedia"
-    : ordenActual.campo;
+if (ordenActual.campo === "pataduras") {
+    ranking.sort((a, b) => a.globopedia - b.globopedia);
+} else {
+    ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo]);
+}
 
-ranking.sort((a, b) => {
-    if (ordenActual.campo === "pataduras") {
-        return a[campo] - b[campo];
-    }
-    return b[campo] - a[campo];
-});
+rankingActual = ranking;
+renderRanking(rankingActual);
+}
   
 /* =========================
    FUNCIONES BASE
