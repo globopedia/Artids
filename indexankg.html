@@ -292,6 +292,7 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="duco">MÁS PARTIDOS EN EL DUCÓ</option>
 <option value="inactividad">MÁS TIEMPO SIN JUGAR</option>
 <option value="rachaSinGoles">MÁS MINUTOS SIN GOLES EN CONTRA</option>
+<option value="rachaSinGoles">MÁS PARTIDOS SEGUIDOS HACIENDO GOLES</option>
 <option value="pataduras">LOS QUE NO RINDIERON</option>
 </select>
 </div>
@@ -340,6 +341,10 @@ const CONFIG_ESTADISTICAS = {
     campo: "Tiempo",
     formato: r => r.inactividadTexto},
 
+rachaGoles:{titulo:"MÁS PARTIDOS SEGUIDOS HACIENDO GOLES",
+    campo:"Partidos",
+    formato:r=>r.rachaGolesTexto},
+  
   rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
     campo: "Minutos",
     formato: r => r.rachaTexto},
@@ -936,6 +941,75 @@ if (rachaActual > 0) {
     fin: mejorFin
   };
 }   
+ function calcularRachasGoleadoras(nombre, partidos) {
+
+  const partidosJugador = partidos
+    .filter(p => (p.Huracán || "").toLowerCase().includes(nombre.toLowerCase()))
+    .sort((a, b) => convertirFecha(a.Fecha) - convertirFecha(b.Fecha));
+
+  let rachas = [];
+
+let rachaActual = 0;
+let golesActual = 0;
+let inicioRacha = null;
+
+for (const p of partidosJugador) {
+
+  const incidencias = p.Incidencias || "";
+  const fecha = convertirFecha(p.Fecha);
+
+  // contar goles del jugador en este partido
+  const patron = new RegExp(
+    "GOL\\s+" +
+    nombre.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+    "\\s*\\(HUR\\)",
+    "gi"
+  );
+
+  const golesPartido = (incidencias.match(patron) || []).length;
+
+  if (golesPartido > 0) {
+
+    if (rachaActual === 0) {
+      inicioRacha = fecha;
+    }
+
+    rachaActual++;
+    golesActual += golesPartido;
+
+  } else {
+
+    if (rachaActual > 0) {
+      rachas.push({
+        partidos: rachaActual,
+        goles: golesActual,
+        inicio: inicioRacha,
+        fin: convertirFecha(p.Fecha)
+      });
+    }
+
+    rachaActual = 0;
+    golesActual = 0;
+    inicioRacha = null;
+  }
+}
+
+// cerrar la última racha
+if (rachaActual > 0) {
+
+  rachas.push({
+    partidos: rachaActual,
+    goles: golesActual,
+    inicio: inicioRacha,
+    fin: convertirFecha(
+      partidosJugador[partidosJugador.length - 1].Fecha
+    )
+  });
+
+}
+
+return rachas;
+}
     // === COEFICIENTES DE RENDIMIENTO ===
 
 const COEF_BASE = {
