@@ -411,7 +411,7 @@ if (fechaHasta) {
 
 // 👇 Sólo mostrar jugadores con más de 20 partidos
 if (ordenActual.campo === "efectividad") {
-  ranking = ranking.filter(j => j.partidos > 20);
+  ranking = ranking.filter(j => j.partidos < 20);
 }
     // 🌍 FILTRO EXTRANJEROS
 const soloExtranjeros = document.getElementById("soloExtranjeros").checked;
@@ -426,7 +426,7 @@ if (soloInferiores) {
 }
   // 👇 Sólo mostrar jugadores con más de 20 partidos
 if (ordenActual.campo === "efectividad") {
-  ranking = ranking.filter(j => j.partidos > 20);
+  ranking = ranking.filter(j => j.partidos < 20);
 }
   // 📈 ORDEN
   ranking.sort((a, b) =>
