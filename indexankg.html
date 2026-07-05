@@ -292,6 +292,7 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="duco">MÁS PARTIDOS EN EL DUCÓ</option>
 <option value="inactividad">MÁS TIEMPO SIN JUGAR</option>
 <option value="rachaSinGoles">MÁS MINUTOS SIN GOLES EN CONTRA</option>
+<option value="pataduras">LOS QUE NO RINDIERON</option>
 </select>
 </div>
 <div id="ranking">Cargando datos...</div>
@@ -343,6 +344,11 @@ const CONFIG_ESTADISTICAS = {
   rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
     campo: "Minutos",
     formato: r => r.rachaTexto}
+
+  pataduras: {
+    campo: "Globopedia",
+    formato: r => r.globopedia.toFixed(1)
+},
 
 };
 function clasificarTorneo(torneo) {
@@ -429,9 +435,11 @@ if (ordenActual.campo === "efectividad") {
   ranking = ranking.filter(j => j.partidos > 20);
 }
   // 📈 ORDEN
-  ranking.sort((a, b) =>
-    b[ordenActual.campo] - a[ordenActual.campo]
-  );
+  if (ordenActual.campo === "pataduras") {
+    ranking.sort((a, b) => a.globopedia - b.globopedia);
+} else {
+    ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo]);
+}
 
   rankingBase = ranking;
 aplicarFiltrosLivianos();
