@@ -1489,6 +1489,14 @@ if (racha.inicio && racha.fin) {
 } else {
   j.rachaTexto = `${racha.minutos} min.`;
 }
+if (j.nombre === "Cristian Tavio") {
+  console.log("TAVIO", {
+    partidos: j.partidos,
+    fechas: j.fechas,
+    anios: Array.from(j.anios),
+    inactividadMs
+  });
+}
     return {
  nombre: j.nombre,
  nombreOrden: formatearApellidoPrimero(j.nombre),
