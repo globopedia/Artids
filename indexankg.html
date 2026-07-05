@@ -297,8 +297,7 @@ Hasta: <input type="date" id="fechaHasta">
 </div>
 <div id="ranking">Cargando datos...</div>
 
-
-  <script>
+<script>
 let rankingActual = [];
 let rankingBase = [];
 let ordenActual = { campo: "globopedia", asc: true };
@@ -345,7 +344,7 @@ const CONFIG_ESTADISTICAS = {
     campo: "Minutos",
     formato: r => r.rachaTexto},
 
-  pataduras: {
+  pataduras: {titulo: "LOS QUE NO RINDIERON",
     campo: "Globopedia",
     formato: r => r.globopedia.toFixed(1)
 }
