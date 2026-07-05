@@ -287,7 +287,7 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="minutos">MÁS MINUTOS JUGADOS</option>
 <option value="goles">MÁXIMOS GOLEADORES</option>
 <option value="expulsiones">MÁS EXPULSIONES</option>
-<option value="efectividad">EFECTIVIDAD DE PUNTOS</option>
+<option value="efectividad">EFECTIVIDAD DE PUNTOS (+20 PARTIDOS)</option>
 <option value="vallasInvictas">MÁS VALLAS INVICTAS</option>
 <option value="duco">MÁS PARTIDOS EN EL DUCÓ</option>
 <option value="inactividad">MÁS TIEMPO SIN JUGAR</option>
@@ -328,7 +328,7 @@ const CONFIG_ESTADISTICAS = {
     campo: "Partidos Invicto",
     formato: r => r.vallasInvictas},
 
-  efectividad: {titulo: "EFECTIVIDAD DE PUNTOS",
+  efectividad: {titulo: "EFECTIVIDAD DE PUNTOS (+20 PARTIDOS)",
     campo: "Efectividad",
     formato: r => r.efectividad + "%"},
 
@@ -409,7 +409,11 @@ if (fechaHasta) {
   // 📊 GENERAR RANKING
   let ranking = generarRanking(partidos);
 
-// 🌍 FILTRO EXTRANJEROS
+// 👇 Sólo mostrar jugadores con más de 20 partidos
+if (ordenActual.campo === "efectividad") {
+  ranking = ranking.filter(j => j.partidos > 20);
+}
+    // 🌍 FILTRO EXTRANJEROS
 const soloExtranjeros = document.getElementById("soloExtranjeros").checked;
 if (soloExtranjeros) {
   ranking = ranking.filter(j => esExtranjero(j.nombre));
@@ -419,6 +423,10 @@ if (soloExtranjeros) {
 const soloInferiores = document.getElementById("soloInferiores").checked;
 if (soloInferiores) {
   ranking = ranking.filter(j => esDeInferiores(j.nombre));
+}
+  // 👇 Sólo mostrar jugadores con más de 20 partidos
+if (ordenActual.campo === "efectividad") {
+  ranking = ranking.filter(j => j.partidos > 20);
 }
   // 📈 ORDEN
   ranking.sort((a, b) =>
