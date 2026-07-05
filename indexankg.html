@@ -346,7 +346,6 @@ const CONFIG_ESTADISTICAS = {
 
   pataduras: {titulo: "LOS QUE NO RINDIERON",
     campo: "Globopedia",
-    orden: "asc",
     formato: r => r.globopedia.toFixed(1)
 }
 
@@ -468,14 +467,21 @@ function aplicarFiltrosLivianos() {
   }
 
   // 🔥 REORDENAR
+if (ordenActual.campo === "pataduras") {
+
+  ranking.sort((a, b) => a.globopedia - b.globopedia);
+
+} else {
+
   ranking.sort((a, b) =>
     b[ordenActual.campo] - a[ordenActual.campo]
   );
 
-  rankingActual = ranking;
-
-  renderRanking(rankingActual);
 }
+
+rankingActual = ranking;
+
+renderRanking(rankingActual);
     
 /* =========================
    FUNCIONES BASE
