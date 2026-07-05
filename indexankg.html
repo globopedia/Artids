@@ -34,7 +34,7 @@ th, td {
   border-bottom:1px solid #ddd;
   text-align:center;
   font-size:18px;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -182,9 +182,14 @@ table tbody tr:hover td {
   box-shadow:0 2px 6px rgba(0,0,0,0.25);
   transition:transform 0.2s ease;
 }
+  
 tr:hover .foto-jugador{
-  transform:scale(1.25);
+  transform: scale(1.45);
+  z-index: 100;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0,0,0,.45);
 }
+
 #ranking {
   opacity: 1;
   transition: opacity 0.25s ease;
