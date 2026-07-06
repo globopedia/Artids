@@ -798,7 +798,9 @@ const htmlTransfers = `
 
   </div>
 `;
-const htmlGoleadores = `
+const topHuracan = goleadores.huracan.length ? goleadores.huracan[0] : null;
+const fotoTopHuracan = topHuracan ? obtenerFotoJugador(topHuracan[0]) : "";
+      const htmlGoleadores = `
     <hr style="margin:15px 0; border-color:#FF1111;">
   <div class="stat-group">
     <div class="stat-title">⚽ GOLEADORES HISTÓRICOS -en construcción-</div>
@@ -806,10 +808,27 @@ const htmlGoleadores = `
     <div style="display:flex; gap:20px; flex-wrap:wrap;">
       
 <div style="flex:1;">
-  <b style="color:#FF0000;">Huracán</b>
+
+  ${topHuracan ? `
+  <div class="goleador-top">
+
+    ${fotoTopHuracan ? `<img src="${fotoTopHuracan}" alt="${topHuracan[0]}">` : ""}
+
+    <div>
+      <div class="titulo">👑 Máximo goleador</div>
+      <div class="nombre">${topHuracan[0]}</div>
+      <div class="goles">⚽ ${topHuracan[1]} goles</div>
+    </div>
+
+  </div>
+  ` : ""}
+
   <ul>
-    ${goleadores.huracan.map(g => `<li>${g[0]} (${g[1]})</li>`).join("")}
+    ${goleadores.huracan.slice(1).map((g,i)=>
+      `<li>${i+2}. ${g[0]} (${g[1]})</li>`
+    ).join("")}
   </ul>
+
 </div>
       <div style="flex:1;">
         <b>${nombreClub}</b>
