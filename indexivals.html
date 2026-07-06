@@ -74,52 +74,45 @@
   margin: 2px 0;
   line-height: 1.2;
 }
-/* ===== GOLEADOR HISTÓRICO ===== */
-
-.goleador-top{
-    display:flex;
-    align-items:center;
-    gap:15px;
-    padding:14px;
-    margin-bottom:14px;
-    border:2px solid #FF0000;
-    border-radius:16px;
-    background:linear-gradient(135deg,#fff,#fff5f5);
-    box-shadow:0 4px 10px rgba(0,0,0,.10);
+.goleadores-lista {
+  list-style:none;
+  padding:0;
+  margin:8px 0 0;
 }
-
-.goleador-top img{
-    width:72px;
-    height:72px;
-    border-radius:50%;
-    object-fit:cover;
-    border:3px solid #FF0000;
+.goleador-top {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:8px 0 10px;
+  padding:8px;
+  border:2px solid #FF0000;
+  border-radius:10px;
+  background:#fff;
 }
-
-.goleador-top .titulo{
-    font-size:12px;
-    font-weight:bold;
-    color:#888;
-    text-transform:uppercase;
-    letter-spacing:1px;
+.goleador-top img {
+  width:58px;
+  height:72px;
+  object-fit:cover;
+  border-radius:8px;
+  border:2px solid #FF0000;
+  background:#fff;
 }
-
-.goleador-top .nombre{
-    font-size:22px;
-    font-weight:700;
-    color:#C00000;
-    line-height:1.1;
+.goleador-top-nombre {
+  display:block;
+  color:#FF0000;
+  font-size:20px;
+  font-weight:900;
+  line-height:1.05;
 }
-
-.goleador-top .goles{
-    display:inline-block;
-    margin-top:6px;
-    padding:4px 10px;
-    border-radius:999px;
-    background:#FF0000;
-    color:white;
-    font-weight:bold;
-    font-size:15px;
+.goleador-top-goles {
+  display:block;
+  color:#222;
+  font-size:15px;
+  font-weight:bold;
+  margin-top:3px;
+}
+.goleador-normal {
+  margin:4px 0;
 }
   </style>
 </head>
@@ -621,14 +614,6 @@ function obtenerGoleadores(partidos, nombreClub) {
     });
   });
 
-function obtenerFotoJugador(nombre){
-
-    const j = transfers.find(t =>
-        norm(t.jugador) === norm(nombre)
-    );
-
-    return j ? j.foto : "";
-}
   function top10(obj) {
     return Object.entries(obj)
       .sort((a,b) => b[1] - a[1])
@@ -639,6 +624,51 @@ function obtenerFotoJugador(nombre){
     huracan: top10(goleadoresHuracan),
     rival: top10(goleadoresRival)
   };
+}
+
+function escapeHTML(valor) {
+  return (valor || "").toString()
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buscarFichaJugador(nombreJugador) {
+  const jugadorNorm = norm(nombreJugador);
+  return transfers.find(t => norm(t.jugador) === jugadorNorm) ||
+         transfers.find(t => norm(t.jugador).includes(jugadorNorm) || jugadorNorm.includes(norm(t.jugador)));
+}
+
+function renderGoleadoresHuracan(goleadores) {
+  if (!goleadores.length) return "<li>Sin goles registrados</li>";
+
+  return goleadores.map((g, index) => {
+    const [nombre, goles] = g;
+    const ficha = buscarFichaJugador(nombre);
+    const nombreSeguro = escapeHTML(nombre);
+    const golesTexto = `${goles} ${goles === 1 ? "gol" : "goles"}`;
+
+    if (index === 0) {
+      return `
+        <li class="goleador-top">
+          ${ficha?.foto ? `<img src="${escapeHTML(ficha.foto)}" alt="${nombreSeguro}" onerror="this.style.display='none'">` : ""}
+          <span>
+            <span class="goleador-top-nombre">${nombreSeguro}</span>
+            <span class="goleador-top-goles">${golesTexto}</span>
+          </span>
+        </li>
+      `;
+    }
+
+    return `<li class="goleador-normal">${nombreSeguro} (${goles})</li>`;
+  }).join("");
+}
+
+function renderGoleadoresRival(goleadores) {
+  if (!goleadores.length) return "<li>Sin goles registrados</li>";
+  return goleadores.map(g => `<li>${escapeHTML(g[0])} (${g[1]})</li>`).join("");
 }
     function renderEstadisticas(nombreClub) {
       const clubNorm = norm(nombreClub);
@@ -806,58 +836,15 @@ const htmlGoleadores = `
     <div style="display:flex; gap:20px; flex-wrap:wrap;">
       
 <div style="flex:1;">
-
-${(() => {
-
-    if (!goleadores.huracan.length) return "<i>Sin datos</i>";
-
-    const top = goleadores.huracan[0];
-    const foto = obtenerFotoJugador(top[0]);
-
-    return `
-
-        <div class="goleador-top">
-
-            ${
-                foto
-                ? `<img src="${foto}" alt="${top[0]}">`
-                : ""
-            }
-
-            <div>
-
-                <div class="titulo">
-                    👑 Máximo goleador
-                </div>
-
-                <div class="nombre">
-                    ${top[0]}
-                </div>
-
-                <div class="goles">
-                    ⚽ ${top[1]} goles
-                </div>
-
-            </div>
-
-        </div>
-
-        <ul style="margin-top:8px;">
-            ${goleadores.huracan
-                .slice(1)
-                .map((g,i)=>`<li>${i+2}. ${g[0]} (${g[1]})</li>`)
-                .join("")}
-        </ul>
-
-    `;
-
-})()}
-
+  <b style="color:#FF0000;">Huracán</b>
+  <ul class="goleadores-lista">
+    ${renderGoleadoresHuracan(goleadores.huracan)}
+  </ul>
 </div>
       <div style="flex:1;">
         <b>${nombreClub}</b>
         <ul>
-          ${goleadores.rival.map(g => `<li>${g[0]} (${g[1]})</li>`).join("")}
+          ${renderGoleadoresRival(goleadores.rival)}
         </ul>
       </div>
 
