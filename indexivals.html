@@ -74,53 +74,6 @@
   margin: 2px 0;
   line-height: 1.2;
 }
-    /* ===== GOLEADOR HISTÓRICO ===== */
-
-.goleador-top{
-    display:flex;
-    align-items:center;
-    gap:15px;
-    padding:14px;
-    margin-bottom:14px;
-    border:2px solid #FF0000;
-    border-radius:16px;
-    background:linear-gradient(135deg,#fff,#fff5f5);
-    box-shadow:0 4px 10px rgba(0,0,0,.10);
-}
-
-.goleador-top img{
-    width:72px;
-    height:72px;
-    border-radius:50%;
-    object-fit:cover;
-    border:3px solid #FF0000;
-}
-
-.goleador-top .titulo{
-    font-size:12px;
-    font-weight:bold;
-    color:#888;
-    text-transform:uppercase;
-    letter-spacing:1px;
-}
-
-.goleador-top .nombre{
-    font-size:22px;
-    font-weight:700;
-    color:#C00000;
-    line-height:1.1;
-}
-
-.goleador-top .goles{
-    display:inline-block;
-    margin-top:6px;
-    padding:4px 10px;
-    border-radius:999px;
-    background:#FF0000;
-    color:white;
-    font-weight:bold;
-    font-size:15px;
-}
   </style>
 </head>
 <body>
@@ -621,14 +574,6 @@ function obtenerGoleadores(partidos, nombreClub) {
     });
   });
 
-  function obtenerFotoJugador(nombre){
-
-    const j = transfers.find(t =>
-        norm(t.jugador) === norm(nombre)
-    );
-
-    return j ? j.foto : "";
-}
   function top10(obj) {
     return Object.entries(obj)
       .sort((a,b) => b[1] - a[1])
@@ -798,9 +743,7 @@ const htmlTransfers = `
 
   </div>
 `;
-const topHuracan = goleadores.huracan.length ? goleadores.huracan[0] : null;
-const fotoTopHuracan = topHuracan ? obtenerFotoJugador(topHuracan[0]) : "";
-      const htmlGoleadores = `
+const htmlGoleadores = `
     <hr style="margin:15px 0; border-color:#FF1111;">
   <div class="stat-group">
     <div class="stat-title">⚽ GOLEADORES HISTÓRICOS -en construcción-</div>
@@ -808,27 +751,10 @@ const fotoTopHuracan = topHuracan ? obtenerFotoJugador(topHuracan[0]) : "";
     <div style="display:flex; gap:20px; flex-wrap:wrap;">
       
 <div style="flex:1;">
-
-  ${topHuracan ? `
-  <div class="goleador-top">
-
-    ${fotoTopHuracan ? `<img src="${fotoTopHuracan}" alt="${topHuracan[0]}">` : ""}
-
-    <div>
-      <div class="titulo">👑 Máximo goleador</div>
-      <div class="nombre">${topHuracan[0]}</div>
-      <div class="goles">⚽ ${topHuracan[1]} goles</div>
-    </div>
-
-  </div>
-  ` : ""}
-
+  <b style="color:#FF0000;">Huracán</b>
   <ul>
-    ${goleadores.huracan.slice(1).map((g,i)=>
-      `<li>${i+2}. ${g[0]} (${g[1]})</li>`
-    ).join("")}
+    ${goleadores.huracan.map(g => `<li>${g[0]} (${g[1]})</li>`).join("")}
   </ul>
-
 </div>
       <div style="flex:1;">
         <b>${nombreClub}</b>
