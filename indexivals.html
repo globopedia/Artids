@@ -806,55 +806,11 @@ const htmlGoleadores = `
     <div style="display:flex; gap:20px; flex-wrap:wrap;">
       
 <div style="flex:1;">
-
-${(() => {
-
-    if (!goleadores.huracan.length) return "<i>Sin datos</i>";
-
-    const top = goleadores.huracan[0];
-    const foto = obtenerFotoJugador(top[0]);
-
-    return `
-
-        <div class="goleador-top">
-
-            ${
-                foto
-                ? `<img src="${foto}" alt="${top[0]}">`
-                : ""
-            }
-
-            <div>
-
-                <div class="titulo">
-                    👑 Máximo goleador
-                </div>
-
-                <div class="nombre">
-                    ${top[0]}
-                </div>
-
-                <div class="goles">
-                    ⚽ ${top[1]} goles
-                </div>
-
-            </div>
-
-        </div>
-
-        <ul style="margin-top:8px;">
-            ${goleadores.huracan
-                .slice(1)
-                .map((g,i)=>`<li>${i+2}. ${g[0]} (${g[1]})</li>`)
-                .join("")}
-        </ul>
-
-    `;
-
-})()}
-
+  <b style="color:#FF0000;">Huracán</b>
+  <ul>
+    ${goleadores.huracan.map(g => `<li>${g[0]} (${g[1]})</li>`).join("")}
+  </ul>
 </div>
-
       <div style="flex:1;">
         <b>${nombreClub}</b>
         <ul>
