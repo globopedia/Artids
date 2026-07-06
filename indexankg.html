@@ -341,14 +341,14 @@ const CONFIG_ESTADISTICAS = {
     campo: "Tiempo",
     formato: r => r.inactividadTexto},
 
-rachaGoles:{titulo:"MÁS PARTIDOS SEGUIDOS HACIENDO GOLES",
-    campo:"Partidos",
-    formato:r=>r.rachaGolesTexto},
-  
   rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
     campo: "Minutos",
     formato: r => r.rachaTexto},
 
+  rachaGoles: {titulo: "MÁS PARTIDOS SEGUIDOS HACIENDO GOLES",
+  campo: "Partidos",
+  formato: r => `${r.partidos} (${r.goles} goles)`},
+  
   pataduras: {titulo: "LOS QUE NO RINDIERON",
     campo: "Globopedia",
     formato: r => r.globopedia.toFixed(1)
