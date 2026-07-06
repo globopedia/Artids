@@ -1245,13 +1245,10 @@ datosGlobal.forEach((d, i) => {
   // 👇 EVENTO HOVER (ahora redibuja)
   canvas.onmousemove = function(e) {
     const rect = canvas.getBoundingClientRect();
-
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-
     const dx = x - cx;
     const dy = y - cy;
-
     const distancia = Math.sqrt(dx * dx + dy * dy);
 
     if (distancia > rBase) {
@@ -1272,7 +1269,6 @@ datosGlobal.forEach((d, i) => {
         return;
       }
     }
-
     hoverIndex = -1;
     canvas.title = "";
     draw();
@@ -1286,5 +1282,3 @@ datosGlobal.forEach((d, i) => {
   </script>
 </body>
 </html>
-
-
