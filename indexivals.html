@@ -1321,7 +1321,11 @@ datosGlobal.forEach((d, i) => {
     canvas.title = "";
     draw();
   };
-
+  canvas.onmouseleave = function() {
+    hoverIndex = -1;
+    canvas.title = "";
+    draw();
+  };
 }
   </script>
 </body>
