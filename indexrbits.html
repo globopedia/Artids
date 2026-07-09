@@ -50,14 +50,14 @@
   <script>
     // URLs (cache buster)
     const arbitrosURL = "https://globopedia.github.io/Rbits/Rbits.csv?v=" + Date.now();
-    const partidosURL2 = "https://globopedia.github.io/Artids/Artids1910.csv?v=" + Date.now();
-    const partidosURL3 = "https://globopedia.github.io/Artids/Artids1925.csv?v=" + Date.now();
-    const partidosURL4 = "https://globopedia.github.io/Artids/Artids1940.csv?v=" + Date.now();
-    const partidosURL5 = "https://globopedia.github.io/Artids/Artids1955.csv?v=" + Date.now();
-    const partidosURL6 = "https://globopedia.github.io/Artids/Artids1970.csv?v=" + Date.now();
-    const partidosURL7 = "https://globopedia.github.io/Artids/Artids1985.csv?v=" + Date.now();
-    const partidosURL8 = "https://globopedia.github.io/Artids/Artids2000.csv?v=" + Date.now();
-    const partidosURL9 = "https://globopedia.github.io/Artids/Artids2015.csv?v=" + Date.now();
+    const partidosURL = "https://globopedia.github.io/Artids/Artids1910.csv?v=" + Date.now();
+    const partidosURL2 = "https://globopedia.github.io/Artids/Artids1925.csv?v=" + Date.now();
+    const partidosURL3 = "https://globopedia.github.io/Artids/Artids1940.csv?v=" + Date.now();
+    const partidosURL4 = "https://globopedia.github.io/Artids/Artids1955.csv?v=" + Date.now();
+    const partidosURL5 = "https://globopedia.github.io/Artids/Artids1970.csv?v=" + Date.now();
+    const partidosURL6 = "https://globopedia.github.io/Artids/Artids1985.csv?v=" + Date.now();
+    const partidosURL7 = "https://globopedia.github.io/Artids/Artids2000.csv?v=" + Date.now();
+    const partidosURL8 = "https://globopedia.github.io/Artids/Artids2015.csv?v=" + Date.now();
     
     let arbitros = [];
     let encuentros = [];
@@ -89,9 +89,8 @@ Promise.all([
   fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); }),
   fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); }),
   fetch(partidosURL8).then(r => { if(!r.ok) throw new Error("Partidos CSV 8 no disponible"); return r.text(); }),
-  fetch(partidosURL9).then(r => { if(!r.ok) throw new Error("Partidos CSV 9 no disponible"); return r.text(); })
 ])
-.then(([csvRbits, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8, csvPartidos9]) => {
+.then(([csvRbits, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
       // Ajustar columnas según tu CSV: ID, Árbitro, Datos (tal como me pasaste)
       arbitros = Papa.parse(csvRbits, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.ID ?? "").toString().trim(),
@@ -102,15 +101,14 @@ Promise.all([
 
      const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
      const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
-     const partidos3 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos4 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos5 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos6 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos7 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos8 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos9 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
+     const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
+     const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
+     const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
+     const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
+     const partidos7 = Papa.parse(csvPartidos7, { header:true, skipEmptyLines:true }).data;
+     const partidos8 = Papa.parse(csvPartidos8, { header:true, skipEmptyLines:true }).data;
 
-encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7, ...partidos8, ...partidos9].map(p => ({
+encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7, ...partidos8].map(p => ({
         Fecha: (p.Fecha ?? "").trim(),
         Técnico: (p.Técnico ?? "").trim(),
         Condición: (p.Condición ?? "").trim(),
