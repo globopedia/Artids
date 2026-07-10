@@ -58,26 +58,26 @@
   <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
   <h1>📜 Árbitros</h1>
 
- placeholder="Escriba un apellido..."
-    autocomplete="off"
-    style="width:100%;padding:8px;border:2px solid #FF0000;border-radius:8px;font-size:16px;">
+style="width:100%;padding:8px;border:2px solid #FF0000;border-radius:8px;font-size:16px;">
 
-  <ul id="autocompleteList"
-      style="position:absolute;
-             top:70px;
-             left:0;
-             right:0;
-             background:white;
-             border:1px solid #ccc;
-             border-radius:8px;
-             list-style:none;
-             padding:0;
-             margin:0;
-             max-height:320px;
-             overflow-y:auto;
-             z-index:999;"></ul>
+<ul id="autocompleteList"
+    style="position:absolute;
+           top:45px;
+           left:0;
+           right:0;
+           background:white;
+           border:1px solid #ccc;
+           border-radius:8px;
+           list-style:none;
+           padding:0;
+           margin:0;
+           max-height:320px;
+           overflow-y:auto;
+           z-index:999;">
+</ul>
 
-  <select id="arbitroSelect" style="display:none;"></select>
+<select id="arbitroSelect" style="display:none;"></select>
+
 </div>
 
   <div id="arbitroInfo" class="club-card" style="display:none;"></div>
@@ -167,10 +167,19 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
     });
 
     // Mostrar apellido, nombre en el select (usa invertirNombre)
-    function llenarSelectArbitros() {
-      const sel = document.getElementById("arbitroSelect");
-      sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
-        }
+ function llenarSelectArbitros() {
+  const sel = document.getElementById("arbitroSelect");
+  sel.innerHTML = "<option value=''></option>";
+
+  arbitros.forEach(a => {
+    if (a.id && a.nombre) {
+      const opt = document.createElement("option");
+      opt.value = a.id;
+      opt.textContent = a.nombre;
+      sel.appendChild(opt);
+    }
+  });
+}
       });
       sel.addEventListener("change", mostrarArbitro);
     }
