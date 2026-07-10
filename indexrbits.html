@@ -34,29 +34,26 @@
     .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; }
     .stat-title small { color:#666; font-weight:normal; margin-left:6px; }
+    
     /* Estilos para el menú de autocompletado */
-.autocomplete-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px;
-  cursor: pointer;
-}
+    .autocomplete-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      cursor: pointer;
+    }
 
-.autocomplete-item img {
-  width: 32px;
-  height: 42px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
+    #autocompleteList {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
 
-#autocompleteList li:hover {
-  background-color: #ffdddd;
-  border-radius: 6px;
-  box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
-  transition: all 0.2s;
-}
+    #autocompleteList li:hover {
+      background-color: #ffdddd;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
+      transition: all 0.2s;
+    }
   </style>
 </head>
 <body>
@@ -64,12 +61,12 @@
   <h1>📜 Árbitros</h1>
 
   <div style="text-align:center; position:relative;">
-  <label for="arbitroSearch">Seleccioná árbitro: </label>
-  <input type="text" id="arbitroSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px;">
-  <select id="arbitroSelect" style="display:none;"></select>
-  <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;"></ul>
-</div>
-  
+    <label for="arbitroSearch">Seleccioná árbitro: </label>
+    <input type="text" id="arbitroSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px; width: 280px;">
+    <select id="arbitroSelect" style="display:none;"></select>
+    <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;display:none;"></ul>
+  </div>
+   
   <div id="arbitroInfo" class="club-card" style="display:none;"></div>
 
   <script>
@@ -82,7 +79,7 @@
   const partidosURL6 = "https://artids.vercel.app/api/data?file=artids1985";
   const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2000";
   const partidosURL8 = "https://artids.vercel.app/api/data?file=artids2015";
-    
+     
     let arbitros = [];
     let encuentros = [];
 
@@ -103,19 +100,18 @@
     const SITUACIONES = ["Victoria","Empate","Derrota"];
 
     // Carga de CSVs
-Promise.all([
-  fetch(arbitrosURL).then(r => { if(!r.ok) throw new Error("Árbitros CSV no disponible"); return r.text(); }),
-  fetch(partidosURL).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
-  fetch(partidosURL2).then(r => { if(!r.ok) throw new Error("Partidos CSV 2 no disponible"); return r.text(); }),
-  fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
-  fetch(partidosURL4).then(r => { if(!r.ok) throw new Error("Partidos CSV 4 no disponible"); return r.text(); }),
-  fetch(partidosURL5).then(r => { if(!r.ok) throw new Error("Partidos CSV 5 no disponible"); return r.text(); }),
-  fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); }),
-  fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); }),
-  fetch(partidosURL8).then(r => { if(!r.ok) throw new Error("Partidos CSV 8 no disponible"); return r.text(); }),
-])
-.then(([csvRbits, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
-      // Ajustar columnas según tu CSV: ID, Árbitro, Datos (tal como me pasaste)
+    Promise.all([
+      fetch(arbitrosURL).then(r => { if(!r.ok) throw new Error("Árbitros CSV no disponible"); return r.text(); }),
+      fetch(partidosURL).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
+      fetch(partidosURL2).then(r => { if(!r.ok) throw new Error("Partidos CSV 2 no disponible"); return r.text(); }),
+      fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
+      fetch(partidosURL4).then(r => { if(!r.ok) throw new Error("Partidos CSV 4 no disponible"); return r.text(); }),
+      fetch(partidosURL5).then(r => { if(!r.ok) throw new Error("Partidos CSV 5 no disponible"); return r.text(); }),
+      fetch(partidosURL6).then(r => { if(!r.ok) throw new Error("Partidos CSV 6 no disponible"); return r.text(); }),
+      fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); }),
+      fetch(partidosURL8).then(r => { if(!r.ok) throw new Error("Partidos CSV 8 no disponible"); return r.text(); }),
+    ])
+    .then(([csvRbits, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
       arbitros = Papa.parse(csvRbits, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.ID ?? "").toString().trim(),
         nombre: (c["Árbitro"] ?? "").toString().trim(),
@@ -123,16 +119,16 @@ Promise.all([
         foto: (c.Foto ?? c.foto ?? "").toString().trim()
       }));
 
-     const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
-     const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
-     const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
-     const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
-     const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
-     const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
-     const partidos7 = Papa.parse(csvPartidos7, { header:true, skipEmptyLines:true }).data;
-     const partidos8 = Papa.parse(csvPartidos8, { header:true, skipEmptyLines:true }).data;
+      const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
+      const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
+      const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
+      const partidos4 = Papa.parse(csvPartidos4, { header:true, skipEmptyLines:true }).data;
+      const partidos5 = Papa.parse(csvPartidos5, { header:true, skipEmptyLines:true }).data;
+      const partidos6 = Papa.parse(csvPartidos6, { header:true, skipEmptyLines:true }).data;
+      const partidos7 = Papa.parse(csvPartidos7, { header:true, skipEmptyLines:true }).data;
+      const partidos8 = Papa.parse(csvPartidos8, { header:true, skipEmptyLines:true }).data;
 
-encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7, ...partidos8].map(p => ({
+      encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partidos5, ...partidos6, ...partidos7, ...partidos8].map(p => ({
         Fecha: (p.Fecha ?? "").trim(),
         Técnico: (p.Técnico ?? "").trim(),
         Condición: (p.Condición ?? "").trim(),
@@ -150,13 +146,13 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
       }));
 
       llenarSelectArbitros();
+      inicializarAutocompletado();
     })
     .catch(err => {
       console.error("Error cargando CSVs:", err);
       alert("No pude cargar los CSV. Revisá las URLs o el formato en la consola.");
     });
 
-    // Mostrar apellido, nombre en el select (usa invertirNombre)
     function llenarSelectArbitros() {
       const sel = document.getElementById("arbitroSelect");
       sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
@@ -171,7 +167,57 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
       sel.addEventListener("change", mostrarArbitro);
     }
 
-    // Al seleccionar árbitro: mostrar datos + estadísticas
+    // LÓGICA DE AUTOCOMPLETADO AGREGADA ACÁ
+    function inicializarAutocompletado() {
+      const inputSearch = document.getElementById("arbitroSearch");
+      const listContainer = document.getElementById("autocompleteList");
+      const sel = document.getElementById("arbitroSelect");
+
+      inputSearch.addEventListener("input", function() {
+        const buscarTexto = norm(this.value);
+        listContainer.innerHTML = "";
+
+        if (!buscarTexto) {
+          listContainer.style.display = "none";
+          return;
+        }
+
+        // Filtramos buscando tanto en el formato original como invertido (Apellido, Nombre)
+        const filtrados = arbitros.filter(a => {
+          const nombreOriginal = norm(a.nombre);
+          const nombreInvertido = norm(invertirNombre(a.nombre));
+          return nombreOriginal.includes(buscarTexto) || nombreInvertido.includes(buscarTexto);
+        });
+
+        if (filtrados.length === 0) {
+          listContainer.style.display = "none";
+          return;
+        }
+
+        filtrados.slice(0, 10).forEach(a => {
+          const li = document.createElement("li");
+          li.className = "autocomplete-item";
+          li.textContent = invertirNombre(a.nombre);
+          li.addEventListener("click", function() {
+            inputSearch.value = invertirNombre(a.nombre);
+            sel.value = a.id;
+            listContainer.style.display = "none";
+            mostrarArbitro(); // Ejecuta la función original para pintar la ficha
+          });
+          listContainer.appendChild(li);
+        });
+
+        listContainer.style.display = "block";
+      });
+
+      // Cierra el menú si se hace click afuera de la barra
+      document.addEventListener("click", function(e) {
+        if (e.target !== inputSearch && e.target !== listContainer) {
+          listContainer.style.display = "none";
+        }
+      });
+    }
+
     function mostrarArbitro() {
       const arbitroId = document.getElementById("arbitroSelect").value;
       const arbitro = arbitros.find(a => (a.id||"").trim() === (arbitroId||"").trim());
@@ -188,15 +234,15 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
           <h2>${arbitro.nombre}</h2>
         </div>
         <p><b>Datos:</b> ${arbitro.datos}</p>
-${ (() => {
-     const r = calcularResumenArbitro(arbitro.nombre);
-     return `
-       <p>Arbitró <b>${r.A}</b> partidos, de los que Huracán ganó <b>${r.B}</b>, empató <b>${r.C}</b> y perdió <b>${r.D}</b>.</p>
-       <p>El Globito anotó <b>${r.E}</b> goles y los rivales marcaron <b>${r.F}</b>.</p>
-       <p>Expulsó a <b>${r.G}</b> de Huracán y a <b>${r.H}</b> del rival.</p>
-       <p>Marcó <b>${r.I}</b> penales para el Globito y <b>${r.J}</b> en contra.</p>
-     `;
-   })() }
+        ${ (() => {
+           const r = calcularResumenArbitro(arbitro.nombre);
+           return `
+             <p>Arbitró <b>${r.A}</b> partidos, de los que Huracán ganó <b>${r.B}</b>, empató <b>${r.C}</b> y perdió <b>${r.D}</b>.</p>
+             <p>El Globito anotó <b>${r.E}</b> goles y los rivales marcaron <b>${r.F}</b>.</p>
+             <p>Expulsó a <b>${r.G}</b> de Huracán y a <b>${r.H}</b> del rival.</p>
+             <p>Marcó <b>${r.I}</b> penales para el Globito y <b>${r.J}</b> en contra.</p>
+           `;
+        })() }
          <div class="stats">
           <h3 style="color:#FF0000;">📊 Partidos arbitrados a Huracán</h3>
           ${renderEstadisticas(arbitro.nombre)}
@@ -205,24 +251,23 @@ ${ (() => {
     }
 
     function calcularResumenArbitro(nombreArbitro) {
-  const delArbitro = encuentros.filter(p => norm(p.Árbitro) === norm(nombreArbitro));
+      const delArbitro = encuentros.filter(p => norm(p.Árbitro) === norm(nombreArbitro));
+      const resumen = {
+        A: delArbitro.length,
+        B: delArbitro.filter(p => norm(p.Situación) === "victoria").length,
+        C: delArbitro.filter(p => norm(p.Situación) === "empate").length,
+        D: delArbitro.filter(p => norm(p.Situación) === "derrota").length,
+        E: delArbitro.reduce((s,p) => s + (parseInt(p.Resultado1)||0), 0),
+        F: delArbitro.reduce((s,p) => s + (parseInt(p.Resultado2)||0), 0),
+        G: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/EXP.*\(HUR\)/gi) || []).length), 0),
+        H: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/EXP.*\((?!HUR)[^)]+\)/gi) || []).length), 0),
+        I: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/\(HUR\)\s*-penal/g)||[]).length), 0),
+        J: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/-penal/g)||[]).length), 0)
+      };
+      resumen.J -= resumen.I;
+      return resumen;
+    }
 
-  const resumen = {
-    A: delArbitro.length, // total de partidos
-    B: delArbitro.filter(p => norm(p.Situación) === "victoria").length,
-    C: delArbitro.filter(p => norm(p.Situación) === "empate").length,
-    D: delArbitro.filter(p => norm(p.Situación) === "derrota").length,
-    E: delArbitro.reduce((s,p) => s + (parseInt(p.Resultado1)||0), 0),
-    F: delArbitro.reduce((s,p) => s + (parseInt(p.Resultado2)||0), 0),
-    G: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/EXP.*\(HUR\)/gi) || []).length), 0),
-    H: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/EXP.*\((?!HUR)[^)]+\)/gi) || []).length), 0),
-    I: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/\(HUR\)\s*-penal/g)||[]).length), 0),
-    J: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/-penal/g)||[]).length), 0)
-  };
-  resumen.J -= resumen.I; // restamos los penales ya contados para Huracán
-  return resumen;
-}
-    // Render estadisticas por competencia y condición (genera checkboxes)
     function renderEstadisticas(nombreArbitro) {
       const delArbitro = encuentros.filter(p => norm(p.Árbitro) === norm(nombreArbitro));
       const agg = {};
@@ -276,7 +321,6 @@ ${ (() => {
       return html || "<p>Sin datos disponibles</p>";
     }
 
-    // Manejador de checkboxes: muestra la lista de partidos según filtro
     document.addEventListener("change", function(e) {
       if (!e.target.classList.contains("chkPartidos")) return;
       const contenedor = e.target.closest("li").querySelector(".partidos-lista");
@@ -292,7 +336,6 @@ ${ (() => {
         if (partidos.length) {
           partidos.forEach(p => {
             let bloqueHTML = "";
-            // Si Huracán fue visitante, lo mostramos en segundo lugar (resultado2)
             if ((p.Condición || "").toLowerCase() === "visitante") {
               bloqueHTML = `
                 <div class="partido-card">
@@ -312,12 +355,11 @@ ${ (() => {
                   </div>
                   <div style="margin-top:6px;"><b>${p.Club}:</b> ${p.Rival}</div>
                   <div><b>Huracán:</b> ${p.Huracán}</div>
-                 ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                  ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
                   </div>
               `;
             } else {
-              // Huracán local (o neutral) — Huracán a la izquierda / primero
               bloqueHTML = `
                 <div class="partido-card">
                   ${getTorneoImage(p.Torneo)}
@@ -337,7 +379,7 @@ ${ (() => {
                   <div style="margin-top:6px;"><b>Huracán:</b> ${p.Huracán}</div>
                   <div><b>${p.Club}:</b> ${p.Rival}</div>
                   <div style="margin-top:6px;">
-                 ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                  ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
                 </div>
               `;
@@ -359,7 +401,6 @@ ${ (() => {
       }
     });
 
-    // Toggle acordeón
     document.addEventListener("click", function(e) {
       if (e.target.classList.contains("acordeon-header")) {
         const body = e.target.nextElementSibling;
@@ -368,17 +409,12 @@ ${ (() => {
       }
     });
 
-    // --- Funciones auxiliares que recuperan el formato original ---
-
-    // Intenta obtener escudo construyendo la URL a la carpeta /escudos/
     function getEscudo(nombreClub) {
       if (!nombreClub) return "";
-      // Primero intentamos con encoding (preserva acentos si los archivos están así)
       try {
         const file = encodeURIComponent(nombreClub.trim()) + ".png";
         return "https://globopedia.github.io/Artids/escudos/" + file;
       } catch (err) {
-        // Fallback: eliminar acentos y espacios
         const fileName = nombreClub
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
           .replace(/\./g, "")
@@ -398,7 +434,6 @@ ${ (() => {
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
     }
 
-    // Busca imagen de estadio en carpeta Estadios (con limpieza básica del nombre)
     function getEstadioImage(estadio) {
       if (!estadio) return "";
       const fileName = estadio
@@ -408,7 +443,6 @@ ${ (() => {
       return "https://globopedia.github.io/Artids/Estadios/" + fileName;
     }
 
-    // Intenta mostrar logo del torneo según una lista conocida
     function getTorneoImage(nombreTorneo) {
       if (!nombreTorneo) return "";
       const texto = nombreTorneo.toLowerCase();
@@ -435,18 +469,18 @@ ${ (() => {
       return "";
     }
     
-function invertirNombre(nombre) {
-  if (!nombre) return "";
-  const match = nombre.match(/^(.*?)\s*\((.*?)\)$/);
-  let base = nombre, extra = "";
-  if (match) { base = match[1]; extra = " (" + match[2] + ")"; }
+    function invertirNombre(nombre) {
+      if (!nombre) return "";
+      const match = text = nombre.match(/^(.*?)\s*\((.*?)\)$/);
+      let base = nombre, extra = "";
+      if (match) { base = match[1]; extra = " (" + match[2] + ")"; }
 
-  const partes = base.trim().split(" ");
-  if (partes.length < 2) return base + extra;
-  const apellido = partes.pop();
-  const nombreSolo = partes.join(" ");
-  return apellido + ", " + nombreSolo + extra;
-}
+      const partes = base.trim().split(" ");
+      if (partes.length < 2) return base + extra;
+      const apellido = partes.pop();
+      const nombreSolo = partes.join(" ");
+      return apellido + ", " + nombreSolo + extra;
+    }
   </script>
 </body>
 </html>
