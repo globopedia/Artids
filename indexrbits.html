@@ -197,6 +197,10 @@
       const listContainer = document.getElementById("autocompleteList");
       const sel = document.getElementById("arbitroSelect");
 
+      // Al hacer click o hacer foco en la barra, se selecciona todo el texto automáticamente
+      inputSearch.addEventListener("focus", function() {
+      this.select();
+});
       inputSearch.addEventListener("input", function() {
         const buscarTexto = norm(this.value);
         listContainer.innerHTML = "";
