@@ -48,16 +48,15 @@
   <div id="arbitroInfo" class="club-card" style="display:none;"></div>
 
   <script>
-    // URLs (cache buster)
-    const arbitrosURL = "https://globopedia.github.io/Rbits/Rbits.csv?v=" + Date.now();
-    const partidosURL = "https://globopedia.github.io/Artids/Artids1910.csv?v=" + Date.now();
-    const partidosURL2 = "https://globopedia.github.io/Artids/Artids1925.csv?v=" + Date.now();
-    const partidosURL3 = "https://globopedia.github.io/Artids/Artids1940.csv?v=" + Date.now();
-    const partidosURL4 = "https://globopedia.github.io/Artids/Artids1955.csv?v=" + Date.now();
-    const partidosURL5 = "https://globopedia.github.io/Artids/Artids1970.csv?v=" + Date.now();
-    const partidosURL6 = "https://globopedia.github.io/Artids/Artids1985.csv?v=" + Date.now();
-    const partidosURL7 = "https://globopedia.github.io/Artids/Artids2000.csv?v=" + Date.now();
-    const partidosURL8 = "https://globopedia.github.io/Artids/Artids2015.csv?v=" + Date.now();
+  const arbitrosURL = "https://artids.vercel.app/api/data?file=rbits" + Date.now();
+  const partidosURL = "https://artids.vercel.app/api/data?file=artids1910";
+  const partidosURL2 = "https://artids.vercel.app/api/data?file=artids1925";
+  const partidosURL3 = "https://artids.vercel.app/api/data?file=artids1940";
+  const partidosURL4 = "https://artids.vercel.app/api/data?file=artids1955";
+  const partidosURL5 = "https://artids.vercel.app/api/data?file=artids1970";
+  const partidosURL6 = "https://artids.vercel.app/api/data?file=artids1985";
+  const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2000";
+  const partidosURL8 = "https://artids.vercel.app/api/data?file=artids2015";
     
     let arbitros = [];
     let encuentros = [];
