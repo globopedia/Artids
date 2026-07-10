@@ -34,17 +34,42 @@
     .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; }
     .stat-title small { color:#666; font-weight:normal; margin-left:6px; }
+    /* Estilos para el menú de autocompletado */
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.autocomplete-item img {
+  width: 32px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+#autocompleteList li:hover {
+  background-color: #ffdddd;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
+  transition: all 0.2s;
+}
   </style>
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
   <h1>📜 Árbitros</h1>
 
-  <div style="text-align:center;">
-    <label>Seleccionar juez: </label>
-    <select id="arbitroSelect"></select>
-  </div>
-
+  <div style="text-align:center; position:relative;">
+  <label for="arbitroSearch">Seleccioná árbitro: </label>
+  <input type="text" id="arbitroSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px;">
+  <select id="arbitroSelect" style="display:none;"></select>
+  <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;"></ul>
+</div>
+  
   <div id="arbitroInfo" class="club-card" style="display:none;"></div>
 
   <script>
