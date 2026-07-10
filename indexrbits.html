@@ -35,24 +35,34 @@
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; }
     .stat-title small { color:#666; font-weight:normal; margin-left:6px; }
     
-    /* Estilos para el menú de autocompletado */
+    /* Estilos para el menú de autocompletado con fotos */
     .autocomplete-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px;
+      gap: 12px;
+      padding: 8px 12px;
       cursor: pointer;
+    }
+
+    .autocomplete-thumb {
+      width: 30px;
+      height: 30px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      background: #eee;
     }
 
     #autocompleteList {
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    #autocompleteList li:hover {
+    #autocompleteList li:hover, 
+    #autocompleteList li.autocomplete-active {
       background-color: #ffdddd;
       border-radius: 6px;
       box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
-      transition: all 0.2s;
+      transition: all 0.1s;
     }
   </style>
 </head>
@@ -64,7 +74,7 @@
     <label for="arbitroSearch">Seleccioná árbitro: </label>
     <input type="text" id="arbitroSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px; width: 280px;">
     <select id="arbitroSelect" style="display:none;"></select>
-    <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;display:none;"></ul>
+    <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:320px;max-height:240px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;display:none;"></ul>
   </div>
    
   <div id="arbitroInfo" class="club-card" style="display:none;"></div>
@@ -82,6 +92,7 @@
      
     let arbitros = [];
     let encuentros = [];
+    let currentFocus = -1; // Para controlar la navegación por teclado
 
     // Utilidades
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -160,14 +171,13 @@
         if (a.id && a.nombre) {
           const opt = document.createElement("option");
           opt.value = a.id;
-          opt.textContent = invertirNombre(a.nombre);
+          opt.textContent = a.nombre;
           sel.appendChild(opt);
         }
       });
       sel.addEventListener("change", mostrarArbitro);
     }
 
-    // LÓGICA DE AUTOCOMPLETADO AGREGADA ACÁ
     function inicializarAutocompletado() {
       const inputSearch = document.getElementById("arbitroSearch");
       const listContainer = document.getElementById("autocompleteList");
@@ -176,18 +186,14 @@
       inputSearch.addEventListener("input", function() {
         const buscarTexto = norm(this.value);
         listContainer.innerHTML = "";
+        currentFocus = -1;
 
         if (!buscarTexto) {
           listContainer.style.display = "none";
           return;
         }
 
-        // Filtramos buscando tanto en el formato original como invertido (Apellido, Nombre)
-        const filtrados = arbitros.filter(a => {
-          const nombreOriginal = norm(a.nombre);
-          const nombreInvertido = norm(invertirNombre(a.nombre));
-          return nombreOriginal.includes(buscarTexto) || nombreInvertido.includes(buscarTexto);
-        });
+        const filtrados = arbitros.filter(a => norm(a.nombre).includes(buscarTexto));
 
         if (filtrados.length === 0) {
           listContainer.style.display = "none";
@@ -197,12 +203,17 @@
         filtrados.slice(0, 10).forEach(a => {
           const li = document.createElement("li");
           li.className = "autocomplete-item";
-          li.textContent = invertirNombre(a.nombre);
+          
+          // Agregamos la foto a la izquierda si existe, sino un circulo gris por defecto
+          const imgUrl = a.foto ? a.foto : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'><circle cx='15' cy='15' r='15' fill='%23ccc'/></svg>";
+          
+          li.innerHTML = `
+            <img src="${imgUrl}" class="autocomplete-thumb" alt="">
+            <span>${a.nombre}</span>
+          `;
+
           li.addEventListener("click", function() {
-            inputSearch.value = invertirNombre(a.nombre);
-            sel.value = a.id;
-            listContainer.style.display = "none";
-            mostrarArbitro(); // Ejecuta la función original para pintar la ficha
+            seleccionarElemento(a.nombre, a.id);
           });
           listContainer.appendChild(li);
         });
@@ -210,7 +221,63 @@
         listContainer.style.display = "block";
       });
 
-      // Cierra el menú si se hace click afuera de la barra
+      // Manejo de flechas del teclado y Enter
+      inputSearch.addEventListener("keydown", function(e) {
+        let items = listContainer.getElementsByTagName("li");
+        if (!items.length) return;
+
+        if (e.keyCode === 40) { // Flecha ABAJO
+          currentFocus++;
+          addActive(items);
+          fixScroll(listContainer, items[currentFocus]);
+        } else if (e.keyCode === 38) { // Flecha ARRIBA
+          currentFocus--;
+          addActive(items);
+          fixScroll(listContainer, items[currentFocus]);
+        } else if (e.keyCode === 13) { // Tecla ENTER
+          e.preventDefault();
+          if (currentFocus > -1 && items[currentFocus]) {
+            items[currentFocus].click();
+          }
+        }
+      });
+
+      function seleccionarElemento(nombre, id) {
+        inputSearch.value = nombre;
+        sel.value = id;
+        listContainer.style.display = "none";
+        mostrarArbitro();
+      }
+
+      function addActive(items) {
+        if (!items) return false;
+        removeActive(items);
+        if (currentFocus >= items.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (items.length - 1);
+        items[currentFocus].classList.add("autocomplete-active");
+      }
+
+      function removeActive(items) {
+        for (let i = 0; i < items.length; i++) {
+          items[i].classList.remove("autocomplete-active");
+        }
+      }
+
+      // Hace scroll automático en la lista si nos movemos con las flechas
+      function fixScroll(container, item) {
+        if (!item) return;
+        const containerTop = container.scrollTop;
+        const containerBottom = containerTop + container.clientHeight;
+        const itemTop = item.offsetTop;
+        const itemBottom = itemTop + item.clientHeight;
+
+        if (itemBottom > containerBottom) {
+          container.scrollTop = itemBottom - container.clientHeight;
+        } else if (itemTop < containerTop) {
+          container.scrollTop = itemTop;
+        }
+      }
+
       document.addEventListener("click", function(e) {
         if (e.target !== inputSearch && e.target !== listContainer) {
           listContainer.style.display = "none";
@@ -434,6 +501,7 @@
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
     }
 
+    // Busca imagen de estadio en carpeta Estadios
     function getEstadioImage(estadio) {
       if (!estadio) return "";
       const fileName = estadio
@@ -467,19 +535,6 @@
         }
       }
       return "";
-    }
-    
-    function invertirNombre(nombre) {
-      if (!nombre) return "";
-      const match = text = nombre.match(/^(.*?)\s*\((.*?)\)$/);
-      let base = nombre, extra = "";
-      if (match) { base = match[1]; extra = " (" + match[2] + ")"; }
-
-      const partes = base.trim().split(" ");
-      if (partes.length < 2) return base + extra;
-      const apellido = partes.pop();
-      const nombreSolo = partes.join(" ");
-      return apellido + ", " + nombreSolo + extra;
     }
   </script>
 </body>
