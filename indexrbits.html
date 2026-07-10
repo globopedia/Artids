@@ -34,51 +34,16 @@
     .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; }
     .stat-title small { color:#666; font-weight:normal; margin-left:6px; }
-.autocomplete-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:6px;
-    cursor:pointer;
-}
-
-.autocomplete-item:hover{
-    background:#ffeaea;
-}
-
-.autocomplete-item img{
-    width:32px;
-    height:42px;
-    object-fit:cover;
-    border-radius:4px;
-}
   </style>
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
   <h1>📜 Árbitros</h1>
 
-style="width:100%;padding:8px;border:2px solid #FF0000;border-radius:8px;font-size:16px;">
-
-<ul id="autocompleteList"
-    style="position:absolute;
-           top:45px;
-           left:0;
-           right:0;
-           background:white;
-           border:1px solid #ccc;
-           border-radius:8px;
-           list-style:none;
-           padding:0;
-           margin:0;
-           max-height:320px;
-           overflow-y:auto;
-           z-index:999;">
-</ul>
-
-<select id="arbitroSelect" style="display:none;"></select>
-
-</div>
+  <div style="text-align:center;">
+    <label>Seleccionar juez: </label>
+    <select id="arbitroSelect"></select>
+  </div>
 
   <div id="arbitroInfo" class="club-card" style="display:none;"></div>
 
@@ -167,19 +132,16 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
     });
 
     // Mostrar apellido, nombre en el select (usa invertirNombre)
- function llenarSelectArbitros() {
-  const sel = document.getElementById("arbitroSelect");
-  sel.innerHTML = "<option value=''></option>";
-
-  arbitros.forEach(a => {
-    if (a.id && a.nombre) {
-      const opt = document.createElement("option");
-      opt.value = a.id;
-      opt.textContent = a.nombre;
-      sel.appendChild(opt);
-    }
-  });
-}
+    function llenarSelectArbitros() {
+      const sel = document.getElementById("arbitroSelect");
+      sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
+      arbitros.forEach(a => {
+        if (a.id && a.nombre) {
+          const opt = document.createElement("option");
+          opt.value = a.id;
+          opt.textContent = invertirNombre(a.nombre);
+          sel.appendChild(opt);
+        }
       });
       sel.addEventListener("change", mostrarArbitro);
     }
@@ -460,85 +422,6 @@ function invertirNombre(nombre) {
   const nombreSolo = partes.join(" ");
   return apellido + ", " + nombreSolo + extra;
 }
-const searchInput = document.getElementById("arbitroSearch");
-const suggestionsList = document.getElementById("autocompleteList");
-
-let debounceTimer;
-let selectedIndex = -1;
-
-function debounce(func, delay){
-    return (...args)=>{
-        clearTimeout(debounceTimer);
-        debounceTimer=setTimeout(()=>func(...args),delay);
-    };
-}
-
-function filtrarArbitros(texto){
-
-    const term=norm(texto);
-
-    suggestionsList.innerHTML="";
-    selectedIndex=-1;
-
-    if(!term) return;
-
-    const resultados=arbitros
-        .filter(a=>norm(a.nombre).includes(term))
-        .slice(0,15);
-
-    resultados.forEach(a=>{
-
-        const li=document.createElement("li");
-
-        li.className="autocomplete-item";
-
-        li.innerHTML=`
-            ${a.foto
-                ? `<img src="${a.foto}" onerror="this.style.display='none'">`
-                : `<div style="width:32px;height:42px"></div>`}
-            <span>${invertirNombre(a.nombre)}</span>
-        `;
-
-        li.onclick=()=>seleccionarArbitro(a);
-
-        suggestionsList.appendChild(li);
-
-    });
-
-}
-
-searchInput.addEventListener(
-    "input",
-    debounce(e=>filtrarArbitros(e.target.value),200)
-);
-
-function seleccionarArbitro(arbitro){
-
-    searchInput.value=invertirNombre(arbitro.nombre);
-
-    suggestionsList.innerHTML="";
-
-    const sel=document.getElementById("arbitroSelect");
-
-    sel.innerHTML=`<option value="${arbitro.id}" selected></option>`;
-
-    sel.value=arbitro.id;
-
-    mostrarArbitro();
-
-}
-
-document.addEventListener("click",e=>{
-
-    if(!searchInput.contains(e.target) &&
-       !suggestionsList.contains(e.target)){
-
-        suggestionsList.innerHTML="";
-        selectedIndex=-1;
-
-    }
-
-});
   </script>
 </body>
 </html>
