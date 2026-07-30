@@ -1374,12 +1374,15 @@ function renderTrayectoriaEscudos(trayectoria) {
       onerror="this.style.display='none'">
   `).join("");
 }
-function InvertirNombre(nombre) {
-  if (!nombre) return "";
-  
-  // Limpia espacios de más si vienen formateados de manera rara
-  return nombre.trim().replace(/\s+/g, " ");
-}
+  function InvertirNombre(nombre) {
+  const partes = nombre.trim().split(" ");
+  if (partes.length < 2) return nombre;
+
+  if (partes.length === 2) {
+    // Caso simple: Nombre + Apellido
+    const [nombre1, apellido] = partes;
+    return apellido + ", " + nombre1;
+  }
 
   // Lista de conectores/apellidos compuestos en minúscula
   const conectores = ["de", "del", "de la", "de los", "la", "las", "los", "san", "santa"];
