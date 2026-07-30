@@ -1627,49 +1627,53 @@ if (j.nombre === "Cristian Tavio") {
    RENDER
 ========================= */
 
+function irAFutbolista(nombre) {
+  // Cambiá la URL por la ruta real de la página de cada jugador
+  window.location.href = `https://globopedia.ar/p/herminio?nombre=${nombre}`;
+}
+
 function renderRanking(ranking) {
-console.log(ordenActual.campo, ranking[0].partidos);  
+  console.log(ordenActual.campo, ranking[0].partidos);  
   // 👇 Sólo mostrar jugadores con más de 20 partidos
   if (ordenActual.campo === "efectividad") {
     ranking = ranking.filter(j => j.partidos > 20);
   }
   
   const cont = document.getElementById("ranking");
-const config = CONFIG_ESTADISTICAS[ordenActual.campo];
-const tituloColumna = config.campo;
-const obtenerValor = config.formato;
+  const config = CONFIG_ESTADISTICAS[ordenActual.campo];
+  const tituloColumna = config.campo;
+  const obtenerValor = config.formato;
   
-    cont.innerHTML = `
-      <table>
-     <tr>
-  <th class="col-numero">N°</th>
-  <th class="col-jugador">Futbolista</th>
-  <th class="col-periodo">Período</th>
-  <th class="col-estadistica">${tituloColumna}</th>
-</tr>
-        ${ranking.slice(0,40).map((r, i) => `
-          <tr>
-            <td class="col-numero">${i+1}</td>
-            <td class="nombre col-jugador">
-              <div class="jugador">
-                <img src="${r.foto}" class="foto-jugador">
-                <div class="jugador-info">
-                  <span class="jugador-nombre">${r.nombreOrden}</span>
-                  <div class="jugador-extra">
-                    <span>${r.bandera}</span>
-                    <span>${r.posicion}</span>
-                  </div>
+  cont.innerHTML = `
+    <table>
+      <tr>
+        <th class="col-numero">N°</th>
+        <th class="col-jugador">Futbolista</th>
+        <th class="col-periodo">Período</th>
+        <th class="col-estadistica">${tituloColumna}</th>
+      </tr>
+      ${ranking.slice(0,40).map((r, i) => `
+        <tr onclick="irAFutbolista('${encodeURIComponent(r.nombre)}')">
+          <td class="col-numero">${i+1}</td>
+          <td class="nombre col-jugador">
+            <div class="jugador">
+              <img src="${r.foto}" class="foto-jugador">
+              <div class="jugador-info">
+                <span class="jugador-nombre">${r.nombreOrden}</span>
+                <div class="jugador-extra">
+                  <span>${r.bandera}</span>
+                  <span>${r.posicion}</span>
                 </div>
               </div>
-            </td>
-            <td class="col-periodo">${r.periodo}</td>
-            <td class="col-estadistica">${obtenerValor(r)}</td>
-          </tr>
-        `).join("")}
-      </table>
-    `;
+            </div>
+          </td>
+          <td class="col-periodo">${r.periodo}</td>
+          <td class="col-estadistica">${obtenerValor(r)}</td>
+        </tr>
+      `).join("")}
+    </table>
+  `;
 }
-
 function aplicarFiltroPosicion() {
   const seleccionadas = new Set(
     [...document.querySelectorAll("#filtroPosiciones input:checked")]
