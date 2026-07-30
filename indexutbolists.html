@@ -104,7 +104,7 @@
                                 "Pretemporada 1940","Campeonato 1940","Amistosos 1940","Gira por Chile 1940","Torneo Internacional 1941","Torneo Relámpago 1941","Campeonato 1941","Copa Escobar 1941","Gira por Chile 1941","Campeonato 1942","Copa Escobar 1942","Torneo Internacional 1943","Campeonato 1943","Copa de la República 1943","Copa Escobar 1943","Torneo Internacional 1944","Campeonato 1944","Copa Competencia 1944","Copa de la República 1944","Copa Escobar 1944",
                                 "Campeonato 1945","Copa Competencia 1945","Campeonato 1946","Copa Competencia 1946","Campeonato 1947","Campeonato 1948","Copa Competencia 1948","Pretemporada 1949","Campeonato 1949",
                                 "Pretemporada 1950","Campeonato 1950","Pretemporada 1951","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Gira por Sudamérica 1952","Pretemporada 1953","Campeonato 1953","Campeonato 1954",
-                                "Campeonato 1955","Amistosos 1955","Gira por América 1956","Cuadrangular de Costa Rica 1956","Pretemporada 1956","Campeonato 1956","Pretemporada 1957","Campeonato 1957","Amistosos 1957","Cuadrangular de Costa Rica 1957","Copa Cincuentenario de Talleres 1958","Gira por América 1958","Campeonato 1958","Copa Suecia 1958","Pentagonal José Artigas 1958","Amistosos 1958","Campeonato 1959","Amistosos 1959",
+                                "Campeonato 1955","Amistosos 1955","Gira por América 1956","Cuadrangular de Costa Rica 1956","Copa Cincuentenario de Talleres 1956","Pretemporada 1956","Campeonato 1956","Pretemporada 1957","Campeonato 1957","Amistosos 1957","Cuadrangular de Costa Rica 1957","Gira por América 1958","Campeonato 1958","Copa Suecia 1958","Pentagonal José Artigas 1958","Amistosos 1958","Campeonato 1959","Amistosos 1959",
                                 "Cuadrangular de Cali 1960","Cuadrangular de Medellín 1960","Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
                                 "Campeonato 1965","Campeonato 1966","Campeonato Metropolitano 1967","Torneo Minas Gerais 1967","Torneo Negrao de Lima 1967","Torneo Promocional 1967","Campeonato Metropolitano 1968","Gira por Europa 1968","Trofeo San Sebastián 1968","Campeonato Nacional 1968","Copa Argentina 1969","Campeonato Metropolitano 1969","Campeonato Nacional 1969",
                                 "Copa Argentina 1970","Campeonato Metropolitano 1970","Petit Torneo 1970","Torneo Reclasificatorio 1970","Campeonato Metropolitano 1971","Campeonato Nacional 1971","Campeonato Metropolitano 1972","Campeonato Nacional 1972","Copa de Oro 1973","Campeonato Metropolitano 1973","Campeonato Nacional 1973","Copa Libertadores 1974","Campeonato Metropolitano 1974","Campeonato Nacional 1974",
@@ -503,6 +503,7 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("amistoso 1955")) return "Amistosos 1955";
       if (t.includes("america 1956")) return "Gira por América 1956";
       if (t.includes("costa rica 1956")) return "Cuadrangular de Costa Rica 1956";
+      if (t.includes("talleres 1956")) return "Copa Cincuentenario de Talleres 1956";
       if (t.includes("pretemporada 1956")) return "Pretemporada 1956";
       if (t.includes("campeonato 1956")) return "Campeonato 1956";
       if (t.includes("pretemporada 1957")) return "Pretemporada 1957";
@@ -510,7 +511,6 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("amistoso 1957")) return "Amistosos 1957";
       if (t.includes("costa rica 1957")) return "Cuadrangular de Costa Rica 1957";
       if (t.includes("america 1958")) return "Gira por América 1958";
-      if (t.includes("talleres 1958")) return "Copa Cincuentenario de Talleres 1958";
       if (t.includes("campeonato 1958")) return "Campeonato 1958";
       if (t.includes("suecia 1958")) return "Copa Suecia 1958";
       if (t.includes("artigas 1958")) return "Pentagonal José Artigas 1958";
