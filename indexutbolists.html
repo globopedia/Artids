@@ -1445,6 +1445,8 @@ function filtrarFutbolistas(termino) {
   });
 }
 
+    searchInput.addEventListener("input", debounce(e => filtrarFutbolistas(e.target.value), 200));
+
 function seleccionarFutbolista(nombre) {
   // Acá también dejamos el nombre original directo del CSV
   searchInput.value = nombre;
