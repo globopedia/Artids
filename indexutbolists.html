@@ -102,9 +102,9 @@
                                 "Pretemporada 1930","Campeonato 1930","Gira por Brasil 1930","Amistosos 1930","Pretemporada 1931","Campeonato 1931","Amistosos 1931","Pretemporada 1932","Campeonato 1932","Copa Competencia 1932","Campeonato Béccar Varela 1932","Amistosos 1932","Pretemporada 1933","Campeonato 1933","Copa Competencia 1933","Campeonato Béccar Varela 1933","Amistosos 1933","Pretemporada 1934","Campeonato 1934","Amistosos 1934",
                                 "Pretemporada 1935","Gira por el Litoral 1935","Campeonato 1935","Amistosos 1935","Gira por Brasil 1936","Pretemporada 1936","Torneo de Honor 1936","Torneo de Campeonato 1936","Amistosos 1936","Pretemporada 1937","Campeonato 1937","Amistosos 1937","Pretemporada 1938","Campeonato 1938","Amistosos 1938","Gira por Brasil 1939","Pretemporada 1939","Campeonato 1939","Copa Escobar 1939","Amistosos 1939",
                                 "Pretemporada 1940","Campeonato 1940","Amistosos 1940","Gira por Chile 1940","Torneo Internacional 1941","Torneo Relámpago 1941","Campeonato 1941","Copa Escobar 1941","Gira por Chile 1941","Campeonato 1942","Copa Escobar 1942","Torneo Internacional 1943","Campeonato 1943","Copa de la República 1943","Copa Escobar 1943","Torneo Internacional 1944","Campeonato 1944","Copa Competencia 1944","Copa de la República 1944","Copa Escobar 1944",
-                                "Campeonato 1945","Copa Competencia 1945","Campeonato 1946","Copa Competencia 1946","Campeonato 1947","Campeonato 1948","Copa Competencia 1948","Campeonato 1949",
-                                "Campeonato 1950","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Campeonato 1953","Campeonato 1954",
-                                "Campeonato 1955","Campeonato 1956","Campeonato 1957","Campeonato 1958","Copa Suecia 1958","Campeonato 1959",
+                                "Campeonato 1945","Copa Competencia 1945","Campeonato 1946","Copa Competencia 1946","Campeonato 1947","Campeonato 1948","Copa Competencia 1948","Pretemporada 1949","Campeonato 1949",
+                                "Pretemporada 1950","Campeonato 1950","Pretemporada 1951","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Pretemporada 1953","Campeonato 1953","Campeonato 1954",
+                                "Campeonato 1955","Pretemporada 1956","Pretemporada 1956","Campeonato 1956","Pretemporada 1957","Campeonato 1957","Campeonato 1958","Copa Suecia 1958","Campeonato 1959",
                                 "Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
                                 "Campeonato 1965","Campeonato 1966","Campeonato Metropolitano 1967","Torneo Minas Gerais 1967","Torneo Negrao de Lima 1967","Torneo Promocional 1967","Campeonato Metropolitano 1968","Gira por Europa 1968","Trofeo San Sebastián 1968","Campeonato Nacional 1968","Copa Argentina 1969","Campeonato Metropolitano 1969","Campeonato Nacional 1969",
                                 "Copa Argentina 1970","Campeonato Metropolitano 1970","Petit Torneo 1970","Torneo Reclasificatorio 1970","Campeonato Metropolitano 1971","Campeonato Nacional 1971","Campeonato Metropolitano 1972","Campeonato Nacional 1972","Copa de Oro 1973","Campeonato Metropolitano 1973","Campeonato Nacional 1973","Copa Libertadores 1974","Campeonato Metropolitano 1974","Campeonato Nacional 1974",
@@ -382,7 +382,6 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("pretemporada 1937")) return "Pretemporada 1937";
       if (t.includes("pretemporada 1938")) return "Pretemporada 1938";
       if (t.includes("pretemporada 1939")) return "Pretemporada 1939";
-      if (t.includes("pretemporada 1940")) return "Pretemporada 1940";
       if (t.includes("amistoso 1914")) return "Amistosos 1914";
       if (t.includes("amistoso 1915")) return "Amistosos 1915";
       if (t.includes("amistoso 1916")) return "Amistosos 1916";
@@ -461,6 +460,7 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("gira por brasil 1939")) return "Gira por Brasil 1939";
       if (t.includes("campeonato 1939")) return "Campeonato 1939";
       if (t.includes("copa escobar 1939")) return "Copa Escobar 1939";
+      if (t.includes("pretemporada 1940")) return "Pretemporada 1940";
       if (t.includes("campeonato 1940")) return "Campeonato 1940";
       if (t.includes("gira por chile 1940")) return "Gira por Chile 1940";
       if (t.includes("nocturno 1941")) return "Torneo Internacional 1941";
@@ -486,16 +486,22 @@ function calcularPuntosPartido(p, minutos) {
       if (t.includes("campeonato 1947")) return "Campeonato 1947";
       if (t.includes("campeonato 1948")) return "Campeonato 1948";
       if (t.includes("competencia 1948")) return "Copa Competencia 1948";
+      if (t.includes("pretemporada 1949")) return "Pretemporada 1949";
       if (t.includes("campeonato 1949")) return "Campeonato 1949";
+      if (t.includes("pretemporada 1950")) return "Pretemporada 1950";
       if (t.includes("campeonato 1950")) return "Campeonato 1950";
+      if (t.includes("pretemporada 1951")) return "Pretemporada 1951";
       if (t.includes("campeonato 1951")) return "Campeonato 1951";
       if (t.includes("eva peron")) return "Campeonato 1952";
       if (t.includes("competencia 1952")) return "Copa Competencia 1952";
+      if (t.includes("pretemporada 1953")) return "Pretemporada 1953";
       if (t.includes("campeonato 1953")) return "Campeonato 1953";
       if (t.includes("campeonato 1954")) return "Campeonato 1954";
       if (t.includes("campeonato 1955")) return "Campeonato 1955";
+      if (t.includes("pretemporada 1957")) return "Pretemporada 1956";
       if (t.includes("campeonato 1956")) return "Campeonato 1956";
       if (t.includes("campeonato 1957")) return "Campeonato 1957";
+      if (t.includes("suecia 1958")) return "Copa Suecia 1958";
       if (t.includes("campeonato 1958")) return "Campeonato 1958";
       if (t.includes("campeonato 1959")) return "Campeonato 1959";
       if (t.includes("campeonato 1960")) return "Campeonato 1960";
