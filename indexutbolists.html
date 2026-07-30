@@ -1460,6 +1460,14 @@ let selectedIndex = -1;
 
 searchInput.addEventListener("keydown", function(e) {
   const items = suggestionsList.querySelectorAll("li");
+
+  if (e.key === "Escape") {
+    suggestionsList.innerHTML = "";
+    selectedIndex = -1;
+    searchInput.blur();
+    return;
+  }
+
   if (!items.length) return;
 
   if (e.key === "ArrowDown") {
@@ -1476,10 +1484,9 @@ searchInput.addEventListener("keydown", function(e) {
       items[selectedIndex].click();
     }
   } else {
-    selectedIndex = -1; // reset si escribe algo nuevo
+    selectedIndex = -1; // Reset si escribe otra tecla
   }
 });
-
 function actualizarSeleccion(items) {
   items.forEach((item, i) => {
     const activo = i === selectedIndex;
@@ -1505,14 +1512,6 @@ function actualizarSeleccion(items) {
     }
   }
 }
-// --- Cerrar autocompletado con ESC --- //
-searchInput.addEventListener("keydown", function(e) {
-  if (e.key === "Escape") {
-    suggestionsList.innerHTML = "";
-    selectedIndex = -1;
-    searchInput.blur(); // opcional: quita el foco del input
-  }
-});
 // --- Cerrar autocompletado al hacer clic fuera --- //
 document.addEventListener("click", function(e) {
   const esClickEnInput = searchInput.contains(e.target);
