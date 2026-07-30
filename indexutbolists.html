@@ -1434,7 +1434,7 @@ function filtrarFutbolistas(termino) {
       ${r.foto1
         ? `<img src="${r.foto1}" onerror="this.style.display='none'">`
         : `<div style="width:32px;height:42px;"></div>`}
-      <span>${InvertirNombre(r.futbolista)}</span>
+      <span>${r.futbolista}</span>
     `;
 
     li.addEventListener("click", () => {
@@ -1445,17 +1445,16 @@ function filtrarFutbolistas(termino) {
   });
 }
 
-searchInput.addEventListener("input", debounce(e => filtrarFutbolistas(e.target.value), 200));
-
 function seleccionarFutbolista(nombre) {
-  searchInput.value = InvertirNombre(nombre);
+  // Acá también dejamos el nombre original directo del CSV
+  searchInput.value = nombre;
   suggestionsList.innerHTML = "";
   const hiddenSelect = document.getElementById("futbolistaSelect");
   hiddenSelect.innerHTML = `<option value="${nombre}" selected></option>`;
   hiddenSelect.value = nombre;
   mostrarFutbolistas();
 }
-  // --- Navegación con teclado en el autocompletado --- //
+    // --- Navegación con teclado en el autocompletado --- //
 let selectedIndex = -1;
 
 searchInput.addEventListener("keydown", function(e) {
