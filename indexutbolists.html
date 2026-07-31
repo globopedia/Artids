@@ -1453,9 +1453,9 @@ function enlazarJugadores(texto) {
     const original = part.trim();
     if (!original) return part;
 
-    // Limpiamos minutos, paréntesis o números para buscar el nombre real
+    // Limpiamos totalmente puntos, paréntesis, comas y números de minutos/sustituciones
     let nombreLimpio = original
-      .replace(/[()]/g, "") 
+      .replace(/[().,;]/g, "") 
       .replace(/\b\d+(?:\+\d+)?\s*/g, "") 
       .trim();
 
@@ -1465,10 +1465,13 @@ function enlazarJugadores(texto) {
     const existeEnBase = typeof futbolistas !== "undefined" && 
       futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
 
-    // Si existe, armamos el link (sin target="_blank" para abrir en la misma pestaña)
+    // Si existe, armamos el enlace en rojo (#d40000) y con efecto hover a negrita
     if (existeEnBase) {
       const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
-      return `<a href="${url}" style="color: #0044cc; text-decoration: none; font-weight: 500;">${original}</a>`;
+      return `<a href="${url}" ` +
+             `style="color: #d40000; text-decoration: none; font-weight: normal;" ` +
+             `onmouseover="this.style.fontWeight='bold'" ` +
+             `onmouseout="this.style.fontWeight='normal'">${original}</a>`;
     }
 
     // Si no está en la base, queda como texto plano
