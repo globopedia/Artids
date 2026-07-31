@@ -1323,25 +1323,26 @@ document.addEventListener("change", function(e) {
 
         contenedor.innerHTML += `
          <div class="acordeon ${lado === 'Rival' ? 'acordeon-rival' : ''}">
-            <div class="acordeon-header">
-              ${fueExpulsado ? `
-              <span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
-                <svg width="12" height="16" viewBox="0 0 12 16">
-                  <rect x="1" y="1" width="10" height="14" rx="2" ry="2"
-                        fill="#d40000" stroke="#8b0000" stroke-width="1"/>
-                </svg>
-              </span>
-              ` : ""}${iconoGol ? iconoGol + " " : ""}${condicion} (${minutosJugados}’) ·
-              ${p.Resultado1}-${p.Resultado2}
-              <span style="font-weight:bold; margin-left:6px;
-                           color:${puntosPartido >= 0 ? '#006400' : '#8B0000'}">
-                (${puntosPartido.toFixed(1)})
-              </span>
-              <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
-                   style="height:22px; vertical-align:middle; margin:0 6px;">
-             ${lado === "Huracan" && p.Técnico ? `[${p.Técnico}]` : ""}
-            </div>
-            <div class="acordeon-body cerrado">${bloqueHTML}</div>
+ <div class="acordeon-header">
+  ${lado === "Rival" ? `<b>[${p.Torneo}]</b> ` : ""}
+  ${fueExpulsado ? `
+  <span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
+    <svg width="12" height="16" viewBox="0 0 12 16">
+      <rect x="1" y="1" width="10" height="14" rx="2" ry="2"
+            fill="#d40000" stroke="#8b0000" stroke-width="1"/>
+    </svg>
+  </span>
+  ` : ""}${iconoGol ? iconoGol + " " : ""}${condicion} (${minutosJugados}’) ·
+  ${p.Resultado1}-${p.Resultado2}
+  <span style="font-weight:bold; margin-left:6px;
+               color:${puntosPartido >= 0 ? '#006400' : '#8B0000'}">
+    (${puntosPartido.toFixed(1)})
+  </span>
+  <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
+       style="height:22px; vertical-align:middle; margin:0 6px;">
+  ${lado === "Huracan" && p.Técnico ? `[${p.Técnico}]` : ""}
+</div>
+<div class="acordeon-body cerrado">${bloqueHTML}</div>
           </div>
         `;
       });
