@@ -1029,7 +1029,6 @@ function getResumenRendimientoFutbolista(nombreFutbolista) {
 }
 function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
   const columna = lado === "Huracan" ? "Huracán" : "Rival";
-  const tagGol = lado === "Huracan" ? "(hur)" : `(${lado.toLowerCase()})`;
 
   const delFutbolista = encuentros.filter(p => {
     const jugadores = (p[columna] || "")
@@ -1048,6 +1047,75 @@ function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
     return jugadores.some(j => norm(j) === norm(nombreFutbolista));
   });
 
+  if (!delFutbolista.length) {
+    return lado === "Rival" 
+      ? "<p style='font-style:italic; color:#666; text-align:center;'>No registra partidos enfrentando a Huracán.</p>" 
+      : "<p style='font-style:italic; color:#666; text-align:center;'>Sin datos disponibles en Huracán.</p>";
+  }
+
+  // =========================================================
+  // CASO A: EN LADOS DE RIVAL (Agrupación por Período de Años)
+  // =========================================================
+  if (lado === "Rival") {
+    // 1. Obtener años de los partidos
+    const anios = delFutbolista
+      .map(p => {
+        const partes = (p.Fecha || "").split("/");
+        return partes.length === 3 ? parseInt(partes[2], 10) : null;
+      })
+      .filter(a => a && !isNaN(a))
+      .sort((a, b) => a - b);
+
+    let rangoAnios = "";
+    if (anios.length === 1) {
+      rangoAnios = `${anios[0]}`;
+    } else if (anios.length > 1) {
+      const minAnio = anios[0];
+      const maxAnio = anios[anios.length - 1];
+      rangoAnios = minAnio === maxAnio ? `${minAnio}` : `${minAnio}-${maxAnio}`;
+    } else {
+      rangoAnios = "Enfrentamientos";
+    }
+
+    // 2. Contar Victorias, Empates, Derrotas y Goles generales frente a Huracán
+    let v = 0, eCount = 0, d = 0, golesTotal = 0;
+    for (const p of delFutbolista) {
+      const sit = cap(norm(p.Situación));
+      if (sit === "Victoria") v++;
+      else if (sit === "Empate") eCount++;
+      else if (sit === "Derrota") d++;
+
+      const textoIncidencias = norm(p.Incidencias || "");
+      const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}`, "g");
+      golesTotal += (textoIncidencias.match(patron) || []).length;
+    }
+
+    const totalPartidos = delFutbolista.length;
+    const resumen = `G${v}-E${eCount}-P${d}`;
+
+    return `
+      <div class="stat-group">
+        <div class="stat-title">🗓️ Período: ${rangoAnios}</div>
+        <ul>
+          <li>
+            <label>
+              <input type="checkbox" class="chkPartidos"
+                data-comp="TODOS"
+                data-sit="todos"
+                data-lado="Rival"
+                data-futbolista="${nombreFutbolista}">
+              📊 ${totalPartidos} ${totalPartidos === 1 ? "partido" : "partidos"} (${resumen}) – ⚽ ${golesTotal} ${golesTotal === 1 ? "gol" : "goles"}
+            </label>
+            <div class="partidos-lista" style="display:none; margin-left:20px;"></div>
+          </li>
+        </ul>
+      </div>
+    `;
+  }
+
+  // =========================================================
+  // CASO B: EN HURACÁN (Se mantiene la agrupación por Torneo)
+  // =========================================================
   const agg = {};
   for (const e of delFutbolista) {
     const comp = bucketCompetencia(e.Torneo);
@@ -1057,11 +1125,9 @@ function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
       agg[comp][sit] += 1;
     }
 
-    // Contar goles según sea de Huracán o del rival
     const textoIncidencias = norm(e.Incidencias || "");
     const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}`, "g");
-    const golesEnEstePartido = (textoIncidencias.match(patron) || []).length;
-    agg[comp].Goles += golesEnEstePartido;
+    agg[comp].Goles += (textoIncidencias.match(patron) || []).length;
   }
 
   let html = "";
@@ -1083,7 +1149,7 @@ function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
               <input type="checkbox" class="chkPartidos"
                 data-comp="${comp}"
                 data-sit="todos"
-                data-lado="${lado}"
+                data-lado="Huracan"
                 data-futbolista="${nombreFutbolista}">
               📊 ${total} ${total === 1 ? "partido" : "partidos"} (${resumen}) – ⚽ ${goles} ${goles === 1 ? "gol" : "goles"}
             </label>
@@ -1094,15 +1160,8 @@ function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
     `;
   }
 
-  if (!html) {
-    return lado === "Rival" 
-      ? "<p style='font-style:italic; color:#666; text-align:center;'>No registra partidos enfrentando a Huracán.</p>" 
-      : "<p style='font-style:italic; color:#666; text-align:center;'>Sin datos disponibles en Huracán.</p>";
-  }
-
   return html;
 }
-
 // Manejador de checkboxes (muestra partidos por filtro)
 document.addEventListener("change", function(e) {
   if (!e.target.classList.contains("chkPartidos")) return;
