@@ -827,6 +827,7 @@ const partidosURLs = [
       sel.addEventListener("change", mostrarFutbolistas);
     }
 
+JavaScript
 function mostrarFutbolistas() {
   const futbolistaId = document.getElementById("futbolistaSelect").value;
   const futbolista = futbolistas.find(a => a.futbolista === futbolistaId);
@@ -834,6 +835,9 @@ function mostrarFutbolistas() {
     document.getElementById("futbolistaInfo").style.display = "none";
     return;
   }
+
+  // 🔹 Traemos el Resumen, Debut y Despedida optimizados de un solo tirón
+  const datosHuracan = getDatosCarreraHuracan(futbolista.futbolista);
 
   // 🔹 Función para validar y renderizar campos individuales
   const campo = (label, valor, sufijo = "") => {
@@ -893,7 +897,7 @@ function mostrarFutbolistas() {
       <div style="text-align:center;">
         <h2>${futbolista.futbolista}</h2>
         <div style="font-size:14px; color:black; font-family:Helvetica, sans-serif;">
-          ${getResumenCarrera(futbolista.futbolista)}
+          ${datosHuracan.resumen}
         </div>
         ${futbolista.pais
         ? futbolista.pais
@@ -915,6 +919,8 @@ function mostrarFutbolistas() {
     ${campo("Nombre", futbolista.nombre)}
     ${campo("Posición", futbolista.posicion)}
     ${campo("Procedencia", futbolista.procedencia)}
+    ${campo("Debut", datosHuracan.debut)}
+    ${campo("Despedida", datosHuracan.despedida)}
     ${htmlNacimiento}
     ${htmlMuerte}
     ${htmlFisico}
@@ -929,11 +935,10 @@ function mostrarFutbolistas() {
               onerror="this.style.display='none'">` 
         : ""}
     </div>
-  <div class="stats">
+    <div class="stats">
       <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
       ${renderEstadisticas(futbolista.futbolista, "Huracan")}
     </div>
-
     <!-- 🔥 NUEVA SECCIÓN: ENFRENTANDO A HURACÁN -->
     <div class="stats" style="margin-top: 20px;">
       <h3 style="color:#333333;">⚔️ Enfrentando a Huracán</h3>
