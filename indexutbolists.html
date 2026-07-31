@@ -1363,37 +1363,36 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
     contenedor.style.display = "none";
   }
 });
-    function getResumenCarrera(nombreFutbolista) {
+function getDatosCarreraHuracan(nombreFutbolista) {
   const delFutbolista = encuentros.filter(p => {
-  const jugadores = (p.Huracán || "")
-  // 1️⃣ convertir paréntesis en comas (sin regex anidada)
-  .replace(/[()]/g, ",")
-
-  // 2️⃣ eliminar minutos: 45, 45+1, 90+3, etc.
-  .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-
-  // 3️⃣ normalización
-  .replace(/\.+/g, "")
-  .replace(/\s+y\s+/gi, ",")
-  .replace(/\s+e\s+/gi, ",")
-  .replace(/,,+/g, ",")
-  .replace(/\s+,/g, ",")
-  .replace(/,\s+/g, ",")
-  .replace(/\s+/g, " ")
-
-  // 4️⃣ separar jugadores
-  .split(/[,;]+/)
-  .map(j => j.trim())
-  .filter(j => j.length > 1);
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
     return jugadores.some(j => norm(j) === norm(nombreFutbolista));
   });
 
-  if (!delFutbolista.length) return "";
+  if (!delFutbolista.length) {
+    return {
+      resumen: "",
+      debut: "Sin registros",
+      despedida: "Sin registros"
+    };
+  }
 
   // ✅ Total de partidos
   const total = delFutbolista.length;
 
-  // ✅ Contar TODAS las menciones de “GOL jugador (HUR)” en todo el CSV
+  // ✅ Total de goles en Huracán
   const totalGoles = encuentros.reduce((acc, p) => {
     const texto = norm(p.Incidencias || "");
     const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}\\s*\\(hur\\)`, "g");
@@ -1401,19 +1400,34 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
     return acc + (coincidencias ? coincidencias.length : 0);
   }, 0);
 
-  // ✅ Fechas para obtener el primer y último año
-  const fechasOrdenadas = delFutbolista
-    .map(p => p.Fecha)
-    .map(f => {
-      const [d, m, a] = f.split("/");
-      return new Date(`${a}-${m}-${d}`);
-    })
-    .sort((a, b) => a - b);
+  // ✅ Ordenamos los partidos cronológicamente UNA SOLA VEZ
+  delFutbolista.sort((a, b) => {
+    const [dA, mA, aA] = (a.Fecha || "").split("/");
+    const [dB, mB, aB] = (b.Fecha || "").split("/");
+    return new Date(`${aA}-${mA}-${dA}`) - new Date(`${aB}-${mB}-${dB}`);
+  });
 
-  const primerAnio = fechasOrdenadas[0].getFullYear();
-  const ultimoAnio = fechasOrdenadas[fechasOrdenadas.length - 1].getFullYear();
+  // Primer y último partido
+  const primerPartido = delFutbolista[0];
+  const ultimoPartido = delFutbolista[delFutbolista.length - 1];
 
-  return `${total} ${total === 1 ? "partido" : "partidos"} – ${totalGoles} ${totalGoles === 1 ? "gol" : "goles"} (${primerAnio}-${ultimoAnio})`;
+  // Helper para darle formato al partido
+  const formatear = (p) => {
+    const res = `${p.Resultado1 || 0}-${p.Resultado2 || 0}`;
+    const rival = p.Club || "Rival";
+    const torneo = p.Torneo || "";
+    const dt = p.Técnico ? ` (DT: ${p.Técnico})` : "";
+    return `${p.Fecha}, ${res} vs. ${rival} - ${torneo}${dt}`;
+  };
+
+  const primerAnio = (primerPartido.Fecha || "").split("/")[2] || "";
+  const ultimoAnio = (ultimoPartido.Fecha || "").split("/")[2] || "";
+
+  return {
+    resumen: `${total} ${total === 1 ? "partido" : "partidos"} – ${totalGoles} ${totalGoles === 1 ? "gol" : "goles"} (${primerAnio}-${ultimoAnio})`,
+    debut: formatear(primerPartido),
+    despedida: formatear(ultimoPartido)
+  };
 }
     function getEscudo(nombreClub) {
   if (!nombreClub) return "";
