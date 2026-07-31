@@ -1187,9 +1187,9 @@ document.addEventListener("change", function(e) {
         .map(j => j.trim())
         .filter(j => j.length > 1);
 
-      return jugadores.some(j => norm(j) === norm(futbolista)) &&
-             bucketCompetencia(p.Torneo) === comp &&
-             (sit === "todos" || cap(norm(p.Situación)) === sit);
+return jugadores.some(j => norm(j) === norm(futbolista)) &&
+       (comp === "TODOS" || bucketCompetencia(p.Torneo) === comp) &&
+       (sit === "todos" || cap(norm(p.Situación)) === sit);
     });
 
     if (partidos.length) {
