@@ -79,6 +79,17 @@
   line-height: 1.3;   /* Hace el texto más compacto verticalmente */
   font-size: 15px;    /* Un tamaño ideal para que parezca un informe técnico */
 }
+    /* Tarjeta de partido cuando jugó EN CONTRA de Huracán */
+.acordeon.acordeon-rival .acordeon-header {
+  background-color: #e8f0fe; /* Fondo azul tenue */
+  border-left: 4px solid #1a73e8; /* Borde lateral azul para identificar rápido */
+  color: #202124;
+}
+
+/* Efecto al pasar el mouse por arriba */
+.acordeon.acordeon-rival .acordeon-header:hover {
+  background-color: #d2e3fc;
+}
   </style>
 </head>
 <body>
@@ -1252,7 +1263,7 @@ document.addEventListener("change", function(e) {
         const puntosPartido = calcularPuntosPartido(p, minutosJugados);
 
         contenedor.innerHTML += `
-          <div class="acordeon">
+         <div class="acordeon ${lado === 'Rival' ? 'acordeon-rival' : ''}">
             <div class="acordeon-header">
               ${fueExpulsado ? `
               <span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
@@ -1269,7 +1280,7 @@ document.addEventListener("change", function(e) {
               </span>
               <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
                    style="height:22px; vertical-align:middle; margin:0 6px;">
-              [${p.Técnico}]
+             ${lado === "Huracan" && p.Técnico ? `[${p.Técnico}]` : ""}
             </div>
             <div class="acordeon-body cerrado">${bloqueHTML}</div>
           </div>
