@@ -814,62 +814,107 @@ function mostrarFutbolistas() {
     return;
   }
 
-      const cont = document.getElementById("futbolistaInfo");
-      cont.style.display = "block";
-      cont.innerHTML = `
-        <div class="club-header">
-${futbolista.foto1 ? 
-  `<img src="${futbolista.foto1}" 
-        alt="${futbolista.futbolista}" 
-        style="width:105px;height:140px;object-fit:cover;border-radius:8px;" 
-        onerror="this.style.display='none'">` 
-  : ""}
-      <div style="text-align:center;">
-  <h2>${futbolista.futbolista}</h2>
-  <div style="font-size:14px; color:black; font-family:Helvetica, sans-serif;">
-    ${getResumenCarrera(futbolista.futbolista)}
-  </div>
-  ${futbolista.pais
-  ? futbolista.pais
-      .split(/[\(\),.;\/]|(?:\)\s*)|(?:\s*\()|(?:\s*\d+\s*)/)
-      .map(p => p.trim())
-      .filter(p => p.length > 0)
-      .map(p => `<img src="https://globopedia.github.io/Artids/Banderas/${encodeURIComponent(p)}.png" alt="${p}" title="${p}" class="bandera">`)
-      .join("")
-  : ""}
-  <div class="trayectoria-escudos">
-    ${renderTrayectoriaEscudos(futbolista.trayectoria)}
-  </div>
-  <!-- 🔥 RENDIMIENTO GENERAL -->
-  ${getResumenRendimientoFutbolista(futbolista.futbolista)}
+  // 🔹 Función para validar y renderizar campos individuales
+  const campo = (label, valor, sufijo = "") => {
+    if (!valor || valor.trim() === "" || valor.trim() === "-") return "";
+    return `<p><b>${label}:</b> ${valor}${sufijo}</p>`;
+  };
 
-  </div>
-  </div>
-    <p><b>Nombre:</b> ${futbolista.nombre}</p>
-    <p><b>Posición:</b> ${futbolista.posicion}</p>
-    <p><b>Procedencia:</b> ${futbolista.procedencia}</p>
-    <p><b>Nacimiento:</b> ${futbolista.fechanac}, en ${futbolista.lugarnac}</p>
-    <p><b>Muerte:</b> ${futbolista.fechamuerte}, en ${futbolista.lugarmuerte}</p>
-    <p><b>Peso:</b> ${futbolista.peso} kg — <b>Altura:</b> ${futbolista.altura} m</p>
-    <p><b>Destino:</b> ${futbolista.destino}</p>
-    <p><b>Biografía:</b> ${futbolista.biografía}</p>
-    <div style="text-align:center;">
-    ${futbolista.foto2 ? 
-  `<img src="${futbolista.foto2}" 
-        alt="${futbolista.futbolista}" 
-        style="width:280px;height:360px;object-fit:cover;border-radius:8px;" 
-        onerror="this.style.display='none'">` 
-  : ""}
-</div>
-<div class="stats">
+  // 🔹 Lógica especial para Nacimiento (combina fecha y lugar)
+  let htmlNacimiento = "";
+  const tieneFechaNac = futbolista.fechanac && futbolista.fechanac.trim() !== "" && futbolista.fechanac.trim() !== "-";
+  const tieneLugarNac = futbolista.lugarnac && futbolista.lugarnac.trim() !== "" && futbolista.lugarnac.trim() !== "-";
 
-  <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
-  ${renderEstadisticas(futbolista.futbolista)}
-
-</div>
-      `;
+  if (tieneFechaNac && tieneLugarNac) {
+    htmlNacimiento = `<p><b>Nacimiento:</b> ${futbolista.fechanac}, en ${futbolista.lugarnac}</p>`;
+  } else if (tieneFechaNac) {
+    htmlNacimiento = `<p><b>Nacimiento:</b> ${futbolista.fechanac}</p>`;
+  } else if (tieneLugarNac) {
+    htmlNacimiento = `<p><b>Lugar de nacimiento:</b> ${futbolista.lugarnac}</p>`;
   }
-function limpiarNombreJugador(s) {
+
+  // 🔹 Lógica especial para Muerte (combina fecha y lugar)
+  let htmlMuerte = "";
+  const tieneFechaMuerte = futbolista.fechamuerte && futbolista.fechamuerte.trim() !== "" && futbolista.fechamuerte.trim() !== "-";
+  const tieneLugarMuerte = futbolista.lugarmuerte && futbolista.lugarmuerte.trim() !== "" && futbolista.lugarmuerte.trim() !== "-";
+
+  if (tieneFechaMuerte && tieneLugarMuerte) {
+    htmlMuerte = `<p><b>Muerte:</b> ${futbolista.fechamuerte}, en ${futbolista.lugarmuerte}</p>`;
+  } else if (tieneFechaMuerte) {
+    htmlMuerte = `<p><b>Muerte:</b> ${futbolista.fechamuerte}</p>`;
+  } else if (tieneLugarMuerte) {
+    htmlMuerte = `<p><b>Lugar de muerte:</b> ${futbolista.lugarmuerte}</p>`;
+  }
+
+  // 🔹 Lógica especial para Peso y Altura
+  let htmlFisico = "";
+  const tienePeso = futbolista.peso && futbolista.peso.trim() !== "" && futbolista.peso.trim() !== "-";
+  const tieneAltura = futbolista.altura && futbolista.altura.trim() !== "" && futbolista.altura.trim() !== "-";
+
+  if (tienePeso && tieneAltura) {
+    htmlFisico = `<p><b>Peso:</b> ${futbolista.peso} kg — <b>Altura:</b> ${futbolista.altura} m</p>`;
+  } else if (tienePeso) {
+    htmlFisico = `<p><b>Peso:</b> ${futbolista.peso} kg</p>`;
+  } else if (tieneAltura) {
+    htmlFisico = `<p><b>Altura:</b> ${futbolista.altura} m</p>`;
+  }
+
+  const cont = document.getElementById("futbolistaInfo");
+  cont.style.display = "block";
+  cont.innerHTML = `
+    <div class="club-header">
+      ${futbolista.foto1 ? 
+        `<img src="${futbolista.foto1}" 
+              alt="${futbolista.futbolista}" 
+              style="width:105px;height:140px;object-fit:cover;border-radius:8px;" 
+              onerror="this.style.display='none'">` 
+        : ""}
+      <div style="text-align:center;">
+        <h2>${futbolista.futbolista}</h2>
+        <div style="font-size:14px; color:black; font-family:Helvetica, sans-serif;">
+          ${getResumenCarrera(futbolista.futbolista)}
+        </div>
+        ${futbolista.pais
+        ? futbolista.pais
+            .split(/[\(\),.;\/]|(?:\)\s*)|(?:\s*\()|(?:\s*\d+\s*)/)
+            .map(p => p.trim())
+            .filter(p => p.length > 0)
+            .map(p => `<img src="https://globopedia.github.io/Artids/Banderas/${encodeURIComponent(p)}.png" alt="${p}" title="${p}" class="bandera">`)
+            .join("")
+        : ""}
+        <div class="trayectoria-escudos">
+          ${renderTrayectoriaEscudos(futbolista.trayectoria)}
+        </div>
+        <!-- 🔥 RENDIMIENTO GENERAL -->
+        ${getResumenRendimientoFutbolista(futbolista.futbolista)}
+      </div>
+    </div>
+
+    <!-- AQUÍ SE IMPRIMEN SOLO LOS CAMPOS QUE TIENEN DATOS VÁLIDOS -->
+    ${campo("Nombre", futbolista.nombre)}
+    ${campo("Posición", futbolista.posicion)}
+    ${campo("Procedencia", futbolista.procedencia)}
+    ${htmlNacimiento}
+    ${htmlMuerte}
+    ${htmlFisico}
+    ${campo("Destino", futbolista.destino)}
+    ${campo("Biografía", futbolista.biografía)}
+
+    <div style="text-align:center;">
+      ${futbolista.foto2 ? 
+        `<img src="${futbolista.foto2}" 
+              alt="${futbolista.futbolista}" 
+              style="width:280px;height:360px;object-fit:cover;border-radius:8px;" 
+              onerror="this.style.display='none'">` 
+        : ""}
+    </div>
+    <div class="stats">
+      <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
+      ${renderEstadisticas(futbolista.futbolista)}
+    </div>
+  `;
+}
+    function limpiarNombreJugador(s) {
   if (!s) return "";
   return String(s)
     .replace(/\u00A0/g, " ")               // NBSP → espacio
