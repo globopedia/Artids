@@ -908,9 +908,15 @@ function mostrarFutbolistas() {
               onerror="this.style.display='none'">` 
         : ""}
     </div>
-    <div class="stats">
+  <div class="stats">
       <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
-      ${renderEstadisticas(futbolista.futbolista)}
+      ${renderEstadisticas(futbolista.futbolista, "Huracan")}
+    </div>
+
+    <!-- 🔥 NUEVA SECCIÓN: ENFRENTANDO A HURACÁN -->
+    <div class="stats" style="margin-top: 20px;">
+      <h3 style="color:#333333;">⚔️ Enfrentando a Huracán</h3>
+      ${renderEstadisticas(futbolista.futbolista, "Rival")}
     </div>
   `;
 }
@@ -1010,28 +1016,24 @@ function getResumenRendimientoFutbolista(nombreFutbolista) {
     </div>
   `;
 }
-function renderEstadisticas(nombreFutbolista) {
+function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
+  const columna = lado === "Huracan" ? "Huracán" : "Rival";
+  const tagGol = lado === "Huracan" ? "(hur)" : `(${lado.toLowerCase()})`;
+
   const delFutbolista = encuentros.filter(p => {
- const jugadores = (p.Huracán || "")
-  // 1️⃣ convertir paréntesis en comas (sin regex anidada)
-  .replace(/[()]/g, ",")
-
-  // 2️⃣ eliminar minutos: 45, 45+1, 90+3, etc.
-  .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-
-  // 3️⃣ normalización
-  .replace(/\.+/g, "")
-  .replace(/\s+y\s+/gi, ",")
-  .replace(/\s+e\s+/gi, ",")
-  .replace(/,,+/g, ",")
-  .replace(/\s+,/g, ",")
-  .replace(/,\s+/g, ",")
-  .replace(/\s+/g, " ")
-
-  // 4️⃣ separar jugadores
-  .split(/[,;]+/)
-  .map(j => j.trim())
-  .filter(j => j.length > 1);
+    const jugadores = (p[columna] || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
     return jugadores.some(j => norm(j) === norm(nombreFutbolista));
   });
 
@@ -1039,14 +1041,14 @@ function renderEstadisticas(nombreFutbolista) {
   for (const e of delFutbolista) {
     const comp = bucketCompetencia(e.Torneo);
     const sit = cap(norm(e.Situación));
-    if (!agg[comp]) agg[comp] = { Victoria:0, Empate:0, Derrota:0, Goles:0 };
+    if (!agg[comp]) agg[comp] = { Victoria: 0, Empate: 0, Derrota: 0, Goles: 0 };
     if (SITUACIONES.includes(sit)) {
       agg[comp][sit] += 1;
     }
 
-    // ✅ contar TODAS las menciones de “GOL jugador (HUR)”
+    // Contar goles según sea de Huracán o del rival
     const textoIncidencias = norm(e.Incidencias || "");
-    const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}\\s*\\(hur\\)`, "g");
+    const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}`, "g");
     const golesEnEstePartido = (textoIncidencias.match(patron) || []).length;
     agg[comp].Goles += golesEnEstePartido;
   }
@@ -1070,6 +1072,7 @@ function renderEstadisticas(nombreFutbolista) {
               <input type="checkbox" class="chkPartidos"
                 data-comp="${comp}"
                 data-sit="todos"
+                data-lado="${lado}"
                 data-futbolista="${nombreFutbolista}">
               📊 ${total} ${total === 1 ? "partido" : "partidos"} (${resumen}) – ⚽ ${goles} ${goles === 1 ? "gol" : "goles"}
             </label>
@@ -1079,42 +1082,44 @@ function renderEstadisticas(nombreFutbolista) {
       </div>
     `;
   }
-  return html || "<p>Sin datos disponibles</p>";
+
+  if (!html) {
+    return lado === "Rival" 
+      ? "<p style='font-style:italic; color:#666; text-align:center;'>No registra partidos enfrentando a Huracán.</p>" 
+      : "<p style='font-style:italic; color:#666; text-align:center;'>Sin datos disponibles en Huracán.</p>";
+  }
+
+  return html;
 }
-  // Manejador de checkboxes (muestra partidos por filtro)
+
+// Manejador de checkboxes (muestra partidos por filtro)
 document.addEventListener("change", function(e) {
   if (!e.target.classList.contains("chkPartidos")) return;
   const contenedor = e.target.closest("li").querySelector(".partidos-lista");
   contenedor.innerHTML = "";
   if (e.target.checked) {
-    const { comp, sit, futbolista } = e.target.dataset;
+    const { comp, sit, futbolista, lado } = e.target.dataset;
+    const columna = lado === "Rival" ? "Rival" : "Huracán";
 
     // filtrar partidos del futbolista
     const partidos = encuentros.filter(p => {
-      // el jugador aparece en la celda de Huracán
-const jugadores = (p.Huracán || "")
-  // 1️⃣ convertir paréntesis en comas (sin regex anidada)
-  .replace(/[()]/g, ",")
+      const jugadores = (p[columna] || "")
+        .replace(/[()]/g, ",")
+        .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+        .replace(/\.+/g, "")
+        .replace(/\s+y\s+/gi, ",")
+        .replace(/\s+e\s+/gi, ",")
+        .replace(/,,+/g, ",")
+        .replace(/\s+,/g, ",")
+        .replace(/,\s+/g, ",")
+        .replace(/\s+/g, " ")
+        .split(/[,;]+/)
+        .map(j => j.trim())
+        .filter(j => j.length > 1);
 
-  // 2️⃣ eliminar minutos: 45, 45+1, 90+3, etc.
-  .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-
-  // 3️⃣ normalización
-  .replace(/\.+/g, "")
-  .replace(/\s+y\s+/gi, ",")
-  .replace(/\s+e\s+/gi, ",")
-  .replace(/,,+/g, ",")
-  .replace(/\s+,/g, ",")
-  .replace(/,\s+/g, ",")
-  .replace(/\s+/g, " ")
-
-  // 4️⃣ separar jugadores
-  .split(/[,;]+/)
-  .map(j => j.trim())
-  .filter(j => j.length > 1);
       return jugadores.some(j => norm(j) === norm(futbolista)) &&
              bucketCompetencia(p.Torneo) === comp &&
-          (sit === "todos" || cap(norm(p.Situación)) === sit);
+             (sit === "todos" || cap(norm(p.Situación)) === sit);
     });
 
     if (partidos.length) {
@@ -1159,146 +1164,113 @@ const jugadores = (p.Huracán || "")
           `;
         }
 
-// --- TITULAR / SUPLENTE + MINUTOS (DEFINITIVO) ---
+        // --- TITULAR / SUPLENTE + MINUTOS ---
+        const texto = p[columna] || "";
+        const jugador = futbolista;
+        let condicion = "Titular";
 
-const texto = p.Huracán || "";
-const jugador = futbolista; // ← el nombre que ya usás en el index
-let condicion = "Titular";
+        function parseMinuto(valor, fallback = 0) {
+          if (valor == null || valor === "") return fallback;
+          const limpio = String(valor).trim();
+          if (limpio.includes("+")) {
+            const [base, extra] = limpio.split("+").map(Number);
+            return (base || 0) + (extra || 0);
+          }
+          const n = Number(limpio);
+          return isNaN(n) ? fallback : n;
+        }
 
-function parseMinuto(valor, fallback = 0) {
-  if (valor == null || valor === "") return fallback;
+        let finReal = 0;
+        if (p.Fin2E && p.Fin2E !== "0") {
+          finReal = parseMinuto(p.Fin2E, 120);
+        } else {
+          finReal = parseMinuto(p.Fin2T, 90);
+        }
 
-  const limpio = String(valor).trim();
+        let minutosJugados = finReal;
 
-  if (limpio.includes("+")) {
-    const [base, extra] = limpio.split("+").map(Number);
-    return (base || 0) + (extra || 0);
-  }
+        let ingreso = obtenerMinutoIngreso(texto, futbolista);
+        let salida  = obtenerMinutoSalida(texto, futbolista);
 
-  const n = Number(limpio);
-  return isNaN(n) ? fallback : n;
-}
+        ingreso = ajustarMinuto(ingreso, p);
+        salida  = ajustarMinuto(salida, p);
 
-console.log("Objeto partido completo:", p);
-console.log("Fin2T leído:", p.Fin2T);
-let finReal = 0;
+        if (ingreso !== null) {
+          condicion = "Suplente";
+          let finJugador = finReal;
+          if (salida !== null) {
+            finJugador = salida - 1;
+          }
+          minutosJugados = Math.max(0, finJugador - ingreso + 1);
+        } else if (salida !== null) {
+          condicion = "Titular";
+          minutosJugados = Math.max(0, salida - 1);
+        } else {
+          minutosJugados = finReal;
+        }
 
-if (p.Fin2E && p.Fin2E !== "0") {
-  // hubo tiempo extra → usar Fin2E
-  finReal = parseMinuto(p.Fin2E, 120);
-} else {
-  // partido normal → usar Fin2T
-  finReal = parseMinuto(p.Fin2T, 90);
-}
+        // --- EXPULSIONES ---
+        const incidencias = p.Incidencias || "";
+        const expulsionRegex = new RegExp(
+          `(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${futbolista}`,
+          "i"
+        );
 
-let minutosJugados = finReal;
+        let fueExpulsado = false;
+        if (expulsionRegex.test(incidencias)) {
+          fueExpulsado = true;
+          const m = incidencias.match(expulsionRegex)[1];
+          let minutoExpulsion = m.includes("+")
+            ? m.split("+").map(Number).reduce((a, b) => a + b)
+            : Number(m);
 
-// patrón: "Jugador (73 Otro)"
-const saleRegex = new RegExp(`${jugador}\\s*\\((\\d+(?:\\+\\d+)?)`, "i");
+          if (condicion === "Titular") {
+            minutosJugados = Math.max(0, minutoExpulsion - 1);
+          } else {
+            const fin = finReal;
+            const minutoIngreso = fin - minutosJugados + 1;
+            minutosJugados = Math.max(0, minutoExpulsion - minutoIngreso + 1);
+          }
+        }
 
-// patrón: "(73 Jugador)"
-const entraRegex = new RegExp(`\\((\\d+(?:\\+\\d+)?)\\s*${jugador}`, "i");
+        // --- GOLES ---
+        let golesJugador = 0;
+        const golRegex = new RegExp(
+          `(\\d+(?:\\+\\d+)?)\\s+GOL\\s+${futbolista}`,
+          "gi"
+        );
+        const golesMatch = incidencias.match(golRegex);
+        if (golesMatch) {
+          golesJugador = golesMatch.length;
+        }
 
-let ingreso = obtenerMinutoIngreso(texto, futbolista);
-let salida  = obtenerMinutoSalida(texto, futbolista);
+        let iconoGol = "";
+        if (golesJugador > 0) {
+          iconoGol = "⚽".repeat(golesJugador);
+        }
 
-ingreso = ajustarMinuto(ingreso, p);
-salida  = ajustarMinuto(salida, p);
+        const puntosPartido = calcularPuntosPartido(p, minutosJugados);
 
-if (ingreso !== null) {
-  // 👉 siempre suplente si tiene minuto de ingreso
-  condicion = "Suplente";
-
- let finJugador = finReal;
-
-if (salida !== null) {
-  finJugador = salida - 1;
-}
-
-minutosJugados = Math.max(0, finJugador - ingreso + 1);
-
-  minutosJugados = Math.max(0, finReal - ingreso + 1);
-
-} else if (salida !== null) {
-  // 👉 titular que fue reemplazado
-  condicion = "Titular";
-  minutosJugados = Math.max(0, salida - 1);
-
-} else {
-  // 👉 titular que jugó todo el partido
-  minutosJugados = finReal;
-}
-// --- EXPULSIONES ---
-const incidencias = p.Incidencias || "";
-
-// ejemplo: "73 EXP Joaquín Larrivey"
-const expulsionRegex = new RegExp(
-  `(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${futbolista}`,
-  "i"
-);
-
-let fueExpulsado = false;
-if (expulsionRegex.test(incidencias)) {
-  fueExpulsado = true;
-  const m = incidencias.match(expulsionRegex)[1];
-
-  let minutoExpulsion = m.includes("+")
-    ? m.split("+").map(Number).reduce((a, b) => a + b)
-    : Number(m);
-
-  if (condicion === "Titular") {
-    // jugó hasta el minuto anterior a la expulsión
-    minutosJugados = Math.max(0, minutoExpulsion - 1);
-  }
- else {
-    // suplente expulsado
-    // ingreso = fin del partido - minutos jugados + 1
-    const fin = finReal;
-    const minutoIngreso = fin - minutosJugados + 1;
-    minutosJugados = Math.max(0, minutoExpulsion - minutoIngreso + 1);
-  }
-}
-// --- GOLES ---
-let golesJugador = 0;
-
-const golRegex = new RegExp(
-  `(\\d+(?:\\+\\d+)?)\\s+GOL\\s+${futbolista}\\s*\\(HUR\\)`,
-  "gi"
-);
-
-const golesMatch = incidencias.match(golRegex);
-
-if (golesMatch) {
-  golesJugador = golesMatch.length;
-}
-
-let iconoGol = "";
-
-if (golesJugador > 0) {
-  iconoGol = "⚽".repeat(golesJugador);
-}
-const puntosPartido = calcularPuntosPartido(p, minutosJugados);
-
-       contenedor.innerHTML += `
+        contenedor.innerHTML += `
           <div class="acordeon">
-          <div class="acordeon-header">
-${fueExpulsado ? `
-<span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
-  <svg width="12" height="16" viewBox="0 0 12 16">
-    <rect x="1" y="1" width="10" height="14" rx="2" ry="2"
-          fill="#d40000" stroke="#8b0000" stroke-width="1"/>
-  </svg>
-</span>
-` : ""}${iconoGol ? iconoGol + " " : ""}${condicion} (${minutosJugados}’) ·
-${p.Resultado1}-${p.Resultado2}
-<span style="font-weight:bold; margin-left:6px;
-             color:${puntosPartido >= 0 ? '#006400' : '#8B0000'}">
-  (${puntosPartido.toFixed(1)})
-</span>
-  <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
-       style="height:22px; vertical-align:middle; margin:0 6px;">
-  [${p.Técnico}]
-</div>
+            <div class="acordeon-header">
+              ${fueExpulsado ? `
+              <span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
+                <svg width="12" height="16" viewBox="0 0 12 16">
+                  <rect x="1" y="1" width="10" height="14" rx="2" ry="2"
+                        fill="#d40000" stroke="#8b0000" stroke-width="1"/>
+                </svg>
+              </span>
+              ` : ""}${iconoGol ? iconoGol + " " : ""}${condicion} (${minutosJugados}’) ·
+              ${p.Resultado1}-${p.Resultado2}
+              <span style="font-weight:bold; margin-left:6px;
+                           color:${puntosPartido >= 0 ? '#006400' : '#8B0000'}">
+                (${puntosPartido.toFixed(1)})
+              </span>
+              <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
+                   style="height:22px; vertical-align:middle; margin:0 6px;">
+              [${p.Técnico}]
+            </div>
             <div class="acordeon-body cerrado">${bloqueHTML}</div>
           </div>
         `;
@@ -1311,16 +1283,7 @@ ${p.Resultado1}-${p.Resultado2}
     contenedor.style.display = "none";
   }
 });
-
-    document.addEventListener("click", function(e) {
-      if (e.target.classList.contains("acordeon-header")) {
-        const body = e.target.nextElementSibling;
-        body.classList.toggle("cerrado");
-        e.target.classList.toggle("abierto");
-      }
-    });
-
-function getResumenCarrera(nombreFutbolista) {
+    function getResumenCarrera(nombreFutbolista) {
   const delFutbolista = encuentros.filter(p => {
   const jugadores = (p.Huracán || "")
   // 1️⃣ convertir paréntesis en comas (sin regex anidada)
