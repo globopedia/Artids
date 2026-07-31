@@ -1441,23 +1441,39 @@ function getDatosCarreraHuracan(nombreFutbolista) {
 function enlazarJugadores(texto) {
   if (!texto) return "";
   
-  // Separamos por comas a cada jugador
-  return texto.split(",").map(item => {
-    const original = item.trim();
-    if (!original) return "";
+  // Separamos por comas, punto y coma, "y" o "e", conservando los separadores
+  const partes = texto.split(/(\s*[,;]\s*|\s+\b[ye]\b\s+)/i);
+  
+  return partes.map(part => {
+    // Si la parte es un separador (coma, punto y coma, "y", "e"), la devolvemos tal cual
+    if (/^(\s*[,;]\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
+      return part;
+    }
 
-    // Limpiamos el nombre SOLO para la URL (le sacamos números de minutos, paréntesis, etc.)
+    const original = part.trim();
+    if (!original) return part;
+
+    // Limpiamos minutos, paréntesis o números para buscar el nombre real
     let nombreLimpio = original
       .replace(/[()]/g, "") 
       .replace(/\b\d+(?:\+\d+)?\s*/g, "") 
       .trim();
 
-    // Armamos la URL con el parámetro "?jugador="
-    const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
-    
-    // Devolvemos el texto original intacto, pero hecho link
-    return `<a href="${url}" target="_blank" style="color: #0044cc; text-decoration: none; font-weight: 500;">${original}</a>`;
-  }).join(", ");
+    if (!nombreLimpio) return part;
+
+    // Verificamos si el futbolista existe en el listado cargado (array 'futbolistas')
+    const existeEnBase = typeof futbolistas !== "undefined" && 
+      futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
+
+    // Si existe, armamos el link (sin target="_blank" para abrir en la misma pestaña)
+    if (existeEnBase) {
+      const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
+      return `<a href="${url}" style="color: #0044cc; text-decoration: none; font-weight: 500;">${original}</a>`;
+    }
+
+    // Si no está en la base, queda como texto plano
+    return original;
+  }).join("");
 }
     function renderIncidencias(texto) {
       if (!texto) return "";
