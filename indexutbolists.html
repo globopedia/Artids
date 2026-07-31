@@ -1441,41 +1441,47 @@ function getDatosCarreraHuracan(nombreFutbolista) {
 function enlazarJugadores(texto) {
   if (!texto) return "";
   
-  // Separamos por comas, punto y coma, "y" o "e", conservando los separadores
-  const partes = texto.split(/(\s*[,;]\s*|\s+\b[ye]\b\s+)/i);
+  // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e"
+  const partes = texto.split(/(\s*[,;().]+\s*|\s+\b[ye]\b\s+)/i);
   
   return partes.map(part => {
-    // Si la parte es un separador (coma, punto y coma, "y", "e"), la devolvemos tal cual
-    if (/^(\s*[,;]\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
+    // Si la parte es un separador o signo de puntuación, la devolvemos tal cual
+    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
       return part;
     }
 
     const original = part.trim();
     if (!original) return part;
 
-    // Limpiamos totalmente puntos, paréntesis, comas y números de minutos/sustituciones
-    let nombreLimpio = original
-      .replace(/[().,;]/g, "") 
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "") 
-      .trim();
+    // Si hay un minuto de cambio al inicio (ej: "67 ", "67' ", "45+2 "), lo extraemos
+    const matchMinuto = original.match(/^(\d+(?:\+\d+)?'?\s*)(.*)/);
+    let prefijoMinuto = "";
+    let candidatoNombre = original;
 
+    if (matchMinuto) {
+      prefijoMinuto = matchMinuto[1];
+      candidatoNombre = matchMinuto[2];
+    }
+
+    const nombreLimpio = candidatoNombre.trim();
     if (!nombreLimpio) return part;
 
     // Verificamos si el futbolista existe en el listado cargado (array 'futbolistas')
     const existeEnBase = typeof futbolistas !== "undefined" && 
       futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
 
-    // Si existe, armamos el enlace en rojo (#d40000) y con efecto hover a negrita
+    // Si existe, armamos el enlace en rojo, dejando el número del minuto afuera del link
     if (existeEnBase) {
       const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
-      return `<a href="${url}" ` +
-             `style="color: #d40000; text-decoration: none; font-weight: normal;" ` +
-             `onmouseover="this.style.fontWeight='bold'" ` +
-             `onmouseout="this.style.fontWeight='normal'">${original}</a>`;
+      const linkHTML = `<a href="${url}" ` +
+                       `style="color: #d40000; text-decoration: none; font-weight: normal;" ` +
+                       `onmouseover="this.style.fontWeight='bold'" ` +
+                       `onmouseout="this.style.fontWeight='normal'">${candidatoNombre}</a>`;
+      return prefijoMinuto + linkHTML;
     }
 
     // Si no está en la base, queda como texto plano
-    return original;
+    return part;
   }).join("");
 }
     function renderIncidencias(texto) {
