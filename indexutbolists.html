@@ -1090,10 +1090,10 @@ function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
     // 2. Contar Victorias, Empates, Derrotas y Goles generales frente a Huracán
     let v = 0, eCount = 0, d = 0, golesTotal = 0;
     for (const p of delFutbolista) {
-      const sit = cap(norm(p.Situación));
-      if (sit === "Victoria") v++;
+    const sit = cap(norm(p.Situación));
+      if (sit === "Victoria") d++;
       else if (sit === "Empate") eCount++;
-      else if (sit === "Derrota") d++;
+      else if (sit === "Derrota") v++;
 
       const textoIncidencias = norm(p.Incidencias || "");
       const patron = new RegExp(`gol\\s+${norm(nombreFutbolista)}`, "g");
@@ -1334,7 +1334,6 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
         contenedor.innerHTML += `
          <div class="acordeon ${lado === 'Rival' ? 'acordeon-rival' : ''}">
  <div class="acordeon-header">
-  ${lado === "Rival" ? `<b>[${p.Torneo}]</b> ` : ""}
   ${fueExpulsado ? `
   <span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
     <svg width="12" height="16" viewBox="0 0 12 16">
