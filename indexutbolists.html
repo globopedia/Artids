@@ -1222,8 +1222,8 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
               <div><b>${p.Torneo}</b></div>
               <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
               <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
-              <div><b>${p.Club}:</b> ${p.Rival}</div>
-              <div><b>Huracán:</b> ${p.Huracán}</div>
+          <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+          <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
               ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
               <div>${renderIncidencias(p.Incidencias)}</div>
             </div>
@@ -1240,8 +1240,8 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
               <div><b>${p.Torneo}</b></div>
               <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
               <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
-              <div><b>Huracán:</b> ${p.Huracán}</div>
-              <div><b>${p.Club}:</b> ${p.Rival}</div>
+<div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+<div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
               ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
               <div>${renderIncidencias(p.Incidencias)}</div>
             </div>
@@ -1437,6 +1437,27 @@ function getDatosCarreraHuracan(nombreFutbolista) {
   if (!nombreClub) return "";
   const club = nombreClub.trim();
       return `https://globopedia.github.io/Artids/escudos/${encodeURIComponent(club)}.png`;
+}
+function enlazarJugadores(texto) {
+  if (!texto) return "";
+  
+  // Separamos por comas a cada jugador
+  return texto.split(",").map(item => {
+    const original = item.trim();
+    if (!original) return "";
+
+    // Limpiamos el nombre SOLO para la URL (le sacamos números de minutos, paréntesis, etc.)
+    let nombreLimpio = original
+      .replace(/[()]/g, "") 
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "") 
+      .trim();
+
+    // Armamos la URL con el parámetro "?jugador="
+    const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
+    
+    // Devolvemos el texto original intacto, pero hecho link
+    return `<a href="${url}" target="_blank" style="color: #0044cc; text-decoration: none; font-weight: 500;">${original}</a>`;
+  }).join(", ");
 }
     function renderIncidencias(texto) {
       if (!texto) return "";
@@ -1703,6 +1724,19 @@ function parseMinuto(minutoStr) {
     }
   }
 });
-</script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Leemos la URL para ver si trae la etiqueta "?jugador="
+  const parametros = new URLSearchParams(window.location.search);
+  const nombreJugador = parametros.get("jugador");
+
+  if (nombreJugador) {
+    // Si trajo un nombre, le damos medio segundo para que tu CSV termine de cargar
+    // y disparamos la función que ya tenés armada
+    setTimeout(() => {
+      seleccionarFutbolista(nombreJugador);
+    }, 500); 
+  }
+});
+  </script>
 </body>
 </html>
