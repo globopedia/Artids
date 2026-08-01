@@ -115,7 +115,7 @@
     function bucketCompetencia(torneo) {
       const t = norm(torneo || "");
       if (t.includes("libertadores") || t.includes("conmebol") || t.includes("sudamericana")) return "Conmebol";
-      if (t.includes("argentina") || t.includes("superliga") || t.includes("maradona") || t.includes("supercopa") || t.includes("promocion") || t.includes("nacional b") || t.includes("b nacional") || t.includes("campeonato")) return "AFA";
+      if (t.includes("argentina") || t.includes("superliga") || t.includes("maradona") || t.includes("supercopa") || t.includes("promocion") || t.includes("nacional b") || t.includes("b nacional") || t.includes("campeonato") || t.includes("torneo") || t.includes("suecia") || t.includes("beccar varela") || t.includes("competencia") || t.includes("escobar")) return "AFA";
       if (t.includes("amistoso")) return "Amistosos";
       return "Otros";
     }
