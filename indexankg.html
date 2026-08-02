@@ -2116,7 +2116,7 @@ document.addEventListener("change", function(e) {
 });
 </script>
 <script>
-    // 1. Diccionario de puntos por equipo
+  // 1. Diccionario de puntos por equipo
   const puntosEquipos = {
     "Real Madrid (España)": 10,
     "Bayern Munich (Alemania)": 5, "Milan (Italia)": 5,
@@ -2128,19 +2128,31 @@ document.addEventListener("change", function(e) {
 
   const URL_BASE_ESCUDOS = "https://globopedia.github.io/Artids/escudos/";
 
-  // 2. Función para renderizar la celda con los escuditos en orden de trayectoria
-  function generarHTMLTrayectoria(listaClubes) {
+  // Función interna para convertir el texto del CSV en una lista limpia
+  function obtenerListaClubes(textoTrayectoria) {
+    if (!textoTrayectoria || textoTrayectoria === 'Trayectoria' || textoTrayectoria === '-') return [];
+    // Separa los equipos por cada coma y quita espacios sobrantes
+    return textoTrayectoria.split(',').map(club => club.trim()).filter(club => club !== '');
+  }
+
+  // Genera los escudos en el HTML respetando el orden del CSV
+  function generarHTMLTrayectoria(textoTrayectoria) {
+    const clubes = obtenerListaClubes(textoTrayectoria);
+    if (clubes.length === 0) return '';
+
     return `<div class="celda-escudos">` + 
-      listaClubes.map(club => {
+      clubes.map(club => {
         const urlEscudo = `${URL_BASE_ESCUDOS}${encodeURIComponent(club)}.png`;
         return `<img src="${urlEscudo}" alt="${club}" title="${club}" class="escudo-img">`;
       }).join('') + 
     `</div>`;
   }
 
-  // 3. Función para calcular el puntaje total del jugador
-  function calcularPuntajeJugador(listaClubes) {
-    return listaClubes.reduce((total, club) => {
+  // Suma los puntos individuales asignados a cada club de la lista
+  function calcularPuntajeJugador(textoTrayectoria) {
+    const clubes = obtenerListaClubes(textoTrayectoria);
+    return clubes.reduce((total, club) => {
+      // Si el club está en el diccionario suma sus puntos, sino suma 0
       return total + (puntosEquipos[club] || 0);
     }, 0);
   }
