@@ -2064,34 +2064,6 @@ function cambiarFiltroTorneo(valor) {
   filtroTorneo = valor;
   aplicarFiltros();
 }
-  // 1. Diccionario de puntos por equipo
-  const puntosEquipos = {
-    "Real Madrid (España)": 10,
-    "Bayern Munich (Alemania)": 5, "Milan (Italia)": 5,
-    "Barcelona (España)": 4, "Boca Juniors": 4, "Internazionale (Italia)": 4, "Nacional (Uruguay)": 4, "Peñarol (Uruguay)": 4, "Sao Paulo (Brasil)": 4,
-    "Ajax (Holanda)": 3, "Chelsea (Inglaterra)": 3, "Corinthians (Brasil)": 3, "Independiente": 3, "Juventus (Italia)": 3, "Manchester United (Inglaterra)": 3, "Porto (Portugal)": 3, "Santos (Brasil)": 3,
-    "Atl. Madrid (España)": 2, "Borussia Dortmund (Alemania)": 2, "Crvena Zvezda (Serbia)": 2, "Estudiantes (La Plata)": 2, "Feyenoord (Holanda)": 2, "Flamengo (Brasil)": 2, "Gremio (Brasil)": 2, "Internacional (Brasil)": 2, "Liverpool (Inglaterra)": 2, "Manchester City (Inglaterra)": 2, "Olimpia (Paraguay)": 2, "Paris Saint Germain (Francia)": 2, "Racing Club": 2, "River Plate": 2, "Vélez Sársfield": 2,
-    "Borussia Monchegladbach (Alemania)": 1, "Eintracht Frankfurt (Alemania)": 1, "Hamburgo (Alemania)": 1, "Werder Bremen (Alemania)": 1, "Stuttgart (Alemania)": 1, "Huracán": 1, "San Lorenzo de Almagro": 1, "Botafogo (Brasil)": 1, "Cruzeiro (Brasil)": 1, "Fluminense (Brasil)": 1, "Mineiro (Brasil)": 1, "Palmeiras (Brasil)": 1, "Paranaense (Brasil)": 1, "Vasco da Gama (Brasil)": 1, "Athletic (España)": 1, "Sevilla (España)": 1, "Valencia (España)": 1, "PSV Eindhoven (Holanda)": 1, "Twente (Holanda)": 1, "Bologna (Italia)": 1, "Fiorentina (Italia)": 1, "Lazio (Italia)": 1, "Napoli (Italia)": 1, "Roma (Italia)": 1, "Torino (Italia)": 1, "Aston Villa (Inglaterra)": 1, "Arsenal (Inglaterra)": 1, "Everton (Inglaterra)": 1, "Newcastle United (Inglaterra)": 1, "Tottenham Hotspur (Inglaterra)": 1, "Sunderland (Inglaterra)": 1, "Bordeaux (Francia)": 1, "Lille (Francia)": 1, "Mónaco (Francia)": 1, "Olympique Lyon (Francia)": 1, "Olympique Marsella (Francia)": 1, "Saint Étienne (Francia)": 1, "Cerro Porteño (Paraguay)": 1, "Guaraní (Paraguay)": 1, "Libertad (Paraguay)": 1, "Nacional (Paraguay)": 1, "Sporting Lisboa (Portugal)": 1, "Vitória Guimaraes (Portugal)": 1, "Sporting Braga (Portugal)": 1, "Boavista (Portugal)": 1, "Belenenses (Portugal)": 1, "Partizan (Serbia)": 1, "Vojvodina (Serbia)": 1, "Omladinski (Serbia)": 1, "Danubio (Uruguay)": 1, "Defensor (Uruguay)": 1, "Wanderers (Uruguay)": 1
-  };
-
-  const URL_BASE_ESCUDOS = "https://globopedia.github.io/Artids/blob/main/escudos/";
-
-  // 2. Función para renderizar la celda con los escuditos en orden de trayectoria
-  function generarHTMLTrayectoria(listaClubes) {
-    return `<div class="celda-escudos">` + 
-      listaClubes.map(club => {
-        const urlEscudo = `${URL_BASE_ESCUDOS}${encodeURIComponent(club)}.png`;
-        return `<img src="${urlEscudo}" alt="${club}" title="${club}" class="escudo-img">`;
-      }).join('') + 
-    `</div>`;
-  }
-
-  // 3. Función para calcular el puntaje total del jugador
-  function calcularPuntajeJugador(listaClubes) {
-    return listaClubes.reduce((total, club) => {
-      return total + (puntosEquipos[club] || 0);
-    }, 0);
-  }
 </script>
 <script>
 function enviarAltura() {
@@ -2142,6 +2114,36 @@ document.addEventListener("change", function(e) {
     clickSound.play().catch(() => {});
   }
 });
+</script>
+<script>
+    // 1. Diccionario de puntos por equipo
+  const puntosEquipos = {
+    "Real Madrid (España)": 10,
+    "Bayern Munich (Alemania)": 5, "Milan (Italia)": 5,
+    "Barcelona (España)": 4, "Boca Juniors": 4, "Internazionale (Italia)": 4, "Nacional (Uruguay)": 4, "Peñarol (Uruguay)": 4, "Sao Paulo (Brasil)": 4,
+    "Ajax (Holanda)": 3, "Chelsea (Inglaterra)": 3, "Corinthians (Brasil)": 3, "Independiente": 3, "Juventus (Italia)": 3, "Manchester United (Inglaterra)": 3, "Porto (Portugal)": 3, "Santos (Brasil)": 3,
+    "Atl. Madrid (España)": 2, "Borussia Dortmund (Alemania)": 2, "Crvena Zvezda (Serbia)": 2, "Estudiantes (La Plata)": 2, "Feyenoord (Holanda)": 2, "Flamengo (Brasil)": 2, "Gremio (Brasil)": 2, "Internacional (Brasil)": 2, "Liverpool (Inglaterra)": 2, "Manchester City (Inglaterra)": 2, "Olimpia (Paraguay)": 2, "Paris Saint Germain (Francia)": 2, "Racing Club": 2, "River Plate": 2, "Vélez Sársfield": 2,
+    "Borussia Monchegladbach (Alemania)": 1, "Eintracht Frankfurt (Alemania)": 1, "Hamburgo (Alemania)": 1, "Werder Bremen (Alemania)": 1, "Stuttgart (Alemania)": 1, "Huracán": 1, "San Lorenzo de Almagro": 1, "Botafogo (Brasil)": 1, "Cruzeiro (Brasil)": 1, "Fluminense (Brasil)": 1, "Mineiro (Brasil)": 1, "Palmeiras (Brasil)": 1, "Paranaense (Brasil)": 1, "Vasco da Gama (Brasil)": 1, "Athletic (España)": 1, "Sevilla (España)": 1, "Valencia (España)": 1, "PSV Eindhoven (Holanda)": 1, "Twente (Holanda)": 1, "Bologna (Italia)": 1, "Fiorentina (Italia)": 1, "Lazio (Italia)": 1, "Napoli (Italia)": 1, "Roma (Italia)": 1, "Torino (Italia)": 1, "Aston Villa (Inglaterra)": 1, "Arsenal (Inglaterra)": 1, "Everton (Inglaterra)": 1, "Newcastle United (Inglaterra)": 1, "Tottenham Hotspur (Inglaterra)": 1, "Sunderland (Inglaterra)": 1, "Bordeaux (Francia)": 1, "Lille (Francia)": 1, "Mónaco (Francia)": 1, "Olympique Lyon (Francia)": 1, "Olympique Marsella (Francia)": 1, "Saint Étienne (Francia)": 1, "Cerro Porteño (Paraguay)": 1, "Guaraní (Paraguay)": 1, "Libertad (Paraguay)": 1, "Nacional (Paraguay)": 1, "Sporting Lisboa (Portugal)": 1, "Vitória Guimaraes (Portugal)": 1, "Sporting Braga (Portugal)": 1, "Boavista (Portugal)": 1, "Belenenses (Portugal)": 1, "Partizan (Serbia)": 1, "Vojvodina (Serbia)": 1, "Omladinski (Serbia)": 1, "Danubio (Uruguay)": 1, "Defensor (Uruguay)": 1, "Wanderers (Uruguay)": 1
+  };
+
+  const URL_BASE_ESCUDOS = "https://globopedia.github.io/Artids/blob/main/escudos/";
+
+  // 2. Función para renderizar la celda con los escuditos en orden de trayectoria
+  function generarHTMLTrayectoria(listaClubes) {
+    return `<div class="celda-escudos">` + 
+      listaClubes.map(club => {
+        const urlEscudo = `${URL_BASE_ESCUDOS}${encodeURIComponent(club)}.png`;
+        return `<img src="${urlEscudo}" alt="${club}" title="${club}" class="escudo-img">`;
+      }).join('') + 
+    `</div>`;
+  }
+
+  // 3. Función para calcular el puntaje total del jugador
+  function calcularPuntajeJugador(listaClubes) {
+    return listaClubes.reduce((total, club) => {
+      return total + (puntosEquipos[club] || 0);
+    }, 0);
+  }
 </script>
 </body>
 </html>
