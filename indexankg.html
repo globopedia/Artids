@@ -335,7 +335,11 @@ const URL_BASE_ESCUDOS = "https://globopedia.github.io/Artids/escudos/";
 
 function obtenerListaClubes(textoTrayectoria) {
   if (!textoTrayectoria || textoTrayectoria === 'Trayectoria' || textoTrayectoria === '-') return [];
-  return textoTrayectoria.split(',').map(club => club.trim()).filter(club => club !== '');
+  
+  return textoTrayectoria
+    .split(',')
+    .map(club => club.trim())
+    .filter(club => club !== '' && puntosEquipos.hasOwnProperty(club)); // 👈 Solo deja los clubes que suman puntos
 }
 
 function generarHTMLTrayectoria(textoTrayectoria) {
