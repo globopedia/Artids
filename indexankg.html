@@ -283,6 +283,7 @@ Hasta: <input type="date" id="fechaHasta">
 <select id="selectorEstadistica" onchange="cambiarEstadistica()">
 
 <option value="globopedia">HALL GLOBOPEDIA</option>
+<option value="populares">LOS MÁS POPULARES</option>
 <option value="partidos">MÁS PARTIDOS JUGADOS</option>
 <option value="minutos">MÁS MINUTOS JUGADOS</option>
 <option value="goles">MÁXIMOS GOLEADORES</option>
@@ -303,11 +304,35 @@ let rankingActual = [];
 let rankingBase = [];
 let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
+
+// 🏆 LISTA DE CLUBES IMPORTANTES A CONSIDERAR
+const CLUBES_IMPORTANTES = new Set([
+  "bayern munich (alemania)", "borussia dortmund (alemania)", "borussia monchegladbach (alemania)",
+  "eintracht frankfurt (alemania)", "hamburgo (alemania)", "werder bremen (alemania)", "stuttgart (alemania)",
+  "boca juniors", "estudiantes (la plata)", "huracán", "independiente", "racing club", "river plate",
+  "san lorenzo de almagro", "vélez sarsfield", "botafogo (brasil)", "corinthians (brasil)", "cruzeiro (brasil)",
+  "flamengo (brasil)", "fluminense (brasil)", "gremio (brasil)", "internacional (brasil)", "mineiro (brasil)",
+  "palmeiras (brasil)", "paranaense (brasil)", "santos (brasil)", "sao paulo (brasil)", "vasco da gama (brasil)",
+  "athletic (españa)", "atl. madrid (españa)", "barcelona (españa)", "real madrid (españa)", "sevilla (españa)",
+  "valencia (españa)", "bologna (italia)", "fiorentina (italia)", "internazionale (italia)", "juventus (italia)",
+  "lazio (italia)", "milan (italia)", "napoli (italia)", "roma (italia)", "torino (italia)", "aston villa (inglaterra)",
+  "arsenal (inglaterra)", "chelsea (inglaterra)", "everton (inglaterra)", "liverpool (inglaterra)",
+  "manchester united (inglaterra)", "manchester city (inglaterra)", "newcastle united (inglaterra)",
+  "tottenham hotspur (inglaterra)", "sunderland (inglaterra)", "girondins (francia)", "lille (francia)",
+  "mónaco (francia)", "olympique lyon (francia)", "olympique marsella (francia)", "parís saint germain (francia)",
+  "saint étienne (francia)", "danubio (uruguay)", "defensor (uruguay)", "nacional (uruguay)", "peñarol (uruguay)",
+  "wanderers (uruguay)"
+].map(c => c.toLowerCase().trim()));
+
 const CONFIG_ESTADISTICAS = {
 
   globopedia: {titulo: "HALL GLOBOPEDIA",
     campo: "Globopedia",
     formato: r => r.globopedia},
+
+  populares: {titulo: "LOS MÁS POPULARES",
+    campo: "Trayectoria",
+    formato: r => r.trayectoriaTexto},
 
   partidos: {titulo: "MÁS PARTIDOS JUGADOS",
     campo: "Partidos",
@@ -355,6 +380,28 @@ const CONFIG_ESTADISTICAS = {
 }
 
 };
+
+function obtenerTrayectoriaImportante(nombre) {
+  const jugador = indiceUtbolistas[norm(nombre)];
+  if (!jugador || !jugador["Trayectoria"]) {
+    return { cantidad: 0, lista: [] };
+  }
+
+  const clubes = jugador["Trayectoria"].split(",").map(c => c.trim()).filter(Boolean);
+  const importantes = [];
+
+  clubes.forEach(c => {
+    if (CLUBES_IMPORTANTES.has(c.toLowerCase())) {
+      importantes.push(c);
+    }
+  });
+
+  return {
+    cantidad: importantes.length,
+    lista: importantes
+  };
+}
+
 function clasificarTorneo(torneo) {
   if (!torneo) return "OTRO";
 
@@ -441,9 +488,11 @@ if (ordenActual.campo === "efectividad") {
   // 📈 ORDEN
   if (ordenActual.campo === "pataduras") {
     ranking.sort((a, b) => a.globopedia - b.globopedia);
-} else {
+  } else if (ordenActual.campo === "populares") {
+    ranking.sort((a, b) => b.cantidadClubesImportantes - a.cantidadClubesImportantes);
+  } else {
     ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo]);
-}
+  }
 
   rankingBase = ranking;
 aplicarFiltrosLivianos();
@@ -474,6 +523,8 @@ function aplicarFiltrosLivianos() {
 // 🔥 REORDENAR
 if (ordenActual.campo === "pataduras") {
     ranking.sort((a, b) => a.globopedia - b.globopedia);
+} else if (ordenActual.campo === "populares") {
+    ranking.sort((a, b) => b.cantidadClubesImportantes - a.cantidadClubesImportantes);
 } else {
     ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo]);
 }
@@ -1580,6 +1631,7 @@ if (matches) {
     const efectividad = ((j.victorias * 3 + j.empates) * 100 / (j.partidos * 3)) || 0;
     const inactividadMs = calcularMayorInactividad(j.fechas);
     const inactividadTexto = formatearTiempo(inactividadMs);
+    const datosPopulares = obtenerTrayectoriaImportante(j.nombre);
  
 const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
 
@@ -1617,7 +1669,9 @@ if (j.nombre === "Cristian Tavio") {
  efectividad: Number(efectividad.toFixed(1)),
  globopedia: Number(j.globopedia.toFixed(1)),
  inactividad: inactividadMs,
- inactividadTexto: inactividadTexto
+ inactividadTexto: inactividadTexto,
+ cantidadClubesImportantes: datosPopulares.cantidad,
+ trayectoriaTexto: datosPopulares.lista.join(", ")
 };
 
   }).sort((a, b) => b.globopedia - a.globopedia);
