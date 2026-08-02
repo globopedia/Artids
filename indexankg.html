@@ -211,18 +211,19 @@ html, body {
 }
   /* Ajuste para que las imágenes de los escudos queden alineadas y prolijas */
   .escudo-img {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     object-fit: contain;
     vertical-align: middle;
-    margin: 2px;
+    margin: 1px 2px;
   }
   
   .celda-escudos {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 2px;
     align-items: center;
+    justify-content: center;
   }
 </style>
 </head>
@@ -232,7 +233,7 @@ html, body {
 <div style="text-align:center; margin-bottom:10px;">
   <img src="https://raw.githubusercontent.com/globopedia/Artids/main/logo_globopedia.png"
        style="height:80px; margin-bottom:10px;">
-  <h2 style="margin:0;">📊 Rendimiento de Futbolistas</br>Faltante: 1960/68 y 1981/90</h2>
+  <h2 style="margin:0;">📊 Rendimiento de Futbolistas<br>Faltante: 1960/68 y 1981/90</h2>
 </div>
 
 <div style="text-align:center; margin:15px 0;">
@@ -267,16 +268,16 @@ Hasta: <input type="date" id="fechaHasta">
 <div id="filtroPosiciones" style="text-align:center; margin-bottom:13px;">
   <label><input type="checkbox" value="Wing izquierdo" checked><span>WING IZQ</span></label>
   <label><input type="checkbox" value="Delantero" checked><span>PUNTERO</span></label>
-  <label><input type="checkbox" value="Wing derecho" checked><span>WING DER</span></label></br>
+  <label><input type="checkbox" value="Wing derecho" checked><span>WING DER</span></label><br>
   <label><input type="checkbox" value="Extremo izquierdo" checked><span>EXTREMO IZQ</span></label>
   <label><input type="checkbox" value="Enganche" checked><span>ENGANCHE</span></label>
-  <label><input type="checkbox" value="Extremo derecho" checked><span>EXTREMO DER</span></label></br>
+  <label><input type="checkbox" value="Extremo derecho" checked><span>EXTREMO DER</span></label><br>
   <label><input type="checkbox" value="Volante izquierdo" checked><span>VOLANTE IZQ</span></label>
   <label><input type="checkbox" value="Volante central" checked><span>VOLANTE CEN</span></label>
-  <label><input type="checkbox" value="Volante derecho" checked><span>VOLANTE DER</span></label></br>
+  <label><input type="checkbox" value="Volante derecho" checked><span>VOLANTE DER</span></label><br>
   <label><input type="checkbox" value="Lateral izquierdo" checked><span>LATERAL IZQ</span></label>
   <label><input type="checkbox" value="Defensor central" checked><span>ZAGUERO</span></label>
-  <label><input type="checkbox" value="Lateral derecho" checked><span>LATERAL DER</span></label></br>
+  <label><input type="checkbox" value="Lateral derecho" checked><span>LATERAL DER</span></label><br>
   <label><input type="checkbox" value="Arquero" checked><span>ARQUERO</span></label>
 </div>
   
@@ -296,7 +297,6 @@ Hasta: <input type="date" id="fechaHasta">
   
 <div style="text-align:center; margin-top:15px;">
 <select id="selectorEstadistica" onchange="cambiarEstadistica()">
-
 <option value="globopedia">HALL GLOBOPEDIA</option>
 <option value="populares">LOS MÁS POPULARES</option>
 <option value="partidos">MÁS PARTIDOS JUGADOS</option>
@@ -312,6 +312,7 @@ Hasta: <input type="date" id="fechaHasta">
 <option value="pataduras">LOS QUE NO RINDIERON</option>
 </select>
 </div>
+
 <div id="ranking">Cargando datos...</div>
 
 <script>
@@ -320,108 +321,61 @@ let rankingBase = [];
 let ordenActual = { campo: "globopedia", asc: true };
 let filtroTorneo = "TODOS";
 
-// 🏆 LISTA DE CLUBES IMPORTANTES A CONSIDERAR
-const CLUBES_IMPORTANTES = new Set([
-  "bayern munich (alemania)", "borussia dortmund (alemania)", "borussia monchegladbach (alemania)",
-  "eintracht frankfurt (alemania)", "hamburgo (alemania)", "werder bremen (alemania)", "stuttgart (alemania)",
-  "boca juniors", "estudiantes (la plata)", "huracán", "independiente", "racing club", "river plate",
-  "san lorenzo de almagro", "vélez sarsfield", "botafogo (brasil)", "corinthians (brasil)", "cruzeiro (brasil)",
-  "flamengo (brasil)", "fluminense (brasil)", "gremio (brasil)", "internacional (brasil)", "mineiro (brasil)",
-  "palmeiras (brasil)", "paranaense (brasil)", "santos (brasil)", "sao paulo (brasil)", "vasco da gama (brasil)",
-  "athletic (españa)", "atl. madrid (españa)", "barcelona (españa)", "real madrid (españa)", "sevilla (españa)",
-  "valencia (españa)", "bologna (italia)", "fiorentina (italia)", "internazionale (italia)", "juventus (italia)",
-  "lazio (italia)", "milan (italia)", "napoli (italia)", "roma (italia)", "torino (italia)", "aston villa (inglaterra)",
-  "arsenal (inglaterra)", "chelsea (inglaterra)", "everton (inglaterra)", "liverpool (inglaterra)",
-  "manchester united (inglaterra)", "manchester city (inglaterra)", "newcastle united (inglaterra)",
-  "tottenham hotspur (inglaterra)", "sunderland (inglaterra)", "girondins (francia)", "lille (francia)",
-  "mónaco (francia)", "olympique lyon (francia)", "olympique marsella (francia)", "parís saint germain (francia)",
-  "saint étienne (francia)", "danubio (uruguay)", "defensor (uruguay)", "nacional (uruguay)", "peñarol (uruguay)",
-  "wanderers (uruguay)"
-].map(c => c.toLowerCase().trim()));
-
-const CONFIG_ESTADISTICAS = {
-
-  globopedia: {titulo: "HALL GLOBOPEDIA",
-    campo: "Globopedia",
-    formato: r => r.globopedia},
-
-  populares: {titulo: "LOS MÁS POPULARES",
-    campo: "Trayectoria",
-    formato: r => r.trayectoriaTexto},
-
-  partidos: {titulo: "MÁS PARTIDOS JUGADOS",
-    campo: "Partidos",
-    formato: r => r.partidos},
-
-  duco: {titulo: "MÁS PARTIDOS EN EL DUCÓ",
-    campo: "Partidos",
-    formato: r => r.duco},
-
-  goles: {titulo: "MÁXIMOS GOLEADORES",
-    campo: "Goles",
-    formato: r => r.goles},
-
-  expulsiones: {titulo: "MÁS EXPULSIONES",
-    campo: "Expulsiones",
-    formato: r => r.expulsiones},
-
-  vallasInvictas: {titulo: "MÁS VALLAS INVICTAS",
-    campo: "Partidos Invicto",
-    formato: r => r.vallasInvictas},
-
-  efectividad: {titulo: "EFECTIVIDAD DE PUNTOS (+20 PARTIDOS)",
-    campo: "Efectividad",
-    formato: r => r.efectividad + "%"},
-
-  minutos: {titulo: "MÁS MINUTOS JUGADOS",
-    campo: "Minutos",
-    formato: r => r.minutos.toLocaleString("es-AR")},
-
-  inactividad: {titulo: "MÁS TIEMPO SIN JUGAR",
-    campo: "Tiempo",
-    formato: r => r.inactividadTexto},
-
-  rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA",
-    campo: "Minutos",
-    formato: r => r.rachaTexto},
-
-  rachaGoles: {titulo: "MÁS PARTIDOS SEGUIDOS HACIENDO GOLES",
-  campo: "Partidos",
-  formato: r => `${r.partidos} (${r.goles} goles)`},
-  
-  pataduras: {titulo: "LOS QUE NO RINDIERON",
-    campo: "Globopedia",
-    formato: r => r.globopedia.toFixed(1)
-}
-
+// 🏆 DICCIONARIO DE PUNTOS POR EQUIPO
+const puntosEquipos = {
+  "Real Madrid (España)": 10,
+  "Bayern Munich (Alemania)": 5, "Milan (Italia)": 5,
+  "Barcelona (España)": 4, "Boca Juniors": 4, "Internazionale (Italia)": 4, "Nacional (Uruguay)": 4, "Peñarol (Uruguay)": 4, "Sao Paulo (Brasil)": 4,
+  "Ajax (Holanda)": 3, "Chelsea (Inglaterra)": 3, "Corinthians (Brasil)": 3, "Independiente": 3, "Juventus (Italia)": 3, "Manchester United (Inglaterra)": 3, "Porto (Portugal)": 3, "Santos (Brasil)": 3,
+  "Atl. Madrid (España)": 2, "Borussia Dortmund (Alemania)": 2, "Crvena Zvezda (Serbia)": 2, "Estudiantes (La Plata)": 2, "Feyenoord (Holanda)": 2, "Flamengo (Brasil)": 2, "Gremio (Brasil)": 2, "Internacional (Brasil)": 2, "Liverpool (Inglaterra)": 2, "Manchester City (Inglaterra)": 2, "Olimpia (Paraguay)": 2, "Paris Saint Germain (Francia)": 2, "Racing Club": 2, "River Plate": 2, "Vélez Sársfield": 2,
+  "Borussia Monchegladbach (Alemania)": 1, "Eintracht Frankfurt (Alemania)": 1, "Hamburgo (Alemania)": 1, "Werder Bremen (Alemania)": 1, "Stuttgart (Alemania)": 1, "Huracán": 1, "San Lorenzo de Almagro": 1, "Botafogo (Brasil)": 1, "Cruzeiro (Brasil)": 1, "Fluminense (Brasil)": 1, "Mineiro (Brasil)": 1, "Palmeiras (Brasil)": 1, "Paranaense (Brasil)": 1, "Vasco da Gama (Brasil)": 1, "Athletic (España)": 1, "Sevilla (España)": 1, "Valencia (España)": 1, "PSV Eindhoven (Holanda)": 1, "Twente (Holanda)": 1, "Bologna (Italia)": 1, "Fiorentina (Italia)": 1, "Lazio (Italia)": 1, "Napoli (Italia)": 1, "Roma (Italia)": 1, "Torino (Italia)": 1, "Aston Villa (Inglaterra)": 1, "Arsenal (Inglaterra)": 1, "Everton (Inglaterra)": 1, "Newcastle United (Inglaterra)": 1, "Tottenham Hotspur (Inglaterra)": 1, "Sunderland (Inglaterra)": 1, "Bordeaux (Francia)": 1, "Lille (Francia)": 1, "Mónaco (Francia)": 1, "Olympique Lyon (Francia)": 1, "Olympique Marsella (Francia)": 1, "Saint Étienne (Francia)": 1, "Cerro Porteño (Paraguay)": 1, "Guaraní (Paraguay)": 1, "Libertad (Paraguay)": 1, "Nacional (Paraguay)": 1, "Sporting Lisboa (Portugal)": 1, "Vitória Guimaraes (Portugal)": 1, "Sporting Braga (Portugal)": 1, "Boavista (Portugal)": 1, "Belenenses (Portugal)": 1, "Partizan (Serbia)": 1, "Vojvodina (Serbia)": 1, "Omladinski (Serbia)": 1, "Danubio (Uruguay)": 1, "Defensor (Uruguay)": 1, "Wanderers (Uruguay)": 1
 };
 
-function obtenerTrayectoriaImportante(nombre) {
-  const jugador = indiceUtbolistas[norm(nombre)];
-  if (!jugador || !jugador["Trayectoria"]) {
-    return { cantidad: 0, lista: [] };
-  }
+const URL_BASE_ESCUDOS = "https://globopedia.github.io/Artids/escudos/";
 
-  const clubes = jugador["Trayectoria"].split(",").map(c => c.trim()).filter(Boolean);
-  const importantes = [];
-
-  clubes.forEach(c => {
-    if (CLUBES_IMPORTANTES.has(c.toLowerCase())) {
-      importantes.push(c);
-    }
-  });
-
-  return {
-    cantidad: importantes.length,
-    lista: importantes
-  };
+function obtenerListaClubes(textoTrayectoria) {
+  if (!textoTrayectoria || textoTrayectoria === 'Trayectoria' || textoTrayectoria === '-') return [];
+  return textoTrayectoria.split(',').map(club => club.trim()).filter(club => club !== '');
 }
+
+function generarHTMLTrayectoria(textoTrayectoria) {
+  const clubes = obtenerListaClubes(textoTrayectoria);
+  if (clubes.length === 0) return '-';
+
+  return `<div class="celda-escudos">` + 
+    clubes.map(club => {
+      const urlEscudo = `${URL_BASE_ESCUDOS}${encodeURIComponent(club)}.png`;
+      return `<img src="${urlEscudo}" alt="${club}" title="${club}" class="escudo-img">`;
+    }).join('') + 
+  `</div>`;
+}
+
+function calcularPuntajeJugador(textoTrayectoria) {
+  const clubes = obtenerListaClubes(textoTrayectoria);
+  return clubes.reduce((total, club) => {
+    return total + (puntosEquipos[club] || 0);
+  }, 0);
+}
+
+const CONFIG_ESTADISTICAS = {
+  globopedia: {titulo: "HALL GLOBOPEDIA", campo: "Globopedia", formato: r => r.globopedia},
+  populares: {titulo: "LOS MÁS POPULARES", campo: "Trayectoria", formato: r => generarHTMLTrayectoria(r.trayectoriaTexto)},
+  partidos: {titulo: "MÁS PARTIDOS JUGADOS", campo: "Partidos", formato: r => r.partidos},
+  duco: {titulo: "MÁS PARTIDOS EN EL DUCÓ", campo: "Partidos", formato: r => r.duco},
+  goles: {titulo: "MÁXIMOS GOLEADORES", campo: "Goles", formato: r => r.goles},
+  expulsiones: {titulo: "MÁS EXPULSIONES", campo: "Expulsiones", formato: r => r.expulsiones},
+  vallasInvictas: {titulo: "MÁS VALLAS INVICTAS", campo: "Partidos Invicto", formato: r => r.vallasInvictas},
+  efectividad: {titulo: "EFECTIVIDAD DE PUNTOS (+20 PARTIDOS)", campo: "Efectividad", formato: r => r.efectividad + "%"},
+  minutos: {titulo: "MÁS MINUTOS JUGADOS", campo: "Minutos", formato: r => r.minutos.toLocaleString("es-AR")},
+  inactividad: {titulo: "MÁS TIEMPO SIN JUGAR", campo: "Tiempo", formato: r => r.inactividadTexto},
+  rachaSinGoles: {titulo: "MÁS MINUTOS SIN GOLES EN CONTRA", campo: "Minutos", formato: r => r.rachaTexto},
+  rachaGoles: {titulo: "MÁS PARTIDOS SEGUIDOS HACIENDO GOLES", campo: "Partidos", formato: r => `${r.partidos} (${r.goles} goles)`},
+  pataduras: {titulo: "LOS QUE NO RINDIERON", campo: "Globopedia", formato: r => r.globopedia.toFixed(1)}
+};
 
 function clasificarTorneo(torneo) {
   if (!torneo) return "OTRO";
-
   const t = torneo.toLowerCase();
-
   if (t.includes("libertadores")) return "LIBERTADORES";
   if (t.includes("sudamericana")) return "SUDAMERICANA";
   if (t.includes("conmebol")) return "CONMEBOL";
@@ -435,525 +389,175 @@ function clasificarTorneo(torneo) {
   if (t.includes("supercopa")) return "SUPERCOPA";
   if (t.includes("escobar")) return "COPA ESCOBAR";
   if (t.includes("amistoso")) return "AMISTOSO";
-
-  if (t.includes("nacional b") ||
-      t.includes("b nacional") ||
-      t.includes("bn") ||
-      t.includes("nb") ||
-      t.includes("reducido")) return "B NACIONAL";
+  if (t.includes("nacional b") || t.includes("b nacional") || t.includes("bn") || t.includes("nb") || t.includes("reducido")) return "B NACIONAL";
   if (t.includes("competencia")) return "COPA COMPETENCIA";
   if (t.includes("superliga")) return "COPA SUPERLIGA";
-  if (t.includes("campeonato") ||
-      t.includes("torneo de honor")) return "CAMPEONATO";
-
+  if (t.includes("campeonato") || t.includes("torneo de honor")) return "CAMPEONATO";
   return "OTRO";
 }
 
-  function aplicarFiltros() {
+function aplicarFiltros() {
   let partidos = [...datosArtids1910, ...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
 
-  // 📅 FILTRO FECHA
   const desde = document.getElementById("fechaDesde").value;
   const hasta = document.getElementById("fechaHasta").value;
+  const fechaDesde = desde ? new Date(desde) : null;
+  const fechaHasta = hasta ? new Date(hasta) : null;
 
-const fechaDesde = desde ? new Date(desde) : null;
-const fechaHasta = hasta ? new Date(hasta) : null;
+  if (fechaDesde) partidos = partidos.filter(p => convertirFecha(p.Fecha) >= fechaDesde);
+  if (fechaHasta) partidos = partidos.filter(p => convertirFecha(p.Fecha) <= fechaHasta);
+  if (filtroTorneo !== "TODOS") partidos = partidos.filter(p => clasificarTorneo(p.Torneo) === filtroTorneo);
 
-if (fechaDesde) {
-  partidos = partidos.filter(p =>
-    convertirFecha(p.Fecha) >= fechaDesde
-  );
-}
-
-if (fechaHasta) {
-  partidos = partidos.filter(p =>
-    convertirFecha(p.Fecha) <= fechaHasta
-  );
-}
-
-  // 🏆 FILTRO TORNEO
-  if (filtroTorneo !== "TODOS") {
-    partidos = partidos.filter(p =>
-      clasificarTorneo(p.Torneo) === filtroTorneo
-    );
-  }
-
-  // 📊 GENERAR RANKING
   let ranking = generarRanking(partidos);
 
-// 👇 Sólo mostrar jugadores con más de 20 partidos
-if (ordenActual.campo === "efectividad") {
-  ranking = ranking.filter(j => j.partidos > 20);
-}
-    // 🌍 FILTRO EXTRANJEROS
-const soloExtranjeros = document.getElementById("soloExtranjeros").checked;
-if (soloExtranjeros) {
-  ranking = ranking.filter(j => esExtranjero(j.nombre));
-}
+  if (ordenActual.campo === "efectividad") ranking = ranking.filter(j => j.partidos > 20);
 
-// 🏠 FILTRO INFERIORES
-const soloInferiores = document.getElementById("soloInferiores").checked;
-if (soloInferiores) {
-  ranking = ranking.filter(j => esDeInferiores(j.nombre));
-}
-  // 👇 Sólo mostrar jugadores con más de 20 partidos
-if (ordenActual.campo === "efectividad") {
-  ranking = ranking.filter(j => j.partidos > 20);
-}
-  // 📈 ORDEN
+  const soloExtranjeros = document.getElementById("soloExtranjeros").checked;
+  if (soloExtranjeros) ranking = ranking.filter(j => esExtranjero(j.nombre));
+
+  const soloInferiores = document.getElementById("soloInferiores").checked;
+  if (soloInferiores) ranking = ranking.filter(j => esDeInferiores(j.nombre));
+
   if (ordenActual.campo === "pataduras") {
     ranking.sort((a, b) => a.globopedia - b.globopedia);
   } else if (ordenActual.campo === "populares") {
-    ranking.sort((a, b) => b.cantidadClubesImportantes - a.cantidadClubesImportantes);
+    ranking.sort((a, b) => b.puntajeTrayectoria - a.puntajeTrayectoria);
   } else {
     ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo]);
   }
 
   rankingBase = ranking;
-aplicarFiltrosLivianos();
+  aplicarFiltrosLivianos();
 }
-function aplicarFiltrosLivianos() {
 
+function aplicarFiltrosLivianos() {
   let ranking = [...rankingBase];
 
-  // 🧍 FILTRO POSICIONES
   const posicionesActivas = Array.from(
     document.querySelectorAll('#filtroPosiciones input:checked')
   ).map(c => c.value);
 
-  ranking = ranking.filter(j =>
-    posicionesActivas.includes(j.posicion)
-  );
+  ranking = ranking.filter(j => posicionesActivas.includes(j.posicion));
   
-  // 🌍 EXTRANJEROS
-  if (document.getElementById("soloExtranjeros").checked) {
-    ranking = ranking.filter(j => esExtranjero(j.nombre));
-  }
+  if (document.getElementById("soloExtranjeros").checked) ranking = ranking.filter(j => esExtranjero(j.nombre));
+  if (document.getElementById("soloInferiores").checked) ranking = ranking.filter(j => esDeInferiores(j.nombre));
 
-  // 🏠 INFERIORES
-  if (document.getElementById("soloInferiores").checked) {
-    ranking = ranking.filter(j => esDeInferiores(j.nombre));
-  }
-
-// 🔥 REORDENAR
-if (ordenActual.campo === "pataduras") {
+  if (ordenActual.campo === "pataduras") {
     ranking.sort((a, b) => a.globopedia - b.globopedia);
-} else if (ordenActual.campo === "populares") {
-    ranking.sort((a, b) => b.cantidadClubesImportantes - a.cantidadClubesImportantes);
-} else {
+  } else if (ordenActual.campo === "populares") {
+    ranking.sort((a, b) => b.puntajeTrayectoria - a.puntajeTrayectoria);
+  } else {
     ranking.sort((a, b) => b[ordenActual.campo] - a[ordenActual.campo]);
-}
-
-rankingActual = ranking;
-renderRanking(rankingActual);
-}
-  
-/* =========================
-   FUNCIONES BASE
-========================= */
-
-    function norm(t) {
-  return (t || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
-function formatearApellidoPrimero(nombreCompleto) {
-
-  const partes = nombreCompleto.trim().split(/\s+/);
-
-  if (partes.length === 2) {
-    return `${partes[1]}, ${partes[0]}`;
   }
 
+  rankingActual = ranking;
+  renderRanking(rankingActual);
+}
+
+function norm(t) {
+  return (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
+function formatearApellidoPrimero(nombreCompleto) {
+  const partes = nombreCompleto.trim().split(/\s+/);
+  if (partes.length === 2) return `${partes[1]}, ${partes[0]}`;
   if (partes.length === 3) {
-
-    if (partes[1].length === 1) {
-      return `${partes[2]}, ${partes[0]} ${partes[1]}`;
-    }
-
+    if (partes[1].length === 1) return `${partes[2]}, ${partes[0]} ${partes[1]}`;
     return `${partes[1]} ${partes[2]}, ${partes[0]}`;
   }
-
   const nombre = partes[0];
   const apellido = partes.slice(1).join(" ");
   return `${apellido}, ${nombre}`;
 }
-/* =========================
-   OBTENER FUTBOLISTAS
-========================= */
-
-function obtenerFutbolistasUnicos(encuentros) {
-  const set = new Set();
-
-  encuentros.forEach(p => {
-    const jugadores = (p.Huracán || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\s+y\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1);
-
-    jugadores.forEach(j => set.add(j));
-  });
-
-  return Array.from(set);
-}
-
-/* =========================
-   CALCULAR RENDIMIENTO
-========================= */
-
-function calcularRendimientoFutbolista(nombre, encuentros) {
-
-  const partidos = encuentros.filter(p => {
-    const jugadores = (p.Huracán || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\s+y\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1);
-
-    return jugadores.some(j => norm(j) === norm(nombre));
-  });
-
-  if (!partidos.length) return null;
-let puntosGlobopedia = 0;
-
-partidos.forEach(p => {
-  // por ahora asumimos 90 minutos
-  puntosGlobopedia += calcularPuntosPartido(p, 90);
-});
-
-  const total = partidos.length;
-  const ganados = partidos.filter(p => norm(p.Situación) === "victoria").length;
-  const empatados = partidos.filter(p => norm(p.Situación) === "empate").length;
-
-  const efectividad = ((ganados * 3 + empatados) * 100 / (total * 3));
-
-return {
-  nombre,
-  partidos: total,
-  efectividad: Number(efectividad.toFixed(1)),
-  globopedia: Number(puntosGlobopedia.toFixed(1))
-};
-}
 
 function obtenerMinutoIngreso(texto, nombre) {
-
   const nombreNorm = nombre.toLowerCase();
-
   const regex = /\((\d+(?:\+\d+)?)\s+([^)]+)\)/g;
-
   let match;
-
   while ((match = regex.exec(texto)) !== null) {
-
     let minuto = match[1];
     let bloque = match[2].toLowerCase();
-
-    // separar posibles múltiples jugadores
     const jugadores = bloque.split(/y|,/).map(j => j.trim());
-
     if (jugadores.includes(nombreNorm)) {
-
-      if (minuto.includes("+")) {
-        return minuto.split("+").map(Number).reduce((a,b)=>a+b);
-      }
-
+      if (minuto.includes("+")) return minuto.split("+").map(Number).reduce((a,b)=>a+b);
       return Number(minuto);
     }
   }
-
   return null;
 }
 
 function obtenerMinutoSalida(texto, futbolista) {
-  const regex = new RegExp(
-    `${futbolista}\\s*\\(\\s*(\\d+(?:\\+\\d+)?)\\s+[^()]+`,
-    "i"
-  );
-
+  const regex = new RegExp(`${futbolista}\\s*\\(\\s*(\\d+(?:\\+\\d+)?)\\s+[^()]+`, "i");
   const match = texto.match(regex);
   if (!match) return null;
-
   const m = match[1];
-  return m.includes("+")
-    ? m.split("+").map(Number).reduce((a,b)=>a+b)
-    : Number(m);
+  return m.includes("+") ? m.split("+").map(Number).reduce((a,b)=>a+b) : Number(m);
 }
+
 function obtenerMinutoSalidaForzada(incidencias, nombre) {
-
   if (!incidencias) return null;
-
-  const regex = new RegExp(
-    `(\\d+(?:\\+\\d+)?)\\s+(EXP|LES)\\s+${nombre}`,
-    "i"
-  );
-
+  const regex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+(EXP|LES)\\s+${nombre}`, "i");
   const match = incidencias.match(regex);
-
   if (!match) return null;
-
   const m = match[1];
-
-  return m.includes("+")
-    ? m.split("+").map(Number).reduce((a,b)=>a+b)
-    : Number(m);
-}
-    function calcularGlobopediaFutbolista(nombre, encuentros) {
-
-  const delFutbolista = encuentros.filter(p => {
-    const jugadores = (p.Huracán || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\s+y\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .replace(/\s+/g, " ")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1);
-
-    return jugadores.some(j => norm(j) === norm(nombre));
-  });
-
-  let totalPuntos = 0;
-
-  delFutbolista.forEach(p => {
-
-    let finReal = Number(p.Fin2T) || 90;
-    if (finReal > 90) finReal = 90;
-
-    const ingreso = obtenerMinutoIngreso(p.Huracán || "", nombre);
-    const salida  = obtenerMinutoSalida(p.Huracán || "", nombre);
-
-    let minutosJugados = 0;
-
-    if (ingreso !== null) {
-      minutosJugados = Math.max(0, finReal - ingreso + 1);
-    } else if (salida !== null) {
-      minutosJugados = Math.max(0, salida - 1);
-    } else {
-      minutosJugados = finReal;
-    }
-
-    const texto = p.Huracán || "";
-    const expulsado = new RegExp(`${nombre}\\s*\\(\\s*\\d+(?:\\+\\d+)?\\s+Exp`, "i").test(texto);
-    if (expulsado && salida !== null) {
-      minutosJugados = Math.max(0, salida - 1);
-    }
-
-    const puntosPartido = calcularPuntosPartido(p, minutosJugados);
-
-    totalPuntos += puntosPartido;
-
-  });
-
-  return Number(totalPuntos.toFixed(1));
-}
-function calcularGolesFutbolista(nombre, encuentros) {
-
-  let totalGoles = 0;
-
-  encuentros.forEach(p => {
-
-    const incidencias = p.Incidencias || "";
-    if (!incidencias) return;
-
-    const regex = new RegExp(`GOL\\s+${nombre}\\s*\\(HUR\\)`, "gi");
-
-    const matches = incidencias.match(regex);
-
-    if (matches) {
-      totalGoles += matches.length;
-    }
-
-  });
-
-  return totalGoles;
-}
-function calcularExpulsionesFutbolista(nombre, partidos) {
-
-  const nombreNormalizado = norm(nombre);
-  let expulsiones = 0;
-
-  partidos.forEach(p => {
-
-    if (!p.Incidencias) return;
-
-    const incidencias = p.Incidencias.split(" - ");
-
-    incidencias.forEach(item => {
-
-      const texto = norm(item);
-
-      if (
-        texto.includes("exp") &&
-        texto.includes(nombreNormalizado) &&
-        texto.includes("(hur)")
-      ) {
-        expulsiones++;
-      }
-
-    });
-
-  });
-
-  return expulsiones;
+  return m.includes("+") ? m.split("+").map(Number).reduce((a,b)=>a+b) : Number(m);
 }
 
-function calcularVallasInvictasFutbolista(nombre, partidos) {
-
-  const nombreNormalizado = norm(nombre);
-  let vallas = 0;
-
-  partidos.forEach(p => {
-
-    // Verificamos que el jugador haya jugado el partido
-    if (!p.Huracán) return;
-
-    const jugo = norm(p.Huracán).includes(nombreNormalizado);
-    if (!jugo) return;
-
-    // Ahora verificamos que el rival haya hecho 0 goles
-    const Resultado1 = parseInt(p.Resultado1);
-    const Resultado2 = parseInt(p.Resultado2);
-
-    if (isNaN(Resultado2)) return;
-
-    if (Resultado2 === 0) {
-      vallas++;
-    }
-
-  });
-
-  return vallas;
-}
 function obtenerMinutosGolesRival(incidencias) {
-
   if (!incidencias) return [];
-
-  const limpio = incidencias
-    .replace(/<[^>]+>/g, " ")   // 🔥 elimina TODO HTML (<br>, <b>, etc)
-    .toUpperCase();
-
+  const limpio = incidencias.replace(/<[^>]+>/g, " ").toUpperCase();
   const regex = /(\d+(?:\+\d+)?)\s+GOL\s+([^()]+)\(([^)]+)\)/g;
-
   const minutos = [];
   let match;
-
   while ((match = regex.exec(limpio)) !== null) {
-
     const minutoTxt = match[1];
-    const equipo = match[3]; // lo que está entre paréntesis
-
-    // 🚫 ignorar goles de Huracán
+    const equipo = match[3];
     if (equipo.includes("HUR")) continue;
-
-    const minuto = minutoTxt.includes("+")
-      ? minutoTxt.split("+").map(Number).reduce((a,b)=>a+b)
-      : Number(minutoTxt);
-
+    const minuto = minutoTxt.includes("+") ? minutoTxt.split("+").map(Number).reduce((a,b)=>a+b) : Number(minutoTxt);
     minutos.push(minuto);
   }
-
   return minutos;
 }
-    function formatearFecha(fecha) {
 
+function formatearFecha(fecha) {
   if (!fecha) return "";
-
   const d = String(fecha.getDate()).padStart(2,"0");
   const m = String(fecha.getMonth()+1).padStart(2,"0");
   const y = fecha.getFullYear();
-
   return `${d}/${m}/${y}`;
 }
-function calcularRachaSinGoles(nombre, partidos) {
 
+function calcularRachaSinGoles(nombre, partidos) {
   const partidosJugador = partidos
     .filter(p => (p.Huracán || "").toLowerCase().includes(nombre.toLowerCase()))
     .sort((a,b) => convertirFecha(a.Fecha) - convertirFecha(b.Fecha));
 
-  let mejorRacha = 0;
-  let rachaActual = 0;
-  let inicioRacha = null;
-  let mejorInicio = null;
-  let mejorFin = null;
-  let ultimaFecha = null;
+  let mejorRacha = 0, rachaActual = 0, inicioRacha = null, mejorInicio = null, mejorFin = null, ultimaFecha = null;
   
   for (const p of partidosJugador) {
-
     const fechaPartido = convertirFecha(p.Fecha);
     ultimaFecha = fechaPartido;
     const incidencias = p.Incidencias || "";
 
-    // ⏱ minutos que jugó
-    const minutos = calcularMinutosJugador(p, nombre);
+    let ingreso = obtenerMinutoIngreso(p.Huracán || "", nombre);
+    let salida = obtenerMinutoSalida(p.Huracán || "", nombre);
+    let salidaForzada = obtenerMinutoSalidaForzada(p.Incidencias || "", nombre);
+    let salidaReal = (salida !== null && salidaForzada !== null) ? Math.min(salida, salidaForzada) : (salida !== null ? salida : salidaForzada);
 
-    // ⏱ límites dentro del partido
-let ingreso = obtenerMinutoIngreso(p.Huracán || "", nombre);
-let salida = obtenerMinutoSalida(p.Huracán || "", nombre);
-let salidaForzada = obtenerMinutoSalidaForzada(p.Incidencias || "", nombre);
-
-// 🔥 salida real
-let salidaReal = null;
-
-if (salida !== null && salidaForzada !== null) {
-  salidaReal = Math.min(salida, salidaForzada);
-} else {
-  salidaReal = salida !== null ? salida : salidaForzada;
-}
-
-// 🔥 fin real del partido (CON descuento)
-let finPartido = Math.max(
-  Number(p.Fin2T) || 90,
-  ...obtenerMinutosGolesRival(p.Incidencias || "")
-);
-
-// 🔥 límites del jugador
-let inicio = ingreso !== null ? ingreso : 1;
-let fin = salidaReal !== null ? salidaReal - 1 : finPartido;
+    let finPartido = Math.max(Number(p.Fin2T) || 90, ...obtenerMinutosGolesRival(p.Incidencias || ""));
+    let inicio = ingreso !== null ? ingreso : 1;
+    let fin = salidaReal !== null ? salidaReal - 1 : finPartido;
     
-    // ⚽ goles del rival
-    const goles = obtenerMinutosGolesRival(incidencias)
-      .filter(m => m >= inicio && m <= fin)
-      .sort((a,b)=>a-b);
+    const goles = obtenerMinutosGolesRival(incidencias).filter(m => m >= inicio && m <= fin).sort((a,b)=>a-b);
 
-    // 🟢 SI NO HAY GOLES → suma todo
     if (goles.length === 0) {
-
       if (rachaActual === 0) inicioRacha = fechaPartido;
-
       rachaActual += (fin - inicio + 1);
-
     } else {
-
       let cursor = inicio;
-
       for (const gol of goles) {
-
         const tramo = gol - cursor;
-
         if (rachaActual === 0) inicioRacha = fechaPartido;
-
         rachaActual += tramo;
 
         if (rachaActual > mejorRacha) {
@@ -961,31 +565,22 @@ let fin = salidaReal !== null ? salidaReal - 1 : finPartido;
           mejorInicio = inicioRacha;
           mejorFin = fechaPartido;
         }
-
-        // 🔴 corta la racha en el gol
         rachaActual = 0;
         inicioRacha = null;
-
         cursor = gol + 1;
       }
 
-      // 🟡 lo que queda después del último gol
- if (cursor <= fin) {
-
-  if (rachaActual === 0) inicioRacha = fechaPartido;
-
-  rachaActual += (fin - cursor + 1);
-
-  // 🔥 evaluar también este tramo
-  if (rachaActual > mejorRacha) {
-    mejorRacha = rachaActual;
-    mejorInicio = inicioRacha;
-    mejorFin = fechaPartido;
-  }
-}
+      if (cursor <= fin) {
+        if (rachaActual === 0) inicioRacha = fechaPartido;
+        rachaActual += (fin - cursor + 1);
+        if (rachaActual > mejorRacha) {
+          mejorRacha = rachaActual;
+          mejorInicio = inicioRacha;
+          mejorFin = fechaPartido;
+        }
+      }
     }
 
-    // 🔄 actualizar mejor racha si terminó sin gol
     if (rachaActual > mejorRacha) {
       mejorRacha = rachaActual;
       mejorInicio = inicioRacha;
@@ -993,110 +588,29 @@ let fin = salidaReal !== null ? salidaReal - 1 : finPartido;
     }
   }
 
-// 🔥 cerrar racha abierta al final
-if (rachaActual > 0) {
-  if (rachaActual > mejorRacha) {
+  if (rachaActual > 0 && rachaActual > mejorRacha) {
     mejorRacha = rachaActual;
     mejorInicio = inicioRacha;
     mejorFin = ultimaFecha;
   }
-}
-  return {
-    minutos: mejorRacha,
-    inicio: mejorInicio,
-    fin: mejorFin
-  };
+
+  return { minutos: mejorRacha, inicio: mejorInicio, fin: mejorFin };
 }   
- function calcularRachasGoleadoras(nombre, partidos) {
-
-  const partidosJugador = partidos
-    .filter(p => (p.Huracán || "").toLowerCase().includes(nombre.toLowerCase()))
-    .sort((a, b) => convertirFecha(a.Fecha) - convertirFecha(b.Fecha));
-
-  let rachas = [];
-
-let rachaActual = 0;
-let golesActual = 0;
-let inicioRacha = null;
-
-for (const p of partidosJugador) {
-
-  const incidencias = p.Incidencias || "";
-  const fecha = convertirFecha(p.Fecha);
-
-  // contar goles del jugador en este partido
-  const patron = new RegExp(
-    "GOL\\s+" +
-    nombre.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
-    "\\s*\\(HUR\\)",
-    "gi"
-  );
-
-  const golesPartido = (incidencias.match(patron) || []).length;
-
-  if (golesPartido > 0) {
-
-    if (rachaActual === 0) {
-      inicioRacha = fecha;
-    }
-
-    rachaActual++;
-    golesActual += golesPartido;
-
-  } else {
-
-    if (rachaActual > 0) {
-      rachas.push({
-        partidos: rachaActual,
-        goles: golesActual,
-        inicio: inicioRacha,
-        fin: convertirFecha(p.Fecha)
-      });
-    }
-
-    rachaActual = 0;
-    golesActual = 0;
-    inicioRacha = null;
-  }
-}
-
-// cerrar la última racha
-if (rachaActual > 0) {
-
-  rachas.push({
-    partidos: rachaActual,
-    goles: golesActual,
-    inicio: inicioRacha,
-    fin: convertirFecha(
-      partidosJugador[partidosJugador.length - 1].Fecha
-    )
-  });
-
-}
-
-return rachas;
-}
-    // === COEFICIENTES DE RENDIMIENTO ===
 
 const COEF_BASE = {
-  Victoria:   { Visitante:  0.4,  Neutral:  0.3,  Local:  0.2 },
-  Empate:     { Visitante:  0.2,  Neutral:  0.1,  Local:  0 },
-  Derrota:    { Visitante:  0,  Neutral:  -0.1,  Local:  -0.2 }
+  Victoria:   { Visitante:  0.4, Neutral:  0.3, Local:  0.2 },
+  Empate:     { Visitante:  0.2, Neutral:  0.1, Local:  0 },
+  Derrota:    { Visitante:  0,   Neutral: -0.1, Local: -0.2 }
 };
 
 function esInternacional(torneo) {
   const t = norm(torneo);
-  return t.includes("libertadores") ||
-         t.includes("sudamericana") ||
-         t.includes("conmebol");
+  return t.includes("libertadores") || t.includes("sudamericana") || t.includes("conmebol");
 }
 
 function esNacionalB(torneo) {
   const t = norm(torneo);
-  return t.includes("nacional b") ||
-         t.includes("b nacional") ||
-         t.includes("reducido") ||
-         t.includes("bn");
+  return t.includes("nacional b") || t.includes("b nacional") || t.includes("reducido") || t.includes("bn");
 }
 
 const CLASICOS = [
@@ -1275,10 +789,9 @@ function ymToIndex(ym) {
   const [y, m] = ym.split("-").map(Number);
   return y * 12 + m;
 }
+
 function esClasico(rival, fecha) {
   if (!rival || !fecha) return false;
-
-  // fecha viene como "dd/mm/yyyy"
   const partes = fecha.split("/");
   const d = Number(partes[0]);
   const m = Number(partes[1]);
@@ -1290,7 +803,6 @@ function esClasico(rival, fecha) {
   return CLASICOS.some(c => {
     const desde = ymToIndex(c.desde);
     const hasta = ymToIndex(c.hasta);
-
     return (
       rivalNorm.includes(c.club.toLowerCase()) &&
       partidoIndex >= desde &&
@@ -1298,13 +810,15 @@ function esClasico(rival, fecha) {
     );
   });
 }
+
 function cap(t) {
   if (!t) return "";
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
+
 function calcularPuntosPartido(p, minutos) {
-  const situacion = cap(norm(p.Situación));   // Victoria / Empate / Derrota
-  const condicion = cap(norm(p.Condición));   // Local / Neutral / Visitante
+  const situacion = cap(norm(p.Situación));
+  const condicion = cap(norm(p.Condición));
 
   let coef = COEF_BASE[situacion]?.[condicion] ?? 0;
 
@@ -1314,396 +828,199 @@ function calcularPuntosPartido(p, minutos) {
 
   return minutos * coef;
 }
- function bucketCompetencia(torneo) {
-      const t = norm(torneo || "");
-      if (t.includes("apertura nacional b 2006")) return "Apertura BN 2006/07";
-      if (t.includes("clausura nacional b 2007")) return "Clausura BN 2006/07";
-      if (t.includes("2° puesto nacional b 2007")) return "2° Puesto BN 2006/07";
-      if (t.includes("promocion 2007")) return "Promoción 2007";
-      if (t.includes("mexico 2007")) return "Gira por México 2007";
-      if (t.includes("apertura 2007")) return "Apertura 2007/08";
-      if (t.includes("clausura 2008")) return "Clausura 2007/08";
-      if (t.includes("cafam 2008")) return "Copa Cafam 2008";
-      if (t.includes("apertura 2008")) return "Apertura 2008/09";
-      if (t.includes("clausura 2009")) return "Clausura 2008/09";
-      if (t.includes("apertura 2009")) return "Apertura 2009/10";
-      if (t.includes("carioca 2010")) return "Despedida de Marcelinho Carioca 2010";
-      if (t.includes("clausura 2010")) return "Clausura 2009/10";
-      if (t.includes("apertura 2010")) return "Apertura 2010/11";
-      if (t.includes("clausura 2011")) return "Clausura 2010/11";
-      if (t.includes("campeonato 10-11")) return "Desempate Descenso 2011";
-      if (t.includes("nacional b 11-12")) return "Campeonato B Nacional 2011/12";
-      if (t.includes("copa argentina 2012")) return "Copa Argentina 2012";
-      if (t.includes("clasicos 2012")) return "Copa de Clásicos 2012";
-      if (t.includes("nacional b 12-13")) return "Campeonato B Nacional 2012/13";
-      if (t.includes("copa argentina 2013")) return "Copa Argentina 2013";
-      if (t.includes("nacional b 13-14")) return "Campeonato B Nacional 2013/14";
-      if (t.includes("copa argentina 2014")) return "Copa Argentina 2014";
-      if (t.includes("nb 13-14")) return "Desempate 3° Puesto BN 2013/14";
-      if (t.includes("nacional b 2014")) return "Campeonato B Nacional 2014";
-      if (t.includes("nb 2014")) return "Desempate 5° Puesto NB 2014";
-      if (t.includes("libertadores 2015")) return "Copa Libertadores 2015";
-      if (t.includes("campeonato 2015")) return "Campeonato 2015";
-      if (t.includes("supercopa 2015")) return "Supercopa 2015";
-      if (t.includes("copa argentina 2015")) return "Copa Argentina 2015";
-      if (t.includes("sudamericana 2015")) return "Copa Sudamericana 2015";
-      if (t.includes("buenos aires 2016")) return "Copa Ciudad de Buenos Aires 2016";
-      if (t.includes("libertadores 2016")) return "Copa Libertadores 2016";
-      if (t.includes("campeonato 2016")) return "Campeonato 2016";
-      if (t.includes("copa argentina 2016")) return "Copa Argentina 2016";
-      if (t.includes("campeonato 16-17")) return "Campeonato 2016/17";
-      if (t.includes("sudamericana 2017")) return "Copa Sudamericana 2017";
-      if (t.includes("copa argentina 2017")) return "Copa Argentina 2017";
-      if (t.includes("saf 17-18")) return "Superliga 2017/18";
-      if (t.includes("schneider 2018")) return "Copa Schneider 2018";
-      if (t.includes("copa argentina 2018")) return "Copa Argentina 2018";
-      if (t.includes("saf 18-19")) return "Superliga 2018/19";
-      if (t.includes("libertadores 2019")) return "Copa Libertadores 2019";
-      if (t.includes("superliga 2019")) return "Copa Superliga 2019";
-      if (t.includes("copa argentina 2019")) return "Copa Argentina 2019";
-      if (t.includes("saf 19-20")) return "Superliga 2019/20";
-      if (t.includes("san juan 2020")) return "Copa San Juan 2020";
-      if (t.includes("sudamericana 2020")) return "Copa Sudamericana 2020";
-      if (t.includes("superliga 2020")) return "Copa Superliga 2020";
-      if (t.includes("copa maradona 2020")) return "Copa Maradona 2020";
-      if (t.includes("copa-lpf 2021")) return "Copa-LPF 2021";
-      if (t.includes("copa argentina 2020")) return "Copa Argentina 2020";
-      if (t.includes("torneo-lpf 2021")) return "Torneo-LPF 2021";
-      if (t.includes("amistosos 2022")) return "Amistosos 2022";
-      if (t.includes("copa-lpf 2022")) return "Copa-LPF 2022";
-      if (t.includes("copa argentina 2022")) return "Copa Argentina 2022";
-      if (t.includes("torneo-lpf 2022")) return "Torneo-LPF 2022";
-      if (t.includes("torneo-lpf 2023")) return "Torneo-LPF 2023";
-      if (t.includes("copa argentina 2023")) return "Copa Argentina 2023";
-      if (t.includes("libertadores 2023")) return "Copa Libertadores 2023";
-      if (t.includes("sudamericana 2023")) return "Copa Sudamericana 2023";
-      if (t.includes("copa-lpf 2023")) return "Copa-LPF 2023";
-      if (t.includes("peña 2024")) return "Copa Agustín Peña 2024";
-      if (t.includes("plata 2024")) return "Serie Río de la Plata 2024";
-      if (t.includes("copa-lpf 2024")) return "Copa-LPF 2024";
-      if (t.includes("copa argentina 2024")) return "Copa Argentina 2024";
-      if (t.includes("torneo-lpf 2024")) return "Torneo-LPF 2024";
-      if (t.includes("plata 2025")) return "Serie Río de la Plata 2025";
-      if (t.includes("apertura-lpf 2025")) return "Apertura-LPF 2025";
-      if (t.includes("copa argentina 2025")) return "Copa Argentina 2025";
-      if (t.includes("sudamericana 2025")) return "Copa Sudamericana 2025";
-      if (t.includes("clausura-lpf 2025")) return "Clausura-LPF 2025";
-      return "Otros";
-    }
+
 function obtenerPosicion(nombre) {
-
   const jugador = indiceUtbolistas[norm(nombre)];
-
   return jugador ? jugador["Posición"] : "-";
 }
+
 function obtenerPaisNacimiento(nombre) {
-
   const jugador = indiceUtbolistas[norm(nombre)];
-
   if (!jugador || !jugador["País"]) return "-";
-
-  const pais = jugador["País"].split("/")[0].trim();
-
-  return pais;
+  return jugador["País"].split("/")[0].trim();
 }
+
+function obtenerTrayectoriaTexto(nombre) {
+  const jugador = indiceUtbolistas[norm(nombre)];
+  return jugador ? jugador["Trayectoria"] : "";
+}
+
 function obtenerBanderaHTML(pais) {
-
   if (!pais || pais === "-") return "-";
-
   const nombreArchivo = pais + ".png";
-
   const url = `https://raw.githubusercontent.com/globopedia/Artids/main/Banderas/${encodeURIComponent(nombreArchivo)}`;
-
   return `<img src="${url}" alt="${pais}" title="${pais}" style="height:16px;">`;
 }
+
 function obtenerFoto(nombre) {
-
   const jugador = indiceUtbolistas[norm(nombre)];
-
   return jugador ? jugador["Foto1"] : "";
 }
 
 function esExtranjero(nombre) {
   const jugador = indiceUtbolistas[norm(nombre)];
   if (!jugador) return false;
-
   const paisRaw = jugador["País"] || "";
   const paises = paisRaw.split("/").map(p => p.trim().toLowerCase());
-
   return paises.length > 0 && paises[0] !== "argentina";
 }
 
 function esDeInferiores(nombre) {
   const jugador = indiceUtbolistas[norm(nombre)];
   if (!jugador) return false;
-
-  return (jugador["Procedencia"] || "")
-    .toLowerCase()
-    .includes("divisiones inferiores");
-}
-    function construirIndiceEstadisticas(partidos) {
-
-  const estadisticas = {};
-
-  partidos.forEach(p => {
-
-    const jugadores = (p.Huracán || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\s+y\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1);
-
-    jugadores.forEach(j => {
-
-      const clave = norm(j);
-
-      if (!estadisticas[clave]) {
-        estadisticas[clave] = {
-          goles: 0,
-          expulsiones: 0,
-          vallasInvictas: 0
-        };
-      }
-
- const expRegex = new RegExp(
-  `EXP\\s+${j.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\(HUR\\)`,
-  "gi"
-);
-
-const matches = (p.Incidencias || "").match(expRegex);
-
-if (matches) {
-  estadisticas[clave].expulsiones += matches.length;
+  return (jugador["Procedencia"] || "").toLowerCase().includes("divisiones inferiores");
 }
 
-const golRegex = new RegExp(
-  `GOL\\s+${j.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\(HUR\\)`,
-  "gi"
-);
-
-const goles = (p.Incidencias || "").match(golRegex);
-
-if (goles) {
-  estadisticas[clave].goles += goles.length;
-}
-
-      if (Number(p.GolesRival) === 0) {
-        estadisticas[clave].vallasInvictas++;
-      }
-
-    });
-
-  });
-
-  return estadisticas;
-}
 function calcularMayorInactividad(fechas) {
   if (!fechas || fechas.length < 2) return 0;
-
   const fechasValidas = fechas.filter(f => f instanceof Date && !isNaN(f));
-
   if (fechasValidas.length < 2) return 0;
-
   fechasValidas.sort((a, b) => a - b);
 
   let maxDiff = 0;
-
   for (let i = 1; i < fechasValidas.length; i++) {
     const diff = fechasValidas[i] - fechasValidas[i - 1];
     if (diff > maxDiff) maxDiff = diff;
   }
-
   return maxDiff;
 }
 
 function formatearTiempo(ms) {
   if (!ms || ms <= 0) return "0";
-
   const dias = Math.floor(ms / (1000 * 60 * 60 * 24));
-
   const años = Math.floor(dias / 365);
   const meses = Math.floor((dias % 365) / 30);
   const diasRestantes = dias % 30;
-
   return `${años}a ${meses}m ${diasRestantes}d`;
 }
-/* =========================
-   GENERAR RANKING
-========================= */
 
 function generarRanking(todosLosPartidos) {
-
   const estadisticas = {};
 
- todosLosPartidos
-  .filter(p => {
-    if (filtroTorneo === "TODOS") return true;
+  todosLosPartidos
+    .filter(p => {
+      if (filtroTorneo === "TODOS") return true;
+      return clasificarTorneo(p.Torneo) === filtroTorneo;
+    })
+    .forEach(p => {
+      const jugadores = (p.Huracán || "")
+        .replace(/[()]/g, ",")
+        .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+        .replace(/\.+/g, "")
+        .replace(/\s+y\s+/gi, ",")
+        .replace(/\s+e\s+/gi, ",")
+        .replace(/,,+/g, ",")
+        .replace(/\s+,/g, ",")
+        .replace(/,\s+/g, ",")
+        .split(/[,;]+/)
+        .map(j => j.trim())
+        .filter(j => j.length > 1);
 
-    const tipo = clasificarTorneo(p.Torneo);
-    return tipo === filtroTorneo;
-  })
-  .forEach(p => {
+      jugadores.forEach(nombre => {
+        const key = norm(nombre);
 
-    const jugadores = (p.Huracán || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\s+y\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1);
+        if (!estadisticas[key]) {
+          estadisticas[key] = {
+            nombre: nombre,
+            partidos: 0,
+            duco: 0,
+            goles: 0,
+            expulsiones: 0,
+            vallasInvictas: 0,
+            globopedia: 0,
+            minutos: 0,
+            rachaSinGoles: 0,
+            rachaTexto: "",
+            victorias: 0,
+            empates: 0,
+            anios: new Set(),
+            fechas: []
+          };
+        }
 
-    jugadores.forEach(nombre => {
+        const j = estadisticas[key];
+        const anio = convertirFecha(p.Fecha)?.getFullYear();
+        if (anio) j.anios.add(anio);
+        
+        j.partidos++;
+        j.fechas.push(convertirFecha(p.Fecha));
 
-      const key = norm(nombre);
+        const estadio = norm(p.Estadio);
+        if (estadio === "el palacio" || estadio.includes("duco")) j.duco++;
 
-if (!estadisticas[key]) {
- estadisticas[key] = {
-  nombre: nombre,
-  partidos: 0,
-  duco: 0,
-  goles: 0,
-  expulsiones: 0,
-  vallasInvictas: 0,
-  globopedia: 0,
-  minutos: 0,   // 👈 NUEVO
-  rachaSinGoles: 0,      // 👈 NUEVO
-  rachaTexto: "",        // 👈 NUEVO
-  victorias: 0,
-  empates: 0,
-  anios: new Set(),
-  fechas: []   // 👈 ACÁ EXACTAMENTE
-};
-}
+        const resultado = norm(p.Situación);
+        if (resultado === "victoria") j.victorias++;
+        if (resultado === "empate") j.empates++;
 
-      const j = estadisticas[key];
-      
-      const anio = convertirFecha(p.Fecha)?.getFullYear();
-      if (anio) j.anios.add(anio);
-      
-      j.partidos++;
-if (nombre === "Cristian Tavio") {
-  console.log(p.Fecha, p.Torneo);
-}
-      j.fechas.push(convertirFecha(p.Fecha));
-const estadio = norm(p.Estadio);
+        const minutos = calcularMinutosJugador(p, nombre);
+        j.minutos += minutos;
 
-if (
-    estadio === "el palacio" ||
-    estadio.includes("duco")
-) {
-    j.duco++;
-}
-      const resultado = norm(p.Situación);
+        const puntos = calcularPuntosPartido(p, minutos);
+        j.globopedia += puntos;
 
-if (resultado === "victoria") j.victorias++;
-if (resultado === "empate") j.empates++;
-     const minutos = calcularMinutosJugador(p, nombre);
+        if (p.Resultado2 == 0) j.vallasInvictas++;
 
-j.minutos += minutos;
+        const incidencias = p.Incidencias || "";
+        const golesRegex = new RegExp(`GOL\\s+${nombre}\\s*\\(HUR\\)`, "gi");
+        const goles = incidencias.match(golesRegex);
+        if (goles) j.goles += goles.length;
 
-const puntos = calcularPuntosPartido(p, minutos);
-j.globopedia += puntos;
-
-      if (p.Resultado2 == 0) {
-        j.vallasInvictas++;
-      }
-
-      const incidencias = p.Incidencias || "";
-
-      const golesRegex = new RegExp(`GOL\\s+${nombre}\\s*\\(HUR\\)`, "gi");
-      const goles = incidencias.match(golesRegex);
-      if (goles) j.goles += goles.length;
-
-const expRegex = new RegExp(`EXP\\s+${nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\(HUR\\)`, "gi");
-
-const matches = incidencias.match(expRegex);
-
-if (matches) {
-  j.expulsiones += matches.length;
-}
-
+        const expRegex = new RegExp(`EXP\\s+${nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\(HUR\\)`, "gi");
+        const matches = incidencias.match(expRegex);
+        if (matches) j.expulsiones += matches.length;
+      });
     });
 
-  });
-
   return Object.values(estadisticas).map(j => {
-
     const listaAnios = Array.from(j.anios).sort((a,b)=>a-b);
     const periodo = construirPeriodos(listaAnios);
     const pais = obtenerPaisNacimiento(j.nombre);
     const efectividad = ((j.victorias * 3 + j.empates) * 100 / (j.partidos * 3)) || 0;
     const inactividadMs = calcularMayorInactividad(j.fechas);
     const inactividadTexto = formatearTiempo(inactividadMs);
-    const datosPopulares = obtenerTrayectoriaImportante(j.nombre);
- 
-const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
+    const trayectoriaTexto = obtenerTrayectoriaTexto(j.nombre);
+    const puntajeTrayectoria = calcularPuntajeJugador(trayectoriaTexto);
 
-j.rachaSinGoles = racha.minutos;
+    const racha = calcularRachaSinGoles(j.nombre, todosLosPartidos);
+    j.rachaSinGoles = racha.minutos;
 
-if (racha.inicio && racha.fin) {
-  j.rachaTexto = `${racha.minutos} min. -${formatearFecha(racha.inicio)} al ${formatearFecha(racha.fin)}-`;
-} else {
-  j.rachaTexto = `${racha.minutos} min.`;
-}
-if (j.nombre === "Cristian Tavio") {
-  console.log("TAVIO", {
-    partidos: j.partidos,
-    fechas: j.fechas,
-    anios: Array.from(j.anios),
-    inactividadMs
-  });
-}
+    if (racha.inicio && racha.fin) {
+      j.rachaTexto = `${racha.minutos} min. -${formatearFecha(racha.inicio)} al ${formatearFecha(racha.fin)}-`;
+    } else {
+      j.rachaTexto = `${racha.minutos} min.`;
+    }
+
     return {
- nombre: j.nombre,
- nombreOrden: formatearApellidoPrimero(j.nombre),
- pais: pais,
- bandera: obtenerBanderaHTML(pais),
- posicion: obtenerPosicion(j.nombre),
- foto: obtenerFoto(j.nombre),
- periodo: periodo,
- partidos: j.partidos,
- duco: j.duco,
- goles: j.goles,
- expulsiones: j.expulsiones,
- vallasInvictas: j.vallasInvictas,
- rachaSinGoles: j.rachaSinGoles,
- rachaTexto: j.rachaTexto,
- minutos: j.minutos,
- efectividad: Number(efectividad.toFixed(1)),
- globopedia: Number(j.globopedia.toFixed(1)),
- inactividad: inactividadMs,
- inactividadTexto: inactividadTexto,
- cantidadClubesImportantes: datosPopulares.cantidad,
- trayectoriaTexto: datosPopulares.lista.join(", ")
-};
-
+      nombre: j.nombre,
+      nombreOrden: formatearApellidoPrimero(j.nombre),
+      pais: pais,
+      bandera: obtenerBanderaHTML(pais),
+      posicion: obtenerPosicion(j.nombre),
+      foto: obtenerFoto(j.nombre),
+      periodo: periodo,
+      partidos: j.partidos,
+      duco: j.duco,
+      goles: j.goles,
+      expulsiones: j.expulsiones,
+      vallasInvictas: j.vallasInvictas,
+      rachaSinGoles: j.rachaSinGoles,
+      rachaTexto: j.rachaTexto,
+      minutos: j.minutos,
+      efectividad: Number(efectividad.toFixed(1)),
+      globopedia: Number(j.globopedia.toFixed(1)),
+      inactividad: inactividadMs,
+      inactividadTexto: inactividadTexto,
+      trayectoriaTexto: trayectoriaTexto,
+      puntajeTrayectoria: puntajeTrayectoria
+    };
   }).sort((a, b) => b.globopedia - a.globopedia);
-
 }
-/* =========================
-   RENDER
-========================= */
 
 function irAFutbolista(nombre) {
-  // Cambiá la URL por la ruta real de la página de cada jugador
   window.location.href = `https://globopedia.github.io/Artids/indexutbolists.html?nombre=${nombre}`;
 }
 
 function renderRanking(ranking) {
-  console.log(ordenActual.campo, ranking[0].partidos);  
-  // 👇 Sólo mostrar jugadores con más de 20 partidos
   if (ordenActual.campo === "efectividad") {
     ranking = ranking.filter(j => j.partidos > 20);
   }
@@ -1743,314 +1060,127 @@ function renderRanking(ranking) {
     </table>
   `;
 }
-function aplicarFiltroPosicion() {
-  const seleccionadas = new Set(
-    [...document.querySelectorAll("#filtroPosiciones input:checked")]
-      .map(cb => cb.value)
-  );
-
-  const rankingFiltrado = rankingActual.filter(j =>
-    seleccionadas.has(j.posicion)
-  );
-
-  renderRanking(rankingFiltrado);
-}
 
 function cambiarEstadistica() {
-  const seleccion = document.getElementById("selectorEstadistica").value;
-  // 🔥 actualizar criterio global
-  ordenActual.campo = seleccion;
-  // 🔥 reaplicar filtros ya ordenados
+  ordenActual.campo = document.getElementById("selectorEstadistica").value;
   aplicarFiltrosLivianos();
 }
     
 function construirPeriodos(anios){
-
   if(anios.length===0) return "";
-
   let periodos = [];
   let inicio = anios[0];
   let anterior = anios[0];
 
   for(let i=1;i<anios.length;i++){
-
     if(anios[i] === anterior + 1){
       anterior = anios[i];
     } else {
-
-      periodos.push(
-        inicio === anterior
-        ? `${inicio}`
-        : `${inicio}-${anterior}`
-      );
-
+      periodos.push(inicio === anterior ? `${inicio}` : `${inicio}-${anterior}`);
       inicio = anios[i];
       anterior = anios[i];
     }
-
   }
-
-  periodos.push(
-    inicio === anterior
-    ? `${inicio}`
-    : `${inicio}-${anterior}`
-  );
-
+  periodos.push(inicio === anterior ? `${inicio}` : `${inicio}-${anterior}`);
   return periodos.join(", ");
-
 }
-/* =========================
-   CARGA DEL CSV
-========================= */
 
-let datosArtids1910 = null;
-let datosArtids1925 = null;
-let datosArtids1940 = null;
-let datosArtids1955 = null;
-let datosArtids1970 = null;
-let datosArtids1985 = null;
-let datosArtids2000 = null;
-let datosArtids2015 = null;
+let datosArtids1910 = null, datosArtids1925 = null, datosArtids1940 = null, datosArtids1955 = null;
+let datosArtids1970 = null, datosArtids1985 = null, datosArtids2000 = null, datosArtids2015 = null;
 let datosUtbolistas = null;
 let indiceUtbolistas = {};
 
 function intentarGenerarRanking() {
   if (!datosArtids1910 || !datosArtids1925 || !datosArtids1940 || !datosArtids1955 || !datosArtids1970 || !datosArtids1985 || !datosArtids2000 || !datosArtids2015 || !datosUtbolistas) return;
-
   ordenActual = { campo: "globopedia", asc: true };
-
-  aplicarFiltros(); // 👈 ESTE es el cambio clave
-}
-function generarRankingPorFecha() {
-
-  const desdeValor = document.getElementById("fechaDesde").value;
-  const hastaValor = document.getElementById("fechaHasta").value;
-
-  const todosLosPartidos = [...datosArtids1910, ...datosArtids1925, ...datosArtids1940, ...datosArtids1955, ...datosArtids1970, ...datosArtids1985, ...datosArtids2000, ...datosArtids2015];
-
-  const desde = desdeValor ? new Date(desdeValor) : new Date("1900-01-01");
-  const hasta = hastaValor ? new Date(hastaValor) : new Date();
-
-  const partidosFiltrados = todosLosPartidos.filter(p => {
-    const fecha = convertirFecha(p.Fecha);
-    return fecha >= desde && fecha <= hasta;
-  });
-
-  rankingActual = generarRanking(partidosFiltrados);
-
-  // ✅ TODO ESTO VA ADENTRO
-  renderRanking(rankingActual);
-  ordenarPor("globopedia");
+  aplicarFiltros();
 }
 
 function convertirFecha(fechaStr) {
-
   if (!fechaStr) return null;
-
   const partes = fechaStr.split("/");
-
-  const dia = Number(partes[0]);
-  const mes = Number(partes[1]) - 1;
-  const anio = Number(partes[2]);
-
-  return new Date(anio, mes, dia);
+  return new Date(Number(partes[2]), Number(partes[1]) - 1, Number(partes[0]));
 }
- document.querySelectorAll("#filtroPosiciones input[type='checkbox']")
-  .forEach(cb => {
-    cb.addEventListener("change", aplicarFiltrosLivianos);
-  });
 
-Papa.parse(
+document.querySelectorAll("#filtroPosiciones input[type='checkbox']").forEach(cb => {
+  cb.addEventListener("change", aplicarFiltrosLivianos);
+});
+
+const urlsCSV = [
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1910.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids1910 = res.data;
-      console.log("CSV Artids1910 cargado:", datosArtids1910.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-
-Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1925.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids1925 = res.data;
-      console.log("CSV Artids1925 cargado:", datosArtids1925.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-
-Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1940.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids1940 = res.data;
-      console.log("CSV Artids1940 cargado:", datosArtids1940.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-
-Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1955.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids1955 = res.data;
-      console.log("CSV Artids1955 cargado:", datosArtids1955.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-
-Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1970.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids1970 = res.data;
-      console.log("CSV Artids1970 cargado:", datosArtids1970.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-
-Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids1985.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids1985 = res.data;
-      console.log("CSV Artids1985 cargado:", datosArtids1985.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-
-Papa.parse(
   "https://raw.githubusercontent.com/globopedia/Artids/main/Artids2000.csv",
-  {
+  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids2015.csv"
+];
+
+urlsCSV.forEach((url, index) => {
+  Papa.parse(url, {
     download: true,
     header: true,
     complete: res => {
-      datosArtids2000 = res.data;
-      console.log("CSV Artids2000 cargado:", datosArtids2000.length);
+      if (index === 0) datosArtids1910 = res.data;
+      if (index === 1) datosArtids1925 = res.data;
+      if (index === 2) datosArtids1940 = res.data;
+      if (index === 3) datosArtids1955 = res.data;
+      if (index === 4) datosArtids1970 = res.data;
+      if (index === 5) datosArtids1985 = res.data;
+      if (index === 6) datosArtids2000 = res.data;
+      if (index === 7) datosArtids2015 = res.data;
       intentarGenerarRanking();
     }
+  });
+});
+
+Papa.parse("https://artids.vercel.app/api/data?file=utbolists", {
+  download: true,
+  header: true,
+  complete: res => {
+    datosUtbolistas = res.data;
+    datosUtbolistas.forEach(j => {
+      indiceUtbolistas[norm(j["Futbolista"])] = j;
+    });
+    intentarGenerarRanking();
   }
-);
-
-Papa.parse(
-  "https://raw.githubusercontent.com/globopedia/Artids/main/Artids2015.csv",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-      datosArtids2015 = res.data;
-      console.log("CSV Artids2015 cargado:", datosArtids2015.length);
-      intentarGenerarRanking();
-    }
-  }
-);
-Papa.parse(
-  "https://artids.vercel.app/api/data?file=utbolists",
-  {
-    download: true,
-    header: true,
-    complete: res => {
-
-      datosUtbolistas = res.data;
-
-      datosUtbolistas.forEach(j => {
-        indiceUtbolistas[norm(j["Futbolista"])] = j;
-      });
-
-      console.log("CSV Utbolists cargado:", datosUtbolistas.length);
-      intentarGenerarRanking();
-    }
-  }
-);
+});
 
 function parseMinuto(valor, fallback = 0) {
   if (!valor || valor === "0") return fallback;
-
   const limpio = String(valor).trim();
-
   if (limpio.includes("+")) {
     const [base, extra] = limpio.split("+").map(Number);
     return (base || 0) + (extra || 0);
   }
-
   const n = Number(limpio);
   return isNaN(n) ? fallback : n;
 }
 
 function calcularMinutosJugador(p, nombre) {
-
   const texto = p.Huracán || "";
-
-  let finReal = 0;
-
-  if (p.Fin2E && p.Fin2E !== "0") {
-    finReal = parseMinuto(p.Fin2E, 120);
-  } else {
-    finReal = parseMinuto(p.Fin2T, 90);
-  }
-
+  let finReal = (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
   let minutosJugados = finReal;
 
   let ingreso = obtenerMinutoIngreso(texto, nombre);
   let salida  = obtenerMinutoSalida(texto, nombre);
 
-  // 👉 SUPLENTE
   if (ingreso !== null) {
-
-    let finJugador = finReal;
-
-    if (salida !== null) {
-      finJugador = salida - 1;
-    }
-
+    let finJugador = salida !== null ? salida - 1 : finReal;
     minutosJugados = Math.max(0, finJugador - ingreso + 1);
-
-  // 👉 TITULAR reemplazado
   } else if (salida !== null) {
-
     minutosJugados = Math.max(0, salida - 1);
-
-  // 👉 TITULAR completo
   } else {
-
     minutosJugados = finReal;
   }
 
-  // 🔴 EXPULSIONES
   const incidencias = p.Incidencias || "";
-
-  const expulsionRegex = new RegExp(
-    `(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${nombre}`,
-    "i"
-  );
+  const expulsionRegex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${nombre}`, "i");
 
   if (expulsionRegex.test(incidencias)) {
-
     const m = incidencias.match(expulsionRegex)[1];
-
-    let minutoExpulsion = m.includes("+")
-      ? m.split("+").map(Number).reduce((a, b) => a + b)
-      : Number(m);
-
+    let minutoExpulsion = m.includes("+") ? m.split("+").map(Number).reduce((a, b) => a + b) : Number(m);
     if (ingreso === null) {
       minutosJugados = Math.max(0, minutoExpulsion - 1);
     } else {
@@ -2060,24 +1190,20 @@ function calcularMinutosJugador(p, nombre) {
 
   return minutosJugados;
 }
+
 function cambiarFiltroTorneo(valor) {
   filtroTorneo = valor;
   aplicarFiltros();
 }
 </script>
+
 <script>
 function enviarAltura() {
   const altura = document.body.scrollHeight;
   document.documentElement.style.overflow = 'hidden';
-  console.log("altura enviada:", altura);
-
-  window.parent.postMessage({
-    type: 'ajustarAltura',
-    altura: altura
-  }, '*');
+  window.parent.postMessage({ type: 'ajustarAltura', altura: altura }, '*');
 }
 
-// Ejecutar varias veces por seguridad
 window.addEventListener('load', () => {
   setTimeout(enviarAltura, 300);
   setTimeout(enviarAltura, 800);
@@ -2086,76 +1212,24 @@ window.addEventListener('load', () => {
 
 window.addEventListener('resize', enviarAltura);
 
-// 🔥 clave: detectar cambios dinámicos
 let timeoutAltura;
-
 const observer = new MutationObserver(() => {
   clearTimeout(timeoutAltura);
   timeoutAltura = setTimeout(enviarAltura, 200);
 });
-
 observer.observe(document.body, { childList: true, subtree: true });
 </script>
-  <script id="2q9s8k">
-function sonidoClick() {
-  const audio = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
-  audio.volume = 0.2;
-  audio.play();
-}
-</script>
-  <script>
+
+<script>
 const clickSound = new Audio("https://www.soundjay.com/switch/switch-1.mp3");
 clickSound.volume = 0.3;
 
-// 🔥 engancha TODOS los clicks reales en checkboxes
 document.addEventListener("change", function(e) {
   if (e.target.type === "checkbox") {
     clickSound.currentTime = 0;
     clickSound.play().catch(() => {});
   }
 });
-</script>
-<script>
-  // 1. Diccionario de puntos por equipo
-  const puntosEquipos = {
-    "Real Madrid (España)": 10,
-    "Bayern Munich (Alemania)": 5, "Milan (Italia)": 5,
-    "Barcelona (España)": 4, "Boca Juniors": 4, "Internazionale (Italia)": 4, "Nacional (Uruguay)": 4, "Peñarol (Uruguay)": 4, "Sao Paulo (Brasil)": 4,
-    "Ajax (Holanda)": 3, "Chelsea (Inglaterra)": 3, "Corinthians (Brasil)": 3, "Independiente": 3, "Juventus (Italia)": 3, "Manchester United (Inglaterra)": 3, "Porto (Portugal)": 3, "Santos (Brasil)": 3,
-    "Atl. Madrid (España)": 2, "Borussia Dortmund (Alemania)": 2, "Crvena Zvezda (Serbia)": 2, "Estudiantes (La Plata)": 2, "Feyenoord (Holanda)": 2, "Flamengo (Brasil)": 2, "Gremio (Brasil)": 2, "Internacional (Brasil)": 2, "Liverpool (Inglaterra)": 2, "Manchester City (Inglaterra)": 2, "Olimpia (Paraguay)": 2, "Paris Saint Germain (Francia)": 2, "Racing Club": 2, "River Plate": 2, "Vélez Sársfield": 2,
-    "Borussia Monchegladbach (Alemania)": 1, "Eintracht Frankfurt (Alemania)": 1, "Hamburgo (Alemania)": 1, "Werder Bremen (Alemania)": 1, "Stuttgart (Alemania)": 1, "Huracán": 1, "San Lorenzo de Almagro": 1, "Botafogo (Brasil)": 1, "Cruzeiro (Brasil)": 1, "Fluminense (Brasil)": 1, "Mineiro (Brasil)": 1, "Palmeiras (Brasil)": 1, "Paranaense (Brasil)": 1, "Vasco da Gama (Brasil)": 1, "Athletic (España)": 1, "Sevilla (España)": 1, "Valencia (España)": 1, "PSV Eindhoven (Holanda)": 1, "Twente (Holanda)": 1, "Bologna (Italia)": 1, "Fiorentina (Italia)": 1, "Lazio (Italia)": 1, "Napoli (Italia)": 1, "Roma (Italia)": 1, "Torino (Italia)": 1, "Aston Villa (Inglaterra)": 1, "Arsenal (Inglaterra)": 1, "Everton (Inglaterra)": 1, "Newcastle United (Inglaterra)": 1, "Tottenham Hotspur (Inglaterra)": 1, "Sunderland (Inglaterra)": 1, "Bordeaux (Francia)": 1, "Lille (Francia)": 1, "Mónaco (Francia)": 1, "Olympique Lyon (Francia)": 1, "Olympique Marsella (Francia)": 1, "Saint Étienne (Francia)": 1, "Cerro Porteño (Paraguay)": 1, "Guaraní (Paraguay)": 1, "Libertad (Paraguay)": 1, "Nacional (Paraguay)": 1, "Sporting Lisboa (Portugal)": 1, "Vitória Guimaraes (Portugal)": 1, "Sporting Braga (Portugal)": 1, "Boavista (Portugal)": 1, "Belenenses (Portugal)": 1, "Partizan (Serbia)": 1, "Vojvodina (Serbia)": 1, "Omladinski (Serbia)": 1, "Danubio (Uruguay)": 1, "Defensor (Uruguay)": 1, "Wanderers (Uruguay)": 1
-  };
-
-  const URL_BASE_ESCUDOS = "https://globopedia.github.io/Artids/escudos/";
-
-  // Función interna para convertir el texto del CSV en una lista limpia
-  function obtenerListaClubes(textoTrayectoria) {
-    if (!textoTrayectoria || textoTrayectoria === 'Trayectoria' || textoTrayectoria === '-') return [];
-    // Separa los equipos por cada coma y quita espacios sobrantes
-    return textoTrayectoria.split(',').map(club => club.trim()).filter(club => club !== '');
-  }
-
-  // Genera los escudos en el HTML respetando el orden del CSV
-  function generarHTMLTrayectoria(textoTrayectoria) {
-    const clubes = obtenerListaClubes(textoTrayectoria);
-    if (clubes.length === 0) return '';
-
-    return `<div class="celda-escudos">` + 
-      clubes.map(club => {
-        const urlEscudo = `${URL_BASE_ESCUDOS}${encodeURIComponent(club)}.png`;
-        return `<img src="${urlEscudo}" alt="${club}" title="${club}" class="escudo-img">`;
-      }).join('') + 
-    `</div>`;
-  }
-
-  // Suma los puntos individuales asignados a cada club de la lista
-  function calcularPuntajeJugador(textoTrayectoria) {
-    const clubes = obtenerListaClubes(textoTrayectoria);
-    return clubes.reduce((total, club) => {
-      // Si el club está en el diccionario suma sus puntos, sino suma 0
-      return total + (puntosEquipos[club] || 0);
-    }, 0);
-  }
 </script>
 </body>
 </html>
