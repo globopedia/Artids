@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Torneos y Campeonatos — Huracán</title>
+  <title>Torneos — Huracán</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
@@ -12,11 +12,9 @@
     h1 { color:#FF0000; text-align:center; }
     .logo { display:block; margin:0 auto 10px; width:100px; }
     
-    /* Contenedor del buscador */
     .search-container { text-align:center; position:relative; margin-bottom: 20px; }
     #torneoSearch { padding:8px; border-radius:8px; border:2px solid #FF0000; font-size:16px; width: 320px; }
     
-    /* Menú desplegable con autocompletado */
     #autocompleteList {
       position: absolute;
       left: 50%;
@@ -54,11 +52,7 @@
       flex-shrink: 0;
     }
 
-    .autocomplete-item span {
-      font-weight: bold;
-      font-size: 15px;
-      color: #222;
-    }
+    .autocomplete-item span { font-weight: bold; font-size: 15px; color: #222; }
 
     #autocompleteList li:hover, 
     #autocompleteList li.autocomplete-active {
@@ -68,19 +62,12 @@
       transition: all 0.1s;
     }
 
-    /* Tarjeta principal e informes */
     .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:0 auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
     .club-header { display:flex; align-items:center; gap:15px; border-bottom:2px solid #FF0000; padding-bottom:10px; margin-bottom:10px; }
     h2 { margin:0; color:#FF0000; font-size:22px; }
     
-    #torneoInfo p {
-      font-family: 'Chakra Petch', sans-serif;
-      margin: 4px 0;
-      line-height: 1.3;
-      font-size: 15px;
-    }
+    #torneoInfo p { font-family: 'Chakra Petch', sans-serif; margin: 4px 0; line-height: 1.3; font-size: 15px; }
 
-    /* Estilos de Acordeón y Tarjetas de Partidos */
     .acordeon { border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; background: #fefefe; }
     .acordeon-header { background: #eee; padding: 6px 12px; cursor: pointer; font-size: 14px; text-align: right; position: relative; padding-right: 25px; font-weight: bold; }
     .acordeon-header::after { content: "▾"; position: absolute; right: 8px; transition: transform 0.3s; }
@@ -113,280 +100,276 @@
   <div id="torneoInfo" class="club-card" style="display:none;"></div>
 
   <script>
-    // URL corregida a "orneos"
-    const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
-    const partidosURLs = [
-      "https://artids.vercel.app/api/data?file=artids1910",
-      "https://artids.vercel.app/api/data?file=artids1925",
-      "https://artids.vercel.app/api/data?file=artids1940",
-      "https://artids.vercel.app/api/data?file=artids1955",
-      "https://artids.vercel.app/api/data?file=artids1970",
-      "https://artids.vercel.app/api/data?file=artids1985",
-      "https://artids.vercel.app/api/data?file=artids2000",
-      "https://artids.vercel.app/api/data?file=artids2015"
-    ];
+    document.addEventListener("DOMContentLoaded", function() {
+      const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
+      const partidosURLs = [
+        "https://artids.vercel.app/api/data?file=artids1910",
+        "https://artids.vercel.app/api/data?file=artids1925",
+        "https://artids.vercel.app/api/data?file=artids1940",
+        "https://artids.vercel.app/api/data?file=artids1955",
+        "https://artids.vercel.app/api/data?file=artids1970",
+        "https://artids.vercel.app/api/data?file=artids1985",
+        "https://artids.vercel.app/api/data?file=artids2000",
+        "https://artids.vercel.app/api/data?file=artids2015"
+      ];
 
-    let torneos = [];
-    let encuentros = [];
-    let currentFocus = -1;
+      let torneos = [];
+      let encuentros = [];
+      let currentFocus = -1;
 
-    const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+      const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 
-    // Carga paralela de CSVs
-    Promise.all([
-      fetch(torneosURL).then(r => r.text()),
-      ...partidosURLs.map(url => fetch(url).then(r => r.text()))
-    ])
-    .then(([csvTorneos, ...csvsPartidos]) => {
-      // Parsear archivo de torneos/orneos
-      torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
-        id: (c.ID ?? c.id ?? i).toString().trim(),
-        nombre: (c["Torneo"] ?? c["Órneo"] ?? c["Órnea"] ?? c.Nombre ?? "").toString().trim(),
-        foto: (c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
-        datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
-      })).filter(t => t.nombre);
+      Promise.all([
+        fetch(torneosURL).then(r => r.text()),
+        ...partidosURLs.map(url => fetch(url).then(r => r.text()))
+      ])
+      .then(([csvTorneos, ...csvsPartidos]) => {
+        torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
+          id: (c.ID ?? c.id ?? i).toString().trim(),
+          nombre: (c["Torneo"] ?? c["Órneo"] ?? c["Órnea"] ?? c.Nombre ?? "").toString().trim(),
+          foto: (c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
+          datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
+        })).filter(t => t.nombre);
 
-      // Parsear Partidos de los 8 CSVs
-      encuentros = csvsPartidos.flatMap(csv => 
-        Papa.parse(csv, { header:true, skipEmptyLines:true }).data.map(p => ({
-          Fecha: (p.Fecha ?? "").trim(),
-          Condición: (p.Condición ?? "").trim(),
-          Situación: (p.Situación ?? "").trim(),
-          Resultado1: (p.Resultado1 ?? "").trim(),
-          Resultado2: (p.Resultado2 ?? "").trim(),
-          Club: (p.Club ?? "").trim(),
-          Torneo: (p.Torneo ?? "").trim(),
-          Estadio: (p.Estadio ?? "").trim(),
-          Árbitro: (p.Árbitro ?? "").trim(),
-          Huracán: (p.Huracán ?? "").trim(),
-          Rival: (p.Rival ?? "").trim(),
-          Foto: (p.Foto ?? "").trim(),
-          Incidencias: (p.Incidencias ?? "").trim()
-        }))
-      );
+        encuentros = csvsPartidos.flatMap(csv => 
+          Papa.parse(csv, { header:true, skipEmptyLines:true }).data.map(p => ({
+            Fecha: (p.Fecha ?? "").trim(),
+            Condición: (p.Condición ?? "").trim(),
+            Situación: (p.Situación ?? "").trim(),
+            Resultado1: (p.Resultado1 ?? "").trim(),
+            Resultado2: (p.Resultado2 ?? "").trim(),
+            Club: (p.Club ?? "").trim(),
+            Torneo: (p.Torneo ?? "").trim(),
+            Estadio: (p.Estadio ?? "").trim(),
+            Árbitro: (p.Árbitro ?? "").trim(),
+            Huracán: (p.Huracán ?? "").trim(),
+            Rival: (p.Rival ?? "").trim(),
+            Foto: (p.Foto ?? "").trim(),
+            Incidencias: (p.Incidencias ?? "").trim()
+          }))
+        );
 
-      llenarSelectTorneos();
-      inicializarAutocompletado();
-    })
-    .catch(err => console.error("Error al cargar datos:", err));
+        llenarSelectTorneos();
+        inicializarAutocompletado();
+      })
+      .catch(err => console.error("Error cargando datos:", err));
 
-    function llenarSelectTorneos() {
-      const sel = document.getElementById("torneoSelect");
-      sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
-      torneos.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t.id;
-        opt.textContent = t.nombre;
-        sel.appendChild(opt);
-      });
-      sel.addEventListener("change", mostrarTorneo);
-    }
+      function llenarSelectTorneos() {
+        const sel = document.getElementById("torneoSelect");
+        if(!sel) return;
+        sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
+        torneos.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.textContent = t.nombre;
+          sel.appendChild(opt);
+        });
+        sel.addEventListener("change", mostrarTorneo);
+      }
 
-    function inicializarAutocompletado() {
-      const inputSearch = document.getElementById("torneoSearch");
-      const listContainer = document.getElementById("autocompleteList");
-      const sel = document.getElementById("torneoSelect");
+      function inicializarAutocompletado() {
+        const inputSearch = document.getElementById("torneoSearch");
+        const listContainer = document.getElementById("autocompleteList");
+        const sel = document.getElementById("torneoSelect");
 
-      // Auto-selección completa de texto al hacer clic/foco
-      inputSearch.addEventListener("focus", function() { this.select(); });
+        if(!inputSearch || !listContainer) return;
 
-      inputSearch.addEventListener("input", function() {
-        const buscarTexto = norm(this.value);
-        listContainer.innerHTML = "";
-        currentFocus = -1;
+        inputSearch.addEventListener("focus", function() { this.select(); });
 
-        if (!buscarTexto) {
-          listContainer.style.display = "none";
-          return;
-        }
+        inputSearch.addEventListener("input", function() {
+          const buscarTexto = norm(this.value);
+          listContainer.innerHTML = "";
+          currentFocus = -1;
 
-        const filtrados = torneos.filter(t => norm(t.nombre).includes(buscarTexto));
-        if (!filtrados.length) {
-          listContainer.style.display = "none";
-          return;
-        }
+          if (!buscarTexto) {
+            listContainer.style.display = "none";
+            return;
+          }
 
-        filtrados.slice(0, 10).forEach(t => {
-          const li = document.createElement("li");
-          li.className = "autocomplete-item";
-          const imgUrl = t.foto ? t.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
-          
-          li.innerHTML = `
-            <img src="${imgUrl}" class="autocomplete-thumb" alt="">
-            <span><b>${t.nombre}</b></span>
-          `;
+          const filtrados = torneos.filter(t => norm(t.nombre).includes(buscarTexto));
+          if (!filtrados.length) {
+            listContainer.style.display = "none";
+            return;
+          }
 
-          li.addEventListener("click", function() {
-            seleccionarElemento(t.nombre, t.id);
+          filtrados.slice(0, 10).forEach(t => {
+            const li = document.createElement("li");
+            li.className = "autocomplete-item";
+            const imgUrl = t.foto ? t.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
+            
+            li.innerHTML = `
+              <img src="${imgUrl}" class="autocomplete-thumb" alt="">
+              <span><b>${t.nombre}</b></span>
+            `;
+
+            li.addEventListener("click", function() {
+              seleccionarElemento(t.nombre, t.id);
+            });
+            listContainer.appendChild(li);
           });
-          listContainer.appendChild(li);
+
+          listContainer.style.display = "block";
         });
 
-        listContainer.style.display = "block";
-      });
+        inputSearch.addEventListener("keydown", function(e) {
+          let items = listContainer.getElementsByTagName("li");
+          if (!items.length) return;
 
-      // Teclado: Navegación con flechas y selección con Enter
-      inputSearch.addEventListener("keydown", function(e) {
-        let items = listContainer.getElementsByTagName("li");
-        if (!items.length) return;
-
-        if (e.keyCode === 40) { // Flecha ABAJO
-          currentFocus++;
-          addActive(items);
-          fixScroll(listContainer, items[currentFocus]);
-        } else if (e.keyCode === 38) { // Flecha ARRIBA
-          currentFocus--;
-          addActive(items);
-          fixScroll(listContainer, items[currentFocus]);
-        } else if (e.keyCode === 13) { // Tecla ENTER
-          e.preventDefault();
-          if (currentFocus > -1 && items[currentFocus]) {
-            items[currentFocus].click();
+          if (e.keyCode === 40) {
+            currentFocus++;
+            addActive(items);
+            fixScroll(listContainer, items[currentFocus]);
+          } else if (e.keyCode === 38) {
+            currentFocus--;
+            addActive(items);
+            fixScroll(listContainer, items[currentFocus]);
+          } else if (e.keyCode === 13) {
+            e.preventDefault();
+            if (currentFocus > -1 && items[currentFocus]) {
+              items[currentFocus].click();
+            }
           }
+        });
+
+        function seleccionarElemento(nombre, id) {
+          inputSearch.value = nombre;
+          sel.value = id;
+          listContainer.style.display = "none";
+          mostrarTorneo();
         }
-      });
 
-      function seleccionarElemento(nombre, id) {
-        inputSearch.value = nombre;
-        sel.value = id;
-        listContainer.style.display = "none";
-        mostrarTorneo();
+        function addActive(items) {
+          if (!items) return false;
+          removeActive(items);
+          if (currentFocus >= items.length) currentFocus = 0;
+          if (currentFocus < 0) currentFocus = (items.length - 1);
+          items[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(items) {
+          for (let i = 0; i < items.length; i++) items[i].classList.remove("autocomplete-active");
+        }
+
+        function fixScroll(container, item) {
+          if (!item) return;
+          const containerTop = container.scrollTop;
+          const containerBottom = containerTop + container.clientHeight;
+          const itemTop = item.offsetTop;
+          const itemBottom = itemTop + item.clientHeight;
+
+          if (itemBottom > containerBottom) container.scrollTop = itemBottom - container.clientHeight;
+          else if (itemTop < containerTop) container.scrollTop = itemTop;
+        }
+
+        document.addEventListener("click", function(e) {
+          if (e.target !== inputSearch && e.target !== listContainer) {
+            listContainer.style.display = "none";
+          }
+        });
       }
 
-      function addActive(items) {
-        if (!items) return false;
-        removeActive(items);
-        if (currentFocus >= items.length) currentFocus = 0;
-        if (currentFocus < 0) currentFocus = (items.length - 1);
-        items[currentFocus].classList.add("autocomplete-active");
-      }
+      function mostrarTorneo() {
+        const torneoId = document.getElementById("torneoSelect").value;
+        const torneo = torneos.find(t => (t.id||"").trim() === (torneoId||"").trim());
+        
+        if (!torneo) {
+          document.getElementById("torneoInfo").style.display = "none";
+          return;
+        }
 
-      function removeActive(items) {
-        for (let i = 0; i < items.length; i++) items[i].classList.remove("autocomplete-active");
-      }
+        const cont = document.getElementById("torneoInfo");
+        cont.style.display = "block";
 
-      function fixScroll(container, item) {
-        if (!item) return;
-        const containerTop = container.scrollTop;
-        const containerBottom = containerTop + container.clientHeight;
-        const itemTop = item.offsetTop;
-        const itemBottom = itemTop + item.clientHeight;
+        const partidosTorneo = encuentros.filter(p => norm(p.Torneo).includes(norm(torneo.nombre)) || norm(torneo.nombre).includes(norm(p.Torneo)));
 
-        if (itemBottom > containerBottom) container.scrollTop = itemBottom - container.clientHeight;
-        else if (itemTop < containerTop) container.scrollTop = itemTop;
+        const PJ = partidosTorneo.length;
+        const PG = partidosTorneo.filter(p => norm(p.Situación) === "victoria").length;
+        const PE = partidosTorneo.filter(p => norm(p.Situación) === "empate").length;
+        const PP = partidosTorneo.filter(p => norm(p.Situación) === "derrota").length;
+        const GF = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado1) || 0), 0);
+        const GC = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado2) || 0), 0);
+
+        let htmlPartidos = "";
+        if (partidosTorneo.length > 0) {
+          partidosTorneo.forEach(p => {
+            const esVisitante = norm(p.Condición) === "visitante";
+            
+            const tarjetaHTML = `
+              <div class="partido-card">
+                <div class="resultado-con-escudo">
+                  ${ esVisitante ? `
+                    <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                    <div class="resultado2-box">${p.Resultado2}</div>
+                    <div class="resultado1-box">${p.Resultado1}</div>
+                    <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+                  ` : `
+                    <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+                    <div class="resultado1-box">${p.Resultado1}</div>
+                    <div class="resultado2-box">${p.Resultado2}</div>
+                    <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                  `}
+                </div>
+                <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${p.Árbitro || "S/D"}</div>
+                <div style="margin-top:4px;"><b>Huracán:</b> ${p.Huracán || "-"}</div>
+                <div><b>${p.Club}:</b> ${p.Rival || "-"}</div>
+                ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Foto" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                <div>${renderIncidencias(p.Incidencias)}</div>
+              </div>
+            `;
+
+            htmlPartidos += `
+              <div class="acordeon">
+                <div class="acordeon-header">${p.Club} — ${p.Fecha}</div>
+                <div class="acordeon-body cerrado">${tarjetaHTML}</div>
+              </div>
+            `;
+          });
+        } else {
+          htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
+        }
+
+        cont.innerHTML = `
+          <div class="club-header">
+            ${torneo.foto ? `<img src="${torneo.foto}" alt="${torneo.nombre}" style="width:90px;height:90px;object-fit:contain;">` : ""}
+            <h2>${torneo.nombre}</h2>
+          </div>
+          ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
+          <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
+          <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
+          <hr style="border:none; border-top:1px solid #FF0000; margin:15px 0;">
+          <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
+          ${htmlPartidos}
+        `;
       }
 
       document.addEventListener("click", function(e) {
-        if (e.target !== inputSearch && e.target !== listContainer) {
-          listContainer.style.display = "none";
+        if (e.target.classList.contains("acordeon-header")) {
+          const body = e.target.nextElementSibling;
+          body.classList.toggle("cerrado");
+          e.target.classList.toggle("abierto");
         }
       });
-    }
 
-    function mostrarTorneo() {
-      const torneoId = document.getElementById("torneoSelect").value;
-      const torneo = torneos.find(t => (t.id||"").trim() === (torneoId||"").trim());
-      
-      if (!torneo) {
-        document.getElementById("torneoInfo").style.display = "none";
-        return;
+      function getEscudo(nombreClub) {
+        if (!nombreClub) return "";
+        try {
+          return "https://globopedia.github.io/Artids/escudos/" + encodeURIComponent(nombreClub.trim()) + ".png";
+        } catch (err) {
+          return "";
+        }
       }
 
-      const cont = document.getElementById("torneoInfo");
-      cont.style.display = "block";
-
-      // Filtro exacto de partidos por nombre de torneo
-      const partidosTorneo = encuentros.filter(p => norm(p.Torneo).includes(norm(torneo.nombre)) || norm(torneo.nombre).includes(norm(p.Torneo)));
-
-      // Resumen estadístico
-      const PJ = partidosTorneo.length;
-      const PG = partidosTorneo.filter(p => norm(p.Situación) === "victoria").length;
-      const PE = partidosTorneo.filter(p => norm(p.Situación) === "empate").length;
-      const PP = partidosTorneo.filter(p => norm(p.Situación) === "derrota").length;
-      const GF = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado1) || 0), 0);
-      const GC = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado2) || 0), 0);
-
-      let htmlPartidos = "";
-      if (partidosTorneo.length > 0) {
-        partidosTorneo.forEach(p => {
-          const esVisitante = norm(p.Condición) === "visitante";
-          
-          const tarjetaHTML = `
-            <div class="partido-card">
-              <div class="resultado-con-escudo">
-                ${ esVisitante ? `
-                  <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
-                  <div class="resultado2-box">${p.Resultado2}</div>
-                  <div class="resultado1-box">${p.Resultado1}</div>
-                  <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
-                ` : `
-                  <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
-                  <div class="resultado1-box">${p.Resultado1}</div>
-                  <div class="resultado2-box">${p.Resultado2}</div>
-                  <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
-                `}
-              </div>
-              <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${p.Árbitro || "S/D"}</div>
-              <div style="margin-top:4px;"><b>Huracán:</b> ${p.Huracán || "-"}</div>
-              <div><b>${p.Club}:</b> ${p.Rival || "-"}</div>
-              ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Foto" style="max-width:250px;border-radius:8px;"></div>` : "" }
-              <div>${renderIncidencias(p.Incidencias)}</div>
-            </div>
-          `;
-
-          htmlPartidos += `
-            <div class="acordeon">
-              <div class="acordeon-header">${p.Club} — ${p.Fecha}</div>
-              <div class="acordeon-body cerrado">${tarjetaHTML}</div>
-            </div>
-          `;
-        });
-      } else {
-        htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
-      }
-
-      cont.innerHTML = `
-        <div class="club-header">
-          ${torneo.foto ? `<img src="${torneo.foto}" alt="${torneo.nombre}" style="width:90px;height:90px;object-fit:contain;">` : ""}
-          <h2>${torneo.nombre}</h2>
-        </div>
-        ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
-        <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
-        <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
-        <hr style="border:none; border-top:1px solid #FF0000; margin:15px 0;">
-        <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
-        ${htmlPartidos}
-      `;
-    }
-
-    // Acordeón dinámico para abrir/cerrar partidos
-    document.addEventListener("click", function(e) {
-      if (e.target.classList.contains("acordeon-header")) {
-        const body = e.target.nextElementSibling;
-        body.classList.toggle("cerrado");
-        e.target.classList.toggle("abierto");
+      function renderIncidencias(texto) {
+        if (!texto) return "";
+        return texto
+          .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:18px;height:18px;'>")
+          .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:18px;height:18px;'>")
+          .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:18px;height:18px;'>")
+          .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:18px;height:18px;'>")
+          .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:18px;height:18px;'>")
+          .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:18px;height:18px;'>");
       }
     });
-
-    function getEscudo(nombreClub) {
-      if (!nombreClub) return "";
-      try {
-        return "https://globopedia.github.io/Artids/escudos/" + encodeURIComponent(nombreClub.trim()) + ".png";
-      } catch (err) {
-        return "";
-      }
-    }
-
-    function renderIncidencias(texto) {
-      if (!texto) return "";
-      return texto
-        .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:18px;height:18px;'>")
-        .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:18px;height:18px;'>")
-        .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:18px;height:18px;'>")
-        .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:18px;height:18px;'>")
-        .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:18px;height:18px;'>")
-        .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:18px;height:18px;'>");
-    }
   </script>
 </body>
 </html>
