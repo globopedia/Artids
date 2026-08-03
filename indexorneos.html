@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Torneos — Huracán</title>
+  
+  <!-- Manifest corregido -->
+  <link rel="manifest" href="https://globopedia.github.io/manifest.json">
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
@@ -121,8 +125,8 @@
     let futbolistas = [];
     let currentFocus = -1;
 
-    // Función auxiliar para limpiar acentos y mayúsculas
-    function norm(texto) {
+    // Función auxiliar única para limpiar acentos y mayúsculas
+    function normTexto(texto) {
       return (texto || "")
         .toString()
         .normalize("NFD")
@@ -131,7 +135,7 @@
         .toLowerCase();
     }
 
-    // Función para enlazar nombres de futbolistas hacia la página de jugadores
+    // Función para enlazar nombres de futbolistas
     function enlazarJugadores(texto) {
       if (!texto) return "";
       
@@ -158,7 +162,7 @@
         if (!nombreLimpio) return part;
 
         const existeEnBase = typeof futbolistas !== "undefined" && 
-          futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
+          futbolistas.some(f => normTexto(f.futbolista) === normTexto(nombreLimpio));
 
         if (existeEnBase) {
           const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
@@ -276,7 +280,7 @@
         inputSearch.addEventListener("focus", function() { this.select(); });
 
         inputSearch.addEventListener("input", function() {
-          const buscarTexto = norm(this.value);
+          const buscarTexto = normTexto(this.value);
           listContainer.innerHTML = "";
           currentFocus = -1;
 
@@ -285,7 +289,7 @@
             return;
           }
 
-          const filtrados = torneos.filter(t => norm(t.nombre).includes(buscarTexto));
+          const filtrados = torneos.filter(t => normTexto(t.nombre).includes(buscarTexto));
           if (!filtrados.length) {
             listContainer.style.display = "none";
             return;
@@ -379,19 +383,19 @@
         const cont = document.getElementById("torneoInfo");
         cont.style.display = "block";
 
-        const partidosTorneo = encuentros.filter(p => norm(p.Torneo).includes(norm(torneo.nombre)) || norm(torneo.nombre).includes(norm(p.Torneo)));
+        const partidosTorneo = encuentros.filter(p => normTexto(p.Torneo).includes(normTexto(torneo.nombre)) || normTexto(torneo.nombre).includes(normTexto(p.Torneo)));
 
         const PJ = partidosTorneo.length;
-        const PG = partidosTorneo.filter(p => norm(p.Situación) === "victoria").length;
-        const PE = partidosTorneo.filter(p => norm(p.Situación) === "empate").length;
-        const PP = partidosTorneo.filter(p => norm(p.Situación) === "derrota").length;
+        const PG = partidosTorneo.filter(p => normTexto(p.Situación) === "victoria").length;
+        const PE = partidosTorneo.filter(p => normTexto(p.Situación) === "empate").length;
+        const PP = partidosTorneo.filter(p => normTexto(p.Situación) === "derrota").length;
         const GF = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado1) || 0), 0);
         const GC = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado2) || 0), 0);
 
         let htmlPartidos = "";
         if (partidosTorneo.length > 0) {
           partidosTorneo.forEach(p => {
-            const esVisitante = norm(p.Condición) === "visitante";
+            const esVisitante = normTexto(p.Condición) === "visitante";
             
             const golesHuracan = esVisitante ? p.Resultado2 : p.Resultado1;
             const golesRival = esVisitante ? p.Resultado1 : p.Resultado2;
