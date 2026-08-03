@@ -371,87 +371,202 @@
         });
       }
 
-      function mostrarTorneo() {
-        const torneoId = document.getElementById("torneoSelect").value;
-        const torneo = torneos.find(t => (t.id||"").trim() === (torneoId||"").trim());
-        
-        if (!torneo) {
-          document.getElementById("torneoInfo").style.display = "none";
-          return;
+// Función para calcular la edad en la fecha del primer partido
+function calcularEdad(fechNacStr, fechPartidoStr) {
+  if (!fechNacStr || !fechPartidoStr) return "S/D";
+  
+  // Intenta parsear fechas en formato DD/MM/YYYY o YYYY-MM-DD
+  const parseFecha = (str) => {
+    const p = str.split(/[/.-]/);
+    if (p.length !== 3) return null;
+    return p[0].length === 4 
+      ? new Date(p[0], p[1] - 1, p[2]) 
+      : new Date(p[2], p[1] - 1, p[0]);
+  };
+
+  const nac = parseFecha(fechNacStr);
+  const partido = parseFecha(fechPartidoStr);
+
+  if (!nac || !partido || isNaN(nac) || isNaN(partido)) return "S/D";
+
+  let edad = partido.getFullYear() - nac.getFullYear();
+  const m = partido.getMonth() - nac.getMonth();
+  if (m < 0 || (m === 0 && partido.getDate() < nac.getDate())) {
+    edad--;
+  }
+  return edad > 0 ? `${edad} años` : "S/D";
+}
+
+// Función principal actualizada
+function mostrarTorneo() {
+  const torneoId = document.getElementById("torneoSelect").value;
+  const torneo = torneos.find(t => (t.id||"").trim() === (torneoId||"").trim());
+  
+  if (!torneo) {
+    document.getElementById("torneoInfo").style.display = "none";
+    return;
+  }
+
+  const cont = document.getElementById("torneoInfo");
+  cont.style.display = "block";
+
+  const partidosTorneo = encuentros.filter(p => 
+    normTexto(p.Torneo).includes(normTexto(torneo.nombre)) || 
+    normTexto(torneo.nombre).includes(normTexto(p.Torneo))
+  );
+
+  const PJ = partidosTorneo.length;
+  const PG = partidosTorneo.filter(p => normTexto(p.Situación) === "victoria").length;
+  const PE = partidosTorneo.filter(p => normTexto(p.Situación) === "empate").length;
+  const PP = partidosTorneo.filter(p => normTexto(p.Situación) === "derrota").length;
+  const GF = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado1) || 0), 0);
+  const GC = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado2) || 0), 0);
+
+  // --- 1. PROCESAR PLANTEL DEL TORNEO ---
+  const mapaJugadores = {};
+  const primeraFechaTorneo = partidosTorneo.length > 0 ? partidosTorneo[0].Fecha : "";
+
+  partidosTorneo.forEach(p => {
+    if (!p.Huracán) return;
+    
+    // Obtenemos todos los nombres del texto de la alineación
+    const nombresEnPartido = p.Huracán.split(/[,;()]+/)
+      .map(n => n.replace(/\b\d+(?:\+\d+)?'?\s*/g, "").trim())
+      .filter(n => n.length > 2);
+
+    nombresEnPartido.forEach(nom => {
+      const match = futbolistas.find(f => normTexto(f.futbolista) === normTexto(nom));
+      if (match) {
+        const idJugador = match.futbolista;
+        if (!mapaJugadores[idJugador]) {
+          mapaJugadores[idJugador] = {
+            datos: match,
+            pj: 0,
+            goles: 0
+          };
         }
-
-        const cont = document.getElementById("torneoInfo");
-        cont.style.display = "block";
-
-        const partidosTorneo = encuentros.filter(p => normTexto(p.Torneo).includes(normTexto(torneo.nombre)) || normTexto(torneo.nombre).includes(normTexto(p.Torneo)));
-
-        const PJ = partidosTorneo.length;
-        const PG = partidosTorneo.filter(p => normTexto(p.Situación) === "victoria").length;
-        const PE = partidosTorneo.filter(p => normTexto(p.Situación) === "empate").length;
-        const PP = partidosTorneo.filter(p => normTexto(p.Situación) === "derrota").length;
-        const GF = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado1) || 0), 0);
-        const GC = partidosTorneo.reduce((s, p) => s + (parseInt(p.Resultado2) || 0), 0);
-
-        let htmlPartidos = "";
-        if (partidosTorneo.length > 0) {
-          partidosTorneo.forEach(p => {
-            const esVisitante = normTexto(p.Condición) === "visitante";
-            
-            const golesHuracan = esVisitante ? p.Resultado2 : p.Resultado1;
-            const golesRival = esVisitante ? p.Resultado1 : p.Resultado2;
-            const resultadoTexto = `${golesHuracan}-${golesRival}`;
-
-            const tarjetaHTML = `
-              <div class="partido-card">
-                <div class="resultado-con-escudo">
-                  ${ esVisitante ? `
-                    <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
-                    <div class="resultado2-box">${p.Resultado2}</div>
-                    <div class="resultado1-box">${p.Resultado1}</div>
-                    <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
-                  ` : `
-                    <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
-                    <div class="resultado1-box">${p.Resultado1}</div>
-                    <div class="resultado2-box">${p.Resultado2}</div>
-                    <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
-                  `}
-                </div>
-                <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${p.Árbitro || "S/D"}</div>
-                
-                <div style="margin-top:4px;"><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
-                <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
-
-                ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Foto" style="max-width:250px;border-radius:8px;"></div>` : "" }
-                <div>${renderIncidencias(p.Incidencias)}</div>
-              </div>
-            `;
-
-            htmlPartidos += `
-              <div class="acordeon">
-                <div class="acordeon-header">${p.Club} — ${p.Fecha} (${resultadoTexto}) <img src="${getEscudo(p.Club)}" style="width:20px; vertical-align:middle; margin-left:4px;"></div>
-                <div class="acordeon-body cerrado">${tarjetaHTML}</div>
-              </div>
-            `;
-          });
-        } else {
-          htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
-        }
-
-        const imgTorneoUrl = torneo.foto ? torneo.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
-
-        cont.innerHTML = `
-          <div class="club-header">
-            <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
-            <h2>${torneo.nombre}</h2>
-          </div>
-          ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
-          <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
-          <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
-          <hr style="border:none; border-top:1px solid #FF0000; margin:15px 0;">
-          <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
-          ${htmlPartidos}
-        `;
+        mapaJugadores[idJugador].pj += 1;
       }
+    });
+  });
+
+  // Clasificación por Posición
+  const categorias = {
+    "ARQUEROS": [],
+    "DEFENSORES": [],
+    "VOLANTES": [],
+    "DELANTEROS": []
+  };
+
+  Object.values(mapaJugadores).forEach(item => {
+    const pos = normTexto(item.datos.posicion || item.datos.Posición || "");
+    
+    if (pos.includes("arquero")) {
+      categorias["ARQUEROS"].push(item);
+    } else if (pos.includes("defensor") || pos.includes("lateral")) {
+      categorias["DEFENSORES"].push(item);
+    } else if (pos.includes("volante") || pos.includes("enganche") || pos.includes("medio")) {
+      categorias["VOLANTES"].push(item);
+    } else {
+      categorias["DELANTEROS"].push(item);
+    }
+  });
+
+  // Armar HTML del Plantel
+  let htmlPlantel = `<h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">👥 Plantel en este Torneo</h3>`;
+
+  Object.keys(categorias).forEach(cat => {
+    if (categorias[cat].length > 0) {
+      // Ordenar (por ahora por partidos jugados)
+      categorias[cat].sort((a, b) => b.pj - a.pj);
+
+      htmlPlantel += `<h4 style="background:#f0f0f0; padding:6px 10px; margin:10px 0 6px; border-left:4px solid #FF0000;">${cat}</h4>`;
+      htmlPlantel += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:10px; margin-bottom:15px;">`;
+
+      categorias[cat].forEach(j => {
+        const f = j.datos;
+        const fotoUrl = f.foto || f.Foto1 || "https://globopedia.github.io/Artids/logo_globopedia.png";
+        const edad = calcularEdad(f.fechNac || f.FechNac, primeraFechaTorneo);
+        const procedencia = f.procedencia || f.Procedencia || "S/D";
+
+        htmlPlantel += `
+          <div style="border:1px solid #ddd; border-radius:10px; padding:8px; text-align:center; background:#fafafa; font-family:'Chakra Petch', sans-serif;">
+            <img src="${fotoUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:50%; border:2px solid #FF0000; margin-bottom:4px;">
+            <div style="font-weight:bold; font-size:14px; color:#222;">${f.futbolista}</div>
+            <div style="font-size:12px; color:#666;">Edad: <b>${edad}</b></div>
+            <div style="font-size:12px; color:#666;">Procedencia: <b>${procedencia}</b></div>
+            <div style="margin-top:4px; font-size:13px; background:#fff; border-radius:6px; padding:2px; border:1px solid #eee;">
+              <b>PJ:</b> ${j.pj}
+            </div>
+          </div>
+        `;
+      });
+
+      htmlPlantel += `</div>`;
+    }
+  });
+
+  // --- 2. TARJETAS DE PARTIDOS ---
+  let htmlPartidos = "";
+  if (partidosTorneo.length > 0) {
+    partidosTorneo.forEach(p => {
+      const esVisitante = normTexto(p.Condición) === "visitante";
+      const golesHuracan = esVisitante ? p.Resultado2 : p.Resultado1;
+      const golesRival = esVisitante ? p.Resultado1 : p.Resultado2;
+      const resultadoTexto = `${golesHuracan}-${golesRival}`;
+
+      const tarjetaHTML = `
+        <div class="partido-card">
+          <div class="resultado-con-escudo">
+            ${ esVisitante ? `
+              <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+              <div class="resultado2-box">${p.Resultado2}</div>
+              <div class="resultado1-box">${p.Resultado1}</div>
+              <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+            ` : `
+              <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+              <div class="resultado1-box">${p.Resultado1}</div>
+              <div class="resultado2-box">${p.Resultado2}</div>
+              <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+            `}
+          </div>
+          <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${p.Árbitro || "S/D"}</div>
+          <div style="margin-top:4px;"><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+          <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+          ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Foto" style="max-width:250px;border-radius:8px;"></div>` : "" }
+          <div>${renderIncidencias(p.Incidencias)}</div>
+        </div>
+      `;
+
+      htmlPartidos += `
+        <div class="acordeon">
+          <div class="acordeon-header">${p.Club} — ${p.Fecha} (${resultadoTexto}) <img src="${getEscudo(p.Club)}" style="width:20px; vertical-align:middle; margin-left:4px;"></div>
+          <div class="acordeon-body cerrado">${tarjetaHTML}</div>
+        </div>
+      `;
+    });
+  } else {
+    htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
+  }
+
+  const imgTorneoUrl = torneo.foto ? torneo.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
+
+  cont.innerHTML = `
+    <div class="club-header">
+      <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
+      <h2>${torneo.nombre}</h2>
+    </div>
+    ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
+    <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
+    <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
+    
+    ${htmlPlantel}
+
+    <hr style="border:none; border-top:1px solid #FF0000; margin:20px 0 15px;">
+    <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
+    ${htmlPartidos}
+  `;
+}
 
       document.addEventListener("click", function(e) {
         if (e.target.classList.contains("acordeon-header")) {
