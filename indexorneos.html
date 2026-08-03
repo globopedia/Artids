@@ -141,12 +141,14 @@
         ...partidosURLs.map(url => fetch(url).then(r => r.text()))
       ])
       .then(([csvTorneos, ...csvsPartidos]) => {
-        torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
-          id: (c.ID ?? c.id ?? i).toString().trim(),
-          nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
-          foto: (c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
-          datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
-        })).filter(t => t.nombre);
+       // Parsear el CSV de torneos tomando la columna Foto1
+torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
+  id: (c.ID ?? c.id ?? i).toString().trim(),
+  nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
+  // Acá buscamos primero "Foto1", si no está busca "Foto" o "Escudo"
+  foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
+  datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
+})).filter(t => t.nombre);
 
         encuentros = csvsPartidos.flatMap(csv => 
           Papa.parse(csv, { header:true, skipEmptyLines:true }).data.map(p => ({
