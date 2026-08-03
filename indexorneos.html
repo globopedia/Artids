@@ -110,18 +110,14 @@
       let variantes = [t];
 
       // Ejemplo Clausura 2009
-      if (t.includes("clausura 2009")) {
-        variantes.push(norm("Campeonato Clausura 2009"));
-        variantes.push(norm("Torneo Clausura 2009"));
-        variantes.push(norm("Clausura 2009"));
-      }
-
-      // Ejemplo Apertura 2008
-      if (t.includes("apertura 2008")) {
-        variantes.push(norm("Campeonato Apertura 2008"));
-        variantes.push(norm("Torneo Apertura 2008"));
-        variantes.push(norm("Apertura 2008"));
-      }
+      if (t.includes("Torneo Clausura 2007")) {variantes.push(norm("Torneo Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2008")) {variantes.push(norm("Torneo Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2008")) {variantes.push(norm("Torneo Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2009 de 1° División 'A'")) {variantes.push(norm("Campeonato Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2009")) {variantes.push(norm("Torneo Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2010")) {variantes.push(norm("Torneo Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2010")) {variantes.push(norm("Torneo Clausura 2009")); }
+      if (t.includes("Torneo Clausura 2011")) {variantes.push(norm("Torneo Clausura 2009")); }
 
       // Pretemporadas
       for (let anio = 1914; anio <= 1930; anio++) {
