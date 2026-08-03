@@ -15,7 +15,7 @@
     .search-container { text-align:center; position:relative; margin-bottom: 20px; }
     #torneoSearch { padding:10px 14px; border-radius:10px; border:2px solid #FF0000; font-size:16px; width: 340px; outline:none; }
     
-    /* Menú desplegable con ítems y círculos más grandes */
+    /* Menú desplegable */
     #autocompleteList {
       position: absolute;
       left: 50%;
@@ -43,7 +43,6 @@
       text-align: left;
     }
 
-    /* Círculos más grandes para las imágenes en el buscador */
     .autocomplete-thumb {
       width: 55px;
       height: 55px;
@@ -64,11 +63,10 @@
       transition: all 0.1s;
     }
 
-    /* Tarjeta principal e imagen redonda del torneo */
+    /* Tarjeta principal */
     .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:0 auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
     .club-header { display:flex; align-items:center; gap:18px; border-bottom:2px solid #FF0000; padding-bottom:12px; margin-bottom:12px; }
     
-    /* Imagen del torneo presentada en círculo */
     .torneo-img-header {
       width: 90px;
       height: 90px;
@@ -117,8 +115,78 @@
   <div id="torneoInfo" class="club-card" style="display:none;"></div>
 
   <script>
+    // Variables globales
+    let torneos = [];
+    let encuentros = [];
+    let futbolistas = [];
+    let currentFocus = -1;
+
+    const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+
+    // Limpia el nombre del jugador quitando números, aclaraciones, etc.
+    function limpiarNombreJugador(cadena) {
+      if (!cadena) return "";
+      return cadena
+        .replace(/[()]/g, "")
+        .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+        .replace(/\.+/g, "")
+        .replace(/\s+y\s+/gi, "")
+        .replace(/\s+e\s+/gi, "")
+        .trim();
+    }
+
+    // Función para enlazar nombres de futbolistas
+    function enlazarJugadores(cadenaJugadores) {
+      if (!cadenaJugadores) return "-";
+      
+      const lista = cadenaJugadores.split(/([,;]+)/);
+      
+      return lista.map(fragmento => {
+        if (fragmento.match(/^[,;]+$/)) return fragmento;
+
+        const nombreLimpio = limpiarNombreJugador(fragmento);
+        if (!nombreLimpio) return fragmento;
+
+        const encontrado = futbolistas.find(f => norm(f.futbolista) === norm(nombreLimpio));
+
+        if (encontrado) {
+          return fragmento.replace(
+            nombreLimpio,
+            `<a href="javascript:void(0)" onclick="seleccionarFutbolistaDirecto('${encontrado.futbolista}')" style="color:#FF0000; font-weight:bold; text-decoration:none;">${nombreLimpio}</a>`
+          );
+        }
+        return fragmento;
+      }).join("");
+    }
+
+    function seleccionarFutbolistaDirecto(idFutbolista) {
+      alert("Seleccionaste a: " + idFutbolista);
+      // Acá podés redirigir a la ficha del jugador o abrir su modal
+    }
+
+    function getEscudo(nombreClub) {
+      if (!nombreClub) return "";
+      try {
+        return "https://globopedia.github.io/Artids/escudos/" + encodeURIComponent(nombreClub.trim()) + ".png";
+      } catch (err) {
+        return "";
+      }
+    }
+
+    function renderIncidencias(texto) {
+      if (!texto) return "";
+      return texto
+        .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:18px;height:18px;'>")
+        .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:18px;height:18px;'>")
+        .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:18px;height:18px;'>")
+        .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:18px;height:18px;'>")
+        .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:18px;height:18px;'>")
+        .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:18px;height:18px;'>");
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
+      const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolistas"; // Carga la lista de jugadores
       const partidosURLs = [
         "https://artids.vercel.app/api/data?file=artids1910",
         "https://artids.vercel.app/api/data?file=artids1925",
@@ -130,26 +198,29 @@
         "https://artids.vercel.app/api/data?file=artids2015"
       ];
 
-      let torneos = [];
-      let encuentros = [];
-      let currentFocus = -1;
-
-      const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-
       Promise.all([
         fetch(torneosURL).then(r => r.text()),
+        fetch(futbolistasURL).then(r => r.text()).catch(() => ""),
         ...partidosURLs.map(url => fetch(url).then(r => r.text()))
       ])
-      .then(([csvTorneos, ...csvsPartidos]) => {
-       // Parsear el CSV de torneos tomando la columna Foto1
-torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
-  id: (c.ID ?? c.id ?? i).toString().trim(),
-  nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
-  // Acá buscamos primero "Foto1", si no está busca "Foto" o "Escudo"
-  foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
-  datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
-})).filter(t => t.nombre);
+      .then(([csvTorneos, csvFutbolistas, ...csvsPartidos]) => {
+        
+        // Cargar Torneos
+        torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
+          id: (c.ID ?? c.id ?? i).toString().trim(),
+          nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
+          foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
+          datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
+        })).filter(t => t.nombre);
 
+        // Cargar Futbolistas
+        if (csvFutbolistas) {
+          futbolistas = Papa.parse(csvFutbolistas, { header:true, skipEmptyLines:true }).data.map(f => ({
+            futbolista: (f.Futbolista ?? f.futbolista ?? f.Nombre ?? "").toString().trim()
+          })).filter(f => f.futbolista);
+        }
+
+        // Cargar Partidos
         encuentros = csvsPartidos.flatMap(csv => 
           Papa.parse(csv, { header:true, skipEmptyLines:true }).data.map(p => ({
             Fecha: (p.Fecha ?? "").trim(),
@@ -313,6 +384,11 @@ torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map(
           partidosTorneo.forEach(p => {
             const esVisitante = norm(p.Condición) === "visitante";
             
+            // Goles formateados siempre con Huracán primero en el encabezado
+            const golesHuracan = esVisitante ? p.Resultado2 : p.Resultado1;
+            const golesRival = esVisitante ? p.Resultado1 : p.Resultado2;
+            const resultadoTexto = `${golesHuracan}-${golesRival}`;
+
             const tarjetaHTML = `
               <div class="partido-card">
                 <div class="resultado-con-escudo">
@@ -329,8 +405,11 @@ torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map(
                   `}
                 </div>
                 <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${p.Árbitro || "S/D"}</div>
-                <div style="margin-top:4px;"><b>Huracán:</b> ${p.Huracán || "-"}</div>
-                <div><b>${p.Club}:</b> ${p.Rival || "-"}</div>
+                
+                <!-- AQUÍ SE ENLAZAN LOS JUGADORES -->
+                <div style="margin-top:4px;"><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+                <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+
                 ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Foto" style="max-width:250px;border-radius:8px;"></div>` : "" }
                 <div>${renderIncidencias(p.Incidencias)}</div>
               </div>
@@ -338,7 +417,7 @@ torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map(
 
             htmlPartidos += `
               <div class="acordeon">
-                <div class="acordeon-header">${p.Club} — ${p.Fecha}</div>
+                <div class="acordeon-header">${p.Club} — ${p.Fecha} (${resultadoTexto}) <img src="${getEscudo(p.Club)}" style="width:20px; vertical-align:middle; margin-left:4px;"></div>
                 <div class="acordeon-body cerrado">${tarjetaHTML}</div>
               </div>
             `;
@@ -370,146 +449,7 @@ torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map(
           e.target.classList.toggle("abierto");
         }
       });
-
-      function getEscudo(nombreClub) {
-        if (!nombreClub) return "";
-        try {
-          return "https://globopedia.github.io/Artids/escudos/" + encodeURIComponent(nombreClub.trim()) + ".png";
-        } catch (err) {
-          return "";
-        }
-      }
-
-      function renderIncidencias(texto) {
-        if (!texto) return "";
-        return texto
-          .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:18px;height:18px;'>")
-          .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:18px;height:18px;'>")
-          .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:18px;height:18px;'>")
-          .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:18px;height:18px;'>")
-          .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:18px;height:18px;'>")
-          .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:18px;height:18px;'>");
-      }
     });
-    // Función para enlazar nombres de futbolistas
-function enlazarJugadores(cadenaJugadores) {
-  if (!cadenaJugadores) return "";
-  
-  // Separamos y procesamos cada jugador manteniendo la estructura
-  const lista = cadenaJugadores.split(/([,;]+)/);
-  
-  return lista.map(fragmento => {
-    // Si es un separador, lo devolvemos tal cual
-    if (fragmento.match(/^[,;]+$/)) return fragmento;
-
-    const nombreLimpio = limpiarNombreJugador(fragmento);
-    if (!nombreLimpio) return fragmento;
-
-    // Buscamos si el futbolista existe en nuestra base
-    const encontrado = futbolistas.find(f => norm(f.futbolista) === norm(nombreLimpio));
-
-    if (encontrado) {
-      return fragmento.replace(
-        nombreLimpio,
-        `<a href="javascript:void(0)" onclick="seleccionarFutbolistaDirecto('${encontrado.futbolista}')" style="color:#FF0000; font-weight:bold; text-decoration:none;">${nombreLimpio}</a>`
-      );
-    }
-    return fragmento;
-  }).join("");
-}
-
-// Auxiliar para seleccionar el futbolista desde el link de la ficha
-function seleccionarFutbolistaDirecto(idFutbolista) {
-  const sel = document.getElementById("futbolistaSelect");
-  if (sel) {
-    sel.value = idFutbolista;
-    mostrarFutbolistas();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-}
-
-// Manejador de checkboxes (muestra partidos por filtro)
-document.addEventListener("change", function(e) {
-  if (!e.target.classList.contains("chkPartidos")) return;
-  const contenedor = e.target.closest("li").querySelector(".partidos-lista");
-  contenedor.innerHTML = "";
-
-  if (e.target.checked) {
-    const { comp, sit, futbolista, lado } = e.target.dataset;
-    const columna = lado === "Rival" ? "Rival" : "Huracán";
-
-    // Filtrar partidos del futbolista
-    const partidos = encuentros.filter(p => {
-      const jugadores = (p[columna] || "")
-        .replace(/[()]/g, ",")
-        .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-        .replace(/\.+/g, "")
-        .replace(/\s+y\s+/gi, ",")
-        .replace(/\s+e\s+/gi, ",")
-        .replace(/,,+/g, ",")
-        .replace(/\s+,/g, ",")
-        .replace(/,\s+/g, ",")
-        .replace(/\s+/g, " ")
-        .split(/[,;]+/)
-        .map(j => j.trim())
-        .filter(j => j.length > 1);
-
-      return jugadores.some(j => norm(j) === norm(futbolista)) &&
-             (comp === "TODOS" || bucketCompetencia(p.Torneo) === comp) &&
-             (sit === "todos" || cap(norm(p.Situación)) === sit);
-    });
-
-    if (partidos.length) {
-      partidos.forEach(p => {
-        let bloqueHTML = "";
-        
-        // Formato para los goles de Huracán siempre primero
-        const golesHuracan = (p.Condición || "").toLowerCase() === "visitante" ? p.Resultado2 : p.Resultado1;
-        const golesRival = (p.Condición || "").toLowerCase() === "visitante" ? p.Resultado1 : p.Resultado2;
-        const resultadoTexto = `${golesHuracan}-${golesRival}`;
-
-        bloqueHTML = `
-          <div class="partido-card">
-            ${getTorneoImage(p.Torneo)}
-            <div style="font-weight:bold; margin-bottom: 4px;">
-              ${p.Club} — ${p.Fecha} (${resultadoTexto}) 
-              <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" style="width:24px; height:24px; vertical-align:middle; margin-left:4px;" />
-            </div>
-
-            <div class="resultado-con-escudo">
-              ${(p.Condición || "").toLowerCase() === "visitante" ? `
-                <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
-                <div class="resultado2-box">${p.Resultado2}</div>
-                <div class="resultado1-box">${p.Resultado1}</div>
-                <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
-              ` : `
-                <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
-                <div class="resultado1-box">${p.Resultado1}</div>
-                <div class="resultado2-box">${p.Resultado2}</div>
-                <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
-              `}
-            </div>
-
-            <div><b>${p.Torneo}</b></div>
-            <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
-            <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
-            
-            <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
-            <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
-
-            ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
-            <div>${renderIncidencias(p.Incidencias)}</div>
-          </div>
-        `;
-
-        contenedor.innerHTML += bloqueHTML;
-      });
-      contenedor.style.display = "block";
-    }
-  } else {
-    contenedor.style.display = "none";
-  }
-});
   </script>
 </body>
 </html>
