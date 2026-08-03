@@ -226,11 +226,15 @@
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
         })).filter(t => t.nombre);
 
-        // Cargar Futbolistas
+        // Cargar Futbolistas (AHORA MAPEAMOS TODAS LAS COLUMNAS DEL CSV)
         if (csvFutbolistas) {
           futbolistas = Papa.parse(csvFutbolistas, { header:true, skipEmptyLines:true }).data.map(f => ({
-            futbolista: (f.Futbolista ?? f.futbolista ?? f.Nombre ?? "").toString().trim()
-          })).filter(f => f.futbolista);
+            futbolista: (f.Futbolista ?? f.futbolista ?? f.Nombre ?? "").toString().trim(),
+            posicion: (f.Posición ?? f.posicion ?? f.Posicion ?? "").toString().trim(),
+            fechNac: (f.FechaNac ?? f.fechNac ?? f.FechNac ?? "").toString().trim(),
+            procedencia: (f.Procedencia ?? f.procedencia ?? "").toString().trim(),
+            Foto1: (f.Foto1 ?? f.foto1 ?? "").toString().trim()
+          })).filter(f => f.futbolista && f.futbolista !== "-");
         }
 
         // Cargar Partidos
@@ -555,7 +559,7 @@ function calcularPuntosPartido(p, minutos) {
 }
 
 function calcularEdad(fechNacStr, fechPartidoStr) {
-  if (!fechNacStr || !fechPartidoStr) return "S/D";
+  if (!fechNacStr || !fechPartidoStr || fechNacStr === "-") return "S/D";
   const parseFecha = (str) => {
     const p = str.split(/[/.-]/);
     if (p.length !== 3) return null;
@@ -648,7 +652,7 @@ function mostrarTorneo() {
   };
 
   Object.values(mapaJugadores).forEach(item => {
-    const pos = norm(item.datos.posicion || item.datos.Posición || "");
+    const pos = norm(item.datos.posicion || "");
     
     if (pos.includes("arquero")) {
       categorias["ARQUEROS"].push(item);
@@ -674,13 +678,14 @@ function mostrarTorneo() {
 
       categorias[cat].forEach(j => {
         const f = j.datos;
-        // Buscamo la foto en Foto1 del CSV Utbolists. 
-        // Si viene vacía, nula o no existe, le mandamo el logo por defecto.
-      const fotoUrl = (f.Foto1 && f.Foto1.trim() !== "") 
-      ? f.Foto1.trim() 
-      : "https://globopedia.github.io/Artids/logo_globopedia.png";
-        const edad = calcularEdad(f.fechNac || f.FechNac, primeraFechaTorneo);
-        const procedencia = f.procedencia || f.Procedencia || "S/D";
+        
+        // Foto desde columna Foto1 del CSV
+        const fotoUrl = (f.Foto1 && f.Foto1.trim() !== "" && f.Foto1.trim() !== "-") 
+          ? f.Foto1.trim() 
+          : "https://globopedia.github.io/Artids/logo_globopedia.png";
+
+        const edad = calcularEdad(f.fechNac, primeraFechaTorneo);
+        const procedencia = (f.procedencia && f.procedencia !== "-") ? f.procedencia : "S/D";
         const puntajeFormateado = j.globopediaScore.toFixed(1);
 
         htmlPlantel += `
@@ -688,7 +693,7 @@ function mostrarTorneo() {
             <span style="position:absolute; top:6px; right:6px; background:#FF0000; color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;" title="Puntaje Hall Globopedia en este torneo">
               ⭐ ${puntajeFormateado} pts
             </span>
-            <img src="${fotoUrl}" style="width:65px; height:65px; object-fit:cover; border-radius:50%; border:2px solid #FF0000; margin-bottom:4px;">
+            <img src="${fotoUrl}" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';" style="width:65px; height:65px; object-fit:cover; border-radius:50%; border:2px solid #FF0000; margin-bottom:4px;">
             <div style="font-weight:bold; font-size:14px; color:#222;">${f.futbolista}</div>
             <div style="font-size:12px; color:#666; margin-top:2px;">Edad: <b>${edad}</b></div>
             <div style="font-size:12px; color:#666;">Procedencia: <b>${procedencia}</b></div>
