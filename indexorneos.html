@@ -113,7 +113,7 @@
   <div id="torneoInfo" class="club-card" style="display:none;"></div>
 
   <script>
-    // URLs de CSVs
+    // URL corregida a "orneos"
     const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
     const partidosURLs = [
       "https://artids.vercel.app/api/data?file=artids1910",
@@ -138,10 +138,10 @@
       ...partidosURLs.map(url => fetch(url).then(r => r.text()))
     ])
     .then(([csvTorneos, ...csvsPartidos]) => {
-      // Parsear Torneos
+      // Parsear archivo de torneos/orneos
       torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
         id: (c.ID ?? c.id ?? i).toString().trim(),
-        nombre: (c.Torneo ?? c.Nombre ?? c.torneo ?? "").toString().trim(),
+        nombre: (c["Torneo"] ?? c["Órneo"] ?? c["Órnea"] ?? c.Nombre ?? "").toString().trim(),
         foto: (c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
         datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
       })).filter(t => t.nombre);
