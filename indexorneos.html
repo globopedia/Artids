@@ -15,7 +15,6 @@
     .search-container { position:relative; max-width:400px; margin:0 auto 20px; text-align:center; }
     #torneoSearch { width:100%; padding:10px; border-radius:8px; border:2px solid #FF0000; font-size:16px; box-sizing:border-box; }
     
-    /* Lista desplegable personalizada con fotos redondas */
     #autocompleteList {
       position: absolute; left: 0; right: 0; background: white;
       border: 1px solid #ccc; border-radius: 8px; max-height: 250px;
@@ -32,7 +31,6 @@
       border: 2px solid #FF0000; flex-shrink: 0; background: #eee;
     }
 
-    /* Ficha del Torneo */
     .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:0 auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
     .club-header { display:flex; align-items:center; gap:20px; border-bottom:2px solid #FF0000; padding-bottom:15px; margin-bottom:15px; }
     .foto-torneo-principal { width:130px; height:130px; object-fit:cover; border-radius:50%; border:3px solid #FF0000; }
@@ -40,7 +38,6 @@
     
     .stats { margin-top:20px; }
     
-    /* Acordeón para partidos */
     .acordeon { border: 1px solid #FF0000; border-radius: 8px; margin: 10px 0; background: #fff; overflow:hidden; }
     .acordeon-header { 
       background: #fff5f5; color: #FF0000; padding: 10px 15px; cursor: pointer; 
@@ -73,6 +70,7 @@
   <div id="torneoInfo" class="club-card" style="display:none;"></div>
 
   <script>
+    // URL ajustada al archivo "orneos"
     const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
     
     const partidosURLs = [
@@ -91,7 +89,7 @@
 
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 
-    // Helper para buscar el valor de una columna sin importar mayúsculas/minúsculas/acentos
+    // Helper para buscar el valor de una columna
     const getCol = (row, ...keys) => {
       const rowKeys = Object.keys(row);
       for (const k of keys) {
@@ -103,7 +101,41 @@
       return "";
     };
 
-    // Cargar Torneos y Partidos tolerando fallos
+    /**
+     * Mapeador de equivalencias entre el nombre del Torneo y la columna 'Torneo' de los CSV de partidos.
+     * Acá podés agregar todas las reglas específicas que quieras.
+     */
+    function obtenerVariantesTorneo(nombreTorneo, idTorneo) {
+      const t = norm(nombreTorneo || idTorneo || "");
+      let variantes = [t];
+
+      // Ejemplo Clausura 2009
+      if (t.includes("clausura 2009")) {
+        variantes.push(norm("Campeonato Clausura 2009"));
+        variantes.push(norm("Torneo Clausura 2009"));
+        variantes.push(norm("Clausura 2009"));
+      }
+
+      // Ejemplo Apertura 2008
+      if (t.includes("apertura 2008")) {
+        variantes.push(norm("Campeonato Apertura 2008"));
+        variantes.push(norm("Torneo Apertura 2008"));
+        variantes.push(norm("Apertura 2008"));
+      }
+
+      // Pretemporadas
+      for (let anio = 1914; anio <= 1930; anio++) {
+        if (t.includes(`pretemporada ${anio}`)) {
+          variantes.push(norm(`Pretemporada ${anio}`));
+        }
+      }
+
+      // Podés agregar más reglas 'if' personalizadas acá según vayas encontrando diferencias...
+
+      return variantes;
+    }
+
+    // Cargar Torneos y Partidos
     Promise.all([
       fetch(torneosURL).then(r => r.ok ? r.text() : "").catch(() => ""),
       ...partidosURLs.map(url => fetch(url).then(r => r.ok ? r.text() : "").catch(() => ""))
@@ -220,10 +252,14 @@
         return `<p><b>${label}:</b> ${valor}</p>`;
       };
 
-      const partidosDelTorneo = encuentros.filter(p => 
-        norm(p.Torneo) === norm(torneo.torneo) || 
-        norm(p.Torneo) === norm(torneo.id)
-      );
+      // Obtener todas las equivalencias posibles para este torneo
+      const variantesBusqueda = obtenerVariantesTorneo(torneo.torneo, torneo.id);
+
+      // Filtrar partidos que coincidan con alguna de las variantes
+      const partidosDelTorneo = encuentros.filter(p => {
+        const torneoPartidoNorm = norm(p.Torneo);
+        return variantesBusqueda.some(v => torneoPartidoNorm.includes(v) || v.includes(torneoPartidoNorm));
+      });
 
       let HTMLPartidos = "";
       if (partidosDelTorneo.length > 0) {
