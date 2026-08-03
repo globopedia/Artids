@@ -13,43 +13,46 @@
     .logo { display:block; margin:0 auto 10px; width:100px; }
     
     .search-container { text-align:center; position:relative; margin-bottom: 20px; }
-    #torneoSearch { padding:8px; border-radius:8px; border:2px solid #FF0000; font-size:16px; width: 320px; }
+    #torneoSearch { padding:10px 14px; border-radius:10px; border:2px solid #FF0000; font-size:16px; width: 340px; outline:none; }
     
+    /* Menú desplegable con ítems y círculos más grandes */
     #autocompleteList {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       background: white;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 340px;
-      max-height: 250px;
+      border-radius: 12px;
+      width: 370px;
+      max-height: 280px;
       overflow-y: auto;
       list-style: none;
       padding: 0;
-      margin-top: 4px;
+      margin-top: 6px;
       z-index: 1000;
       display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
     }
 
     .autocomplete-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 8px 12px;
+      gap: 14px;
+      padding: 10px 14px;
       cursor: pointer;
       text-align: left;
     }
 
+    /* Círculos más grandes para las imágenes en el buscador */
     .autocomplete-thumb {
-      width: 45px;
-      height: 45px;
+      width: 55px;
+      height: 55px;
       object-fit: contain;
       border-radius: 50%;
-      border: 1px solid #ccc;
+      border: 2px solid #eee;
       background: #fdfdfd;
       flex-shrink: 0;
+      padding: 2px;
     }
 
     .autocomplete-item span { font-weight: bold; font-size: 15px; color: #222; }
@@ -57,17 +60,31 @@
     #autocompleteList li:hover, 
     #autocompleteList li.autocomplete-active {
       background-color: #ffdddd;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
+      border-radius: 8px;
       transition: all 0.1s;
     }
 
+    /* Tarjeta principal e imagen redonda del torneo */
     .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:0 auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
-    .club-header { display:flex; align-items:center; gap:15px; border-bottom:2px solid #FF0000; padding-bottom:10px; margin-bottom:10px; }
-    h2 { margin:0; color:#FF0000; font-size:22px; }
+    .club-header { display:flex; align-items:center; gap:18px; border-bottom:2px solid #FF0000; padding-bottom:12px; margin-bottom:12px; }
+    
+    /* Imagen del torneo presentada en círculo */
+    .torneo-img-header {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid #FF0000;
+      padding: 4px;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    h2 { margin:0; color:#FF0000; font-size:24px; }
     
     #torneoInfo p { font-family: 'Chakra Petch', sans-serif; margin: 4px 0; line-height: 1.3; font-size: 15px; }
 
+    /* Acordeón y partidos */
     .acordeon { border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; background: #fefefe; }
     .acordeon-header { background: #eee; padding: 6px 12px; cursor: pointer; font-size: 14px; text-align: right; position: relative; padding-right: 25px; font-weight: bold; }
     .acordeon-header::after { content: "▾"; position: absolute; right: 8px; transition: transform 0.3s; }
@@ -126,7 +143,7 @@
       .then(([csvTorneos, ...csvsPartidos]) => {
         torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
           id: (c.ID ?? c.id ?? i).toString().trim(),
-          nombre: (c["Torneo"] ?? c["Órneo"] ?? c["Órnea"] ?? c.Nombre ?? "").toString().trim(),
+          nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
           foto: (c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
         })).filter(t => t.nombre);
@@ -328,9 +345,11 @@
           htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
         }
 
+        const imgTorneoUrl = torneo.foto ? torneo.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
+
         cont.innerHTML = `
           <div class="club-header">
-            ${torneo.foto ? `<img src="${torneo.foto}" alt="${torneo.nombre}" style="width:90px;height:90px;object-fit:contain;">` : ""}
+            <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
             <h2>${torneo.nombre}</h2>
           </div>
           ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
