@@ -391,6 +391,125 @@ torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map(
           .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:18px;height:18px;'>");
       }
     });
+    // Función para enlazar nombres de futbolistas
+function enlazarJugadores(cadenaJugadores) {
+  if (!cadenaJugadores) return "";
+  
+  // Separamos y procesamos cada jugador manteniendo la estructura
+  const lista = cadenaJugadores.split(/([,;]+)/);
+  
+  return lista.map(fragmento => {
+    // Si es un separador, lo devolvemos tal cual
+    if (fragmento.match(/^[,;]+$/)) return fragmento;
+
+    const nombreLimpio = limpiarNombreJugador(fragmento);
+    if (!nombreLimpio) return fragmento;
+
+    // Buscamos si el futbolista existe en nuestra base
+    const encontrado = futbolistas.find(f => norm(f.futbolista) === norm(nombreLimpio));
+
+    if (encontrado) {
+      return fragmento.replace(
+        nombreLimpio,
+        `<a href="javascript:void(0)" onclick="seleccionarFutbolistaDirecto('${encontrado.futbolista}')" style="color:#FF0000; font-weight:bold; text-decoration:none;">${nombreLimpio}</a>`
+      );
+    }
+    return fragmento;
+  }).join("");
+}
+
+// Auxiliar para seleccionar el futbolista desde el link de la ficha
+function seleccionarFutbolistaDirecto(idFutbolista) {
+  const sel = document.getElementById("futbolistaSelect");
+  if (sel) {
+    sel.value = idFutbolista;
+    mostrarFutbolistas();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// Manejador de checkboxes (muestra partidos por filtro)
+document.addEventListener("change", function(e) {
+  if (!e.target.classList.contains("chkPartidos")) return;
+  const contenedor = e.target.closest("li").querySelector(".partidos-lista");
+  contenedor.innerHTML = "";
+
+  if (e.target.checked) {
+    const { comp, sit, futbolista, lado } = e.target.dataset;
+    const columna = lado === "Rival" ? "Rival" : "Huracán";
+
+    // Filtrar partidos del futbolista
+    const partidos = encuentros.filter(p => {
+      const jugadores = (p[columna] || "")
+        .replace(/[()]/g, ",")
+        .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+        .replace(/\.+/g, "")
+        .replace(/\s+y\s+/gi, ",")
+        .replace(/\s+e\s+/gi, ",")
+        .replace(/,,+/g, ",")
+        .replace(/\s+,/g, ",")
+        .replace(/,\s+/g, ",")
+        .replace(/\s+/g, " ")
+        .split(/[,;]+/)
+        .map(j => j.trim())
+        .filter(j => j.length > 1);
+
+      return jugadores.some(j => norm(j) === norm(futbolista)) &&
+             (comp === "TODOS" || bucketCompetencia(p.Torneo) === comp) &&
+             (sit === "todos" || cap(norm(p.Situación)) === sit);
+    });
+
+    if (partidos.length) {
+      partidos.forEach(p => {
+        let bloqueHTML = "";
+        
+        // Formato para los goles de Huracán siempre primero
+        const golesHuracan = (p.Condición || "").toLowerCase() === "visitante" ? p.Resultado2 : p.Resultado1;
+        const golesRival = (p.Condición || "").toLowerCase() === "visitante" ? p.Resultado1 : p.Resultado2;
+        const resultadoTexto = `${golesHuracan}-${golesRival}`;
+
+        bloqueHTML = `
+          <div class="partido-card">
+            ${getTorneoImage(p.Torneo)}
+            <div style="font-weight:bold; margin-bottom: 4px;">
+              ${p.Club} — ${p.Fecha} (${resultadoTexto}) 
+              <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" style="width:24px; height:24px; vertical-align:middle; margin-left:4px;" />
+            </div>
+
+            <div class="resultado-con-escudo">
+              ${(p.Condición || "").toLowerCase() === "visitante" ? `
+                <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                <div class="resultado2-box">${p.Resultado2}</div>
+                <div class="resultado1-box">${p.Resultado1}</div>
+                <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+              ` : `
+                <img class="escudo-huracan" src="${getEscudo('Huracán')}" alt="Huracán">
+                <div class="resultado1-box">${p.Resultado1}</div>
+                <div class="resultado2-box">${p.Resultado2}</div>
+                <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+              `}
+            </div>
+
+            <div><b>${p.Torneo}</b></div>
+            <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+            <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
+            
+            <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+            <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+
+            ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+            <div>${renderIncidencias(p.Incidencias)}</div>
+          </div>
+        `;
+
+        contenedor.innerHTML += bloqueHTML;
+      });
+      contenedor.style.display = "block";
+    }
+  } else {
+    contenedor.style.display = "none";
+  }
+});
   </script>
 </body>
 </html>
