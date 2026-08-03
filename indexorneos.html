@@ -226,7 +226,7 @@
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
         })).filter(t => t.nombre);
 
-        // Cargar Futbolistas (AHORA MAPEAMOS TODAS LAS COLUMNAS DEL CSV)
+        // Cargar Futbolistas
         if (csvFutbolistas) {
           futbolistas = Papa.parse(csvFutbolistas, { header:true, skipEmptyLines:true }).data.map(f => ({
             futbolista: (f.Futbolista ?? f.futbolista ?? f.Nombre ?? "").toString().trim(),
@@ -613,9 +613,12 @@ function mostrarTorneo() {
   partidosTorneo.forEach(p => {
     if (!p.Huracán) return;
     
-    const nombresEnPartido = p.Huracán.split(/[,;()]+/)
-      .map(n => n.replace(/\b\d+(?:\+\d+)?'?\s*/g, "").trim())
-      .filter(n => n.length > 2);
+    // FILTRO REMENDADO: Separa por comas, puntos, paréntesis, saltos y letras "y"/"e"
+    const nombresEnPartido = [...new Set(
+      p.Huracán.split(/[,;().\n\r]+|\s+\b[ye]\b\s+|[()]+/)
+        .map(n => n.replace(/\b\d+(?:\+\d+)?'?\s*/g, "").trim())
+        .filter(n => n.length > 2)
+    )];
 
     nombresEnPartido.forEach(nom => {
       const match = futbolistas.find(f => norm(f.futbolista) === norm(nom));
