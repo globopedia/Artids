@@ -5,6 +5,7 @@ export default async function handler(req, res) {
   const archivos = {
     lubs: { repo: "Lubs", path: "Ivals.csv" },
     utbolists: { repo: "Lubs", path: "Utbolists.csv" },
+    orneos: { repo: "Lubs", path: "Orneos.csv" },
     rbits: { repo: "Lubs", path: "Rbits.csv" },
     ankg: { repo: "Artids", path: "Ankg.csv" },
     artids1910: { repo: "Artids", path: "Artids1910.csv" },
