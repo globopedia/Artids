@@ -81,7 +81,7 @@
       "https://artids.vercel.app/api/data?file=artids1940",
       "https://artids.vercel.app/api/data?file=artids1955",
       "https://artids.vercel.app/api/data?file=artids1970",
-      "https://artids.vercel.app/api/data?file=artids85",
+      "https://artids.vercel.app/api/data?file=artids1985",
       "https://artids.vercel.app/api/data?file=artids2000",
       "https://artids.vercel.app/api/data?file=artids2015"
     ];
@@ -91,45 +91,64 @@
 
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 
-    // Cargar Torneos y Partidos
+    // Helper para buscar el valor de una columna sin importar mayúsculas/minúsculas/acentos
+    const getCol = (row, ...keys) => {
+      const rowKeys = Object.keys(row);
+      for (const k of keys) {
+        const found = rowKeys.find(rk => norm(rk) === norm(k));
+        if (found && row[found] !== undefined && row[found] !== null) {
+          return row[found].toString().trim();
+        }
+      }
+      return "";
+    };
+
+    // Cargar Torneos y Partidos tolerando fallos
     Promise.all([
-      fetch(torneosURL).then(r => r.text()),
-      ...partidosURLs.map(url => fetch(url).then(r => r.text()))
+      fetch(torneosURL).then(r => r.ok ? r.text() : "").catch(() => ""),
+      ...partidosURLs.map(url => fetch(url).then(r => r.ok ? r.text() : "").catch(() => ""))
     ])
     .then(([csvTorneos, ...csvPartidos]) => {
 
-      // Parseo de Torneos usando 'id' como identificador principal
-      torneos = Papa.parse(csvTorneos, { header: true, skipEmptyLines: true }).data.map(t => ({
-        id: (t.ID || t.id || t.Id || "").toString().trim(),
-        torneo: (t.Torneo || t.torneo || t.Nombre || "").toString().trim(),
-        anio: (t.Año || t.Anio || t.anio || "").toString().trim(),
-        puesto: (t.Puesto || t.Posicion || "").toString().trim(),
-        pj: (t.PJ || t.Partidos || "").toString().trim(),
-        pg: (t.PG || "").toString().trim(),
-        pe: (t.PE || "").toString().trim(),
-        pp: (t.PP || "").toString().trim(),
-        gf: (t.GF || "").toString().trim(),
-        gc: (t.GC || "").toString().trim(),
-        campeon: (t.Campeon || t.Campeón || "").toString().trim(),
-        resumen: (t.Resumen || t.Detalle || t.Observaciones || "").toString().trim(),
-        foto: (t.Foto || t.Foto1 || "").toString().trim(),
-        raw: t
-      }));
+      if (csvTorneos) {
+        torneos = Papa.parse(csvTorneos, { header: true, skipEmptyLines: true }).data.map(t => {
+          const idVal = getCol(t, "id", "ID", "Torneo", "torneo", "Nombre");
+          const torneoVal = getCol(t, "torneo", "Torneo", "Nombre", "id", "ID");
+          const anioVal = getCol(t, "año", "anio", "Año", "Anio");
+          
+          return {
+            id: idVal || torneoVal,
+            torneo: torneoVal || idVal,
+            anio: anioVal,
+            puesto: getCol(t, "puesto", "Puesto", "posicion", "Posición"),
+            pj: getCol(t, "pj", "PJ", "partidos", "Partidos"),
+            pg: getCol(t, "pg", "PG"),
+            pe: getCol(t, "pe", "PE"),
+            pp: getCol(t, "pp", "PP"),
+            gf: getCol(t, "gf", "GF"),
+            gc: getCol(t, "gc", "GC"),
+            campeon: getCol(t, "campeon", "campeón", "Campeon", "Campeón"),
+            resumen: getCol(t, "resumen", "Resumen", "detalle", "Detalle", "observaciones"),
+            foto: getCol(t, "foto", "Foto", "foto1", "Foto1", "imagen", "Imagen"),
+            raw: t
+          };
+        }).filter(t => t.id || t.torneo);
+      }
 
       // Parseo de Partidos
-      const partidosParseados = csvPartidos.map(csv =>
-        Papa.parse(csv, { header: true, skipEmptyLines: true }).data
-      );
+      const partidosParseados = csvPartidos
+        .filter(csv => csv.length > 0)
+        .map(csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data);
 
       encuentros = partidosParseados.flat().map(p => ({
-        Fecha: (p.Fecha ?? "").trim(),
-        Torneo: (p.Torneo ?? "").trim(),
-        Condición: (p.Condición ?? "").trim(),
-        Situación: (p.Situación ?? "").trim(),
-        Resultado1: (p.Resultado1 ?? "").trim(),
-        Resultado2: (p.Resultado2 ?? "").trim(),
-        Rival: (p.Rival ?? "").trim(),
-        Estadio: (p.Estadio ?? "").trim()
+        Fecha: getCol(p, "Fecha", "fecha"),
+        Torneo: getCol(p, "Torneo", "torneo"),
+        Condición: getCol(p, "Condición", "condicion", "Condicion"),
+        Situación: getCol(p, "Situación", "situacion", "Situacion"),
+        Resultado1: getCol(p, "Resultado1", "resultado1"),
+        Resultado2: getCol(p, "Resultado2", "resultado2"),
+        Rival: getCol(p, "Rival", "rival"),
+        Estadio: getCol(p, "Estadio", "estadio")
       }));
 
       configurarBuscador();
@@ -149,7 +168,11 @@
           return;
         }
 
-        const filtrados = torneos.filter(t => norm(t.id).includes(query) || norm(t.torneo).includes(query) || norm(t.anio).includes(query));
+        const filtrados = torneos.filter(t => 
+          norm(t.id).includes(query) || 
+          norm(t.torneo).includes(query) || 
+          norm(t.anio).includes(query)
+        );
 
         if (filtrados.length === 0) {
           list.style.display = "none";
@@ -197,7 +220,6 @@
         return `<p><b>${label}:</b> ${valor}</p>`;
       };
 
-      // Filtrar partidos que coincidan con el torneo seleccionado
       const partidosDelTorneo = encuentros.filter(p => 
         norm(p.Torneo) === norm(torneo.torneo) || 
         norm(p.Torneo) === norm(torneo.id)
@@ -231,7 +253,7 @@
 
         ${campo("Puesto final", torneo.puesto)}
         ${campo("Partidos Jugados", torneo.pj)}
-        ${campo("Campaña", (torneo.pg || torneo.pe || torneo.pp) ? `${torneo.pg} G / ${torneo.pe} E / ${torneo.pp} P` : "")}
+        ${campo("Campaña", (torneo.pg || torneo.pe || torneo.pp) ? `${torneo.pg} G / ${torneo.pe} E / ${torneo.pp} P` : "")}
         ${campo("Goles", (torneo.gf || torneo.gc) ? `${torneo.gf} GF / ${torneo.gc} GC` : "")}
         ${campo("Campeón", torneo.campeon)}
         ${campo("Resumen", torneo.resumen)}
