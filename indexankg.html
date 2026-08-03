@@ -298,7 +298,7 @@ Hasta: <input type="date" id="fechaHasta">
 <div style="text-align:center; margin-top:15px;">
 <select id="selectorEstadistica" onchange="cambiarEstadistica()">
 <option value="globopedia">HALL GLOBOPEDIA</option>
-<option value="populares">LOS MÁS POPULARES</option>
+<option value="populares">LOS MÁS CONOCIDOS EN EL MUNDO</option>
 <option value="partidos">MÁS PARTIDOS JUGADOS</option>
 <option value="minutos">MÁS MINUTOS JUGADOS</option>
 <option value="goles">MÁXIMOS GOLEADORES</option>
@@ -377,7 +377,7 @@ function calcularPuntajeJugador(textoTrayectoria) {
 
 const CONFIG_ESTADISTICAS = {
   globopedia: {titulo: "HALL GLOBOPEDIA", campo: "Globopedia", formato: r => r.globopedia},
-  populares: {titulo: "LOS MÁS POPULARES", campo: "Trayectoria", formato: r => generarHTMLTrayectoria(r.trayectoriaTexto)},
+  populares: {titulo: "LOS MÁS CONOCIDOS EN EL MUNDO", campo: "Trayectoria", formato: r => generarHTMLTrayectoria(r.trayectoriaTexto)},
   partidos: {titulo: "MÁS PARTIDOS JUGADOS", campo: "Partidos", formato: r => r.partidos},
   duco: {titulo: "MÁS PARTIDOS EN EL DUCÓ", campo: "Partidos", formato: r => r.duco},
   goles: {titulo: "MÁXIMOS GOLEADORES", campo: "Goles", formato: r => r.goles},
