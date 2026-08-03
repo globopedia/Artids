@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campeonatos — Huracán</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Chakra Petch', sans-serif; background:#fff; color:#222; margin:20px; }
+    h1 { color:#FF0000; text-align:center; }
+    .logo { display:block; margin:0 auto 10px; width:100px; }
+    
+    .search-container { position:relative; max-width:400px; margin:0 auto 20px; text-align:center; }
+    #torneoSearch { width:100%; padding:10px; border-radius:8px; border:2px solid #FF0000; font-size:16px; box-sizing:border-box; }
+    
+    /* Lista desplegable personalizada con fotos redondas */
+    #autocompleteList {
+      position: absolute; left: 0; right: 0; background: white;
+      border: 1px solid #ccc; border-radius: 8px; max-height: 250px;
+      overflow-y: auto; list-style: none; padding: 0; margin: 4px 0 0 0;
+      z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: none;
+    }
+    #autocompleteList li {
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+      cursor: pointer; text-align: left; border-bottom: 1px solid #f0f0f0;
+    }
+    #autocompleteList li:hover { background-color: #ffdddd; }
+    .thumb-menu {
+      width: 45px; height: 45px; border-radius: 50%; object-fit: cover;
+      border: 2px solid #FF0000; flex-shrink: 0; background: #eee;
+    }
+
+    /* Ficha del Torneo */
+    .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:0 auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    .club-header { display:flex; align-items:center; gap:20px; border-bottom:2px solid #FF0000; padding-bottom:15px; margin-bottom:15px; }
+    .foto-torneo-principal { width:130px; height:130px; object-fit:cover; border-radius:50%; border:3px solid #FF0000; }
+    h2 { margin:0; color:#FF0000; font-size:24px; }
+    
+    .stats { margin-top:20px; }
+    
+    /* Acordeón para partidos */
+    .acordeon { border: 1px solid #FF0000; border-radius: 8px; margin: 10px 0; background: #fff; overflow:hidden; }
+    .acordeon-header { 
+      background: #fff5f5; color: #FF0000; padding: 10px 15px; cursor: pointer; 
+      font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; align-items: center; 
+    }
+    .acordeon-header::after { content: "▾"; font-size: 18px; transition: transform 0.3s; }
+    .acordeon-header.abierto::after { transform: rotate(180deg); }
+    .acordeon-body { max-height: 1200px; overflow-y: auto; transition: max-height 0.3s ease; padding: 10px; }
+    .acordeon-body.cerrado { max-height: 0; padding: 0 10px; opacity:0; }
+
+    .partido-card { 
+      border: 1px solid #e0e0e0; border-left: 4px solid #FF0000; border-radius: 6px; 
+      padding: 8px 12px; margin: 6px 0; background: #fafafa; font-size: 14px; 
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px;
+    }
+
+    #torneoInfo p { margin: 4px 0; line-height: 1.3; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+  <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
+  <h1>🏆 Campeonatos y Torneos</h1>
+
+  <div class="search-container">
+    <input type="text" id="torneoSearch" placeholder="Escribí un torneo o año (ej: 1980)..." autocomplete="off">
+    <ul id="autocompleteList"></ul>
+  </div>
+
+  <div id="torneoInfo" class="club-card" style="display:none;"></div>
+
+  <script>
+    const torneosURL = "https://artids.vercel.app/api/data?file=torneos";
+    
+    const partidosURLs = [
+      "https://artids.vercel.app/api/data?file=artids1910",
+      "https://artids.vercel.app/api/data?file=artids1925",
+      "https://artids.vercel.app/api/data?file=artids1940",
+      "https://artids.vercel.app/api/data?file=artids1955",
+      "https://artids.vercel.app/api/data?file=artids1970",
+      "https://artids.vercel.app/api/data?file=artids85",
+      "https://artids.vercel.app/api/data?file=artids2000",
+      "https://artids.vercel.app/api/data?file=artids2015"
+    ];
+
+    let torneos = [];
+    let encuentros = [];
+
+    const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+
+    // Cargar Torneos y Partidos
+    Promise.all([
+      fetch(torneosURL).then(r => r.text()),
+      ...partidosURLs.map(url => fetch(url).then(r => r.text()))
+    ])
+    .then(([csvTorneos, ...csvPartidos]) => {
+
+      // Parseo de Torneos usando 'id' como identificador principal
+      torneos = Papa.parse(csvTorneos, { header: true, skipEmptyLines: true }).data.map(t => ({
+        id: (t.ID || t.id || t.Id || "").toString().trim(),
+        torneo: (t.Torneo || t.torneo || t.Nombre || "").toString().trim(),
+        anio: (t.Año || t.Anio || t.anio || "").toString().trim(),
+        puesto: (t.Puesto || t.Posicion || "").toString().trim(),
+        pj: (t.PJ || t.Partidos || "").toString().trim(),
+        pg: (t.PG || "").toString().trim(),
+        pe: (t.PE || "").toString().trim(),
+        pp: (t.PP || "").toString().trim(),
+        gf: (t.GF || "").toString().trim(),
+        gc: (t.GC || "").toString().trim(),
+        campeon: (t.Campeon || t.Campeón || "").toString().trim(),
+        resumen: (t.Resumen || t.Detalle || t.Observaciones || "").toString().trim(),
+        foto: (t.Foto || t.Foto1 || "").toString().trim(),
+        raw: t
+      }));
+
+      // Parseo de Partidos
+      const partidosParseados = csvPartidos.map(csv =>
+        Papa.parse(csv, { header: true, skipEmptyLines: true }).data
+      );
+
+      encuentros = partidosParseados.flat().map(p => ({
+        Fecha: (p.Fecha ?? "").trim(),
+        Torneo: (p.Torneo ?? "").trim(),
+        Condición: (p.Condición ?? "").trim(),
+        Situación: (p.Situación ?? "").trim(),
+        Resultado1: (p.Resultado1 ?? "").trim(),
+        Resultado2: (p.Resultado2 ?? "").trim(),
+        Rival: (p.Rival ?? "").trim(),
+        Estadio: (p.Estadio ?? "").trim()
+      }));
+
+      configurarBuscador();
+    })
+    .catch(err => console.error("Error al cargar los datos:", err));
+
+    function configurarBuscador() {
+      const input = document.getElementById("torneoSearch");
+      const list = document.getElementById("autocompleteList");
+
+      input.addEventListener("input", () => {
+        const query = norm(input.value);
+        list.innerHTML = "";
+        
+        if (!query) {
+          list.style.display = "none";
+          return;
+        }
+
+        const filtrados = torneos.filter(t => norm(t.id).includes(query) || norm(t.torneo).includes(query) || norm(t.anio).includes(query));
+
+        if (filtrados.length === 0) {
+          list.style.display = "none";
+          return;
+        }
+
+        filtrados.forEach(t => {
+          const li = document.createElement("li");
+          const img = document.createElement("img");
+          img.src = t.foto || "https://globopedia.github.io/Artids/logo_globopedia.png";
+          img.className = "thumb-menu";
+          img.onerror = () => { img.src = "https://globopedia.github.io/Artids/logo_globopedia.png"; };
+
+          const span = document.createElement("span");
+          span.textContent = t.id || t.torneo;
+
+          li.appendChild(img);
+          li.appendChild(span);
+
+          li.addEventListener("click", () => {
+            input.value = t.id || t.torneo;
+            list.style.display = "none";
+            mostrarTorneo(t);
+          });
+
+          list.appendChild(li);
+        });
+
+        list.style.display = "block";
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!input.contains(e.target) && !list.contains(e.target)) {
+          list.style.display = "none";
+        }
+      });
+    }
+
+    function mostrarTorneo(torneo) {
+      const cont = document.getElementById("torneoInfo");
+      cont.style.display = "block";
+
+      const campo = (label, valor) => {
+        if (!valor || valor.trim() === "" || valor.trim() === "-") return "";
+        return `<p><b>${label}:</b> ${valor}</p>`;
+      };
+
+      // Filtrar partidos que coincidan con el torneo seleccionado
+      const partidosDelTorneo = encuentros.filter(p => 
+        norm(p.Torneo) === norm(torneo.torneo) || 
+        norm(p.Torneo) === norm(torneo.id)
+      );
+
+      let HTMLPartidos = "";
+      if (partidosDelTorneo.length > 0) {
+        HTMLPartidos = partidosDelTorneo.map(p => `
+          <div class="partido-card">
+            <span><b>${p.Fecha}</b></span>
+            <span>${p.Condición ? `(${p.Condición})` : ""} vs <b>${p.Rival}</b></span>
+            <span><b>${p.Resultado1} - ${p.Resultado2}</b></span>
+            <span>${p.Estadio ? `🏟️ ${p.Estadio}` : ""}</span>
+          </div>
+        `).join("");
+      } else {
+        HTMLPartidos = "<p style='padding:10px; color:#666;'>No se encontraron registros de partidos para este torneo en la base de datos.</p>";
+      }
+
+      cont.innerHTML = `
+        <div class="club-header">
+          <img src="${torneo.foto || 'https://globopedia.github.io/Artids/logo_globopedia.png'}" 
+               alt="${torneo.id}" 
+               class="foto-torneo-principal" 
+               onerror="this.src='https://globopedia.github.io/Artids/logo_globopedia.png'">
+          <div>
+            <h2>${torneo.id || torneo.torneo}</h2>
+            ${campo("Año", torneo.anio)}
+          </div>
+        </div>
+
+        ${campo("Puesto final", torneo.puesto)}
+        ${campo("Partidos Jugados", torneo.pj)}
+        ${campo("Campaña", (torneo.pg || torneo.pe || torneo.pp) ? `${torneo.pg} G / ${torneo.pe} E / ${torneo.pp} P` : "")}
+        ${campo("Goles", (torneo.gf || torneo.gc) ? `${torneo.gf} GF / ${torneo.gc} GC` : "")}
+        ${campo("Campeón", torneo.campeon)}
+        ${campo("Resumen", torneo.resumen)}
+
+        <div class="stats">
+          <div class="acordeon">
+            <div class="acordeon-header abierto" onclick="toggleAcordeon(this)">
+              <span>⚽ Campaña en el Torneo (${partidosDelTorneo.length} partidos)</span>
+            </div>
+            <div class="acordeon-body">
+              ${HTMLPartidos}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleAcordeon(header) {
+      header.classList.toggle("abierto");
+      const body = header.nextElementSibling;
+      body.classList.toggle("cerrado");
+    }
+  </script>
+</body>
+</html>
