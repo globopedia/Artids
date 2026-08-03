@@ -674,7 +674,11 @@ function mostrarTorneo() {
 
       categorias[cat].forEach(j => {
         const f = j.datos;
-        const fotoUrl = f.foto || f.Foto1 || "https://globopedia.github.io/Artids/logo_globopedia.png";
+        // Buscamo la foto en Foto1 del CSV Utbolists. 
+        // Si viene vacía, nula o no existe, le mandamo el logo por defecto.
+      const fotoUrl = (f.Foto1 && f.Foto1.trim() !== "") 
+      ? f.Foto1.trim() 
+      : "https://globopedia.github.io/Artids/logo_globopedia.png";
         const edad = calcularEdad(f.fechNac || f.FechNac, primeraFechaTorneo);
         const procedencia = f.procedencia || f.Procedencia || "S/D";
         const puntajeFormateado = j.globopediaScore.toFixed(1);
