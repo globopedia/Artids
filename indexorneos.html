@@ -121,47 +121,56 @@
     let futbolistas = [];
     let currentFocus = -1;
 
-    const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-
-    // Limpia el nombre del jugador quitando números, aclaraciones, etc.
-    function limpiarNombreJugador(cadena) {
-      if (!cadena) return "";
-      return cadena
-        .replace(/[()]/g, "")
-        .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-        .replace(/\.+/g, "")
-        .replace(/\s+y\s+/gi, "")
-        .replace(/\s+e\s+/gi, "")
-        .trim();
+    // Función auxiliar para limpiar acentos y mayúsculas
+    function norm(texto) {
+      return (texto || "")
+        .toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
     }
 
-    // Función para enlazar nombres de futbolistas
-    function enlazarJugadores(cadenaJugadores) {
-      if (!cadenaJugadores) return "-";
+    // Función para enlazar nombres de futbolistas hacia la página de jugadores
+    function enlazarJugadores(texto) {
+      if (!texto) return "";
       
-      const lista = cadenaJugadores.split(/([,;]+)/);
+      const partes = texto.split(/(\s*[,;().]+\s*|\s+\b[ye]\b\s+)/i);
       
-      return lista.map(fragmento => {
-        if (fragmento.match(/^[,;]+$/)) return fragmento;
-
-        const nombreLimpio = limpiarNombreJugador(fragmento);
-        if (!nombreLimpio) return fragmento;
-
-        const encontrado = futbolistas.find(f => norm(f.futbolista) === norm(nombreLimpio));
-
-        if (encontrado) {
-          return fragmento.replace(
-            nombreLimpio,
-            `<a href="javascript:void(0)" onclick="seleccionarFutbolistaDirecto('${encontrado.futbolista}')" style="color:#FF0000; font-weight:bold; text-decoration:none;">${nombreLimpio}</a>`
-          );
+      return partes.map(part => {
+        if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
+          return part;
         }
-        return fragmento;
-      }).join("");
-    }
 
-    function seleccionarFutbolistaDirecto(idFutbolista) {
-      alert("Seleccionaste a: " + idFutbolista);
-      // Acá podés redirigir a la ficha del jugador o abrir su modal
+        const original = part.trim();
+        if (!original) return part;
+
+        const matchMinuto = original.match(/^(\d+(?:\+\d+)?'?\s*)(.*)/);
+        let prefijoMinuto = "";
+        let candidatoNombre = original;
+
+        if (matchMinuto) {
+          prefijoMinuto = matchMinuto[1];
+          candidatoNombre = matchMinuto[2];
+        }
+
+        const nombreLimpio = candidatoNombre.trim();
+        if (!nombreLimpio) return part;
+
+        const existeEnBase = typeof futbolistas !== "undefined" && 
+          futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
+
+        if (existeEnBase) {
+          const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
+          const linkHTML = `<a href="${url}" ` +
+                           `style="color: #d40000; text-decoration: none; font-weight: normal;" ` +
+                           `onmouseover="this.style.fontWeight='bold'" ` +
+                           `onmouseout="this.style.fontWeight='normal'">${candidatoNombre}</a>`;
+          return prefijoMinuto + linkHTML;
+        }
+
+        return part;
+      }).join("");
     }
 
     function getEscudo(nombreClub) {
@@ -186,7 +195,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
-      const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolistas"; // Carga la lista de jugadores
+      const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolistas";
       const partidosURLs = [
         "https://artids.vercel.app/api/data?file=artids1910",
         "https://artids.vercel.app/api/data?file=artids1925",
@@ -384,7 +393,6 @@
           partidosTorneo.forEach(p => {
             const esVisitante = norm(p.Condición) === "visitante";
             
-            // Goles formateados siempre con Huracán primero en el encabezado
             const golesHuracan = esVisitante ? p.Resultado2 : p.Resultado1;
             const golesRival = esVisitante ? p.Resultado1 : p.Resultado2;
             const resultadoTexto = `${golesHuracan}-${golesRival}`;
@@ -406,7 +414,6 @@
                 </div>
                 <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${p.Árbitro || "S/D"}</div>
                 
-                <!-- AQUÍ SE ENLAZAN LOS JUGADORES -->
                 <div style="margin-top:4px;"><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
                 <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
 
@@ -450,62 +457,6 @@
         }
       });
     });
-    // Función auxiliar para limpiar acentos y mayúsculas
-function norm(texto) {
-  return (texto || "")
-    .toString()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-}
-
-function enlazarJugadores(texto) {
-  if (!texto) return "";
-  
-  // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e"
-  const partes = texto.split(/(\s*[,;().]+\s*|\s+\b[ye]\b\s+)/i);
-  
-  return partes.map(part => {
-    // Si la parte es un separador o signo de puntuación, la devolvemos tal cual
-    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
-      return part;
-    }
-
-    const original = part.trim();
-    if (!original) return part;
-
-    // Si hay un minuto de cambio al inicio (ej: "67 ", "67' ", "45+2 "), lo extraemos
-    const matchMinuto = original.match(/^(\d+(?:\+\d+)?'?\s*)(.*)/);
-    let prefijoMinuto = "";
-    let candidatoNombre = original;
-
-    if (matchMinuto) {
-      prefijoMinuto = matchMinuto[1];
-      candidatoNombre = matchMinuto[2];
-    }
-
-    const nombreLimpio = candidatoNombre.trim();
-    if (!nombreLimpio) return part;
-
-    // Verificamos si el futbolista existe en el array 'futbolistas'
-    const existeEnBase = typeof futbolistas !== "undefined" && 
-      futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
-
-    // Si existe, armamos el enlace apuntando a tu URL exacta
-    if (existeEnBase) {
-      const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
-      const linkHTML = `<a href="${url}" ` +
-                       `style="color: #d40000; text-decoration: none; font-weight: normal;" ` +
-                       `onmouseover="this.style.fontWeight='bold'" ` +
-                       `onmouseout="this.style.fontWeight='normal'">${candidatoNombre}</a>`;
-      return prefijoMinuto + linkHTML;
-    }
-
-    // Si no está en la base, queda como texto plano
-    return part;
-  }).join("");
-}
   </script>
 </body>
 </html>
