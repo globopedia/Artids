@@ -1056,7 +1056,7 @@ function renderRanking(ranking) {
         <th class="col-periodo">Período</th>
         <th class="col-estadistica">${tituloColumna}</th>
       </tr>
-      ${ranking.slice(0,40).map((r, i) => `
+      ${ranking.slice(0,35).map((r, i) => `
         <tr onclick="irAFutbolista('${encodeURIComponent(r.nombre)}')">
           <td class="col-numero">${i+1}</td>
           <td class="nombre col-jugador">
