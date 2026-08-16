@@ -886,7 +886,7 @@ function esExtranjero(nombre) {
 function esDeInferiores(nombre) {
   const jugador = indiceUtbolistas[norm(nombre)];
   if (!jugador) return false;
-  return (jugador["Procedencia"] || "").toLowerCase().includes("divisiones inferiores");
+  return (jugador["Procedencia"] || "").toLowerCase().includes("inferiores");
 }
 
 function calcularMayorInactividad(fechas) {
