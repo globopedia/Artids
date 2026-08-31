@@ -100,6 +100,78 @@
 .acordeon.acordeon-rival .acordeon-header:hover {
   background-color: #d2e3fc;      /* Cambio de color al pasar el mouse */
 }
+
+/* === Cuadro "Goles y penales" === */
+.golpen-box {
+  border: 1px solid #FF0000;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  background: #fff5f5;
+}
+.golpen-titulo {
+  font-weight: bold;
+  color: #FF0000;
+  font-size: 15px;
+  margin: 10px 0 4px;
+}
+.golpen-titulo:first-child { margin-top: 0; }
+.golpen-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 8px;
+  font-size: 14px;
+}
+.golpen-item b { color: #222; }
+
+/* === Frase de historial por AFA/CONMEBOL/Amistosos === */
+.resumen-jugador {
+  margin: 6px 0;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #666;
+  text-align: center;
+}
+
+/* === "Sus compañeros" === */
+.companeros-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.companero-item {
+  width: 100px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid #FF0000;
+  border-radius: 10px;
+  padding: 6px;
+  background: #fff;
+  transition: background 0.2s ease;
+}
+.companero-item:hover { background: #ffe0e0; }
+.companero-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+.companero-nombre {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  color: #222;
+  line-height: 1.2;
+}
+.companero-veces {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
   </style>
 </head>
 <body>
@@ -827,6 +899,366 @@ const partidosURLs = [
       sel.addEventListener("change", mostrarFutbolistas);
     }
 
+// ============================================================
+// === FUNCIONES NUEVAS: historial por competencia, goles y
+// === penales, y "sus compañeros"
+// ============================================================
+
+// Lista de partidos donde jugó nombreJugador (columna Huracán o Rival)
+function partidosDeJugador(nombreJugador, columna = "Huracán") {
+  return encuentros.filter(p => {
+    const jugadores = (p[columna] || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+    return jugadores.some(j => norm(j) === norm(nombreJugador));
+  });
+}
+
+// Estima el minuto cuando el dato viene como "PT" o "ST" sin número exacto,
+// repartiendo el tiempo restante según cuántas veces se repite el tag sin minuto.
+function estimarMinutoPorRepeticion(texto, tag) {
+  const regex = new RegExp(`\\b${tag}\\b`, "g");
+  const apariciones = (texto.match(regex) || []).length;
+  if (apariciones === 0) return null;
+
+  const base = tag === "ST" ? 45 : 0;
+  const aprox = Math.ceil(45 / (apariciones + 1));
+  return base + aprox;
+}
+
+function resolverMinutoEvento(minutoTexto, incidenciasCompletas) {
+  if (/^\d+(?:\+\d+)?$/.test(minutoTexto)) return parseMinuto(minutoTexto);
+  if (minutoTexto === "PT") return estimarMinutoPorRepeticion(incidenciasCompletas, "PT");
+  if (minutoTexto === "ST") return estimarMinutoPorRepeticion(incidenciasCompletas, "ST");
+  return null;
+}
+
+// --- Goles y penales pateados por el propio jugador ---
+function contarGolesYPenales(nombreJugador, partidosDelJugador) {
+  const goles = { tiroLibre: 0, cabeza: 0, taquito: 0, rebote: 0, rabona: 0, penal: 0, otros: 0, total: 0 };
+  const penalesPateados = { convertidos: 0, atajados: 0, desviados: 0, poste: 0 };
+
+  partidosDelJugador.forEach(p => {
+    (p.Incidencias || "").split("</br>").forEach(ev => {
+      const t = ev.trim();
+
+      const mGol = t.match(/GOL\s+([^(]+)\(([^)]+)\)/i);
+      if (mGol && mGol[2].trim().toUpperCase() === "HUR" &&
+          norm(mGol[1]) === norm(nombreJugador)) {
+        goles.total++;
+        if (/-tiro libre-/i.test(t)) goles.tiroLibre++;
+        else if (/-cabezazo-/i.test(t)) goles.cabeza++;
+        else if (/-taquito-/i.test(t)) goles.taquito++;
+        else if (/-de rebote-/i.test(t)) goles.rebote++;
+        else if (/-rabona-/i.test(t)) goles.rabona++;
+        else if (/-penal-/i.test(t)) { goles.penal++; penalesPateados.convertidos++; }
+        else goles.otros++;
+        return;
+      }
+
+      const mAta = t.match(/\bATA\s+([^(]+)\(([^)]+)\)/i);
+      if (mAta && mAta[2].trim().toUpperCase() === "HUR" &&
+          norm(mAta[1]) === norm(nombreJugador)) {
+        if (/ataja/i.test(t)) penalesPateados.atajados++;
+        return;
+      }
+
+      const mDes = t.match(/\bDES\s+([^(]+)\(([^)]+)\)/i);
+      if (mDes && mDes[2].trim().toUpperCase() === "HUR" &&
+          norm(mDes[1]) === norm(nombreJugador)) {
+        penalesPateados.desviados++;
+        return;
+      }
+
+      const mPos = t.match(/\bPOS\s+([^(]+)\(([^)]+)\)/i);
+      if (mPos && mPos[2].trim().toUpperCase() === "HUR" &&
+          norm(mPos[1]) === norm(nombreJugador)) {
+        penalesPateados.poste++;
+      }
+    });
+  });
+
+  return { goles, penalesPateados };
+}
+
+// --- Arqueros de Huracán en un partido dado, y quién atajaba en un minuto puntual ---
+function obtenerArquerosDelPartido(partido, listaFutbolistas) {
+  const jugadores = (partido.Huracán || "")
+    .replace(/[()]/g, ",")
+    .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+    .replace(/\.+/g, "")
+    .replace(/\s+y\s+/gi, ",")
+    .replace(/\s+e\s+/gi, ",")
+    .replace(/,,+/g, ",")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s+/g, ",")
+    .replace(/\s+/g, " ")
+    .split(/[,;]+/)
+    .map(j => j.trim())
+    .filter(j => j.length > 1);
+
+  return jugadores.filter(nombre => {
+    const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(nombre));
+    return datos && norm(datos.posicion) === "arquero";
+  });
+}
+
+function arqueroEnMinuto(partido, minuto, listaFutbolistas) {
+  if (minuto == null) return null;
+  const arqueros = obtenerArquerosDelPartido(partido, listaFutbolistas);
+  if (!arqueros.length) return null;
+
+  const texto = partido.Huracán || "";
+  const finReal = (partido.Fin2E && partido.Fin2E !== "0")
+    ? (parseMinuto(partido.Fin2E) || 120)
+    : (parseMinuto(partido.Fin2T) || 90);
+
+  for (const nombre of arqueros) {
+    let ingreso = ajustarMinuto(obtenerMinutoIngreso(texto, nombre), partido);
+    let salida  = ajustarMinuto(obtenerMinutoSalida(texto, nombre), partido);
+
+    const desde = ingreso !== null ? ingreso : 1;
+    const hasta = salida !== null ? salida - 1 : finReal;
+
+    if (minuto >= desde && minuto <= hasta) return nombre;
+  }
+  return arqueros[0]; // respaldo si algo no calzó
+}
+
+// --- Penales en contra (solo para arqueros) ---
+function contarPenalesEnContra(nombreArquero, partidosDelArquero, listaFutbolistas) {
+  const enContra = { atajados: 0, convertidos: 0, desviados: 0, poste: 0 };
+
+  partidosDelArquero.forEach(p => {
+    const incidenciasCompletas = p.Incidencias || "";
+    incidenciasCompletas.split("</br>").forEach(ev => {
+      const t = ev.trim();
+
+      // ATAJÓ: el nombre del arquero ya viene en el texto
+      const mAta = t.match(/\bATA\s+([^(]+)\(([^)]+)\)[^-]*-ataja\s+([^(]+)\(([^)]+)\)-/i);
+      if (mAta) {
+        const siglaPateador = mAta[2].trim().toUpperCase();
+        const siglaGK = mAta[4].trim().toUpperCase();
+        if (siglaPateador !== "HUR" && siglaGK === "HUR" &&
+            norm(mAta[3]) === norm(nombreArquero)) {
+          enContra.atajados++;
+        }
+        return;
+      }
+
+      const mMin = t.match(/^(\d+(?:\+\d+)?|PT|ST)/i);
+      if (!mMin) return;
+      const minuto = resolverMinutoEvento(mMin[1].toUpperCase(), incidenciasCompletas);
+      if (minuto == null) return;
+
+      const mGol = t.match(/GOL\s+([^(]+)\(([^)]+)\)/i);
+      if (mGol && mGol[2].trim().toUpperCase() !== "HUR" && /-penal-/i.test(t)) {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.convertidos++;
+        return;
+      }
+
+      const mDes = t.match(/\bDES\s+([^(]+)\(([^)]+)\)/i);
+      if (mDes && mDes[2].trim().toUpperCase() !== "HUR") {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.desviados++;
+        return;
+      }
+
+      const mPos = t.match(/\bPOS\s+([^(]+)\(([^)]+)\)/i);
+      if (mPos && mPos[2].trim().toUpperCase() !== "HUR") {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.poste++;
+      }
+    });
+  });
+
+  return enContra;
+}
+
+function itemGolPen(label, valor) {
+  if (!valor) return "";
+  return `<div class="golpen-item"><span>${label}</span><b>${valor}</b></div>`;
+}
+
+function renderGolesYPenales(nombreJugador, partidosDelJugador, posicion, listaFutbolistas) {
+  const { goles, penalesPateados } = contarGolesYPenales(nombreJugador, partidosDelJugador);
+
+  let cuerpo = "";
+
+  if (goles.total > 0) {
+    cuerpo += `<div class="golpen-titulo">⚽ Goles convertidos: ${goles.total}</div>`;
+    cuerpo += itemGolPen("De tiro libre", goles.tiroLibre);
+    cuerpo += itemGolPen("De cabeza", goles.cabeza);
+    cuerpo += itemGolPen("De taquito", goles.taquito);
+    cuerpo += itemGolPen("De rebote", goles.rebote);
+    cuerpo += itemGolPen("De rabona", goles.rabona);
+    cuerpo += itemGolPen("De penal", goles.penal);
+    cuerpo += itemGolPen("Otros", goles.otros);
+  }
+
+  const totalPateados = penalesPateados.convertidos + penalesPateados.atajados +
+                         penalesPateados.desviados + penalesPateados.poste;
+  if (totalPateados > 0) {
+    cuerpo += `<div class="golpen-titulo">🎯 Penales pateados: ${totalPateados}</div>`;
+    cuerpo += itemGolPen("Convertidos", penalesPateados.convertidos);
+    cuerpo += itemGolPen("Atajados", penalesPateados.atajados);
+    cuerpo += itemGolPen("Desviados", penalesPateados.desviados);
+    cuerpo += itemGolPen("En el poste", penalesPateados.poste);
+  }
+
+  if (norm(posicion) === "arquero") {
+    const enContra = contarPenalesEnContra(nombreJugador, partidosDelJugador, listaFutbolistas);
+    const totalEnContra = enContra.atajados + enContra.convertidos +
+                           enContra.desviados + enContra.poste;
+    if (totalEnContra > 0) {
+      cuerpo += `<div class="golpen-titulo">🧤 Penales en contra: ${totalEnContra}</div>`;
+      cuerpo += itemGolPen("Atajó", enContra.atajados);
+      cuerpo += itemGolPen("Le convirtieron", enContra.convertidos);
+      cuerpo += itemGolPen("Le patearon desviado", enContra.desviados);
+      cuerpo += itemGolPen("En el poste", enContra.poste);
+    }
+  }
+
+  if (!cuerpo) return "";
+  return `<div class="golpen-box">${cuerpo}</div>`;
+}
+
+// --- Frase de historial por AFA / CONMEBOL / Amistosos ---
+function calcularResumenCompetencia(nombreJugador, partidos, tipo) {
+  let filtrados = [];
+
+  if (tipo === "CONMEBOL") {
+    filtrados = partidos.filter(p => esInternacional(p.Torneo));
+  } else if (tipo === "AMISTOSO") {
+    filtrados = partidos.filter(p => norm(p.Torneo).includes("amistoso"));
+  } else { // AFA = todo lo que no sea CONMEBOL ni amistoso
+    filtrados = partidos.filter(p => !esInternacional(p.Torneo) && !norm(p.Torneo).includes("amistoso"));
+  }
+
+  if (!filtrados.length) return "";
+
+  const A = filtrados.length;
+
+  const años = filtrados
+    .map(p => parseInt((p.Fecha || "").split("/").pop()))
+    .filter(a => !isNaN(a));
+  const B = Math.min(...años);
+  const C = Math.max(...años);
+
+  let D = 0, E = 0, F = 0, G = 0, H = 0;
+
+  filtrados.forEach(p => {
+    const sit = cap(norm(p.Situación));
+    if (sit === "Victoria") D++;
+    else if (sit === "Empate") E++;
+    else if (sit === "Derrota") F++;
+
+    (p.Incidencias || "").split("</br>").forEach(ev => {
+      const t = ev.trim();
+
+      const mGol = t.match(/GOL\s+([^(]+)\(([^)]+)\)/i);
+      if (mGol && mGol[2].trim().toUpperCase() === "HUR" && norm(mGol[1]) === norm(nombreJugador)) G++;
+
+      const mExp = t.match(/EXP\s+([^(]+)\(([^)]+)\)/i);
+      if (mExp && mExp[2].trim().toUpperCase() === "HUR" && norm(mExp[1]) === norm(nombreJugador)) H++;
+    });
+  });
+
+  const rangoAnios = (B === C) ? `EN ${B}` : `ENTRE ${B} Y ${C}`;
+
+  let partesResultados = [];
+  if (D > 0) partesResultados.push(`GANÓ ${D}`);
+  if (E > 0) partesResultados.push(`EMPATÓ ${E}`);
+  if (F > 0) partesResultados.push(`PERDIÓ ${F}`);
+
+  let fraseResultados = "";
+  if (partesResultados.length === 1) fraseResultados = partesResultados[0] + ".";
+  else if (partesResultados.length === 2) fraseResultados = partesResultados.join(" Y ") + ".";
+  else if (partesResultados.length === 3) fraseResultados = `${partesResultados[0]}, ${partesResultados[1]} Y ${partesResultados[2]}.`;
+
+  let fraseGolExp = "";
+  const partesGolExp = [];
+  if (G > 0) partesGolExp.push(`ANOTÓ ${G} ${G === 1 ? "GOL" : "GOLES"}`);
+  if (H > 0) partesGolExp.push(`FUE EXPULSADO ${H} ${H === 1 ? "VEZ" : "VECES"}`);
+  if (partesGolExp.length) fraseGolExp = partesGolExp.join(" Y ") + ".";
+
+  let texto = "";
+  if (tipo === "AFA") {
+    texto = `POR AFA JUGÓ ${A} ${A === 1 ? "PARTIDO" : "PARTIDOS"} ${rangoAnios}.`;
+  } else if (tipo === "CONMEBOL") {
+    texto = `POR CONMEBOL JUGÓ ${A} ${A === 1 ? "PARTIDO" : "PARTIDOS"} ${rangoAnios}.`;
+  } else {
+    texto = `JUGÓ ${A} ${A === 1 ? "PARTIDO AMISTOSO" : "PARTIDOS AMISTOSOS"} ${rangoAnios}.`;
+  }
+
+  return `<p class="resumen-jugador">${texto} ${fraseResultados} ${fraseGolExp}</p>`;
+}
+
+// --- Sus compañeros (los 4 que más veces coincidieron) ---
+function obtenerCompaneros(nombreJugador, partidosDelJugador, listaFutbolistas, cantidad = 4) {
+  const conteo = {};
+
+  partidosDelJugador.forEach(p => {
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1 && norm(j) !== norm(nombreJugador));
+
+    jugadores.forEach(nombre => {
+      const clave = norm(nombre);
+      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0 };
+      conteo[clave].veces++;
+    });
+  });
+
+  return Object.values(conteo)
+    .sort((a, b) => b.veces - a.veces)
+    .slice(0, cantidad)
+    .map(c => {
+      const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(c.nombre));
+      return { nombre: c.nombre, veces: c.veces, foto: datos ? datos.foto1 : "" };
+    });
+}
+
+function renderCompaneros(nombreJugador, partidosDelJugador, listaFutbolistas) {
+  const companeros = obtenerCompaneros(nombreJugador, partidosDelJugador, listaFutbolistas);
+  if (!companeros.length) return "";
+
+  const items = companeros.map(c => `
+    <div class="companero-item" onclick="seleccionarFutbolista('${c.nombre.replace(/'/g, "\\'")}')">
+      ${c.foto
+        ? `<img src="${c.foto}" alt="${c.nombre}" onerror="this.style.display='none'">`
+        : ""}
+      <span class="companero-nombre">${c.nombre}</span>
+      <span class="companero-veces">${c.veces} ${c.veces === 1 ? "partido juntos" : "partidos juntos"}</span>
+    </div>
+  `).join("");
+
+  return `
+    <div class="stats" style="margin-top: 20px;">
+      <h3 style="color:#FF0000;">🤝 Sus compañeros</h3>
+      <div class="companeros-grid">${items}</div>
+    </div>
+  `;
+}
+
 function mostrarFutbolistas() {
   const futbolistaId = document.getElementById("futbolistaSelect").value;
   const futbolista = futbolistas.find(a => a.futbolista === futbolistaId);
@@ -837,6 +1269,14 @@ function mostrarFutbolistas() {
 
   // 🔹 Traemos el Resumen, Debut y Despedida optimizados de un solo tirón
   const datosHuracan = getDatosCarreraHuracan(futbolista.futbolista);
+
+  // 🔹 Partidos del jugador en Huracán, calculado una sola vez y reutilizado
+  //    en el historial por competencia, el cuadro de goles/penales y "sus compañeros"
+  const partidosJugador = partidosDeJugador(futbolista.futbolista);
+  const historialTexto =
+    calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "AFA") +
+    calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "CONMEBOL") +
+    calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "AMISTOSO");
 
   // 🔹 Función para validar y renderizar campos individuales
   const campo = (label, valor, sufijo = "") => {
@@ -886,6 +1326,7 @@ function mostrarFutbolistas() {
   const cont = document.getElementById("futbolistaInfo");
   cont.style.display = "block";
   cont.innerHTML = `
+    ${historialTexto}
     <div class="club-header">
       ${futbolista.foto1 ? 
         `<img src="${futbolista.foto1}" 
@@ -938,11 +1379,18 @@ function mostrarFutbolistas() {
       <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
       ${renderEstadisticas(futbolista.futbolista, "Huracan")}
     </div>
+    <!-- 🔥 NUEVA SECCIÓN: GOLES Y PENALES -->
+    <div class="stats" style="margin-top: 20px;">
+      <h3 style="color:#FF0000;">🥅 Goles y penales</h3>
+      ${renderGolesYPenales(futbolista.futbolista, partidosJugador, futbolista.posicion, futbolistas)}
+    </div>
     <!-- 🔥 NUEVA SECCIÓN: ENFRENTANDO A HURACÁN -->
     <div class="stats" style="margin-top: 20px;">
       <h3 style="color:#333333;">⚔️ Enfrentando a Huracán</h3>
       ${renderEstadisticas(futbolista.futbolista, "Rival")}
     </div>
+    <!-- 🔥 NUEVA SECCIÓN: SUS COMPAÑEROS -->
+    ${renderCompaneros(futbolista.futbolista, partidosJugador, futbolistas)}
   `;
 }
     function limpiarNombreJugador(s) {
