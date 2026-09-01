@@ -126,12 +126,13 @@
 
 /* === Frase de historial por AFA/CONMEBOL/Amistosos === */
 .resumen-jugador {
-  margin: 6px 0;
+  margin: 4px 0 0;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 11px;
   text-transform: uppercase;
   color: #666;
-  text-align: center;
+  text-align: left;
+  letter-spacing: 0.3px;
 }
 
 /* === "Sus compañeros" === */
@@ -1348,7 +1349,6 @@ function mostrarFutbolistas() {
   const cont = document.getElementById("futbolistaInfo");
   cont.style.display = "block";
   cont.innerHTML = `
-    ${historialTexto}
     <div class="club-header">
       ${futbolista.foto1 ? 
         `<img src="${futbolista.foto1}" 
@@ -1400,6 +1400,7 @@ function mostrarFutbolistas() {
     <div class="stats">
       <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
       ${renderEstadisticas(futbolista.futbolista, "Huracan")}
+      ${historialTexto}
     </div>
     <!-- 🔥 NUEVA SECCIÓN: GOLES Y PENALES -->
     <div class="stats" style="margin-top: 20px;">
