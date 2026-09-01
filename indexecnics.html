@@ -72,10 +72,17 @@
     }
     .cancha-fila-arquero { justify-content: center; }
     .jugador-cancha {
-      width: 76px;
+      width: auto;
+      min-width: 76px;
+      max-width: 150px;
       text-align: center;
       color: #fff;
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
     }
+    .jugador-cancha:hover { opacity: 0.8; }
     .jugador-cancha img {
       width: 48px; height: 62px; object-fit: cover;
       border-radius: 6px; border: 2px solid #fff;
@@ -87,6 +94,7 @@
       font-size: 10px;
       font-weight: bold;
       line-height: 1.15;
+      white-space: nowrap;
       text-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
     .jugador-cancha-veces {
@@ -95,16 +103,39 @@
       color: #eaffea;
       text-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
+
+    /* === Menú de búsqueda con autocompletado (igual al de Futbolistas) === */
+    .autocomplete-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      cursor: pointer;
+    }
+    .autocomplete-item img {
+      width: 32px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    #autocompleteListTecnicos li:hover {
+      background-color: #ffdddd;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
+      transition: all 0.2s;
+    }
   </style>
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
   <h1>📜 Técnicos</h1>
 
-  <div style="text-align:center;">
-    <label>Seleccioná técnico: </label>
-    <select id="tecnicoSelect"></select>
-  </div>
+<div style="text-align:center; position:relative;">
+  <label for="tecnicoSearch">Buscá técnico: </label>
+  <input type="text" id="tecnicoSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px;"><select id="tecnicoSelect" style="display:none;"></select>
+  <ul id="autocompleteListTecnicos" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;"></ul>
+</div>
 
   <div id="tecnicoInfo" class="club-card" style="display:none;"></div>
 
@@ -548,13 +579,18 @@ function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
   return { arquero, resto };
 }
 
+// URL pública de la página de Futbolistas, para que "Sus jugadores" linkee directo al jugador.
+// Ajustá esta constante si la página vive en otra dirección.
+const URL_PAGINA_FUTBOLISTAS = "https://globopedia.github.io/Artids/indexutbolists.html";
+
 function tarjetaJugadorCancha(j) {
+  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
   return `
-    <div class="jugador-cancha">
+    <a class="jugador-cancha" href="${url}" target="_blank" rel="noopener">
       ${j.foto ? `<img src="${j.foto}" alt="${j.nombre}" onerror="this.style.display='none'">` : ""}
       <span class="jugador-cancha-nombre">${j.nombre}</span>
       <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
-    </div>
+    </a>
   `;
 }
 
@@ -893,6 +929,124 @@ function InvertirNombre(nombre) {
   const nombres = partes.slice(0, i).join(" ");
   return apellido + ", " + nombres;
 }
+
+// --- AUTOCOMPLETADO CON DEBOUNCE (mismo comportamiento que en Futbolistas) --- //
+const searchInputTecnicos = document.getElementById("tecnicoSearch");
+const suggestionsListTecnicos = document.getElementById("autocompleteListTecnicos");
+let debounceTimerTecnicos;
+let selectedIndexTecnicos = -1;
+
+function debounceTecnicos(func, delay) {
+  return function(...args) {
+    clearTimeout(debounceTimerTecnicos);
+    debounceTimerTecnicos = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+function filtrarTecnicos(termino) {
+  const termNorm = norm(termino);
+  suggestionsListTecnicos.innerHTML = "";
+  selectedIndexTecnicos = -1;
+
+  if (!termNorm) return;
+
+  const resultados = tecnicos
+    .filter(a => norm(a.tecnico).includes(termNorm))
+    .slice(0, 15);
+
+  resultados.forEach(r => {
+    const li = document.createElement("li");
+    li.className = "autocomplete-item";
+
+    li.innerHTML = `
+      ${r.foto
+        ? `<img src="${r.foto}" onerror="this.style.display='none'">`
+        : `<div style="width:32px;height:42px;"></div>`}
+      <span>${r.tecnico}</span>
+    `;
+
+    li.addEventListener("click", () => {
+      seleccionarTecnico(r);
+    });
+
+    suggestionsListTecnicos.appendChild(li);
+  });
+}
+
+searchInputTecnicos.addEventListener("input", debounceTecnicos(e => filtrarTecnicos(e.target.value), 200));
+
+function seleccionarTecnico(tecnico) {
+  searchInputTecnicos.value = tecnico.tecnico;
+  suggestionsListTecnicos.innerHTML = "";
+  const hiddenSelect = document.getElementById("tecnicoSelect");
+  hiddenSelect.innerHTML = `<option value="${tecnico.id}" selected></option>`;
+  hiddenSelect.value = tecnico.id;
+  mostrarTecnico();
+}
+
+// --- Navegación con teclado en el autocompletado --- //
+searchInputTecnicos.addEventListener("keydown", function(e) {
+  const items = suggestionsListTecnicos.querySelectorAll("li");
+
+  if (e.key === "Escape") {
+    suggestionsListTecnicos.innerHTML = "";
+    selectedIndexTecnicos = -1;
+    searchInputTecnicos.blur();
+    return;
+  }
+
+  if (!items.length) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    selectedIndexTecnicos = (selectedIndexTecnicos + 1) % items.length;
+    actualizarSeleccionTecnicos(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    selectedIndexTecnicos = (selectedIndexTecnicos - 1 + items.length) % items.length;
+    actualizarSeleccionTecnicos(items);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (selectedIndexTecnicos >= 0 && selectedIndexTecnicos < items.length) {
+      items[selectedIndexTecnicos].click();
+    }
+  } else {
+    selectedIndexTecnicos = -1;
+  }
+});
+
+function actualizarSeleccionTecnicos(items) {
+  items.forEach((item, i) => {
+    const activo = i === selectedIndexTecnicos;
+    item.style.background = activo ? "#ffdddd" : "white";
+    if (activo) {
+      searchInputTecnicos.value = item.textContent.trim();
+    }
+  });
+
+  const selectedItem = items[selectedIndexTecnicos];
+  if (selectedItem) {
+    const containerTop = suggestionsListTecnicos.scrollTop;
+    const containerBottom = containerTop + suggestionsListTecnicos.offsetHeight;
+    const itemTop = selectedItem.offsetTop;
+    const itemBottom = itemTop + selectedItem.offsetHeight;
+    if (itemTop < containerTop) {
+      suggestionsListTecnicos.scrollTop = itemTop;
+    } else if (itemBottom > containerBottom) {
+      suggestionsListTecnicos.scrollTop = itemBottom - suggestionsListTecnicos.offsetHeight;
+    }
+  }
+}
+
+// --- Cerrar autocompletado al hacer clic fuera --- //
+document.addEventListener("click", function(e) {
+  const esClickEnInput = searchInputTecnicos.contains(e.target);
+  const esClickEnLista = suggestionsListTecnicos.contains(e.target);
+  if (!esClickEnInput && !esClickEnLista) {
+    suggestionsListTecnicos.innerHTML = "";
+    selectedIndexTecnicos = -1;
+  }
+});
   </script>
 </body>
 </html>
