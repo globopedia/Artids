@@ -1374,6 +1374,7 @@ function mostrarFutbolistas() {
         </div>
         <!-- 🔥 RENDIMIENTO GENERAL -->
         ${getResumenRendimientoFutbolista(futbolista.futbolista)}
+        ${historialTexto}
       </div>
     </div>
 
@@ -1400,7 +1401,6 @@ function mostrarFutbolistas() {
     <div class="stats">
       <h3 style="color:#FF0000;">📊 Trayectoria en Huracán</h3>
       ${renderEstadisticas(futbolista.futbolista, "Huracan")}
-      ${historialTexto}
     </div>
     <!-- 🔥 NUEVA SECCIÓN: GOLES Y PENALES -->
     <div class="stats" style="margin-top: 20px;">
