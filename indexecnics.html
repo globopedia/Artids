@@ -158,83 +158,196 @@
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
     const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
 
-    const ORDEN_COMPETENCIAS = ["Campeonato 1914",
-                                "Campeonato 1915","Campeonato 1916","Campeonato 1917","Campeonato 1918","Campeonato 1919",
-                                "Campeonato 1920","Campeonato 1921","Campeonato 1922","Campeonato 1923","Campeonato 1924",
-                                "Campeonato 1925","Campeonato 1926","Campeonato 1927","Campeonato 1928","Campeonato 1929",
-                                "Campeonato 1930","Campeonato 1931","Campeonato 1932","Campeonato 1933","Campeonato 1934",
-                                "Campeonato 1935","Campeonato 1936","Campeonato 1937","Campeonato 1938","Campeonato 1939",
-                                "Campeonato 1940","Campeonato 1941","Campeonato 1942","Campeonato 1943","Campeonato 1944",
-                                "Campeonato 1945","Campeonato 1946","Campeonato 1947","Campeonato 1948","Campeonato 1949",
-                                "Campeonato 1950","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Campeonato 1953","Campeonato 1954",
-                                "Campeonato 1955","Campeonato 1956","Campeonato 1957","Campeonato 1958","Copa Suecia 1958","Campeonato 1959",
-                                "Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
+    const ORDEN_COMPETENCIAS = ["Pretemporada 1914","Campeonato 1914","Copa Competencia 1914","Amistosos 1914",
+                                "Pretemporada 1915","Campeonato 1915","Copa Competencia 1915","Amistosos 1915","Pretemporada 1916","Copa de Honor 1916","Campeonato 1916","Copa Competencia 1916","Amistosos 1916","Pretemporada 1917","Campeonato 1917","Copa Competencia 1917","Copa de Honor 1917","Amistosos 1917","Pretemporada 1918","Campeonato 1918","Copa Competencia 1918","Copa de Honor 1918","Amistosos 1918","Pretemporada 1919","Campeonato 1919","Copa Competencia 1919","Amistosos 1919",
+                                "Pretemporada 1920","Campeonato 1920","Copa de Honor 1920","Campeonato Estímulo 1920","Amistosos 1920","Pretemporada 1921","Campeonato 1921","Copa Competencia 1921","Amistosos 1921","Pretemporada 1922","Campeonato 1922","Amistosos 1922","Pretemporada 1923","Campeonato 1923","Amistosos 1923","Pretemporada 1924","Campeonato 1924","Amistosos 1924",
+                                "Pretemporada 1925","Campeonato 1925","Copa Competencia 1925","Amistosos 1925","Pretemporada 1926","Campeonato 1926","Campeonato Estímulo 1926","Amistosos 1926","Pretemporada 1927","Campeonato 1927","Amistosos 1927","Pretemporada 1928","Campeonato 1928","Amistosos 1928","Pretemporada 1929","Campeonato 1929","Amistosos 1929",
+                                "Pretemporada 1930","Campeonato 1930","Gira por Brasil 1930","Amistosos 1930","Pretemporada 1931","Campeonato 1931","Amistosos 1931","Pretemporada 1932","Campeonato 1932","Copa Competencia 1932","Campeonato Béccar Varela 1932","Amistosos 1932","Pretemporada 1933","Campeonato 1933","Copa Competencia 1933","Campeonato Béccar Varela 1933","Amistosos 1933","Pretemporada 1934","Campeonato 1934","Amistosos 1934",
+                                "Pretemporada 1935","Gira por el Litoral 1935","Campeonato 1935","Amistosos 1935","Gira por Brasil 1936","Pretemporada 1936","Torneo de Honor 1936","Torneo de Campeonato 1936","Amistosos 1936","Pretemporada 1937","Campeonato 1937","Amistosos 1937","Pretemporada 1938","Campeonato 1938","Amistosos 1938","Gira por Brasil 1939","Pretemporada 1939","Campeonato 1939","Copa Escobar 1939","Amistosos 1939",
+                                "Pretemporada 1940","Campeonato 1940","Amistosos 1940","Gira por Chile 1940","Torneo Internacional 1941","Torneo Relámpago 1941","Campeonato 1941","Copa Escobar 1941","Gira por Chile 1941","Campeonato 1942","Copa Escobar 1942","Torneo Internacional 1943","Campeonato 1943","Copa de la República 1943","Copa Escobar 1943","Torneo Internacional 1944","Campeonato 1944","Copa Competencia 1944","Copa de la República 1944","Copa Escobar 1944",
+                                "Campeonato 1945","Copa Competencia 1945","Campeonato 1946","Copa Competencia 1946","Campeonato 1947","Campeonato 1948","Copa Competencia 1948","Pretemporada 1949","Campeonato 1949",
+                                "Pretemporada 1950","Campeonato 1950","Pretemporada 1951","Campeonato 1951","Campeonato 1952","Copa Competencia 1952","Gira por Sudamérica 1952","Pretemporada 1953","Campeonato 1953","Campeonato 1954",
+                                "Campeonato 1955","Amistosos 1955","Gira por América 1956","Cuadrangular de Costa Rica 1956","Copa Cincuentenario de Talleres 1956","Pretemporada 1956","Campeonato 1956","Pretemporada 1957","Campeonato 1957","Amistosos 1957","Cuadrangular de Costa Rica 1957","Gira por América 1958","Campeonato 1958","Copa Suecia 1958","Pentagonal José Artigas 1958","Amistosos 1958","Campeonato 1959","Amistosos 1959",
+                                "Cuadrangular de Cali 1960","Cuadrangular de Medellín 1960","Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
                                 "Campeonato 1965","Campeonato 1966","Campeonato Metropolitano 1967","Torneo Minas Gerais 1967","Torneo Negrao de Lima 1967","Torneo Promocional 1967","Campeonato Metropolitano 1968","Gira por Europa 1968","Trofeo San Sebastián 1968","Campeonato Nacional 1968","Copa Argentina 1969","Campeonato Metropolitano 1969","Campeonato Nacional 1969",
                                 "Copa Argentina 1970","Campeonato Metropolitano 1970","Petit Torneo 1970","Torneo Reclasificatorio 1970","Campeonato Metropolitano 1971","Campeonato Nacional 1971","Campeonato Metropolitano 1972","Campeonato Nacional 1972","Copa de Oro 1973","Campeonato Metropolitano 1973","Campeonato Nacional 1973","Copa Libertadores 1974","Campeonato Metropolitano 1974","Campeonato Nacional 1974",
                                 "Campeonato Metropolitano 1975","Campeonato Nacional 1975","Clasificación 1975 Pre-Libertadores","Campeonato Metropolitano 1976","Campeonato Nacional 1976","Clasificación 1976 Pre-Libertadores","Campeonato Metropolitano 1977","Campeonato Nacional 1977","Campeonato Metropolitano 1978","Trofeo Costa del Sol 1978","Trofeo Naranja 1978","Campeonato Nacional 1978","Campeonato Metropolitano 1979","Campeonato Nacional 1979",
-                                "Copa Santiago 1980","Primera División 1980","Pretemporada 1981","Campeonato Nacional 1980","Primera División 1981","Campeonato Nacional 1981","Campeonato Nacional 1982","Primera División 1982","Trofeo Cartagena de Indias 1983","Amistosos 1983","Campeonato Nacional 1983","Primera División 1983","Campeonato Nacional 1984","Primera División 1984","Trofeo Ciudad de Badajoz 1984",
-                                "Campeonato Nacional 1985","Primera División 1985/86","Nacional B 1986/87","Segundo Ascenso 1987","Nacional B 1987/88","Segundo Ascenso 1988","Nacional B 1988/89","Segundo Ascenso 1989","Nacional B 1989/90",
-                                "Campeonato 1990/91","Copa Libertad 1992","Apertura 1991","Clausura 1992","Liguilla Pre-Libertadores 1992","Copa Libertad 1992","Copa Ciudad de Buenos Aires 1992","Amistosos 1992","Apertura 1992","Clausura 1993","Apertura 1993","Clausura 1994","Apertura 1994",
-                                "Clausura 1995","Apertura 1995","Clausura 1996","Copa Amistad 1996","Apertura 1996","Clausura 1997","Apertura 1997","Clausura 1998","Apertura 1998","Clausura 1999","1°B Nacional 1999/2000","Apertura 2000","Clausura 2001","Apertura 2001","Clausura 2002","Apertura 2002","Clausura 2003","Apertura BN 2003","Clausura BN 2004","Apertura BN 2004",
+                                "Copa Santiago 1980","Primera División 1980","Campeonato Nacional 1980","Primera División 1981","Campeonato Nacional 1981","Campeonato Nacional 1982","Primera División 1982","Trofeo Cartagena de Indias 1983","Campeonato Nacional 1983","Amistosos 1983","Primera División 1983","Campeonato Nacional 1984","Primera División 1984","Trofeo Ciudad de Badajoz 1984",
+                                "Pretemporada 1985/86","Campeonato Nacional 'Gral. San Martín' 1985","Amistosos 1985/86","Copa del Presidente 1985","Primera División 1985/86","Reducido del Apertura 1°B 1986","Nacional B 1986/87","Liguilla de Ascenso 1987","Nacional B 1987/88","Liguilla de Ascenso 1988","Nacional B 1988/89","Liguilla de Ascenso 1989","Pretemporada 1989/90","Nacional B 1989/90",
+                                "Pretemporada 1990/91","Campeonato 1990/91","Amistosos 1990/91","Copa Amistad 1991","Pretemporada 1991/92","Apertura 1991","Copa Libertad 1992","Copa Ciudad de Buenos Aires 1992","Amistosos 1991/92","Clausura 1992","Liguilla Pre-Libertadores 1992","Pretemporada 1992/93","Apertura 1992","Copa Libertad 1993","Amistosos 1992/93","Copa Libertad II 1993","Clausura 1993","Copa Centenario 1993","Copa Conmebol 1993","Apertura 1993","Amistosos 1993/94","Clausura 1994","Copa Carlos Menem 1994","Apertura 1994","Copa Conmebol 1994","Amistosos 1994/95",
+                                "Clausura 1995","Apertura 1995","Amistosos 1995/96","Copa Amistad 1996","Clausura 1996","Apertura 1996","Copa Necochea 1997","Clausura 1997","Apertura 1997","Copa Necochea 1998","Clausura 1998","Apertura 1998","Copa Provincia de Buenos Aires 1999","Clausura 1999","1°B Nacional 1999/2000","Apertura 2000","Clausura 2001","Apertura 2001","Clausura 2002","Apertura 2002","Clausura 2003","Apertura BN 2003","Clausura BN 2004","Apertura BN 2004",
                                 "Clausura BN 2005","Segundo Ascenso 2005","Promoción 2005","Apertura BN 2005","Clausura BN 2006","Reducido BN 2006","Promoción 2006","Apertura BN 2006","Clausura BN 2007","Segundo Ascenso 2007","Promoción 2007","Gira por México 2007","Apertura 2007","Clausura 2008","Copa Cafam 2008","Apertura 2008","Clausura 2009","Apertura 2009",
                                 "Despedida de Marcelinho Carioca 2010","Clausura 2010","Apertura 2010","Clausura 2011","Desempate Descenso 2011","Campeonato B Nacional 2011/12","Copa Argentina 2012","Copa de Clásicos 2012","Campeonato B Nacional 2012/13","Copa Argentina 2013","Campeonato B Nacional 2013/14","Desempate 3° Ascenso BN 2013/14","Copa Argentina 2014","Desempate 3° Ascenso BN 2013/14","Campeonato B Nacional 2014","Desempate 5° Puesto NB 2014",
                                 "Copa Libertadores 2015","Campeonato 2015","Supercopa 2015","Copa Argentina 2015","Copa Sudamericana 2015","Copa Ciudad de Buenos Aires 2016","Copa Libertadores 2016","Campeonato 2016","Copa Argentina 2016","Campeonato 2016/17","Copa Sudamericana 2017","Copa Argentina 2017","Superliga 2017/18","Copa Schneider 2018","Copa Argentina 2018","Superliga 2018/19","Copa Libertadores 2019","Copa Superliga 2019","Copa Argentina 2019","Superliga 2019/20",
                                 "Copa San Juan 2020","Copa Sudamericana 2020","Copa Superliga 2020","Copa Maradona 2020","Copa-LPF 2021","Copa Argentina 2020","Torneo-LPF 2021","Amistosos 2022","Copa-LPF 2022","Copa Argentina 2022","Torneo-LPF 2022","Torneo-LPF 2023","Copa Argentina 2023","Copa Libertadores 2023","Copa Sudamericana 2023","Copa-LPF 2023","Copa Agustín Peña 2024","Serie Río de la Plata 2024","Copa-LPF 2024","Copa Argentina 2024","Torneo-LPF 2024",
-                                "Serie Río de la Plata 2025","Apertura-LPF 2025","Copa Argentina 2025","Copa Sudamericana 2025","Clausura-LPF 2025","Amistosos","Otros"];
+                                "Serie Río de la Plata 2025","Apertura-LPF 2025","Copa Argentina 2025","Copa Sudamericana 2025","Clausura-LPF 2025","Apertura-LPF 2026","Clausura-LPF 2026","Amistosos","Otros"];
+
     const CONDICIONES = ["Local","Neutral","Visitante"];
     const SITUACIONES = ["Victoria","Empate","Derrota"];
 
     function bucketCompetencia(torneo) {
       const t = norm(torneo || "");
+      if (t.includes("amistoso 1920")) return "Amistosos 1920";
+      if (t.includes("amistoso 1921")) return "Amistosos 1921";
+      if (t.includes("amistoso 1922")) return "Amistosos 1922";
+      if (t.includes("amistoso 1923")) return "Amistosos 1923";
+      if (t.includes("amistoso 1924")) return "Amistosos 1924";
+      if (t.includes("amistoso 1925")) return "Amistosos 1925";
+      if (t.includes("amistoso 1926")) return "Amistosos 1926";
+      if (t.includes("amistoso 1927")) return "Amistosos 1927";
+      if (t.includes("amistoso 1928")) return "Amistosos 1928";
+      if (t.includes("amistoso 1929")) return "Amistosos 1929";
+      if (t.includes("amistoso 1930")) return "Amistosos 1930";
+      if (t.includes("amistoso 1931")) return "Amistosos 1931";
+      if (t.includes("amistoso 1932")) return "Amistosos 1932";
+      if (t.includes("amistoso 1933")) return "Amistosos 1933";
+      if (t.includes("amistoso 1934")) return "Amistosos 1934";
+      if (t.includes("amistoso 1935")) return "Amistosos 1935";
+      if (t.includes("amistoso 1936")) return "Amistosos 1936";
+      if (t.includes("amistoso 1937")) return "Amistosos 1937";
+      if (t.includes("amistoso 1938")) return "Amistosos 1938";
+      if (t.includes("amistoso 1939")) return "Amistosos 1939";
+      if (t.includes("pretemporada 1914")) return "Pretemporada 1914";
       if (t.includes("campeonato 1914")) return "Campeonato 1914";
+      if (t.includes("competencia 1914")) return "Copa Competencia 1914";
+      if (t.includes("amistoso 1914")) return "Amistosos 1914";
+      if (t.includes("pretemporada 1915")) return "Pretemporada 1915";
       if (t.includes("campeonato 1915")) return "Campeonato 1915";
+      if (t.includes("competencia 1915")) return "Copa Competencia 1915";
+      if (t.includes("honor 1915")) return "Copa de Honor 1915";
+      if (t.includes("amistoso 1915")) return "Amistosos 1915";
+      if (t.includes("pretemporada 1916")) return "Pretemporada 1916";
       if (t.includes("campeonato 1916")) return "Campeonato 1916";
+      if (t.includes("competencia 1916")) return "Copa Competencia 1916";
+      if (t.includes("honor 1916")) return "Copa de Honor 1916";
+      if (t.includes("amistoso 1916")) return "Amistosos 1916";
+      if (t.includes("pretemporada 1917")) return "Pretemporada 1917";
       if (t.includes("campeonato 1917")) return "Campeonato 1917";
+      if (t.includes("competencia 1917")) return "Copa Competencia 1917";
+      if (t.includes("honor 1917")) return "Copa de Honor 1917";
+      if (t.includes("amistoso 1917")) return "Amistosos 1917";
+      if (t.includes("pretemporada 1918")) return "Pretemporada 1918";
       if (t.includes("campeonato 1918")) return "Campeonato 1918";
+      if (t.includes("competencia 1918")) return "Copa Competencia 1918";
+      if (t.includes("honor 1918")) return "Copa de Honor 1918";
+      if (t.includes("amistoso 1918")) return "Amistosos 1918";
+      if (t.includes("pretemporada 1919")) return "Pretemporada 1919";
       if (t.includes("campeonato 1919")) return "Campeonato 1919";
+      if (t.includes("competencia 1919")) return "Copa Competencia 1919";
+      if (t.includes("amistoso 1919")) return "Amistosos 1919";
+      if (t.includes("pretemporada 1920")) return "Pretemporada 1920";
       if (t.includes("campeonato 1920")) return "Campeonato 1920";
+      if (t.includes("honor 1920")) return "Copa de Honor 1920";
+      if (t.includes("estimulo 1920")) return "Campeonato Estímulo 1920";
+      if (t.includes("pretemporada 1921")) return "Pretemporada 1921";
       if (t.includes("campeonato 1921")) return "Campeonato 1921";
+      if (t.includes("competencia 1921")) return "Copa Competencia 1921";
+      if (t.includes("pretemporada 1922")) return "Pretemporada 1922";
       if (t.includes("campeonato 1922")) return "Campeonato 1922";
+      if (t.includes("pretemporada 1923")) return "Pretemporada 1923";
       if (t.includes("campeonato 1923")) return "Campeonato 1923";
+      if (t.includes("pretemporada 1924")) return "Pretemporada 1924";
       if (t.includes("campeonato 1924")) return "Campeonato 1924";
+      if (t.includes("pretemporada 1925")) return "Pretemporada 1925";
       if (t.includes("campeonato 1925")) return "Campeonato 1925";
+      if (t.includes("competencia 1925")) return "Copa Competencia 1925";
+      if (t.includes("pretemporada 1926")) return "Pretemporada 1926";
       if (t.includes("campeonato 1926")) return "Campeonato 1926";
+      if (t.includes("estimulo 1926")) return "Campeonato Estímulo 1926";
+      if (t.includes("pretemporada 1927")) return "Pretemporada 1927";
       if (t.includes("campeonato 1927")) return "Campeonato 1927";
+      if (t.includes("pretemporada 1928")) return "Pretemporada 1928";
       if (t.includes("campeonato 1928")) return "Campeonato 1928";
-      if (t.includes("campeonato 1929")) return "Campeonato 1929";
+      if (t.includes("pretemporada 1929")) return "Pretemporada 1929";
+      if (t.includes("campeonato estímulo 1929")) return "Campeonato 1929";
+      if (t.includes("pretemporada 1930")) return "Pretemporada 1930";
       if (t.includes("campeonato 1930")) return "Campeonato 1930";
+      if (t.includes("gira por brasil 1930")) return "Gira por Brasil 1930";
+      if (t.includes("pretemporada 1931")) return "Pretemporada 1931";
       if (t.includes("campeonato 1931")) return "Campeonato 1931";
+      if (t.includes("pretemporada 1932")) return "Pretemporada 1932";
       if (t.includes("campeonato 1932")) return "Campeonato 1932";
+      if (t.includes("competencia 1932")) return "Copa Competencia 1932";
+      if (t.includes("beccar varela 1932")) return "Campeonato Béccar Varela 1932";
+      if (t.includes("pretemporada 1933")) return "Pretemporada 1933";
       if (t.includes("campeonato 1933")) return "Campeonato 1933";
+      if (t.includes("competencia 1933")) return "Copa Competencia 1933";
+      if (t.includes("beccar varela 1933")) return "Campeonato Béccar Varela 1933";
+      if (t.includes("pretemporada 1934")) return "Pretemporada 1934";
       if (t.includes("campeonato 1934")) return "Campeonato 1934";
+      if (t.includes("gira por el litoral 1935")) return "Gira por el Litoral 1935";
+      if (t.includes("pretemporada 1935")) return "Pretemporada 1935";
       if (t.includes("campeonato 1935")) return "Campeonato 1935";
-      if (t.includes("campeonato 1936")) return "Campeonato 1936";
+      if (t.includes("gira por brasil 1936")) return "Gira por Brasil 1936";
+      if (t.includes("pretemporada 1936")) return "Pretemporada 1936";
+      if (t.includes("honor 1936")) return "Torneo de Honor 1936";
+      if (t.includes("campeonato 1936")) return "Torneo de Campeonato 1936";
+      if (t.includes("pretemporada 1937")) return "Pretemporada 1937";
       if (t.includes("campeonato 1937")) return "Campeonato 1937";
+      if (t.includes("pretemporada 1938")) return "Pretemporada 1938";
       if (t.includes("campeonato 1938")) return "Campeonato 1938";
+      if (t.includes("gira por brasil 1939")) return "Gira por Brasil 1939";
+      if (t.includes("pretemporada 1939")) return "Pretemporada 1939";
       if (t.includes("campeonato 1939")) return "Campeonato 1939";
+      if (t.includes("copa escobar 1939")) return "Copa Escobar 1939";
+      if (t.includes("pretemporada 1940")) return "Pretemporada 1940";
       if (t.includes("campeonato 1940")) return "Campeonato 1940";
+      if (t.includes("amistoso 1940")) return "Amistosos 1940";
+      if (t.includes("gira por chile 1940")) return "Gira por Chile 1940";
+      if (t.includes("nocturno 1941")) return "Torneo Internacional 1941";
+      if (t.includes("relampago 1941")) return "Torneo Relámpago 1941";
       if (t.includes("campeonato 1941")) return "Campeonato 1941";
+      if (t.includes("copa escobar 1941")) return "Copa Escobar 1941";
+      if (t.includes("gira por chile 1941")) return "Gira por Chile 1941";
       if (t.includes("campeonato 1942")) return "Campeonato 1942";
+      if (t.includes("copa escobar 1942")) return "Copa Escobar 1942";
+      if (t.includes("nocturno 1943")) return "Torneo Internacional 1943";
       if (t.includes("campeonato 1943")) return "Campeonato 1943";
+      if (t.includes("copa republica 1943")) return "Copa de la República 1943";
+      if (t.includes("copa escobar 1943")) return "Copa Escobar 1943";
+      if (t.includes("nocturno 1944")) return "Torneo Internacional 1944";
       if (t.includes("campeonato 1944")) return "Campeonato 1944";
+      if (t.includes("competencia 1944")) return "Copa Competencia 1944";
+      if (t.includes("copa republica 1944")) return "Copa de la República 1944";
+      if (t.includes("copa escobar 1944")) return "Copa Escobar 1944";
       if (t.includes("campeonato 1945")) return "Campeonato 1945";
+      if (t.includes("competencia 1945")) return "Copa Competencia 1945";
       if (t.includes("campeonato 1946")) return "Campeonato 1946";
+      if (t.includes("competencia 1946")) return "Copa Competencia 1946";
       if (t.includes("campeonato 1947")) return "Campeonato 1947";
       if (t.includes("campeonato 1948")) return "Campeonato 1948";
+      if (t.includes("competencia 1948")) return "Copa Competencia 1948";
+      if (t.includes("pretemporada 1949")) return "Pretemporada 1949";
       if (t.includes("campeonato 1949")) return "Campeonato 1949";
+      if (t.includes("pretemporada 1950")) return "Pretemporada 1950";
       if (t.includes("campeonato 1950")) return "Campeonato 1950";
+      if (t.includes("pretemporada 1951")) return "Pretemporada 1951";
       if (t.includes("campeonato 1951")) return "Campeonato 1951";
       if (t.includes("eva peron")) return "Campeonato 1952";
       if (t.includes("competencia 1952")) return "Copa Competencia 1952";
-      if (t.includes("campeonato 1953")) return "Campeonato 1953";
+      if (t.includes("sudamerica 1952")) return "Gira por Sudamérica 1952";
+      if (t.includes("pretemporada 1953")) return "Pretemporada 1953";
       if (t.includes("campeonato 1953")) return "Campeonato 1953";
       if (t.includes("campeonato 1954")) return "Campeonato 1954";
       if (t.includes("campeonato 1955")) return "Campeonato 1955";
+      if (t.includes("pretemporada 1955")) return "Pretemporada 1955";
+      if (t.includes("amistoso 1955")) return "Amistosos 1955";
+      if (t.includes("america 1956")) return "Gira por América 1956";
+      if (t.includes("costa rica 1956")) return "Cuadrangular de Costa Rica 1956";
+      if (t.includes("talleres 1956")) return "Copa Cincuentenario de Talleres 1956";
+      if (t.includes("pretemporada 1956")) return "Pretemporada 1956";
       if (t.includes("campeonato 1956")) return "Campeonato 1956";
+      if (t.includes("pretemporada 1957")) return "Pretemporada 1957";
       if (t.includes("campeonato 1957")) return "Campeonato 1957";
+      if (t.includes("amistoso 1957")) return "Amistosos 1957";
+      if (t.includes("costa rica 1957")) return "Cuadrangular de Costa Rica 1957";
+      if (t.includes("america 1958")) return "Gira por América 1958";
       if (t.includes("campeonato 1958")) return "Campeonato 1958";
-      if (t.includes("suecia")) return "Copa Suecia 1958";
+      if (t.includes("suecia 1958")) return "Copa Suecia 1958";
+      if (t.includes("artigas 1958")) return "Pentagonal José Artigas 1958";
+      if (t.includes("amistoso 1958")) return "Amistosos 1958";
       if (t.includes("campeonato 1959")) return "Campeonato 1959";
+      if (t.includes("amistoso 1959")) return "Amistosos 1959";
       if (t.includes("campeonato 1960")) return "Campeonato 1960";
       if (t.includes("campeonato 1961")) return "Campeonato 1961";
       if (t.includes("campeonato 1962")) return "Campeonato 1962";
@@ -246,7 +359,7 @@
       if (t.includes("metropolitano 1967")) return "Campeonato Metropolitano 1967";
       if (t.includes("gerais 1967")) return "Torneo Minas Gerais 1967";
       if (t.includes("lima 1967")) return "Torneo Negrao de Lima 1967";
-      if (t.includes("promocional")) return "Campeonato Promocional 1967";
+      if (t.includes("promocional")) return "Torneo Promocional 1967";
       if (t.includes("metropolitano 1968")) return "Campeonato Metropolitano 1968";
       if (t.includes("europa 1968")) return "Gira por Europa 1968";
       if (t.includes("sebastian 1968")) return "Trofeo San Sebastián 1968";
@@ -257,7 +370,7 @@
       if (t.includes("argentina 1970")) return "Copa Argentina 1970";
       if (t.includes("metropolitano 1970")) return "Campeonato Metropolitano 1970";
       if (t.includes("petit")) return "Petit Torneo 1970";
-      if (t.includes("reclasificatorio 1970")) return "Torneo Reclasificatorio 1970";
+      if (t.includes("reclasificatorio")) return "Torneo Reclasificatorio 1970";
       if (t.includes("metropolitano 1971")) return "Campeonato Metropolitano 1971";
       if (t.includes("nacional 1971")) return "Campeonato Nacional 1971";
       if (t.includes("metropolitano 1972")) return "Campeonato Metropolitano 1972";
@@ -285,51 +398,72 @@
       if (t.includes("santiago 1980")) return "Copa Santiago 1980";
       if (t.includes("'a' 1980")) return "Primera División 1980";
       if (t.includes("nacional 1980")) return "Campeonato Nacional 1980";
-      if (t.includes("pretemporada 1981")) return "Pretemporada 1981";
       if (t.includes("'a' 1981")) return "Primera División 1981";
       if (t.includes("nacional 1981")) return "Campeonato Nacional 1981";
       if (t.includes("nacional 1982")) return "Campeonato Nacional 1982";
       if (t.includes("'a' 1982")) return "Primera División 1982";
       if (t.includes("cartagena de indias 1983")) return "Trofeo Cartagena de Indias 1983";
       if (t.includes("nacional 1983")) return "Campeonato Nacional 1983";
+      if (t.includes("amistoso 1983")) return "Amistosos 1983";
       if (t.includes("'a' 1983")) return "Primera División 1983";
       if (t.includes("nacional 1984")) return "Campeonato Nacional 1984";
+      if (t.includes("badajoz 1984")) return "Trofeo Ciudad de Badajoz 1984";
       if (t.includes("1° 'a' 1984")) return "Primera División 1984";
-      if (t.includes("de badajoz 1984")) return "Trofeo Ciudad de Badajoz 1984";
-      if (t.includes("nacional 1985")) return "Campeonato Nacional 1985";
+      if (t.includes("pretemporada 1985/86")) return "Pretemporada 1985";
+      if (t.includes("nacional 'Gral. San Martín' 1985")) return "Campeonato Nacional 1985";
+      if (t.includes("amistoso 1985/86")) return "Amistosos 1985/86";
+      if (t.includes("presidente 1985")) return "Copa del Presidente 1985";
       if (t.includes("'a' 1985")) return "Primera División 1985/86";
+      if (t.includes("ascenso 1986")) return "Liguilla de Ascenso 1986";
       if (t.includes("nacional b 1986/87")) return "Nacional B 1986/87";
-      if (t.includes("octogonal nb 1987")) return "Segundo Ascenso 1987";
+      if (t.includes("ascenso 1987")) return "Liguilla de Ascenso 1987";
       if (t.includes("nacional b 1987/88")) return "Nacional B 1987/88";
-      if (t.includes("dodecagonal nb 1988")) return "Segundo Ascenso 1988";
+      if (t.includes("ascenso 1988")) return "Liguilla de Ascenso 1988";
       if (t.includes("nacional b 1988/89")) return "Nacional B 1988/89";
-      if (t.includes("dodecagonal nb 1989")) return "Segundo Ascenso 1989";
+      if (t.includes("ascenso 1989")) return "Liguilla de Ascenso 1989";
+      if (t.includes("pretemporada 1989/90")) return "Pretemporada 1989/90";
       if (t.includes("nacional b 1989/90")) return "Nacional B 1989/90";
+      if (t.includes("pretemporada 1990/91")) return "Pretemporada 1990/91";
       if (t.includes("campeonato 1990/91")) return "Campeonato 1990/91";
-      if (t.includes("libertad 1991")) return "Copa Libertad 1991";
+      if (t.includes("amistoso 1990/91")) return "Amistosos 1990/91";
+      if (t.includes("amistad 1991")) return "Copa Amistad 1991";
+      if (t.includes("pretemporada 1991/92")) return "Pretemporada 1991/92";
       if (t.includes("apertura 1991")) return "Apertura 1991";
-      if (t.includes("clausura 1992")) return "Clausura 1992";
-      if (t.includes("liguilla")) return "Liguilla Pre-Libertadores 1992";
-      if (t.includes("copa libertad 1992")) return "Copa Libertad 1992";
+      if (t.includes("libertad 1992")) return "Copa Libertad 1992";
       if (t.includes("buenos aires 1992")) return "Copa Ciudad de Buenos Aires 1992";
-      if (t.includes("amistoso 1992")) return "Amistosos 1992";
+      if (t.includes("amistoso 1991/92")) return "Amistosos 1991/92";
+      if (t.includes("clausura 1992")) return "Clausura 1992";
+      if (t.includes("libertadores 1992")) return "Liguilla Pre-Libertadores 1992";
+      if (t.includes("pretemporada 1992/93")) return "Pretemporada 1992/93";
       if (t.includes("apertura 1992")) return "Apertura 1992";
+      if (t.includes("libertad 1993")) return "Copa Libertad 1993";
+      if (t.includes("amistoso 1992/93")) return "Amistosos 1992/93";
+      if (t.includes("libertad ii 1993")) return "Copa Libertad II 1993";
       if (t.includes("clausura 1993")) return "Clausura 1993";
+      if (t.includes("centenario 1993")) return "Copa Centenario 1993";
+      if (t.includes("conmebol 1993")) return "Copa Conmebol 1993";
       if (t.includes("apertura 1993")) return "Apertura 1993";
+      if (t.includes("amistoso 1993/94")) return "Amistosos 1993/94";
       if (t.includes("clausura 1994")) return "Clausura 1994";
+      if (t.includes("menem 1994")) return "Copa Carlos Menem 1994";
       if (t.includes("apertura 1994")) return "Apertura 1994";
+      if (t.includes("conmebol 1994")) return "Copa Conmebol 1994";
+      if (t.includes("amistoso 1994/95")) return "Amistosos 1994/95";
       if (t.includes("clausura 1995")) return "Clausura 1995";
       if (t.includes("apertura 1995")) return "Apertura 1995";
-      if (t.includes("clausura 1996")) return "Clausura 1996";
+      if (t.includes("amistoso 1995/96")) return "Amistosos 1995/96";
       if (t.includes("amistad 1996")) return "Copa Amistad 1996";
+      if (t.includes("clausura 1996")) return "Clausura 1996";
       if (t.includes("apertura 1996")) return "Apertura 1996";
+      if (t.includes("necochea 1997")) return "Copa Necochea 1997";
       if (t.includes("clausura 1997")) return "Clausura 1997";
       if (t.includes("apertura 1997")) return "Apertura 1997";
+      if (t.includes("necochea 1998")) return "Copa Necochea 1998";
       if (t.includes("clausura 1998")) return "Clausura 1998";
       if (t.includes("apertura 1998")) return "Apertura 1998";
+      if (t.includes("buenos aires 1999")) return "Copa Provincia de Buenos Aires 1999";
       if (t.includes("clausura 1999")) return "Clausura 1999";
       if (t.includes("nacional b 1999/2000")) return "1°B Nacional 1999/2000";
-      if (t.includes("amistoso 1983")) return "Amistosos 1983";
       if (t.includes("apertura 2000")) return "Apertura 2000";
       if (t.includes("clausura 2001")) return "Clausura 2001";
       if (t.includes("apertura 2001")) return "Apertura 2001";
@@ -364,6 +498,7 @@
       if (t.includes("campeonato 10-11")) return "Desempate Descenso 2011";
       if (t.includes("nacional b 11-12")) return "Campeonato B Nacional 2011/12";
       if (t.includes("copa argentina 2012")) return "Copa Argentina 2012";
+      if (t.includes("clasicos 2012")) return "Copa de Clásicos 2012";
       if (t.includes("nacional b 12-13")) return "Campeonato B Nacional 2012/13";
       if (t.includes("copa argentina 2013")) return "Copa Argentina 2013";
       if (t.includes("nacional b 13-14")) return "Campeonato B Nacional 2013/14";
@@ -407,7 +542,7 @@
       if (t.includes("libertadores 2023")) return "Copa Libertadores 2023";
       if (t.includes("sudamericana 2023")) return "Copa Sudamericana 2023";
       if (t.includes("copa-lpf 2023")) return "Copa-LPF 2023";
-      if (t.includes("peña 2024")) return "Copa Agustín Peña 2024";
+      if (t.includes("copa agustin")) return "Copa Agustín Peña 2024";
       if (t.includes("plata 2024")) return "Serie Río de la Plata 2024";
       if (t.includes("copa-lpf 2024")) return "Copa-LPF 2024";
       if (t.includes("copa argentina 2024")) return "Copa Argentina 2024";
@@ -417,6 +552,8 @@
       if (t.includes("copa argentina 2025")) return "Copa Argentina 2025";
       if (t.includes("sudamericana 2025")) return "Copa Sudamericana 2025";
       if (t.includes("clausura-lpf 2025")) return "Clausura-LPF 2025";
+      if (t.includes("apertura-lpf 2026")) return "Apertura-LPF 2026";
+      if (t.includes("clausura-lpf 2026")) return "Clausura-LPF 2026";
       return "Otros";
     }
 
