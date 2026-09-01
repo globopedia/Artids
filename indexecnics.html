@@ -34,6 +34,67 @@
     .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; }
     .stat-title small { color:#666; font-weight:normal; margin-left:6px; }
+
+    /* === "Sus jugadores": canchita con los 11 que más dirigió === */
+    .cancha {
+      background: linear-gradient(#2e7d32, #1b5e20);
+      border: 3px solid #fff;
+      border-radius: 10px;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cancha::before {
+      content: "";
+      position: absolute;
+      left: 8px; right: 8px; top: 50%;
+      border-top: 2px solid rgba(255,255,255,0.45);
+    }
+    .cancha::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 70px; height: 70px;
+      margin: -35px 0 0 -35px;
+      border: 2px solid rgba(255,255,255,0.45);
+      border-radius: 50%;
+    }
+    .cancha-fila {
+      display: flex;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .cancha-fila-arquero { justify-content: center; }
+    .jugador-cancha {
+      width: 76px;
+      text-align: center;
+      color: #fff;
+    }
+    .jugador-cancha img {
+      width: 48px; height: 62px; object-fit: cover;
+      border-radius: 6px; border: 2px solid #fff;
+      margin-bottom: 3px;
+      background: #ddd;
+    }
+    .jugador-cancha-nombre {
+      display: block;
+      font-size: 10px;
+      font-weight: bold;
+      line-height: 1.15;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    }
+    .jugador-cancha-veces {
+      display: block;
+      font-size: 9px;
+      color: #eaffea;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    }
   </style>
 </head>
 <body>
@@ -49,6 +110,7 @@
 
   <script>
     const tecnicosURL = "https://globopedia.github.io/Ecnics/Ecnics.csv?v=" + Date.now();
+    const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolists";
     const partidosURL1 = "https://globopedia.github.io/Artids/Artids1910.csv?v=" + Date.now();
     const partidosURL2 = "https://globopedia.github.io/Artids/Artids1925.csv?v=" + Date.now();
     const partidosURL3 = "https://globopedia.github.io/Artids/Artids1940.csv?v=" + Date.now();
@@ -59,6 +121,7 @@
     const partidosURL8 = "https://globopedia.github.io/Artids/Artids2015.csv?v=" + Date.now();
     
     let tecnicos = [];
+    let futbolistas = [];
     let encuentros = [];
 
     const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -328,6 +391,7 @@
 
     Promise.all([
   fetch(tecnicosURL).then(r => { if(!r.ok) throw new Error("Técnicos CSV no disponible"); return r.text(); }),
+  fetch(futbolistasURL).then(r => { if(!r.ok) throw new Error("Futbolistas CSV no disponible"); return r.text(); }),
   fetch(partidosURL1).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
   fetch(partidosURL2).then(r => { if(!r.ok) throw new Error("Partidos CSV 2 no disponible"); return r.text(); }),
   fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
@@ -337,7 +401,7 @@
   fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); }),
   fetch(partidosURL8).then(r => { if(!r.ok) throw new Error("Partidos CSV 8 no disponible"); return r.text(); })
 ])
-.then(([csvEcnics, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
+.then(([csvEcnics, csvFutbolistas, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
   
       tecnicos = Papa.parse(csvEcnics, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.ID ?? "").toString().trim(),
@@ -350,6 +414,12 @@
         biografía: (c.Biografía ?? "").toString().trim(),
         trayectoria: (c.Trayectoria ?? "").toString().trim(),
         foto: (c.Foto ?? "").toString().trim()
+      }));
+
+      futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
+        futbolista: (c["Futbolista"] ?? "").toString().trim(),
+        posicion: (c.Posición ?? "").toString().trim(),
+        foto1: (c.Foto1 ?? "").toString().trim()
       }));
 
       const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
@@ -395,6 +465,136 @@
       sel.addEventListener("change", mostrarTecnico);
     }
 
+// ============================================================
+// === "Sus jugadores": los 11 que más dirigió, en una canchita
+// ============================================================
+
+// Mapea el texto libre de la columna Posición a una categoría fija.
+// Contempla variantes/erratas reales encontradas en el CSV
+// (mayúsculas sueltas, "Zaguero", "Defensor", "Full-Back", etc.)
+function categorizarPosicion(posicionRaw) {
+  const p = norm(posicionRaw);
+  if (!p) return "desconocida";
+  if (p.includes("arquero")) return "arquero";
+  if (p.includes("wing izquierdo")) return "wing_izq";
+  if (p.includes("wing derecho")) return "wing_der";
+  if (p.includes("extremo izquierdo") || p.includes("insider izquierdo")) return "extremo_izq";
+  if (p.includes("extremo derecho")) return "extremo_der";
+  if (p.includes("enganche")) return "enganche";
+  if (p.includes("volante izquierdo")) return "volante_izq";
+  if (p.includes("volante derecho") || p.includes("half derecho")) return "volante_der";
+  if (p.includes("volante central") || p === "volante") return "volante_central";
+  if (p.includes("lateral izquierdo") || p.includes("defensor izquierdo")) return "lateral_izq";
+  if (p.includes("lateral derecho") || p.includes("full-back") || p.includes("full back")) return "lateral_der";
+  if (p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return "defensor_central";
+  if (p.includes("delantero") || p === "elantero") return "delantero";
+  return "desconocida";
+}
+
+// Filas de la canchita, de ataque a defensa, en el orden de izquierda a derecha
+// que pediste. La fila del arquero se maneja aparte.
+const FILAS_CANCHA = [
+  ["wing_izq", "delantero", "wing_der"],
+  ["extremo_izq", "enganche", "extremo_der"],
+  ["volante_izq", "volante_central", "volante_der"],
+  ["lateral_izq", "defensor_central", "lateral_der"]
+];
+
+function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
+  const partidosTecnico = encuentros.filter(p => norm(p.Técnico) === norm(idTecnico));
+  if (!partidosTecnico.length) return null;
+
+  const conteo = {};
+  partidosTecnico.forEach(p => {
+    const jugadores = (p.Huracán || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\s+y\s+/gi, ",")
+      .replace(/\s+e\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+
+    jugadores.forEach(nombre => {
+      const clave = norm(nombre);
+      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0 };
+      conteo[clave].veces++;
+    });
+  });
+
+  const lista = Object.values(conteo)
+    .map(c => {
+      const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(c.nombre));
+      return {
+        nombre: c.nombre,
+        veces: c.veces,
+        foto: datos ? datos.foto1 : "",
+        categoria: categorizarPosicion(datos ? datos.posicion : "")
+      };
+    })
+    .sort((a, b) => b.veces - a.veces);
+
+  // El arquero titular: el que más atajó, entre los que tienen esa posición
+  const arquero = lista.find(j => j.categoria === "arquero") || null;
+
+  // Los 10 jugadores de campo que más jugaron (se excluyen arqueros)
+  const resto = lista.filter(j => j.categoria !== "arquero").slice(0, 10);
+
+  return { arquero, resto };
+}
+
+function tarjetaJugadorCancha(j) {
+  return `
+    <div class="jugador-cancha">
+      ${j.foto ? `<img src="${j.foto}" alt="${j.nombre}" onerror="this.style.display='none'">` : ""}
+      <span class="jugador-cancha-nombre">${j.nombre}</span>
+      <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
+    </div>
+  `;
+}
+
+function renderFormacionTecnico(idTecnico, listaFutbolistas) {
+  const formacion = obtenerFormacionTecnico(idTecnico, listaFutbolistas);
+  if (!formacion || (!formacion.arquero && !formacion.resto.length)) return "";
+
+  const filasHTML = FILAS_CANCHA.map(categorias => {
+    const jugadoresFila = formacion.resto
+      .filter(j => categorias.includes(j.categoria))
+      .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.veces - a.veces);
+    if (!jugadoresFila.length) return "";
+    return `<div class="cancha-fila">${jugadoresFila.map(tarjetaJugadorCancha).join("")}</div>`;
+  }).join("");
+
+  // Jugadores sin posición reconocible en el CSV (dato vacío o atípico):
+  // los mostramos en su propia fila para no perderlos, aunque no tengamos
+  // dónde ubicarlos tácticamente.
+  const categoriasConocidas = FILAS_CANCHA.flat();
+  const sinCategoria = formacion.resto.filter(j => !categoriasConocidas.includes(j.categoria));
+  const filaSinCategoria = sinCategoria.length
+    ? `<div class="cancha-fila">${sinCategoria.map(tarjetaJugadorCancha).join("")}</div>`
+    : "";
+
+  const filaArquero = formacion.arquero
+    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacion.arquero)}</div>`
+    : "";
+
+  return `
+    <div class="stats" style="margin-top:20px;">
+      <h3 style="color:#FF0000;">⚽ Sus jugadores</h3>
+      <div class="cancha">
+        ${filasHTML}
+        ${filaSinCategoria}
+        ${filaArquero}
+      </div>
+    </div>
+  `;
+}
+
     function mostrarTecnico() {
       const tecnicoId = document.getElementById("tecnicoSelect").value;
       const tecnico = tecnicos.find(a => a.id === tecnicoId);
@@ -427,6 +627,7 @@
           <h3 style="color:#FF0000;">📊 Partidos dirigidos en Huracán</h3>
           ${renderEstadisticas(tecnico.id)}
         </div>
+        ${renderFormacionTecnico(tecnico.id, futbolistas)}
       `;
     }
 function getResumenTecnico(nombreTecnico) {
