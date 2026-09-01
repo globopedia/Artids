@@ -1913,7 +1913,7 @@ function enlazarJugadores(texto) {
   if (!texto) return "";
   
   // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e"
-  const partes = texto.split(/(\s*[,;().]+\s*|\s+\b[ye]\b\s+)/i);
+  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/i);
   
   return partes.map(part => {
     // Si la parte es un separador o signo de puntuación, la devolvemos tal cual
