@@ -146,6 +146,23 @@
 /* En la canchita doble (rival arriba + Huracán abajo) la línea divisoria
    es un elemento propio, para que quede justo entre los dos equipos
    sin importar cuántas filas tenga cada uno. */
+/* En la canchita doble (rival arriba + Huracán abajo), además de la línea
+   media dibujamos las dos áreas grandes, para reforzar de un vistazo
+   que esto es una canchita de fútbol y marcar dónde va cada arquero. */
+.cancha-doble::before,
+.cancha-doble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 92%);
+  height: 150px;
+  border: 2px solid rgba(255,255,255,0.35);
+  z-index: 0;
+  pointer-events: none;
+}
+.cancha-doble::before { top: 2px; }
+.cancha-doble::after { bottom: 2px; }
 .cancha-linea-media {
   border-top: 2px solid rgba(255,255,255,0.55);
   margin: 2px 8px;
@@ -173,11 +190,23 @@
   transition: opacity 0.15s ease;
 }
 .jugador-cancha:hover { opacity: 0.8; }
+/* Sin foto propia (mostramos el escudo del club) = no hay ficha a la que
+   ir, así que esta tarjeta no es clickeable: sin manito ni efecto hover. */
+.jugador-cancha.jugador-cancha-sin-link {
+  cursor: default;
+}
+.jugador-cancha.jugador-cancha-sin-link:hover { opacity: 1; }
 .jugador-cancha img {
   width: 48px; height: 62px; object-fit: cover;
   border-radius: 6px; border: 2px solid #fff;
   margin-bottom: 3px;
   background: #ddd;
+}
+/* El arquero se distingue con borde dorado, para no perderlo de vista
+   entre el resto (que llevan borde blanco). */
+.jugador-cancha-arquero img {
+  border-color: #FFD700;
+  border-width: 3px;
 }
 .jugador-cancha-nombre {
   display: block;
@@ -660,6 +689,20 @@ function parsearFormacionColumna(texto) {
   const segmentos = texto.split(";").map(s => s.trim()).filter(Boolean);
   if (!segmentos.length) return [];
 
+  // Si el texto no viene separado en al menos 2 líneas (";"), no hay
+  // estructura táctica real para leer — puede ser una carga vieja con todos
+  // los nombres en una sola lista. En ese caso NO asumimos que el primer
+  // segmento es el arquero (nos inflaría esa categoría con todo el plantel);
+  // devolvemos los nombres sin categoría, para que sigan contando presencias
+  // pero no distorsionen el resto.
+  if (segmentos.length < 2) {
+    return extraerLineaConSuplentes(segmentos[0]).flatMap(j => {
+      const items = [{ nombre: j.nombre, categoria: "desconocida" }];
+      if (j.suplente) items.push({ nombre: j.suplente, categoria: "desconocida" });
+      return items;
+    });
+  }
+
   const resultado = [];
 
   // Primera línea = arquero (y su suplente, si lo hay)
@@ -733,15 +776,22 @@ function obtenerFormacionEquipo(partidosFiltrados, columna, listaFutbolistas, no
   return { arquero, resto };
 }
 
-function tarjetaJugadorCancha(j) {
-  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
-  return `
-    <a class="jugador-cancha" href="${url}" target="_blank" rel="noopener">
-      <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
-      <span class="jugador-cancha-nombre">${j.nombre}</span>
-      <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
-    </a>
+function tarjetaJugadorCancha(j, esArquero = false) {
+  const claseArquero = esArquero ? " jugador-cancha-arquero" : "";
+  const contenido = `
+    <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
+    <span class="jugador-cancha-nombre">${j.nombre}</span>
+    <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
   `;
+
+  // Si no tiene foto propia (mostramos el escudo del club), no hay ficha
+  // de jugador a la que llevarlo — lo dejamos como tarjeta simple, sin link.
+  if (j.esEscudo) {
+    return `<div class="jugador-cancha jugador-cancha-sin-link${claseArquero}">${contenido}</div>`;
+  }
+
+  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
+  return `<a class="jugador-cancha${claseArquero}" href="${url}" target="_blank" rel="noopener">${contenido}</a>`;
 }
 
 function filaFormacionHTML(categorias, jugadores) {
@@ -749,7 +799,7 @@ function filaFormacionHTML(categorias, jugadores) {
     .filter(j => categorias.includes(j.categoria))
     .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.veces - a.veces);
   if (!jugadoresFila.length) return "";
-  return `<div class="cancha-fila">${jugadoresFila.map(tarjetaJugadorCancha).join("")}</div>`;
+  return `<div class="cancha-fila">${jugadoresFila.map(j => tarjetaJugadorCancha(j)).join("")}</div>`;
 }
 
 function renderFormacionRival(nombreClubRival) {
@@ -767,14 +817,14 @@ function renderFormacionRival(nombreClubRival) {
   const filasRivalHTML = [...FILAS_CANCHA].reverse()
     .map(categorias => filaFormacionHTML(categorias, formacionRival.resto)).join("");
   const arqueroRivalHTML = formacionRival.arquero
-    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacionRival.arquero)}</div>`
+    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacionRival.arquero, true)}</div>`
     : "";
 
   // Huracán: ataque arriba, arquero abajo (orden normal, igual que en Técnicos)
   const filasHuracanHTML = FILAS_CANCHA
     .map(categorias => filaFormacionHTML(categorias, formacionHuracan.resto)).join("");
   const arqueroHuracanHTML = formacionHuracan.arquero
-    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacionHuracan.arquero)}</div>`
+    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacionHuracan.arquero, true)}</div>`
     : "";
 
   return `
