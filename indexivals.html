@@ -544,32 +544,164 @@ const FILAS_CANCHA = [
   ["lateral_izq", "defensor_central", "lateral_der"]
 ];
 
+// === Deducción de posición a partir de la propia línea de formación ===
+// Necesaria para los jugadores RIVALES: no están en Utbolists.csv (esa base
+// es solo el plantel de Huracán), así que no tienen Posición cargada. En vez
+// de dejarlos afuera, deducimos su rol leyendo directamente la columna
+// Huracán/Rival, que viene separada por ";" en líneas tácticas
+// (arquero; defensa; medio; ataque), y por "," / "y" dentro de cada línea.
+
+// Plantillas para las formaciones más comunes: la clave es la cantidad de
+// titulares por línea (sin el arquero), ej. "4-3-3". El array asigna la
+// categoría de cada nombre según su posición de izquierda a derecha en esa línea.
+const PLANTILLAS_FORMACION = {
+  "2-3-5": [
+    ["defensor_central", "defensor_central"],
+    ["volante_der", "volante_central", "volante_izq"],
+    ["wing_der", "extremo_der", "delantero", "extremo_izq", "wing_izq"]
+  ],
+  "4-2-4": [
+    ["lateral_der", "defensor_central", "defensor_central", "lateral_izq"],
+    ["volante_der", "volante_izq"],
+    ["wing_der", "delantero", "enganche", "wing_izq"]
+  ],
+  "4-3-3": [
+    ["lateral_der", "defensor_central", "defensor_central", "lateral_izq"],
+    ["volante_der", "volante_central", "volante_izq"],
+    ["wing_der", "delantero", "wing_izq"]
+  ],
+  "4-4-2": [
+    ["lateral_der", "defensor_central", "defensor_central", "lateral_izq"],
+    ["volante_der", "volante_central", "enganche", "volante_izq"],
+    ["delantero", "delantero"]
+  ],
+  "3-5-2": [
+    ["lateral_der", "defensor_central", "lateral_izq"],
+    ["extremo_der", "volante_der", "volante_central", "volante_izq", "extremo_izq"],
+    ["delantero", "delantero"]
+  ]
+};
+
+// Reparto genérico para cuando la cantidad de titulares de una línea no
+// coincide con ninguna plantilla conocida (formaciones no contempladas,
+// o líneas "infladas" por errores de carga). Toma muestras equiespaciadas
+// de un patrón de referencia según el rol de la línea (defensa/medio/ataque),
+// así el jugador cae en una fila razonable aunque no sepamos el detalle exacto.
+const PATRON_GENERICO = {
+  defensa: ["lateral_izq", "defensor_central", "defensor_central", "defensor_central", "lateral_der"],
+  medio:   ["extremo_izq", "volante_izq", "volante_central", "volante_der", "extremo_der"],
+  ataque:  ["wing_izq", "extremo_izq", "delantero", "extremo_der", "wing_der"]
+};
+
+function categoriasGenericas(rol, cantidad) {
+  const patron = PATRON_GENERICO[rol];
+  if (cantidad <= 0) return [];
+  if (cantidad === 1) return [rol === "defensa" ? "defensor_central" : rol === "ataque" ? "delantero" : "volante_central"];
+  const resultado = [];
+  for (let i = 0; i < cantidad; i++) {
+    const idx = Math.round(i * (patron.length - 1) / (cantidad - 1));
+    resultado.push(patron[idx]);
+  }
+  return resultado;
+}
+
+// Asigna categoría a cada nombre de cada línea (sin el arquero), probando
+// primero la plantilla exacta y, si no calza, el reparto genérico por rol.
+function asignarCategoriasPorFormacion(lineasTitulares) {
+  const forma = lineasTitulares.map(l => l.length).join("-");
+  const plantilla = PLANTILLAS_FORMACION[forma];
+  if (plantilla) {
+    return lineasTitulares.map((linea, i) => linea.map((_, j) => plantilla[i][j]));
+  }
+
+  const roles = lineasTitulares.length <= 1
+    ? lineasTitulares.map(() => "medio")
+    : lineasTitulares.map((_, i) =>
+        i === 0 ? "defensa" : i === lineasTitulares.length - 1 ? "ataque" : "medio");
+
+  return lineasTitulares.map((linea, i) => categoriasGenericas(roles[i], linea.length));
+}
+
+// Separa una línea táctica ("Fulano, Mengano (70 Suplente) y Zutano") en sus
+// titulares, capturando el suplente de cada uno ANTES de limpiar los
+// paréntesis — así el conteo de titulares por línea no se infla con los
+// nombres de los suplentes (lo que rompería el matcheo de formación).
+function extraerLineaConSuplentes(segmentoTexto) {
+  const subsPorTitular = {};
+  const regexSub = /([^,()]+?)\s*\(([^)]*)\)/g;
+  let m;
+  while ((m = regexSub.exec(segmentoTexto)) !== null) {
+    const titular = m[1].trim();
+    const sup = m[2].trim().replace(/^\d+(?:\+\d+)?'?\s*/, "");
+    if (sup) subsPorTitular[norm(titular)] = sup;
+  }
+
+  const limpio = segmentoTexto.replace(/\([^)]*\)/g, "");
+  const titulares = limpio
+    .replace(/\.+/g, "")
+    .replace(/\by\s+/gi, ",")
+    .replace(/\be\s+/gi, ",")
+    .replace(/,,+/g, ",")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s+/g, ",")
+    .replace(/\s+/g, " ")
+    .split(/[,;]+/)
+    .map(j => j.trim())
+    .filter(j => j.length > 1);
+
+  return titulares.map(nombre => ({ nombre, suplente: subsPorTitular[norm(nombre)] || null }));
+}
+
+// Parsea la columna completa (Huracán o Rival) de UN partido y devuelve la
+// lista de jugadores con la categoría deducida de la formación. El suplente
+// hereda la categoría del titular al que reemplazó.
+function parsearFormacionColumna(texto) {
+  if (!texto) return [];
+  const segmentos = texto.split(";").map(s => s.trim()).filter(Boolean);
+  if (!segmentos.length) return [];
+
+  const resultado = [];
+
+  // Primera línea = arquero (y su suplente, si lo hay)
+  const lineaArquero = extraerLineaConSuplentes(segmentos[0]);
+  lineaArquero.forEach(j => {
+    resultado.push({ nombre: j.nombre, categoria: "arquero" });
+    if (j.suplente) resultado.push({ nombre: j.suplente, categoria: "arquero" });
+  });
+
+  // Resto de líneas = defensa / medio / ataque, según formación
+  const lineasConSuplentes = segmentos.slice(1).map(extraerLineaConSuplentes);
+  const lineasNombres = lineasConSuplentes.map(l => l.map(x => x.nombre));
+  const categoriasPorLinea = asignarCategoriasPorFormacion(lineasNombres);
+
+  lineasConSuplentes.forEach((linea, i) => {
+    linea.forEach((jugador, j) => {
+      const categoria = (categoriasPorLinea[i] && categoriasPorLinea[i][j]) || "desconocida";
+      resultado.push({ nombre: jugador.nombre, categoria });
+      if (jugador.suplente) resultado.push({ nombre: jugador.suplente, categoria });
+    });
+  });
+
+  return resultado;
+}
+
 // Cuenta apariciones en una columna (Huracán o Rival) de una lista de partidos ya filtrada,
 // y arma el "arquero titular" + los 10 de campo que más jugaron.
+// La categoría de cada jugador sale, en orden de preferencia:
+//   1) su Posición real en Utbolists.csv, si está cargado ahí (jugadores de Huracán)
+//   2) la posición deducida de la formación del partido (jugadores rivales, o
+//      cualquiera que por algún motivo no esté en la base)
 // Si un jugador no tiene foto propia en la base (típico de jugadores rivales que no
 // pasaron por Huracán), usamos el escudo del club como respaldo.
 function obtenerFormacionEquipo(partidosFiltrados, columna, listaFutbolistas, nombreClubFallback) {
-  const conteo = {};
+  const conteo = {}; // clave -> { nombre, veces, categoriasDeducidas: {cat: n} }
 
   partidosFiltrados.forEach(p => {
-    const jugadores = (p[columna] || "")
-      .replace(/[()]/g, ",")
-      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
-      .replace(/\.+/g, "")
-      .replace(/\by\s+/gi, ",")
-      .replace(/\be\s+/gi, ",")
-      .replace(/,,+/g, ",")
-      .replace(/\s+,/g, ",")
-      .replace(/,\s+/g, ",")
-      .replace(/\s+/g, " ")
-      .split(/[,;]+/)
-      .map(j => j.trim())
-      .filter(j => j.length > 1);
-
-    jugadores.forEach(nombre => {
+    parsearFormacionColumna(p[columna] || "").forEach(({ nombre, categoria }) => {
       const clave = norm(nombre);
-      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0 };
+      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0, categoriasDeducidas: {} };
       conteo[clave].veces++;
+      conteo[clave].categoriasDeducidas[categoria] = (conteo[clave].categoriasDeducidas[categoria] || 0) + 1;
     });
   });
 
@@ -577,12 +709,20 @@ function obtenerFormacionEquipo(partidosFiltrados, columna, listaFutbolistas, no
     .map(c => {
       const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(c.nombre));
       const tieneFotoPropia = !!(datos && datos.foto1);
+
+      // Preferimos la posición real (Huracán); si no está, la más frecuente
+      // entre las que le dedujimos de la formación en los partidos donde jugó.
+      const categoriaReal = datos ? categorizarPosicion(datos.posicion) : "desconocida";
+      const categoriaDeducida = Object.entries(c.categoriasDeducidas)
+        .sort((a, b) => b[1] - a[1])[0][0];
+      const categoria = categoriaReal !== "desconocida" ? categoriaReal : categoriaDeducida;
+
       return {
         nombre: c.nombre,
         veces: c.veces,
         foto: tieneFotoPropia ? datos.foto1 : getEscudo(nombreClubFallback),
         esEscudo: !tieneFotoPropia,
-        categoria: categorizarPosicion(datos ? datos.posicion : "")
+        categoria: categoria
       };
     })
     .sort((a, b) => b.veces - a.veces);
