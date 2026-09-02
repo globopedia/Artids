@@ -114,6 +114,85 @@
 .goleador-normal {
   margin:4px 0;
 }
+
+/* === "Los 22 que más jugaron": canchita con ambos equipos === */
+.cancha {
+  background: linear-gradient(#2e7d32, #1b5e20);
+  border: 3px solid #fff;
+  border-radius: 10px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+/* En la canchita simple (un solo equipo) mostramos línea media y círculo central */
+.cancha:not(.cancha-doble)::before {
+  content: "";
+  position: absolute;
+  left: 8px; right: 8px; top: 50%;
+  border-top: 2px solid rgba(255,255,255,0.45);
+}
+.cancha:not(.cancha-doble)::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 70px; height: 70px;
+  margin: -35px 0 0 -35px;
+  border: 2px solid rgba(255,255,255,0.45);
+  border-radius: 50%;
+}
+/* En la canchita doble (rival arriba + Huracán abajo) la línea divisoria
+   es un elemento propio, para que quede justo entre los dos equipos
+   sin importar cuántas filas tenga cada uno. */
+.cancha-linea-media {
+  border-top: 2px solid rgba(255,255,255,0.55);
+  margin: 2px 8px;
+  position: relative;
+  z-index: 1;
+}
+.cancha-fila {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.cancha-fila-arquero { justify-content: center; }
+.jugador-cancha {
+  width: auto;
+  min-width: 76px;
+  max-width: 150px;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.jugador-cancha:hover { opacity: 0.8; }
+.jugador-cancha img {
+  width: 48px; height: 62px; object-fit: cover;
+  border-radius: 6px; border: 2px solid #fff;
+  margin-bottom: 3px;
+  background: #ddd;
+}
+.jugador-cancha-nombre {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.jugador-cancha-veces {
+  display: block;
+  font-size: 9px;
+  color: #eaffea;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
   </style>
 </head>
 <body>
@@ -169,6 +248,7 @@ const transfersURL = "https://artids.vercel.app/api/data?file=utbolists";
     let transfers = [];
     let clubes = [];
     let encuentros = [];
+    let futbolistas = [];
 
    // Normalizaciones y utilidades
 const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -313,6 +393,14 @@ transfers = transfersCSV
     foto: (t.Foto1 || "").trim()
   }));
 console.log("TRANSFERS:", transfers);
+
+// futbolistas: mismo CSV que transfersCSV, pero SIN filtrar por foto —
+// lo necesitamos completo (con Posición) para armar la canchita de "Los 22".
+futbolistas = transfersCSV.map(t => ({
+  futbolista: (t.Futbolista || "").trim(),
+  posicion: (t["Posición"] || "").trim(),
+  foto1: (t.Foto1 || "").trim()
+}));
       const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
       const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
       const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
@@ -421,6 +509,148 @@ function seleccionarClub(id) {
     input.select();
   }, 0);
 }
+// ============================================================
+// === "Los 22 que más jugaron": canchita con ambos planteles
+// ============================================================
+
+// URL pública de la página de Futbolistas, para que cada jugador linkee a su perfil.
+const URL_PAGINA_FUTBOLISTAS = "https://globopedia.github.io/Artids/indexutbolists.html";
+
+// Mapea el texto libre de Posición a una categoría fija (mismo criterio que en Técnicos)
+function categorizarPosicion(posicionRaw) {
+  const p = norm(posicionRaw);
+  if (!p) return "desconocida";
+  if (p.includes("arquero")) return "arquero";
+  if (p.includes("wing izquierdo")) return "wing_izq";
+  if (p.includes("wing derecho")) return "wing_der";
+  if (p.includes("extremo izquierdo") || p.includes("insider izquierdo")) return "extremo_izq";
+  if (p.includes("extremo derecho")) return "extremo_der";
+  if (p.includes("enganche")) return "enganche";
+  if (p.includes("volante izquierdo")) return "volante_izq";
+  if (p.includes("volante derecho") || p.includes("half derecho")) return "volante_der";
+  if (p.includes("volante central") || p === "volante") return "volante_central";
+  if (p.includes("lateral izquierdo") || p.includes("defensor izquierdo")) return "lateral_izq";
+  if (p.includes("lateral derecho") || p.includes("full-back") || p.includes("full back")) return "lateral_der";
+  if (p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return "defensor_central";
+  if (p.includes("delantero") || p === "elantero") return "delantero";
+  return "desconocida";
+}
+
+// Filas de ataque (arriba) a defensa (abajo). El arquero se maneja aparte.
+const FILAS_CANCHA = [
+  ["wing_izq", "delantero", "wing_der"],
+  ["extremo_izq", "enganche", "extremo_der"],
+  ["volante_izq", "volante_central", "volante_der"],
+  ["lateral_izq", "defensor_central", "lateral_der"]
+];
+
+// Cuenta apariciones en una columna (Huracán o Rival) de una lista de partidos ya filtrada,
+// y arma el "arquero titular" + los 10 de campo que más jugaron.
+// Si un jugador no tiene foto propia en la base (típico de jugadores rivales que no
+// pasaron por Huracán), usamos el escudo del club como respaldo.
+function obtenerFormacionEquipo(partidosFiltrados, columna, listaFutbolistas, nombreClubFallback) {
+  const conteo = {};
+
+  partidosFiltrados.forEach(p => {
+    const jugadores = (p[columna] || "")
+      .replace(/[()]/g, ",")
+      .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+      .replace(/\.+/g, "")
+      .replace(/\by\s+/gi, ",")
+      .replace(/\be\s+/gi, ",")
+      .replace(/,,+/g, ",")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s+/g, ",")
+      .replace(/\s+/g, " ")
+      .split(/[,;]+/)
+      .map(j => j.trim())
+      .filter(j => j.length > 1);
+
+    jugadores.forEach(nombre => {
+      const clave = norm(nombre);
+      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0 };
+      conteo[clave].veces++;
+    });
+  });
+
+  const lista = Object.values(conteo)
+    .map(c => {
+      const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(c.nombre));
+      const tieneFotoPropia = !!(datos && datos.foto1);
+      return {
+        nombre: c.nombre,
+        veces: c.veces,
+        foto: tieneFotoPropia ? datos.foto1 : getEscudo(nombreClubFallback),
+        esEscudo: !tieneFotoPropia,
+        categoria: categorizarPosicion(datos ? datos.posicion : "")
+      };
+    })
+    .sort((a, b) => b.veces - a.veces);
+
+  const arquero = lista.find(j => j.categoria === "arquero") || null;
+  const resto = lista.filter(j => j.categoria !== "arquero").slice(0, 10);
+
+  return { arquero, resto };
+}
+
+function tarjetaJugadorCancha(j) {
+  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
+  return `
+    <a class="jugador-cancha" href="${url}" target="_blank" rel="noopener">
+      <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
+      <span class="jugador-cancha-nombre">${j.nombre}</span>
+      <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
+    </a>
+  `;
+}
+
+function filaFormacionHTML(categorias, jugadores) {
+  const jugadoresFila = jugadores
+    .filter(j => categorias.includes(j.categoria))
+    .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.veces - a.veces);
+  if (!jugadoresFila.length) return "";
+  return `<div class="cancha-fila">${jugadoresFila.map(tarjetaJugadorCancha).join("")}</div>`;
+}
+
+function renderFormacionRival(nombreClubRival) {
+  const partidosClub = encuentros.filter(p => norm(p.Club) === norm(nombreClubRival));
+  if (!partidosClub.length) return "";
+
+  const formacionRival = obtenerFormacionEquipo(partidosClub, "Rival", futbolistas, nombreClubRival);
+  const formacionHuracan = obtenerFormacionEquipo(partidosClub, "Huracán", futbolistas, "Huracán");
+
+  const hayRival = formacionRival.arquero || formacionRival.resto.length;
+  const hayHuracan = formacionHuracan.arquero || formacionHuracan.resto.length;
+  if (!hayRival && !hayHuracan) return "";
+
+  // Rival: arquero arriba, ataque abajo (orden invertido respecto a Huracán)
+  const filasRivalHTML = [...FILAS_CANCHA].reverse()
+    .map(categorias => filaFormacionHTML(categorias, formacionRival.resto)).join("");
+  const arqueroRivalHTML = formacionRival.arquero
+    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacionRival.arquero)}</div>`
+    : "";
+
+  // Huracán: ataque arriba, arquero abajo (orden normal, igual que en Técnicos)
+  const filasHuracanHTML = FILAS_CANCHA
+    .map(categorias => filaFormacionHTML(categorias, formacionHuracan.resto)).join("");
+  const arqueroHuracanHTML = formacionHuracan.arquero
+    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacionHuracan.arquero)}</div>`
+    : "";
+
+  return `
+    <div class="stats" style="margin-top:20px;">
+      <h3 style="color:#FF0000;">⚽ Los 22 que más jugaron este cruce</h3>
+      <div class="cancha cancha-doble">
+        ${arqueroRivalHTML}
+        ${filasRivalHTML}
+        <div class="cancha-linea-media"></div>
+        ${filasHuracanHTML}
+        ${arqueroHuracanHTML}
+      </div>
+    </div>
+  `;
+}
+
 function mostrarClub() {
       const clubId = document.getElementById("clubSelect").value;
       const club = clubes.find(c => (c.id||"").trim() === (clubId||"").trim());
@@ -452,6 +682,7 @@ function mostrarClub() {
           <h3 style="color:#FF0000;">📊 Historial</h3>
         ${stats.html}
         </div>
+        ${renderFormacionRival(club.club)}
       `;
   setTimeout(() => {
   dibujarTorta(stats.ganados, stats.empatados, stats.perdidos);
