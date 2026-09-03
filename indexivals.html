@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Clubes y Estadísticas</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'RobotoCondensed', sans-serif; background:#fff; color:#222; margin:20px; }
+    body { font-family: 'Chakra Petch', sans-serif; background:#fff; color:#222; margin:20px; }
     h1 { color:#FF0000; text-align:center; }
     .logo { display:block; margin:0 auto 10px; width:100px; }
     select { padding:8px; border-radius:8px; border:2px solid #FF0000; font-size:16px; margin-bottom:20px; }
@@ -26,6 +26,15 @@
     .acordeon-header.abierto::after { transform: rotate(180deg); }
     .acordeon-body { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease; padding: 8px; }
     .acordeon-body.cerrado { max-height: 0; padding: 0 8px; }
+    /* Barrita blanca con piquito rojo, igual a la de indexutbolists.html */
+    .acordeon .acordeon-header {
+      border-left: 4px solid #e00000;
+      background-color: #ffffff;
+      transition: background-color 0.2s ease;
+    }
+    .acordeon .acordeon-header:hover {
+      background-color: #ffe0e0;
+    }
     .resultado1-box, .resultado2-box {
       display: inline-block; width: 16px; height: 28px; font-size: 32px; font-weight: bold;
       line-height: 28px; text-align: center; margin: 2px; padding: 10px 10px;
@@ -210,6 +219,7 @@
 }
 .jugador-cancha-nombre {
   display: block;
+  font-family: 'RobotoCondensed', sans-serif;
   font-size: 10px;
   font-weight: bold;
   line-height: 1.15;
@@ -218,6 +228,7 @@
 }
 .jugador-cancha-veces {
   display: block;
+  font-family: 'RobotoCondensed', sans-serif;
   font-size: 9px;
   color: #eaffea;
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
@@ -274,10 +285,12 @@ const partidosURL6 = "https://artids.vercel.app/api/data?file=artids1985";
 const partidosURL7 = "https://artids.vercel.app/api/data?file=artids2000";
 const partidosURL8 = "https://artids.vercel.app/api/data?file=artids2015";
 const transfersURL = "https://artids.vercel.app/api/data?file=utbolists";
+const arbitrosURL = "https://artids.vercel.app/api/data?file=rbits";
     let transfers = [];
     let clubes = [];
     let encuentros = [];
     let futbolistas = [];
+    let arbitros = [];
 
    // Normalizaciones y utilidades
 const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -393,10 +406,11 @@ let debounceTimer;
   fetch(partidosURL6).then(r => r.text()),
   fetch(partidosURL7).then(r => r.text()),
   fetch(partidosURL8).then(r => r.text()),
-  fetch(transfersURL).then(r => r.text())
+  fetch(transfersURL).then(r => r.text()),
+  fetch(arbitrosURL).then(r => r.text())
 ])
 
-.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8, csvTransfers]) => {
+.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8, csvTransfers, csvRbits]) => {
         clubes = Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.id ?? "").toString().trim(),
         club: (c.Club ?? c.club ?? "").toString().trim(),
@@ -430,6 +444,12 @@ futbolistas = transfersCSV.map(t => ({
   posicion: (t["Posición"] || "").trim(),
   foto1: (t.Foto1 || "").trim()
 }));
+
+arbitros = Papa.parse(csvRbits, { header: true, skipEmptyLines: true }).data.map(c => ({
+  id: (c.ID ?? "").toString().trim(),
+  nombre: (c["Árbitro"] ?? "").toString().trim()
+}));
+
       const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
       const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
       const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
@@ -668,8 +688,8 @@ function extraerLineaConSuplentes(segmentoTexto) {
   const limpio = segmentoTexto.replace(/\([^)]*\)/g, "");
   const titulares = limpio
     .replace(/\.+/g, "")
-    .replace(/\by\s+/gi, ",")
-    .replace(/\be\s+/gi, ",")
+    .replace(/\by\s+/g, ",")
+    .replace(/\be\s+/g, ",")
     .replace(/,,+/g, ",")
     .replace(/\s+,/g, ",")
     .replace(/,\s+/g, ",")
@@ -1008,8 +1028,10 @@ return `
 `;
 }
 function obtenerGoleadores(partidos, nombreClub) {
-  const goleadoresHuracan = {};
-  const goleadoresRival = {};
+  const golesHuracan = {};      // goles propios de jugadores de Huracán
+  const enContraHuracan = {};   // goles EN CONTRA que favorecieron a Huracán (los hizo un rival)
+  const golesRival = {};        // goles propios de jugadores del rival
+  const enContraRival = {};     // goles EN CONTRA que favorecieron al rival (los hizo alguien de Huracán)
 
   partidos.forEach(p => {
     const texto = p.Incidencias || "";
@@ -1026,24 +1048,32 @@ function obtenerGoleadores(partidos, nombreClub) {
       if (!match) return;
 
       const nombre = match[1].trim();
+      const esEnContra = /-\s*en contra\s*-/i.test(limpio);
 
       if (limpio.includes("(HUR)")) {
-        goleadoresHuracan[nombre] = (goleadoresHuracan[nombre] || 0) + 1;
+        const bucket = esEnContra ? enContraHuracan : golesHuracan;
+        bucket[nombre] = (bucket[nombre] || 0) + 1;
       } else {
-        goleadoresRival[nombre] = (goleadoresRival[nombre] || 0) + 1;
+        const bucket = esEnContra ? enContraRival : golesRival;
+        bucket[nombre] = (bucket[nombre] || 0) + 1;
       }
     });
   });
 
-  function top10(obj) {
-    return Object.entries(obj)
-      .sort((a,b) => b[1] - a[1])
-      .slice(0,10);
+  // Junta los goles propios y los "en contra" de un mismo lado, como entradas
+  // INDEPENDIENTES (aunque compartan nombre) — así un jugador que hizo goles
+  // propios Y además figura con un gol en contra de otro partido (por ejemplo,
+  // un homónimo de otro club) no se suman en un solo total engañoso.
+  function combinarYOrdenar(golesObj, enContraObj) {
+    const entradas = [];
+    Object.entries(golesObj).forEach(([nombre, n]) => entradas.push({ nombre, goles: n, enContra: false }));
+    Object.entries(enContraObj).forEach(([nombre, n]) => entradas.push({ nombre, goles: n, enContra: true }));
+    return entradas.sort((a, b) => b.goles - a.goles).slice(0, 10);
   }
 
   return {
-    huracan: top10(goleadoresHuracan),
-    rival: top10(goleadoresRival)
+    huracan: combinarYOrdenar(golesHuracan, enContraHuracan),
+    rival: combinarYOrdenar(golesRival, enContraRival)
   };
 }
 
@@ -1054,6 +1084,38 @@ function escapeHTML(valor) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+// Envuelve un nombre en un link a su ficha de futbolista SOLO si existe en
+// la base (Utbolists.csv, cargada en 'futbolistas'). Si no, devuelve el
+// nombre tal cual (escapado), sin link. Pensado para reusar en cualquier
+// lugar del sitio donde aparezca un nombre de jugador: goleadores,
+// transferencias, incidencias, etc.
+function linkJugadorSiExiste(nombre) {
+  const nombreSeguro = escapeHTML(nombre);
+  if (!nombre) return nombreSeguro;
+  const existe = typeof futbolistas !== "undefined" &&
+    futbolistas.some(f => norm(f.futbolista) === norm(nombre));
+  if (!existe) return nombreSeguro;
+  const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombre)}`;
+  return `<a href="${url}" target="_blank" rel="noopener" ` +
+         `style="color:#d40000; text-decoration:none;" ` +
+         `onmouseover="this.style.fontWeight='bold'" ` +
+         `onmouseout="this.style.fontWeight='normal'">${nombreSeguro}</a>`;
+}
+
+// Igual que la anterior, pero para árbitros -> indexrbits.html
+function linkArbitroSiExiste(nombre) {
+  const nombreSeguro = escapeHTML(nombre);
+  if (!nombre) return nombreSeguro;
+  const existe = typeof arbitros !== "undefined" &&
+    arbitros.some(a => norm(a.nombre) === norm(nombre));
+  if (!existe) return nombreSeguro;
+  const url = `https://globopedia.github.io/Artids/indexrbits.html?arbitro=${encodeURIComponent(nombre)}`;
+  return `<a href="${url}" target="_blank" rel="noopener" ` +
+         `style="color:#d40000; text-decoration:none;" ` +
+         `onmouseover="this.style.fontWeight='bold'" ` +
+         `onmouseout="this.style.fontWeight='normal'">${nombreSeguro}</a>`;
 }
 
 function buscarFichaJugador(nombreJugador) {
@@ -1069,24 +1131,35 @@ function renderGoleadoresHuracan(goleadores) {
   if (!goleadores.length) return "<li>Sin goles registrados</li>";
 
   return goleadores.map((g, index) => {
-    const [nombre, goles] = g;
-    const ficha = buscarFichaJugador(nombre);
+    const { nombre, goles, enContra } = g;
     const nombreSeguro = escapeHTML(nombre);
-    const golesTexto = `${goles} ${goles === 1 ? "gol" : "goles"}`;
+    const sufijoTexto = enContra ? " e/c" : "";
+    const golesTexto = `${goles} ${goles === 1 ? "gol" : "goles"}${sufijoTexto}`;
+
+    // Un "en contra" a favor de Huracán lo hizo un jugador RIVAL — nunca
+    // buscamos su ficha ni lo linkeamos acá, para no arriesgarnos a mostrar
+    // por error la foto/link de un homónimo que sí jugó en Huracán (el
+    // caso "Nervo").
+    const ficha = enContra ? null : buscarFichaJugador(nombre);
+    const nombreVisible = enContra ? nombreSeguro : linkJugadorSiExiste(nombre);
 
     if (index === 0) {
+      // Si el máximo goleador todavía no tiene la foto cargada, usamos el
+      // escudo de Huracán como respaldo (misma lógica que del lado rival),
+      // en vez de dejar el cuadrito sin ninguna imagen.
+      const fotoSrc = ficha?.foto || getEscudo("Huracán");
       return `
         <li class="goleador-top">
-          ${ficha?.foto ? `<img src="${escapeHTML(ficha.foto)}" alt="${nombreSeguro}" onerror="this.style.display='none'">` : ""}
+          ${fotoSrc ? `<img src="${escapeHTML(fotoSrc)}" alt="${nombreSeguro}" onerror="this.style.display='none'">` : ""}
           <span>
-            <span class="goleador-top-nombre">${nombreSeguro}</span>
+            <span class="goleador-top-nombre">${nombreVisible}</span>
             <span class="goleador-top-goles">${golesTexto}</span>
           </span>
         </li>
       `;
     }
 
-    return `<li class="goleador-normal">${nombreSeguro} (${goles})</li>`;
+    return `<li class="goleador-normal">${nombreVisible} (${goles}${sufijoTexto})</li>`;
   }).join("");
 }
 
@@ -1095,46 +1168,63 @@ function renderGoleadoresRival(goleadoresRival, nombreClubRival) {
 
   // Buscamos, entre los goleadores rivales (de más a menos goles), el
   // índice del primero que también haya jugado en Huracán (match exacto).
+  // OJO: buscamos contra 'futbolistas' (la base COMPLETA), no contra
+  // 'transfers' (que solo trae a los que además tienen foto cargada) —
+  // si buscáramos solo en 'transfers', a un jugador que sí pasó por
+  // Huracán pero todavía no tiene la foto subida lo tratábamos como si
+  // fuera un desconocido, y terminaba destacando a alguien que nunca jugó acá.
   let indiceDestacado = -1;
   let fichaDestacado = null;
   for (let i = 0; i < goleadoresRival.length; i++) {
-    const ficha = buscarFichaJugador(goleadoresRival[i][0]);
-    if (ficha) {
+    const nombre = goleadoresRival[i].nombre;
+    const datos = futbolistas.find(f => norm(f.futbolista) === norm(nombre));
+    if (datos) {
       indiceDestacado = i;
-      fichaDestacado = ficha;
+      fichaDestacado = datos;
       break;
     }
   }
 
-  // Si ninguno del listado jugó en Huracán, destacamos al máximo goleador
-  // (posición 0) con el escudo del club como imagen de respaldo.
+  // Si encontramos a alguien que jugó en Huracán, lo destacamos siempre —
+  // pero solo mostramos su foto si realmente está cargada (URL válida);
+  // si no, usamos el escudo del club como respaldo de imagen (la persona
+  // destacada sigue siendo él, no cambia a otro por no tener foto).
+  // Si NINGUNO del listado jugó en Huracán, ahí sí destacamos al máximo
+  // goleador tal cual, con el escudo del club como imagen.
   let esEscudo = false;
   if (indiceDestacado === -1) {
     indiceDestacado = 0;
+    esEscudo = true;
+  } else if (!fichaDestacado.foto1 || !fichaDestacado.foto1.startsWith("http")) {
     esEscudo = true;
   }
 
   // Recorremos el listado SIN reordenarlo: el destacado se pinta distinto,
   // pero se queda en el lugar que le corresponde por goles.
   return goleadoresRival.map((g, i) => {
-    const [nombre, goles] = g;
+    const { nombre, goles, enContra } = g;
     const nombreSeguro = escapeHTML(nombre);
+    const sufijoTexto = enContra ? " e/c" : "";
+    // Acá SÍ linkeamos siempre, incluso los "en contra": un en contra en
+    // este listado lo hizo un jugador DE Huracán (contra su propio equipo),
+    // así que si tiene ficha, es una coincidencia real, no un homónimo.
+    const nombreVisible = linkJugadorSiExiste(nombre);
 
     if (i === indiceDestacado) {
-      const golesTexto = `${goles} ${goles === 1 ? "gol" : "goles"}`;
-      const fotoSrc = esEscudo ? getEscudo(nombreClubRival) : fichaDestacado.foto;
+      const golesTexto = `${goles} ${goles === 1 ? "gol" : "goles"}${sufijoTexto}`;
+      const fotoSrc = esEscudo ? getEscudo(nombreClubRival) : fichaDestacado.foto1;
       return `
         <li class="goleador-top">
           ${fotoSrc ? `<img src="${escapeHTML(fotoSrc)}" alt="${nombreSeguro}" onerror="this.style.display='none'">` : ""}
           <span>
-            <span class="goleador-top-nombre">${nombreSeguro}</span>
+            <span class="goleador-top-nombre">${nombreVisible}</span>
             <span class="goleador-top-goles">${golesTexto}</span>
           </span>
         </li>
       `;
     }
 
-    return `<li class="goleador-normal">${nombreSeguro} (${goles})</li>`;
+    return `<li class="goleador-normal">${nombreVisible} (${goles}${sufijoTexto})</li>`;
   }).join("");
 }
     function renderEstadisticas(nombreClub) {
@@ -1334,8 +1424,14 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
 
   const e = calcularRachaConsecutiva(partidosSubset, esInvicto);
   if (e >= 2) {
-    const pi = partidoQueInicioRacha(partidosSubset, esInvicto);
-    lineas.push(`ARRASTRA ${e} PARTIDOS SIN PERDER, PUES NO CAE DESDE LA ${pi ? pi.Torneo : ""}.`);
+    if (totalDerrotas > 0) {
+      const pi = partidoQueInicioRacha(partidosSubset, esInvicto);
+      lineas.push(`ARRASTRA ${e} PARTIDOS SIN PERDER, PUES NO CAE DESDE LA ${pi ? pi.Torneo : ""}.`);
+    } else {
+      // Nunca perdió en todo el historial registrado: no hay "desde cuándo"
+      // que mencionar, sería inventar una referencia que no existió.
+      lineas.push(`ARRASTRA ${e} PARTIDOS SIN PERDER.`);
+    }
   }
 
   const f = calcularRachaConsecutiva(partidosSubset, esDerrota);
@@ -1343,8 +1439,13 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
 
   const g = calcularRachaConsecutiva(partidosSubset, esSinGanar);
   if (g >= 2) {
-    const pig = partidoQueInicioRacha(partidosSubset, esSinGanar);
-    lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE, PUES NO LO HACE DESDE ${pig ? pig.Torneo : ""}.`);
+    if (totalVictorias > 0) {
+      const pig = partidoQueInicioRacha(partidosSubset, esSinGanar);
+      lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE, PUES NO LO HACE DESDE ${pig ? pig.Torneo : ""}.`);
+    } else {
+      // Nunca ganó en todo el historial registrado: mismo caso, sin "desde cuándo".
+      lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE.`);
+    }
   }
 
   const h = calcularRachaConsecutiva(partidosSubset, noRecibioGoles);
@@ -1419,9 +1520,9 @@ function renderRachasYCampanas(nombreClub) {
   return `
     <div class="stat-group">
       <div class="stat-title">📈 RACHAS Y CAMPAÑAS</div>
-      ${bloqueGeneral ? `<p style="margin:8px 0; font-size:12px;"><b style="color:#FF0000;">GENERAL:</b><br>${bloqueGeneral}</p>` : ""}
-      ${bloqueLocal ? `<p style="margin:8px 0; font-size:12px;"><b style="color:#FF0000;">DE LOCAL:</b><br>${bloqueLocal}</p>` : ""}
-      ${bloqueVisitante ? `<p style="margin:8px 0; font-size:12px;"><b style="color:#FF0000;">DE VISITANTE:</b><br>${bloqueVisitante}</p>` : ""}
+      ${bloqueGeneral ? `<p style="margin:8px 0; font-size:12px; font-family:'RobotoCondensed', sans-serif;"><b style="color:#FF0000;">GENERAL:</b><br>${bloqueGeneral}</p>` : ""}
+      ${bloqueLocal ? `<p style="margin:8px 0; font-size:12px; font-family:'RobotoCondensed', sans-serif;"><b style="color:#FF0000;">DE LOCAL:</b><br>${bloqueLocal}</p>` : ""}
+      ${bloqueVisitante ? `<p style="margin:8px 0; font-size:12px; font-family:'RobotoCondensed', sans-serif;"><b style="color:#FF0000;">DE VISITANTE:</b><br>${bloqueVisitante}</p>` : ""}
     </div>
   `;
 }
@@ -1445,7 +1546,7 @@ const htmlTransfers = `
   }"
   style="width:30px;height:30px;object-fit:contain;">
   <span>
-  ${t.jugador} (${t.fecha})
+  ${linkJugadorSiExiste(t.jugador)} (${t.fecha})
   </span>
 
 </li>
@@ -1523,7 +1624,7 @@ const htmlGoleadores = `
                   <div class="resultado1-box">${p.Resultado1}</div>
                   <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" class="escudo-huracan">
                   <div><b>${p.Torneo}</b></div>
-                  <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+                  <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro)}</div>
                   <div>
   ${ p.Estadio && getEstadioImage(p.Estadio)
       ? `<img src="${getEstadioImage(p.Estadio)}" alt="${p.Estadio}" style="max-height:40px; display:block; margin:4px auto;">`
@@ -1545,7 +1646,7 @@ ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias"
                   <div class="resultado2-box">${p.Resultado2}</div>
                   <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
                   <div><b>${p.Torneo}</b></div>
-                  <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${p.Árbitro}</div>
+                  <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro)}</div>
                   <div>${ p.Estadio && getEstadioImage(p.Estadio)
       ? `<img src="${getEstadioImage(p.Estadio)}" alt="${p.Estadio}" style="max-height:40px; display:block; margin:4px auto;">`
       : ""
@@ -1595,12 +1696,15 @@ ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias"
 function enlazarJugadores(texto) {
   if (!texto) return "";
 
-  // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e"
-  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/i);
+  // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e".
+  // OJO: el conector es SIEMPRE minúscula ("y"/"e") — si fuera insensible a
+  // mayúsculas, una inicial de nombre como "Juan E Strak" se interpretaría
+  // como "Juan" + conector "E" + "Strak", partiendo el nombre en dos.
+  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/);
 
   return partes.map(part => {
     // Si la parte es un separador o signo de puntuación, la devolvemos tal cual
-    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
+    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/.test(part)) {
       return part;
     }
 
@@ -1639,9 +1743,23 @@ function enlazarJugadores(texto) {
   }).join("");
 }
 
+    // Busca patrones "TAG Nombre (" dentro de Incidencias (goles, expulsiones,
+    // atajadas, etc.) y envuelve el nombre en el mismo link rojo de siempre,
+    // SOLO si ese nombre existe en la base de futbolistas de Huracán.
+    function linkearNombresEnIncidencia(texto) {
+      if (typeof futbolistas === "undefined") return texto;
+      return texto.replace(/\b(GOL|EXP|LES|ATA|DES|POS)\b(\s+)([^(]+?)(\s*\()/g, (match, tag, espacio, nombre, apertura) => {
+        const nombreLimpio = nombre.trim();
+        if (!nombreLimpio) return match;
+        const existe = futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
+        if (!existe) return match;
+        return `${tag}${espacio}${linkJugadorSiExiste(nombreLimpio)}${apertura}`;
+      });
+    }
+
     function renderIncidencias(texto) {
       if (!texto) return "";
-      return texto
+      return linkearNombresEnIncidencia(texto)
         .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:20px;height:20px;'>")
         .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:20px;height:20px;'>")
         .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:20px;height:20px;'>")
