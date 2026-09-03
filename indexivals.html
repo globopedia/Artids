@@ -1057,9 +1057,12 @@ function escapeHTML(valor) {
 }
 
 function buscarFichaJugador(nombreJugador) {
+  // Coincidencia EXACTA de nombre normalizado, nada más. Un match parcial
+  // (por ejemplo "Alarcón" contra "Williams Alarcón", o "Rami" contra
+  // "Ramírez") empareja personas distintas — mejor no encontrar nada que
+  // encontrar mal.
   const jugadorNorm = norm(nombreJugador);
-  return transfers.find(t => norm(t.jugador) === jugadorNorm) ||
-         transfers.find(t => norm(t.jugador).includes(jugadorNorm) || jugadorNorm.includes(norm(t.jugador)));
+  return transfers.find(t => norm(t.jugador) === jugadorNorm) || null;
 }
 
 function renderGoleadoresHuracan(goleadores) {
@@ -1087,9 +1090,52 @@ function renderGoleadoresHuracan(goleadores) {
   }).join("");
 }
 
-function renderGoleadoresRival(goleadores) {
-  if (!goleadores.length) return "<li>Sin goles registrados</li>";
-  return goleadores.map(g => `<li>${escapeHTML(g[0])} (${g[1]})</li>`).join("");
+function renderGoleadoresRival(goleadoresRival, nombreClubRival) {
+  if (!goleadoresRival.length) return "<li>Sin goles registrados</li>";
+
+  // Buscamos, entre los goleadores rivales (de más a menos goles), el
+  // índice del primero que también haya jugado en Huracán (match exacto).
+  let indiceDestacado = -1;
+  let fichaDestacado = null;
+  for (let i = 0; i < goleadoresRival.length; i++) {
+    const ficha = buscarFichaJugador(goleadoresRival[i][0]);
+    if (ficha) {
+      indiceDestacado = i;
+      fichaDestacado = ficha;
+      break;
+    }
+  }
+
+  // Si ninguno del listado jugó en Huracán, destacamos al máximo goleador
+  // (posición 0) con el escudo del club como imagen de respaldo.
+  let esEscudo = false;
+  if (indiceDestacado === -1) {
+    indiceDestacado = 0;
+    esEscudo = true;
+  }
+
+  // Recorremos el listado SIN reordenarlo: el destacado se pinta distinto,
+  // pero se queda en el lugar que le corresponde por goles.
+  return goleadoresRival.map((g, i) => {
+    const [nombre, goles] = g;
+    const nombreSeguro = escapeHTML(nombre);
+
+    if (i === indiceDestacado) {
+      const golesTexto = `${goles} ${goles === 1 ? "gol" : "goles"}`;
+      const fotoSrc = esEscudo ? getEscudo(nombreClubRival) : fichaDestacado.foto;
+      return `
+        <li class="goleador-top">
+          ${fotoSrc ? `<img src="${escapeHTML(fotoSrc)}" alt="${nombreSeguro}" onerror="this.style.display='none'">` : ""}
+          <span>
+            <span class="goleador-top-nombre">${nombreSeguro}</span>
+            <span class="goleador-top-goles">${golesTexto}</span>
+          </span>
+        </li>
+      `;
+    }
+
+    return `<li class="goleador-normal">${nombreSeguro} (${goles})</li>`;
+  }).join("");
 }
     function renderEstadisticas(nombreClub) {
       const clubNorm = norm(nombreClub);
@@ -1221,14 +1267,173 @@ html += `
 `;
         }
       }
+// ============================================================
+// === "Rachas y campañas": estadísticas de racha/sequía frente a este rival
+// ============================================================
+function esVictoria(p) { return cap(norm(p.Situación)) === "Victoria"; }
+function esEmpate(p) { return cap(norm(p.Situación)) === "Empate"; }
+function esDerrota(p) { return cap(norm(p.Situación)) === "Derrota"; }
+function esInvicto(p) { return esVictoria(p) || esEmpate(p); }
+function esSinGanar(p) { return esEmpate(p) || esDerrota(p); }
+function noRecibioGoles(p) { return (parseInt(p.Resultado2) || 0) === 0; }
+function noMarco(p) { return (parseInt(p.Resultado1) || 0) === 0; }
+
+// Cuenta cuántos partidos consecutivos (contando desde el más reciente hacia
+// atrás, en un array ordenado ascendente por fecha) cumplen el predicado.
+function calcularRachaConsecutiva(partidosAsc, predicado) {
+  let count = 0;
+  for (let i = partidosAsc.length - 1; i >= 0; i--) {
+    if (predicado(partidosAsc[i])) count++;
+    else break;
+  }
+  return count;
+}
+// Devuelve el partido más antiguo dentro de la racha actual (o sea, en el
+// que arrancó), para poder decir "no pierde desde LA (torneo)".
+function partidoQueInicioRacha(partidosAsc, predicado) {
+  const n = calcularRachaConsecutiva(partidosAsc, predicado);
+  if (n === 0) return null;
+  return partidosAsc[partidosAsc.length - n];
+}
+
+// Arma el bloque de texto de rachas para un subconjunto de partidos ya
+// filtrado (general / de local / de visitante). Cualquier número que dé 0
+// o 1 se considera "exiguo" y esa línea (o esa cláusula puntual, en el caso
+// de ganó/empató/perdió) se omite directamente.
+function armarBloqueRachas(nombreClub, partidosSubset) {
+  if (!partidosSubset.length) return "";
+
+  const nombreRivalUpper = escapeHTML(nombreClub).toUpperCase();
+  const ultimos10 = partidosSubset.slice(-10);
+  let a = 0, b = 0, c = 0;
+  ultimos10.forEach(p => {
+    const sit = cap(norm(p.Situación));
+    if (sit === "Victoria") a++;
+    else if (sit === "Empate") b++;
+    else if (sit === "Derrota") c++;
+  });
+
+  const lineas = [];
+
+  const partesResultado = [];
+  if (a >= 2) partesResultado.push(`GANÓ ${a}`);
+  if (b >= 2) partesResultado.push(`EMPATÓ ${b}`);
+  if (c >= 2) partesResultado.push(`PERDIÓ ${c}`);
+  if (partesResultado.length) {
+    const frase = partesResultado.length === 1 ? partesResultado[0]
+      : partesResultado.length === 2 ? partesResultado.join(" Y ")
+      : `${partesResultado[0]}, ${partesResultado[1]} Y ${partesResultado[2]}`;
+    lineas.push(`DE LOS ÚLTIMOS ${ultimos10.length} PARTIDOS OFICIALES ANTE ${nombreRivalUpper}, HURACÁN ${frase}.`);
+  }
+
+  const totalVictorias = partidosSubset.filter(esVictoria).length;
+  const totalDerrotas = partidosSubset.filter(esDerrota).length;
+
+  const d = calcularRachaConsecutiva(partidosSubset, esVictoria);
+  if (d >= 2) lineas.push(`LLEVA ANTE ${nombreRivalUpper} UNA RACHA GANADORA DE ${d} PARTIDOS CONSECUTIVOS.`);
+
+  const e = calcularRachaConsecutiva(partidosSubset, esInvicto);
+  if (e >= 2) {
+    const pi = partidoQueInicioRacha(partidosSubset, esInvicto);
+    lineas.push(`ARRASTRA ${e} PARTIDOS SIN PERDER, PUES NO CAE DESDE LA ${pi ? pi.Torneo : ""}.`);
+  }
+
+  const f = calcularRachaConsecutiva(partidosSubset, esDerrota);
+  if (f >= 2) lineas.push(`POSEE ANTE ${nombreRivalUpper} UNA RACHA SIN SACAR PUNTOS DE ${f} PARTIDOS CONSECUTIVOS.`);
+
+  const g = calcularRachaConsecutiva(partidosSubset, esSinGanar);
+  if (g >= 2) {
+    const pig = partidoQueInicioRacha(partidosSubset, esSinGanar);
+    lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE, PUES NO LO HACE DESDE ${pig ? pig.Torneo : ""}.`);
+  }
+
+  const h = calcularRachaConsecutiva(partidosSubset, noRecibioGoles);
+  const i = calcularRachaConsecutiva(partidosSubset, noMarco);
+  const partesGoles = [];
+  if (h >= 2) partesGoles.push(`${h} PARTIDOS SIN RECIBIR GOLES`);
+  if (i >= 2) partesGoles.push(`${i} ENCUENTROS SIN MARCAR`);
+  if (partesGoles.length) lineas.push(`LLEVA ${partesGoles.join(" Y ")}.`);
+
+  let fraseMejor = "";
+  if (totalVictorias > 0) {
+    const ganados = partidosSubset.filter(esVictoria);
+    const mejor = ganados.reduce((mx, p) => {
+      if (!mx) return p;
+      const dif = (parseInt(p.Resultado1) || 0) - (parseInt(p.Resultado2) || 0);
+      const difMx = (parseInt(mx.Resultado1) || 0) - (parseInt(mx.Resultado2) || 0);
+      if (dif > difMx) return p;
+      // Empate en diferencia de gol: gana el que tenga más goles a favor
+      // (2-1 "pesa" más que 1-0, aunque la diferencia sea la misma).
+      if (dif === difMx && (parseInt(p.Resultado1) || 0) > (parseInt(mx.Resultado1) || 0)) return p;
+      return mx;
+    }, null);
+    if (mejor) fraseMejor = `LA MAYOR GOLEADA DE HURACÁN FUE EL ${mejor.Resultado1}-${mejor.Resultado2} EN LA ${mejor.Torneo}`;
+  }
+
+  let frasePeor = "";
+  if (totalDerrotas > 0) {
+    const perdidos = partidosSubset.filter(esDerrota);
+    const peor = perdidos.reduce((mx, p) => {
+      if (!mx) return p;
+      const dif = (parseInt(p.Resultado2) || 0) - (parseInt(p.Resultado1) || 0);
+      const difMx = (parseInt(mx.Resultado2) || 0) - (parseInt(mx.Resultado1) || 0);
+      if (dif > difMx) return p;
+      if (dif === difMx && (parseInt(p.Resultado2) || 0) > (parseInt(mx.Resultado2) || 0)) return p;
+      return mx;
+    }, null);
+    if (peor) frasePeor = `LA MAYOR GOLEADA DE ${nombreRivalUpper} FUE EL ${peor.Resultado2}-${peor.Resultado1} DE LA ${peor.Torneo}`;
+  }
+
+  if (fraseMejor && frasePeor) {
+    lineas.push(`${fraseMejor}, MIENTRAS QUE ${frasePeor}.`);
+  } else if (fraseMejor) {
+    lineas.push(`${fraseMejor}.`);
+  } else if (frasePeor) {
+    lineas.push(`${frasePeor}.`);
+  }
+
+  if (totalVictorias === 0 && partidosSubset.length >= 2) {
+    lineas.push(`HURACÁN NO LE GANA A ${nombreRivalUpper}.`);
+  }
+
+  return lineas.map(l => l.toUpperCase()).join("<br>");
+}
+
+function renderRachasYCampanas(nombreClub) {
+  const partidosOficiales = encuentros
+    .filter(p => norm(p.Club) === norm(nombreClub) && !norm(p.Torneo).includes("amistoso"))
+    .filter(p => parseFecha(p.Fecha))
+    .sort((p1, p2) => parseFecha(p1.Fecha) - parseFecha(p2.Fecha));
+
+  if (!partidosOficiales.length) return "";
+
+  const partidosLocal = partidosOficiales.filter(p => cap(norm(p.Condición)) === "Local");
+  const partidosVisitante = partidosOficiales.filter(p => cap(norm(p.Condición)) === "Visitante");
+
+  const bloqueGeneral = armarBloqueRachas(nombreClub, partidosOficiales);
+  const bloqueLocal = armarBloqueRachas(nombreClub, partidosLocal);
+  const bloqueVisitante = armarBloqueRachas(nombreClub, partidosVisitante);
+
+  if (!bloqueGeneral && !bloqueLocal && !bloqueVisitante) return "";
+
+  return `
+    <div class="stat-group">
+      <div class="stat-title">📈 RACHAS Y CAMPAÑAS</div>
+      ${bloqueGeneral ? `<p style="margin:8px 0; font-size:12px;"><b style="color:#FF0000;">GENERAL:</b><br>${bloqueGeneral}</p>` : ""}
+      ${bloqueLocal ? `<p style="margin:8px 0; font-size:12px;"><b style="color:#FF0000;">DE LOCAL:</b><br>${bloqueLocal}</p>` : ""}
+      ${bloqueVisitante ? `<p style="margin:8px 0; font-size:12px;"><b style="color:#FF0000;">DE VISITANTE:</b><br>${bloqueVisitante}</p>` : ""}
+    </div>
+  `;
+}
+
 const transfersData = obtenerTransferencias(nombreClub);
 
 const htmlTransfers = `
   <div class="stat-group">
     <div class="stat-title">🔄 TRANSFERENCIAS</div>
 
-    <ul>
-      ${transfersData.map(t => `
+    <ul style="max-height:380px; overflow-y:auto; padding-right:6px; border:1px solid #ffdddd; border-radius:8px; margin:0;">
+      ${[...transfersData].reverse().map(t => `
 <li style="display:flex;align-items:center;gap:10px;">
   
   <img src="${t.foto}"
@@ -1252,20 +1457,26 @@ const htmlTransfers = `
 const htmlGoleadores = `
     <hr style="margin:15px 0; border-color:#FF1111;">
   <div class="stat-group">
-    <div class="stat-title">⚽ GOLEADORES HISTÓRICOS -en construcción-</div>
+    <div class="stat-title">⚽ GOLEADORES HISTÓRICOS</div>
 
     <div style="display:flex; gap:20px; flex-wrap:wrap;">
       
 <div style="flex:1;">
-  <b style="color:#FF0000;">Huracán</b>
+  <b style="color:#FF0000; display:flex; align-items:center; gap:6px;">
+    <img src="${getEscudo("Huracán")}" alt="" style="width:18px;height:18px;object-fit:contain;">
+    HURACÁN
+  </b>
   <ul class="goleadores-lista">
     ${renderGoleadoresHuracan(goleadores.huracan)}
   </ul>
 </div>
       <div style="flex:1;">
-        <b>${nombreClub}</b>
-        <ul>
-          ${renderGoleadoresRival(goleadores.rival)}
+        <b style="display:flex; align-items:center; gap:6px;">
+          <img src="${getEscudo(nombreClub)}" alt="" style="width:18px;height:18px;object-fit:contain;">
+          ${escapeHTML(nombreClub).toUpperCase()}
+        </b>
+        <ul class="goleadores-lista">
+          ${renderGoleadoresRival(goleadores.rival, nombreClub)}
         </ul>
       </div>
 
@@ -1279,7 +1490,7 @@ const htmlGoleadores = `
     ${resumenAMISTOSOS}
   `,
   html: html 
-  ? html + htmlGoleadores + htmlTransfers
+  ? html + renderRachasYCampanas(nombreClub) + htmlGoleadores + htmlTransfers
   : "<p>Sin datos disponibles</p>",
   ganados,
   empatados,
@@ -1319,8 +1530,8 @@ const htmlGoleadores = `
       : ""
   }
 </div>
-<div><b>${p.Club}:</b> ${p.Rival}</div>
-                  <div><b>Huracán:</b> ${p.Huracán}</div>
+<div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+                  <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
 ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
                 </div>
@@ -1340,8 +1551,8 @@ ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias"
       : ""
   }
 </div>
-<div><b>Huracán:</b> ${p.Huracán}</div>
-                  <div><b>${p.Club}:</b> ${p.Rival}</div>
+<div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+                  <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
                 ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
               `;
@@ -1380,6 +1591,53 @@ ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias"
         return "https://globopedia.github.io/Artids/escudos/" + fileName;
       }
     }
+
+function enlazarJugadores(texto) {
+  if (!texto) return "";
+
+  // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e"
+  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/i);
+
+  return partes.map(part => {
+    // Si la parte es un separador o signo de puntuación, la devolvemos tal cual
+    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
+      return part;
+    }
+
+    const original = part.trim();
+    if (!original) return part;
+
+    // Si hay un minuto de cambio al inicio (ej: "67 ", "67' ", "45+2 "), lo extraemos
+    const matchMinuto = original.match(/^(\d+(?:\+\d+)?'?\s*)(.*)/);
+    let prefijoMinuto = "";
+    let candidatoNombre = original;
+
+    if (matchMinuto) {
+      prefijoMinuto = matchMinuto[1];
+      candidatoNombre = matchMinuto[2];
+    }
+
+    const nombreLimpio = candidatoNombre.trim();
+    if (!nombreLimpio) return part;
+
+    // Verificamos si el futbolista existe en el listado cargado (array 'futbolistas')
+    const existeEnBase = typeof futbolistas !== "undefined" &&
+      futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
+
+    // Si existe, armamos el enlace en rojo, dejando el número del minuto afuera del link
+    if (existeEnBase) {
+      const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
+      const linkHTML = `<a href="${url}" ` +
+                       `style="color: #d40000; text-decoration: none; font-weight: normal;" ` +
+                       `onmouseover="this.style.fontWeight='bold'" ` +
+                       `onmouseout="this.style.fontWeight='normal'">${candidatoNombre}</a>`;
+      return prefijoMinuto + linkHTML;
+    }
+
+    // Si no está en la base, queda como texto plano
+    return part;
+  }).join("");
+}
 
     function renderIncidencias(texto) {
       if (!texto) return "";
