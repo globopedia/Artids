@@ -756,6 +756,37 @@ function parsearFormacionColumna(texto) {
 //      cualquiera que por algún motivo no esté en la base)
 // Si un jugador no tiene foto propia en la base (típico de jugadores rivales que no
 // pasaron por Huracán), usamos el escudo del club como respaldo.
+// Recorre la lista ya ordenada por partidos jugados y arma el "resto" (los
+// jugadores de campo), respetando un tope de jugadores por línea táctica.
+// Si una línea ya llegó al tope, el siguiente candidato que le tocaría esa
+// línea se saltea (no se descarta del todo el concepto de "quién jugó más":
+// simplemente cede su lugar al que sigue en la lista, que sí entra en una
+// línea con espacio disponible).
+function seleccionarRestoConTope(listaOrdenada, maxPorLinea = 5, maxTotal = 10) {
+  const contadorPorFila = FILAS_CANCHA.map(() => 0);
+  const elegidos = [];
+
+  for (const jugador of listaOrdenada) {
+    if (elegidos.length >= maxTotal) break;
+
+    const filaIndex = FILAS_CANCHA.findIndex(categorias => categorias.includes(jugador.categoria));
+
+    // Categoría no reconocida (cae en la fila "sin categoría" al renderizar):
+    // no le aplicamos tope de línea, porque no compite por un lugar fijo.
+    if (filaIndex === -1) {
+      elegidos.push(jugador);
+      continue;
+    }
+
+    if (contadorPorFila[filaIndex] >= maxPorLinea) continue; // línea llena, lo salteamos
+
+    contadorPorFila[filaIndex]++;
+    elegidos.push(jugador);
+  }
+
+  return elegidos;
+}
+
 function obtenerFormacionEquipo(partidosFiltrados, columna, listaFutbolistas, nombreClubFallback) {
   const conteo = {}; // clave -> { nombre, veces, categoriasDeducidas: {cat: n} }
 
@@ -791,7 +822,8 @@ function obtenerFormacionEquipo(partidosFiltrados, columna, listaFutbolistas, no
     .sort((a, b) => b.veces - a.veces);
 
   const arquero = lista.find(j => j.categoria === "arquero") || null;
-  const resto = lista.filter(j => j.categoria !== "arquero").slice(0, 10);
+  const candidatos = lista.filter(j => j.categoria !== "arquero");
+  const resto = seleccionarRestoConTope(candidatos, 5, 10);
 
   return { arquero, resto };
 }
@@ -2106,6 +2138,64 @@ datosGlobal.forEach((d, i) => {
     draw();
   };
 }
+
+// ============================================================
+// === Sonidos sutiles de interacción (hover en links, click en acordeón)
+// ============================================================
+// Generados por código con Web Audio API (nada de archivos de audio que
+// cargar). OJO: los navegadores bloquean el audio hasta la primera
+// interacción real del usuario (política anti-autoplay) — así que el
+// primerísimo hover, antes de cualquier click, puede no sonar; a partir
+// del primer click en cualquier parte de la página, ya queda desbloqueado.
+let audioCtxSonidos = null;
+function getAudioCtxSonidos() {
+  if (!audioCtxSonidos) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    audioCtxSonidos = new AudioCtx();
+  }
+  if (audioCtxSonidos.state === "suspended") audioCtxSonidos.resume();
+  return audioCtxSonidos;
+}
+
+function reproducirTono(frecuencia, duracionMs, volumen) {
+  try {
+    const ctx = getAudioCtxSonidos();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = frecuencia;
+    gain.gain.value = volumen;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const fin = ctx.currentTime + duracionMs / 1000;
+    gain.gain.exponentialRampToValueAtTime(0.0001, fin);
+    osc.start();
+    osc.stop(fin);
+  } catch (e) {
+    // Si el navegador bloquea el audio, no rompemos nada: quedamos en silencio.
+  }
+}
+
+// "Tick" agudo y cortito al pasar el mouse por cualquier link, o por la
+// barrita de un partido en el listado (cuando pasa de blanco a rojito)
+let ultimoTick = 0;
+document.addEventListener("mouseover", function(e) {
+  const esInteractivo = e.target.closest("a") || e.target.closest(".acordeon-header");
+  if (!esInteractivo) return;
+  const ahora = Date.now();
+  if (ahora - ultimoTick < 150) return; // evita que se dispare en cadena
+  ultimoTick = ahora;
+  reproducirTono(900, 45, 0.035);
+});
+
+// "Tock" un poco más grave al abrir/cerrar un acordeón de partido
+document.addEventListener("click", function(e) {
+  if (e.target.closest(".acordeon-header")) {
+    reproducirTono(500, 70, 0.05);
+  }
+});
   </script>
 </body>
 </html>
