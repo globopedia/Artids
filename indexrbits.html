@@ -554,6 +554,24 @@
       }
       return "";
     }
+
+    // Leemos la URL para ver si trae la etiqueta "?arbitro=" (para poder
+    // linkear directo a un árbitro desde otras páginas del sitio)
+    document.addEventListener("DOMContentLoaded", function() {
+      const parametros = new URLSearchParams(window.location.search);
+      const nombreArbitro = parametros.get("arbitro");
+
+      if (nombreArbitro) {
+        // Le damos medio segundo para que los CSV terminen de cargar
+        setTimeout(() => {
+          const encontrado = arbitros.find(a => norm(a.nombre) === norm(nombreArbitro));
+          if (!encontrado) return;
+          document.getElementById("arbitroSearch").value = encontrado.nombre;
+          document.getElementById("arbitroSelect").value = encontrado.id;
+          mostrarArbitro();
+        }, 500);
+      }
+    });
   </script>
 </body>
 </html>
