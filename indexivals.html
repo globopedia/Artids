@@ -2201,6 +2201,20 @@ document.addEventListener("click", function(e) {
     reproducirTono(500, 70, 0.05);
   }
 });
+
+// Leemos la URL para ver si trae la etiqueta "?club=" (para poder linkear
+// directo a un club desde otras páginas del sitio, como indexorneos.html)
+document.addEventListener("DOMContentLoaded", function() {
+  const parametros = new URLSearchParams(window.location.search);
+  const nombreClub = parametros.get("club");
+
+  if (nombreClub) {
+    setTimeout(() => {
+      const encontrado = clubes.find(c => norm(c.club) === norm(nombreClub));
+      if (encontrado) seleccionarClub(encontrado.id);
+    }, 500);
+  }
+});
   </script>
 </body>
 </html>
