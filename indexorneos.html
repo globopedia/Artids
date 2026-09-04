@@ -11,6 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'MuseoModerno', sans-serif; background:#fff; color:#222; margin:20px; }
     h1 { color:#FF0000; text-align:center; }
@@ -233,6 +234,7 @@
             posicion: (f.Posición ?? f.posicion ?? f.Posicion ?? "").toString().trim(),
             fechNac: (f.FechaNac ?? f.fechNac ?? f.FechNac ?? "").toString().trim(),
             procedencia: (f.Procedencia ?? f.procedencia ?? "").toString().trim(),
+            pais: (f.País ?? f.Pais ?? f.pais ?? "").toString().trim(),
             Foto1: (f.Foto1 ?? f.foto1 ?? "").toString().trim()
           })).filter(f => f.futbolista && f.futbolista !== "-");
         }
@@ -558,6 +560,15 @@ function calcularPuntosPartido(p, minutos) {
   return minutos * coef;
 }
 
+function escapeHTML(valor) {
+  return (valor || "").toString()
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function calcularEdad(fechNacStr, fechPartidoStr) {
   if (!fechNacStr || !fechPartidoStr || fechNacStr === "-") return "S/D";
   const parseFecha = (str) => {
@@ -620,6 +631,9 @@ function mostrarTorneo() {
         .filter(n => n.length > 2)
     )];
 
+    const situacionPartido = cap(norm(p.Situación));
+    const incidenciasPartido = p.Incidencias || "";
+
     nombresEnPartido.forEach(nom => {
       const match = futbolistas.find(f => norm(f.futbolista) === norm(nom));
       if (match) {
@@ -628,89 +642,261 @@ function mostrarTorneo() {
           mapaJugadores[idJugador] = {
             datos: match,
             pj: 0,
+            pg: 0,
+            pe: 0,
+            pp: 0,
             goles: 0,
+            asistencias: 0,
+            expulsiones: 0,
+            vallasInvictas: 0,
+            penalesAtajados: 0,
             minutos: 0,
             globopediaScore: 0
           };
         }
         
         mapaJugadores[idJugador].pj += 1;
-        
+        if (situacionPartido === "Victoria") mapaJugadores[idJugador].pg += 1;
+        else if (situacionPartido === "Empate") mapaJugadores[idJugador].pe += 1;
+        else if (situacionPartido === "Derrota") mapaJugadores[idJugador].pp += 1;
+
         // Cálculo exacto de minutos y puntaje del Hall Globopedia para este partido
         const min = calcularMinutosJugador(p, nom);
         const pts = calcularPuntosPartido(p, min);
         
         mapaJugadores[idJugador].minutos += min;
         mapaJugadores[idJugador].globopediaScore += pts;
+
+        // Goles y expulsiones de ESTE jugador en ESTE partido, buscados en Incidencias
+        const nombreEscapado = nom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const golRegex = new RegExp(`GOL\\s+${nombreEscapado}\\s*\\(HUR\\)`, "gi");
+        mapaJugadores[idJugador].goles += (incidenciasPartido.match(golRegex) || []).length;
+
+        const expRegex = new RegExp(`EXP\\s+${nombreEscapado}\\s*\\(HUR\\)`, "i");
+        if (expRegex.test(incidenciasPartido)) mapaJugadores[idJugador].expulsiones += 1;
+
+        // Asistencias: formato "asistencia de 'Nombre' (HUR)" (las comillas son
+        // opcionales acá, por si algún día se cargan sin ellas). Todavía no hay
+        // datos cargados en el CSV con este formato, pero el conteo ya está listo.
+        const asistRegex = new RegExp(`asistencia\\s+de\\s+['"]?${nombreEscapado}['"]?\\s*\\(HUR\\)`, "gi");
+        mapaJugadores[idJugador].asistencias += (incidenciasPartido.match(asistRegex) || []).length;
+
+        // Vallas invictas y penales atajados, solo tienen sentido para arqueros
+        if (norm(match.posicion || "").includes("arquero")) {
+          if ((parseInt(p.Resultado2) || 0) === 0) mapaJugadores[idJugador].vallasInvictas += 1;
+
+          // El penal atajado se registra en el texto de Incidencias del pateador,
+          // como "-ataja NombreDelArquero (HUR)-"
+          const penalAtajadoRegex = new RegExp(`ataja\\s+${nombreEscapado}\\s*\\(HUR\\)`, "gi");
+          mapaJugadores[idJugador].penalesAtajados += (incidenciasPartido.match(penalAtajadoRegex) || []).length;
+        }
       }
     });
   });
 
-  // Clasificación por Posición
-  const categorias = {
-    "ARQUEROS": [],
-    "DEFENSORES": [],
-    "VOLANTES": [],
-    "DELANTEROS": []
-  };
+  // Orden único por posición (en vez de agrupar por franjas de "Arqueros /
+  // Defensores / Volantes / Delanteros"), para que todas las fichas se
+  // acomoden en una sola grilla continua y no queden huecos grandes cuando
+  // una posición tiene pocos jugadores.
+  const ORDEN_POSICIONES = [
+    "arquero", "lateral derecho", "defensor central", "lateral izquierdo",
+    "volante derecho", "volante central", "volante izquierdo", "enganche",
+    "wing derecho", "extremo derecho", "delantero", "extremo izquierdo", "wing izquierdo"
+  ];
 
-  Object.values(mapaJugadores).forEach(item => {
-    const pos = norm(item.datos.posicion || "");
-    
-    if (pos.includes("arquero")) {
-      categorias["ARQUEROS"].push(item);
-    } else if (pos.includes("defensor") || pos.includes("lateral") || pos.includes("zaguero")) {
-      categorias["DEFENSORES"].push(item);
-    } else if (pos.includes("volante") || pos.includes("enganche") || pos.includes("medio")) {
-      categorias["VOLANTES"].push(item);
-    } else {
-      categorias["DELANTEROS"].push(item);
-    }
+  function indicePosicion(posicionRaw) {
+    const p = norm(posicionRaw || "");
+    if (!p) return ORDEN_POSICIONES.length;
+    if (p.includes("arquero")) return 0;
+    if (p.includes("lateral derecho")) return 1;
+    if (p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return 2;
+    if (p.includes("lateral izquierdo") || p.includes("defensor izquierdo")) return 3;
+    if (p.includes("volante derecho") || p.includes("half derecho")) return 4;
+    if (p.includes("volante central") || p === "volante") return 5;
+    if (p.includes("volante izquierdo")) return 6;
+    if (p.includes("enganche")) return 7;
+    if (p.includes("wing derecho")) return 8;
+    if (p.includes("extremo derecho")) return 9;
+    if (p.includes("delantero")) return 10;
+    if (p.includes("extremo izquierdo") || p.includes("insider izquierdo")) return 11;
+    if (p.includes("wing izquierdo")) return 12;
+    return ORDEN_POSICIONES.length; // posición no reconocida: al final de todo
+  }
+
+  const plantelOrdenado = Object.values(mapaJugadores).sort((a, b) => {
+    const posA = indicePosicion(a.datos.posicion);
+    const posB = indicePosicion(b.datos.posicion);
+    if (posA !== posB) return posA - posB;
+    return b.globopediaScore - a.globopediaScore; // dentro de la misma posición, por puntaje
   });
 
-  // Armar HTML del Plantel ordenado por Puntaje del Hall Globopedia
+  // Mientras nadie tenga ninguna asistencia cargada en este torneo, no
+  // mostramos esa fila en NINGUNA ficha (para no publicar "Asistencias: 0"
+  // en todas cuando en realidad es que todavía no se cargó el dato). Apenas
+  // uno solo tenga alguna, la fila aparece en todo el plantel del torneo.
+  const hayAsistenciasEnTorneo = Object.values(mapaJugadores).some(item => item.asistencias > 0);
+
+  // Puntaje más alto y más bajo del plantel de Huracán EN ESTE TORNEO,
+  // para ubicar a cada jugador en su segmento (de 1 a 10) dentro de ese
+  // rango, y así armar la "barra de estrellas" tipo videojuego.
+  const puntajesDelTorneo = Object.values(mapaJugadores).map(item => item.globopediaScore);
+  const puntajeMaxTorneo = puntajesDelTorneo.length ? Math.max(...puntajesDelTorneo) : 0;
+  const puntajeMinTorneo = puntajesDelTorneo.length ? Math.min(...puntajesDelTorneo) : 0;
+
+  function calcularSegmentoEstrella(score, min, max) {
+    if (max === min) return 10; // todos empatados: no hay "peor", les damos el máximo
+    const paso = (max - min) / 10;
+    let segmento = Math.ceil((score - min) / paso);
+    if (segmento < 1) segmento = 1;
+    if (segmento > 10) segmento = 10;
+    return segmento;
+  }
+
+  // 5 estrellas, coloreadas de a medias, según el segmento (1 a 10 = medias
+  // estrellas). El "relleno" se logra con dos capas de texto superpuestas:
+  // una gris de fondo con las 5 estrellas vacías, y otra dorada arriba,
+  // recortada al ancho exacto que corresponda (10% = media estrella).
+  function renderEstrellas(segmento) {
+    const porcentaje = segmento * 10;
+    const contorno = "-1px -1px 0 #B71C1C, 1px -1px 0 #B71C1C, -1px 1px 0 #B71C1C, 1px 1px 0 #B71C1C";
+    return `
+      <div style="position:relative; display:inline-block; font-size:22px; letter-spacing:2px; line-height:1;" title="${(segmento / 2).toFixed(1)} / 5">
+        <div style="color:#fff; text-shadow:${contorno};">★★★★★</div>
+        <div style="position:absolute; top:0; left:0; width:${porcentaje}%; overflow:hidden; white-space:nowrap; color:#FFC107; text-shadow:${contorno};">★★★★★</div>
+      </div>
+    `;
+  }
+
+  // Devuelve el HTML de la primera bandera del jugador (puede tener más de
+  // un país separado por comas/paréntesis; para la tarjeta compacta usamos
+  // solo la primera, la principal).
+  function renderBanderaPrincipal(pais) {
+    if (!pais) return "";
+    const partes = pais
+      .split(/[\(\),.;\/]|(?:\)\s*)|(?:\s*\()|(?:\s*\d+\s*)/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+    if (!partes.length) return "";
+    const primerPais = partes[0];
+    return `<img src="https://globopedia.github.io/Artids/Banderas/${encodeURIComponent(primerPais)}.png" alt="${primerPais}" title="${primerPais}" style="height:14px; border-radius:2px; vertical-align:middle;">`;
+  }
+
+  // Armar HTML del Plantel, ya ordenado por posición (y dentro de cada
+  // posición, por puntaje del Hall Globopedia) — todo en UNA sola grilla,
+  // sin franjas de título por posición, para que no queden huecos grandes.
   let htmlPlantel = `<h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">👥 Plantel en este Torneo</h3>`;
+  htmlPlantel += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:10px; margin-bottom:15px;">`;
 
-  Object.keys(categorias).forEach(cat => {
-    if (categorias[cat].length > 0) {
-      // 🏆 ORDENAR POR PUNTAJE DE HALL GLOBOPEDIA (De mayor a menor)
-      categorias[cat].sort((a, b) => b.globopediaScore - a.globopediaScore);
-
-      htmlPlantel += `<h4 style="background:#f0f0f0; padding:6px 10px; margin:10px 0 6px; border-left:4px solid #FF0000;">${cat}</h4>`;
-      htmlPlantel += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:10px; margin-bottom:15px;">`;
-
-      categorias[cat].forEach(j => {
-        const f = j.datos;
-        
+  plantelOrdenado.forEach(j => {
+      const f = j.datos;
+      
         // Foto desde columna Foto1 del CSV
         const fotoUrl = (f.Foto1 && f.Foto1.trim() !== "" && f.Foto1.trim() !== "-") 
           ? f.Foto1.trim() 
           : "https://globopedia.github.io/Artids/logo_globopedia.png";
 
         const edad = calcularEdad(f.fechNac, primeraFechaTorneo);
-        const procedencia = (f.procedencia && f.procedencia !== "-") ? f.procedencia : "S/D";
-        const puntajeFormateado = j.globopediaScore.toFixed(1);
+        const segmento = calcularSegmentoEstrella(j.globopediaScore, puntajeMinTorneo, puntajeMaxTorneo);
+        const banderaHTML = renderBanderaPrincipal(f.pais);
+        const nombreTorneoCorto = escapeHTML(
+          (torneo.nombre || "")
+            .replace(/campeonato\s*/gi, "")
+            .replace(/-?\s*LPF/gi, "")
+            .replace(/metropolitano/gi, "METRO")
+            .replace(/copa\s+libertadores/gi, "Libertadores")
+            .trim()
+        ).toUpperCase();
+        const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(f.futbolista)}`;
+        const esArquero = norm(f.posicion || "").includes("arquero");
+
+        // El nombre del torneo se ajusta verticalmente para que SIEMPRE entre
+        // en el espacio disponible: si es corto (por ej. solo el año) se
+        // ESTIRA para no quedar apretadito, y si es largo se ACHICA para que
+        // no se pase del límite (antes solo estirábamos, nunca achicábamos,
+        // y por eso los nombres largos no llegaban a entrar).
+        const alturaDisponibleCinta = 81; // px aprox. de alto útil de la cinta, ya con más aire arriba/abajo
+        const anchoTextoEstimado = nombreTorneoCorto.length * 13.5; // ~13.5px por letra a font-size 13
+        let escalaCinta = anchoTextoEstimado > 0 ? alturaDisponibleCinta / anchoTextoEstimado : 1;
+        if (!isFinite(escalaCinta)) escalaCinta = 1;
+        if (escalaCinta < 0.62) escalaCinta = 0.62; // tope para que no quede ilegible de chiquito
+        if (escalaCinta > 1.3) escalaCinta = 1.3;
+
+        // Filas de estadísticas: para arqueros, "Vallas invictas" y "Penales
+        // atajados" en vez de "Goles" y "Asistencias" (que no tienen sentido
+        // para ellos). "Asistencias" además solo se muestra si hay al menos
+        // una cargada en TODO el torneo (para no publicar "0" en cadena).
+        const filasStats = esArquero
+          ? [
+              ["Partidos jugados", j.pj],
+              ["Partidos ganados", j.pg],
+              ["Minutos jugados", j.minutos],
+              ["Vallas invictas", j.vallasInvictas],
+              ["Penales atajados", j.penalesAtajados],
+              ["Expulsiones", j.expulsiones]
+            ]
+          : [
+              ["Partidos jugados", j.pj],
+              ["Partidos ganados", j.pg],
+              ["Minutos jugados", j.minutos],
+              ["Goles", j.goles],
+              ...(hayAsistenciasEnTorneo ? [["Asistencias", j.asistencias]] : []),
+              ["Expulsiones", j.expulsiones]
+            ];
 
         htmlPlantel += `
-          <div style="border:1px solid #ddd; border-radius:10px; padding:10px; text-align:center; background:#fafafa; font-family:'Chakra Petch', sans-serif; position:relative;">
-            <span style="position:absolute; top:6px; right:6px; background:#FF0000; color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;" title="Puntaje Hall Globopedia en este torneo">
-              ⭐ ${puntajeFormateado} pts
-            </span>
-            <img src="${fotoUrl}" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';" style="width:65px; height:65px; object-fit:cover; border-radius:50%; border:2px solid #FF0000; margin-bottom:4px;">
-            <div style="font-weight:bold; font-size:14px; color:#222;">${f.futbolista}</div>
-            <div style="font-size:12px; color:#666; margin-top:2px;">Edad: <b>${edad}</b></div>
-            <div style="font-size:12px; color:#666;">Procedencia: <b>${procedencia}</b></div>
-            <div style="margin-top:6px; font-size:12px; background:#fff; border-radius:6px; padding:3px; border:1px solid #eee; display:flex; justify-content:space-around;">
-              <span><b>PJ:</b> ${j.pj}</span>
-              <span><b>Min:</b> ${j.minutos}'</span>
-            </div>
-          </div>
-        `;
-      });
+          <a href="${urlJugador}" target="_blank" rel="noopener"
+             style="display:block; border:2px solid #222; border-radius:12px; overflow:hidden; text-align:center; background:#fafafa; font-family:'Chakra Petch', sans-serif; position:relative; text-decoration:none; color:inherit; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);">
+            <div style="position:relative;">
+              <img src="${fotoUrl}" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';" style="width:100%; height:215px; object-fit:cover; object-position:center 15%; display:block;">
 
-      htmlPlantel += `</div>`;
-    }
+              <!-- Franja vidriada de punta a punta, en el margen izquierdo (más angosta, para que no aplaste las fotos) -->
+              <div style="position:absolute; top:0; left:0; bottom:0; width:24px; background:rgba(255,255,255,.25); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); border-right:1px solid rgba(255,255,255,.4); z-index:1; display:flex; align-items:center; justify-content:center; padding:64px 0 70px; box-sizing:border-box;">
+                <span style="writing-mode:vertical-rl; transform:rotate(180deg) scaleY(${escalaCinta.toFixed(2)}); transform-origin:center; font-family:'Oswald', 'Chakra Petch', sans-serif; font-weight:700; font-size:13px; letter-spacing:1.5px; color:#8B0000; text-shadow:-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; white-space:nowrap;">
+                  ${nombreTorneoCorto}
+                </span>
+              </div>
+
+              <!-- Escudo del torneo, arriba a la izquierda, sobre la franja vidriada (más grande, para que se distinga bien) -->
+              <img src="${torneo.foto || 'https://globopedia.github.io/Artids/logo_globopedia.png'}" alt="${torneo.nombre}"
+                   style="position:absolute; top:4px; left:4px; width:34px; height:34px; object-fit:contain; background:#fff; border-radius:50%; padding:2px; box-shadow:0 1px 3px rgba(0,0,0,.3); z-index:2;">
+
+              <!-- Escudo de Huracán, en triángulo recortado en la punta superior derecha, centrado dentro del triángulo -->
+              <div style="position:absolute; top:0; right:0; width:56px; height:56px; overflow:hidden; clip-path:polygon(100% 0%, 0% 0%, 100% 100%); z-index:2;">
+                <div style="position:relative; width:100%; height:100%; background:#fff;">
+                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán"
+                       style="position:absolute; top:33%; left:67%; transform:translate(-50%,-50%); width:26px; height:26px; object-fit:contain;">
+                </div>
+              </div>
+
+              <!-- El bloque de nombre/bandera/posición/edad arranca DESPUÉS de la
+                   franja vidriada, no desde el margen izquierdo, para que la
+                   banda nunca lo tape ni le reste contraste. -->
+              <div style="position:absolute; left:24px; right:0; bottom:0; background:linear-gradient(transparent, rgba(139,0,0,.88) 45%); color:#fff; padding:22px 8px 6px; text-align:center;">
+                <div style="font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase;">${f.futbolista}</div>
+                <div style="font-size:11px; display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
+                  ${banderaHTML}
+                  <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${f.posicion || "S/D"}</span>
+                  <span>·</span>
+                  <span style="white-space:nowrap;">${edad}${edad === "S/D" ? " años" : ""}</span>
+                </div>
+              </div>
+            </div>
+            <div style="padding:3px 8px 8px;">
+              ${renderEstrellas(segmento)}
+              <div style="margin-top:3px; font-size:11px; background:#fff; border-radius:6px; border:1px solid #eee; overflow:hidden;">
+                ${filasStats.map(([etiqueta, valor], idx) => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 8px; ${idx % 2 === 0 ? "background:#f7f7f7;" : ""}">
+                    <span style="text-align:left; color:#555;">${etiqueta}:</span>
+                    <span style="text-align:right; font-weight:bold; color:#8B0000;">${valor}</span>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </a>
+        `;
   });
+
+  htmlPlantel += `</div>`;
 
   // --- TARJETAS DE PARTIDOS ---
   let htmlPartidos = "";
