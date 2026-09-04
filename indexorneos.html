@@ -124,6 +124,8 @@
     let torneos = [];
     let encuentros = [];
     let futbolistas = [];
+    let futbolistasPorNombre = new Map();
+    let clubesConFicha = new Set();
     let currentFocus = -1;
 
     // Función auxiliar única para limpiar acentos y mayúsculas
@@ -201,6 +203,7 @@
     document.addEventListener("DOMContentLoaded", function() {
       const torneosURL = "https://artids.vercel.app/api/data?file=orneos";
       const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolists";
+      const clubesURL = "https://artids.vercel.app/api/data?file=lubs";
       const partidosURLs = [
         "https://artids.vercel.app/api/data?file=artids1910",
         "https://artids.vercel.app/api/data?file=artids1925",
@@ -215,9 +218,10 @@
       Promise.all([
         fetch(torneosURL).then(r => r.text()),
         fetch(futbolistasURL).then(r => r.text()).catch(() => ""),
+        fetch(clubesURL).then(r => r.text()).catch(() => ""),
         ...partidosURLs.map(url => fetch(url).then(r => r.text()))
       ])
-      .then(([csvTorneos, csvFutbolistas, ...csvsPartidos]) => {
+      .then(([csvTorneos, csvFutbolistas, csvClubes, ...csvsPartidos]) => {
         
         // Cargar Torneos
         torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
@@ -226,6 +230,16 @@
           foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
         })).filter(t => t.nombre);
+
+        // Cargar Clubes (solo para saber cuáles tienen ficha propia en
+        // indexivals.html, y así poder linkearlos con seguridad)
+        clubesConFicha = new Set();
+        if (csvClubes) {
+          Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.forEach(c => {
+            const nombreClub = (c.Club ?? c.club ?? "").toString().trim();
+            if (nombreClub) clubesConFicha.add(norm(nombreClub));
+          });
+        }
 
         // Cargar Futbolistas
         if (csvFutbolistas) {
@@ -238,6 +252,14 @@
             Foto1: (f.Foto1 ?? f.foto1 ?? "").toString().trim()
           })).filter(f => f.futbolista && f.futbolista !== "-");
         }
+
+        // Mapa de nombre normalizado -> jugador, construido UNA sola vez.
+        // Antes, cada búsqueda de un nombre dentro de una incidencia hacía
+        // un .find() recorriendo TODO el array de futbolistas — multiplicado
+        // por miles de nombres en todo el historial de partidos, eso era
+        // el cuello de botella que hacía tardar tanto la carga inicial.
+        futbolistasPorNombre = new Map();
+        futbolistas.forEach(f => futbolistasPorNombre.set(norm(f.futbolista), f));
 
         // Cargar Partidos
         encuentros = csvsPartidos.flatMap(csv => 
@@ -258,10 +280,130 @@
           }))
         );
 
+        calcularDebuts();
+
         llenarSelectTorneos();
         inicializarAutocompletado();
       })
       .catch(err => console.error("Error cargando datos:", err));
+
+      // ============================================================
+      // === Debuts: "Incorporaciones" (debut real, en amistoso) y
+      // === "Nuevas adquisiciones" (debut oficial) por jugador
+      // ============================================================
+      // Se calcula UNA sola vez con todo el historial de Huracán (encuentros
+      // ya trae TODOS los partidos, de todos los torneos), no cada vez que
+      // se cambia de torneo.
+      let debutTotal = {};     // nombre -> { partido, esAmistoso, datos }
+      let debutOficial = {};   // nombre -> { partido, datos } -- primer partido NO amistoso (puede ser internacional)
+      let debutDomestico = {}; // nombre -> { partido, datos } -- primer partido NI amistoso NI internacional
+
+      function calcularDebuts() {
+        debutTotal = {};
+        debutOficial = {};
+        debutDomestico = {};
+
+        const partidosOrdenados = encuentros
+          .filter(p => p.Huracán && parseFecha(p.Fecha))
+          .slice()
+          .sort((a, b) => parseFecha(a.Fecha) - parseFecha(b.Fecha));
+
+        partidosOrdenados.forEach(p => {
+          const esAmistoso = norm(p.Torneo).includes("amistoso");
+          // "Aislado": internacional o Copa Argentina — ninguno de los dos
+          // cuenta como el debut "de verdad" en el campeonato argentino,
+          // aunque sea oficial (se juegan en fechas sueltas y confunden).
+          const esAislado = !esAmistoso && (esInternacional(p.Torneo) || esCopaArgentina(p.Torneo));
+
+          const nombresEnPartido = [...new Set(
+            p.Huracán.split(/[,;().\n\r]+|\s+\b[ye]\b\s+|[()]+/)
+              .map(n => n.replace(/\b\d+(?:\+\d+)?'?\s*/g, "").trim())
+              .filter(n => n.length > 2)
+          )];
+
+          nombresEnPartido.forEach(nom => {
+            const datos = futbolistasPorNombre.get(norm(nom));
+            if (!datos) return;
+            const clave = datos.futbolista;
+
+            if (!debutTotal[clave]) {
+              debutTotal[clave] = { partido: p, esAmistoso, datos };
+            }
+            if (!esAmistoso && !debutOficial[clave]) {
+              debutOficial[clave] = { partido: p, datos };
+            }
+            // Debut "doméstico puro" (ni amistoso, ni internacional, ni Copa
+            // Argentina): si el debut oficial general de este jugador fue en
+            // uno de esos torneos "aislados", este campo va a marcar un
+            // partido DISTINTO y posterior — el primer campeonato argentino
+            // de verdad donde jugó — para no dejarlo "perdido" ahí.
+            if (!esAmistoso && !esAislado && !debutDomestico[clave]) {
+              debutDomestico[clave] = { partido: p, datos };
+            }
+          });
+        });
+      }
+
+      // Arma el HTML de una lista de debutantes (mismo estilo visual que
+      // "Transferencias": foto -> flecha -> escudo del club de procedencia)
+      function renderDebutantes(lista, titulo, icono) {
+        if (!lista.length) return "";
+
+        // "Inferiores" siempre al final del listado (los que llegan de otro
+        // club van primero, ordenados tal cual venían).
+        const listaOrdenada = [...lista].sort((a, b) => {
+          const aEsInferiores = norm(a.procedencia || "") === "inferiores" ? 1 : 0;
+          const bEsInferiores = norm(b.procedencia || "") === "inferiores" ? 1 : 0;
+          return aEsInferiores - bEsInferiores;
+        });
+
+        return `
+          <div class="stat-group">
+            <div class="stat-title">${icono} ${titulo.toUpperCase()}</div>
+            <ul style="list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-family:'Chakra Petch', sans-serif;">
+              ${listaOrdenada.map(datos => {
+                const procedenciaNorm = norm(datos.procedencia || "");
+                const esInferiores = procedenciaNorm === "inferiores";
+                const escudoUrl = esInferiores
+                  ? getEscudo("Huracán")
+                  : getEscudo(datos.procedencia && datos.procedencia !== "-" ? datos.procedencia : "");
+                const fotoUrl = datos.Foto1 && datos.Foto1.trim() && datos.Foto1.trim() !== "-"
+                  ? datos.Foto1
+                  : "https://globopedia.github.io/Artids/logo_globopedia.png";
+
+                // Nombre del jugador -> siempre linkea (ya sabemos que existe
+                // en Utbolists.csv, porque salió de futbolistasPorNombre).
+                const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(datos.futbolista)}`;
+                const nombreHTML = `<a href="${urlJugador}" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">${escapeHTML(datos.futbolista)}</a>`;
+
+                // Club de procedencia -> solo linkea si tiene ficha propia en
+                // indexivals.html (Lubs.csv), y nunca si es "Inferiores"
+                // (es el propio club, no un club rival con ficha).
+                const tieneFichaClub = !esInferiores && datos.procedencia && datos.procedencia !== "-" &&
+                  clubesConFicha.has(procedenciaNorm);
+                const procedenciaTexto = escapeHTML(datos.procedencia || "S/D");
+                const procedenciaHTML = tieneFichaClub
+                  ? `<a href="https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(datos.procedencia)}" target="_blank" rel="noopener" style="color:#666; text-decoration:none;">${procedenciaTexto}</a>`
+                  : `<span style="color:#666;">${procedenciaTexto}</span>`;
+
+                return `
+                  <li style="display:flex; align-items:center; gap:10px; margin:0;">
+                    <div style="position:relative; width:54px; height:54px; flex-shrink:0;">
+                      <img src="${fotoUrl}" style="width:54px; height:54px; border-radius:50%; object-fit:cover; border:2px solid #FF0000; display:block;">
+                      <img src="${escudoUrl}" title="${escapeHTML(datos.procedencia || 'S/D')}"
+                           style="position:absolute; bottom:-3px; right:-3px; width:26px; height:26px; object-fit:contain; background:#fff; border-radius:50%; padding:1px; box-shadow:0 1px 3px rgba(0,0,0,.4);">
+                    </div>
+                    <div>
+                      <div style="font-weight:bold; text-transform:uppercase; font-size:13px; line-height:1.2;">${nombreHTML}</div>
+                      <div style="font-size:12px;">${procedenciaHTML}</div>
+                    </div>
+                  </li>
+                `;
+              }).join("")}
+            </ul>
+          </div>
+        `;
+      }
 
       function llenarSelectTorneos() {
         const sel = document.getElementById("torneoSelect");
@@ -490,6 +632,10 @@ function esInternacional(torneo) {
   return t.includes("libertadores") || t.includes("sudamericana") || t.includes("conmebol");
 }
 
+function esCopaArgentina(torneo) {
+  return norm(torneo).includes("copa argentina");
+}
+
 function esNacionalB(torneo) {
   const t = norm(torneo);
   return t.includes("nacional b") || t.includes("b nacional") || t.includes("reducido") || t.includes("bn");
@@ -569,16 +715,17 @@ function escapeHTML(valor) {
     .replace(/'/g, "&#39;");
 }
 
+function parseFecha(str) {
+  if (!str) return null;
+  const p = str.split(/[/.-]/);
+  if (p.length !== 3) return null;
+  return p[0].length === 4 
+    ? new Date(p[0], p[1] - 1, p[2]) 
+    : new Date(p[2], p[1] - 1, p[0]);
+}
+
 function calcularEdad(fechNacStr, fechPartidoStr) {
   if (!fechNacStr || !fechPartidoStr || fechNacStr === "-") return "S/D";
-  const parseFecha = (str) => {
-    const p = str.split(/[/.-]/);
-    if (p.length !== 3) return null;
-    return p[0].length === 4 
-      ? new Date(p[0], p[1] - 1, p[2]) 
-      : new Date(p[2], p[1] - 1, p[0]);
-  };
-
   const nac = parseFecha(fechNacStr);
   const partido = parseFecha(fechPartidoStr);
   if (!nac || !partido || isNaN(nac) || isNaN(partido)) return "S/D";
@@ -610,6 +757,37 @@ function mostrarTorneo() {
     norm(torneo.nombre).includes(norm(p.Torneo))
   );
 
+  // Incorporaciones (debut REAL, en amistoso) y Nuevas adquisiciones (debut
+  // OFICIAL) que corresponden a este torneo puntual. Usamos referencia
+  // directa al objeto "partido" (no comparamos texto de torneo de nuevo),
+  // así queda 100% consistente con el mismo criterio de partidosTorneo.
+  const incorporaciones = Object.values(debutTotal)
+    .filter(info => info.esAmistoso && partidosTorneo.includes(info.partido))
+    .map(info => info.datos);
+
+  // "Nuevas adquisiciones" suma dos fuentes, sin duplicar a nadie dentro del
+  // mismo torneo: 1) su debut oficial general (puede ser un torneo
+  // internacional), y 2) si ese debut general fue justo en un torneo
+  // internacional, TAMBIÉN su primer torneo doméstico — para que no quede
+  // "perdido" y sí figure entre los adquiridos del campeonato argentino.
+  const nombresYaListados = new Set();
+  const nuevasAdquisiciones = [];
+
+  Object.entries(debutOficial).forEach(([nombre, info]) => {
+    if (partidosTorneo.includes(info.partido) && !nombresYaListados.has(nombre)) {
+      nuevasAdquisiciones.push(info.datos);
+      nombresYaListados.add(nombre);
+    }
+  });
+
+  Object.entries(debutDomestico).forEach(([nombre, info]) => {
+    const difiereDelOficialGeneral = debutOficial[nombre] && debutOficial[nombre].partido !== info.partido;
+    if (difiereDelOficialGeneral && partidosTorneo.includes(info.partido) && !nombresYaListados.has(nombre)) {
+      nuevasAdquisiciones.push(info.datos);
+      nombresYaListados.add(nombre);
+    }
+  });
+
   const PJ = partidosTorneo.length;
   const PG = partidosTorneo.filter(p => norm(p.Situación) === "victoria").length;
   const PE = partidosTorneo.filter(p => norm(p.Situación) === "empate").length;
@@ -635,7 +813,7 @@ function mostrarTorneo() {
     const incidenciasPartido = p.Incidencias || "";
 
     nombresEnPartido.forEach(nom => {
-      const match = futbolistas.find(f => norm(f.futbolista) === norm(nom));
+      const match = futbolistasPorNombre.get(norm(nom));
       if (match) {
         const idJugador = match.futbolista;
         if (!mapaJugadores[idJugador]) {
@@ -951,7 +1129,10 @@ function mostrarTorneo() {
     ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
     <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
     <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
-    
+
+    ${renderDebutantes(incorporaciones, "Incorporaciones", "🆕")}
+    ${renderDebutantes(nuevasAdquisiciones, "Nuevas adquisiciones", "✍️")}
+
     ${htmlPlantel}
 
     <hr style="border:none; border-top:1px solid #FF0000; margin:20px 0 15px;">
