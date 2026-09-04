@@ -1069,14 +1069,19 @@ function obtenerGoleadores(partidos, nombreClub) {
     const texto = p.Incidencias || "";
     if (!texto.includes("GOL")) return;
 
-    // separa por "GOL"
-    const eventos = texto.split("GOL").slice(1);
+    // Separamos por el separador REAL de incidencias ("</br>"), y de ahí nos
+    // quedamos solo con las líneas que tienen un gol. Si separáramos por
+    // "GOL" directamente, un gol sin otro gol después arrastraría todo el
+    // resto del texto (incluyendo incidencias de otros jugadores, como una
+    // expulsión o lesión posterior) y podía "contaminar" el chequeo de
+    // "(HUR)" con una sigla que en realidad pertenece a otro evento.
+    const eventos = texto.split("</br>").filter(ev => /\bGOL\b/.test(ev));
 
     eventos.forEach(ev => {
       const limpio = ev.trim();
 
-      // nombre hasta el paréntesis
-      const match = limpio.match(/^([^(]+)/);
+      // nombre entre "GOL" y el paréntesis
+      const match = limpio.match(/GOL\s+([^(]+)\(/);
       if (!match) return;
 
       const nombre = match[1].trim();
