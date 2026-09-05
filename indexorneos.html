@@ -346,7 +346,14 @@
             const clave = norm(nom);
             if (!futbolistasPorNombre.has(clave)) return; // no es un jugador conocido
             if (!partidosPorJugador.has(clave)) partidosPorJugador.set(clave, []);
-            partidosPorJugador.get(clave).push({ ...p, fechaObj });
+            // OJO: no copiamos el objeto (evitamos "{...p, fechaObj}") — le
+            // agregamos fechaObj directo a 'p' y guardamos la MISMA
+            // referencia. Si hiciéramos una copia, más abajo en
+            // mostrarTorneo() la comparación "partidosTorneo.includes(...)"
+            // (que compara identidad de objeto, no contenido) nunca iba a
+            // encontrar coincidencia, y las listas quedaban siempre vacías.
+            p.fechaObj = fechaObj;
+            partidosPorJugador.get(clave).push(p);
           });
         });
 
@@ -365,19 +372,31 @@
 
           const nombreCanonico = filas[0].futbolista;
 
-          // Cortamos en etapas
+          // Cortamos en etapas -- pero NUNCA en más etapas de las que el
+          // jugador tenga filas cargadas en el CSV. Un jugador suplente que
+          // jugó salteado (sin haberse ido nunca) puede tener huecos de más
+          // de 11 meses sin que eso signifique una salida real; si hay más
+          // huecos "candidatos" que filas, nos quedamos solo con los más
+          // grandes (los más probables de ser una salida real).
+          const huecosCandidatos = [];
+          for (let i = 1; i < partidosJugador.length; i++) {
+            const diffMeses = (partidosJugador[i].fechaObj - partidosJugador[i - 1].fechaObj) / (1000 * 60 * 60 * 24 * 30);
+            if (diffMeses > 11) huecosCandidatos.push({ indice: i, diffMeses });
+          }
+
+          const maxCortes = filas.length - 1;
+          const cortesElegidos = huecosCandidatos
+            .sort((a, b) => b.diffMeses - a.diffMeses)
+            .slice(0, maxCortes)
+            .map(h => h.indice)
+            .sort((a, b) => a - b);
+
           const etapas = [];
           let indiceInicio = 0;
-          let anterior = partidosJugador[0].fechaObj;
-          for (let i = 1; i < partidosJugador.length; i++) {
-            const actual = partidosJugador[i].fechaObj;
-            const diffMeses = (actual - anterior) / (1000 * 60 * 60 * 24 * 30);
-            if (diffMeses > 11) {
-              etapas.push({ desde: indiceInicio, hasta: i - 1 });
-              indiceInicio = i;
-            }
-            anterior = actual;
-          }
+          cortesElegidos.forEach(corte => {
+            etapas.push({ desde: indiceInicio, hasta: corte - 1 });
+            indiceInicio = corte;
+          });
           etapas.push({ desde: indiceInicio, hasta: partidosJugador.length - 1 });
 
           debutTotal[nombreCanonico] = [];
