@@ -195,12 +195,23 @@
     // Arma la fila de escuditos de los clubes participantes de un torneo,
     // a partir de la columna "Participantes" de Orneos.csv (nombres separados
     // por coma, igual que "trayectoria" en Utbolists.csv).
+    //
+    // Corte de línea manual: si en el CSV escribís un "|" entre dos clubes,
+    // ahí se cierra la fila de escuditos y arranca una nueva debajo. Ej.:
+    //   Boca, River, San Lorenzo, Racing, Independiente, |, Vélez, Huracán
+    // deja "Boca...Independiente" en una fila y "Vélez, Huracán" en la
+    // siguiente, sin depender de cómo envuelva el navegador.
     function renderParticipantesEscudos(participantes) {
       if (!participantes) return "";
-      const clubes = participantes.split(",").map(c => c.trim()).filter(Boolean);
-      if (!clubes.length) return "";
 
-      const escuditos = clubes.map(club => `
+      const filas = participantes
+        .split("|")
+        .map(fila => fila.split(",").map(c => c.trim()).filter(Boolean))
+        .filter(fila => fila.length);
+
+      if (!filas.length) return "";
+
+      const filaHTML = clubes => clubes.map(club => `
         <img
           src="${getEscudo(club)}"
           alt="${club}"
@@ -210,8 +221,12 @@
       `).join("");
 
       return `
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:2px; margin:10px 0;">
-          ${escuditos}
+        <div style="margin:10px 0;">
+          ${filas.map(clubes => `
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:2px;">
+              ${filaHTML(clubes)}
+            </div>
+          `).join("")}
         </div>
       `;
     }
