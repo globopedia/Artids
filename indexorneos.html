@@ -192,6 +192,30 @@
       }
     }
 
+    // Arma la fila de escuditos de los clubes participantes de un torneo,
+    // a partir de la columna "Participantes" de Orneos.csv (nombres separados
+    // por coma, igual que "trayectoria" en Utbolists.csv).
+    function renderParticipantesEscudos(participantes) {
+      if (!participantes) return "";
+      const clubes = participantes.split(",").map(c => c.trim()).filter(Boolean);
+      if (!clubes.length) return "";
+
+      const escuditos = clubes.map(club => `
+        <img
+          src="${getEscudo(club)}"
+          alt="${club}"
+          title="${club}"
+          style="width:44px; height:44px; object-fit:contain; margin:4px;"
+          onerror="this.style.display='none'">
+      `).join("");
+
+      return `
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:2px; margin:10px 0;">
+          ${escuditos}
+        </div>
+      `;
+    }
+
     function renderIncidencias(texto) {
       if (!texto) return "";
       return texto
@@ -231,7 +255,8 @@
           id: (c.ID ?? c.id ?? i).toString().trim(),
           nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
           foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
-          datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim()
+          datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim(),
+          participantes: (c.Participantes ?? c.participantes ?? "").toString().trim()
         })).filter(t => t.nombre);
 
         // Cargar Clubes (solo para saber cuáles tienen ficha propia en
@@ -1234,6 +1259,7 @@ function mostrarTorneo() {
       <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
       <h2>${torneo.nombre}</h2>
     </div>
+    ${renderParticipantesEscudos(torneo.participantes)}
     ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
     <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
     <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
