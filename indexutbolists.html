@@ -1290,6 +1290,17 @@ function mostrarFutbolistas() {
     return;
   }
 
+  // Si el jugador tiene más de una fila en el CSV (volvió al club más de
+  // una vez), "Procedencia" viene de la PRIMERA fila (de dónde llegó
+  // originalmente), pero "Destino" tiene que venir de la ÚLTIMA fila (su
+  // salida definitiva) — si no, queda mostrando un destino intermedio
+  // (por ejemplo, "se fue a Defensor" cuando en realidad volvió después y
+  // recién ahí se retiró).
+  const filasDelJugador = futbolistas.filter(a => a.futbolista === futbolistaId);
+  const destinoFinal = filasDelJugador.length
+    ? filasDelJugador[filasDelJugador.length - 1].destino
+    : futbolista.destino;
+
   // 🔹 Traemos el Resumen, Debut y Despedida optimizados de un solo tirón
   const datosHuracan = getDatosCarreraHuracan(futbolista.futbolista);
 
@@ -1387,7 +1398,7 @@ function mostrarFutbolistas() {
     ${htmlNacimiento}
     ${htmlMuerte}
     ${htmlFisico}
-    ${campo("Destino", futbolista.destino)}
+    ${campo("Destino", destinoFinal)}
     ${campo("Biografía", futbolista.biografía)}
 
     <div style="text-align:center;">
@@ -2060,9 +2071,20 @@ function filtrarFutbolistas(termino) {
 
   if (!termNorm) return;
 
-  const resultados = futbolistas
-    .filter(a => norm(a.futbolista).includes(termNorm))
-    .slice(0, 15);
+  // Un jugador puede tener más de una fila en el CSV (si volvió al club más
+  // de una vez, con Procedencia/Destino distintos por etapa) — acá solo nos
+  // interesa mostrarlo UNA vez en la lista, quedándonos con la primera fila
+  // que aparezca para ese nombre.
+  const vistos = new Set();
+  const resultados = [];
+  for (const a of futbolistas) {
+    if (!norm(a.futbolista).includes(termNorm)) continue;
+    const clave = norm(a.futbolista);
+    if (vistos.has(clave)) continue;
+    vistos.add(clave);
+    resultados.push(a);
+    if (resultados.length >= 15) break;
+  }
 
   resultados.forEach(r => {
     const li = document.createElement("li");
