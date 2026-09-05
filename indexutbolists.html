@@ -2259,16 +2259,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
   <script>
   // --- Aviso al padre (Blogger) de la altura real del contenido ---
-  // Esto es lo que permite que el <iframe> en globopedia.ar se ajuste
-  // a la altura real de esta página y no le queden dos scrolls.
+  // Mismo mecanismo que ya usa indexivals.html (Rivales), que sabemos que funciona:
+  // MutationObserver + resize + imágenes + un reenvío corto de respaldo.
   function enviarAltura() {
-    parent.postMessage(
-      { type: "ajustarAltura", altura: document.documentElement.scrollHeight },
-      "*"
-    );
+    const altura = document.documentElement.scrollHeight || document.body.scrollHeight;
+    parent.postMessage({ type: 'ajustarAltura', altura: altura }, '*');
   }
-  window.addEventListener("load", enviarAltura);
-  new ResizeObserver(enviarAltura).observe(document.body);
+
+  // Envío inicial y en resize
+  window.addEventListener('load', enviarAltura);
+  window.addEventListener('resize', enviarAltura);
+
+  // Detecta cambios dinámicos en el DOM (buscador, resultados, acordeones)
+  const moFutbolistas = new MutationObserver(() => enviarAltura());
+  moFutbolistas.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
+
+  // Recalcula cuando terminan de cargar las imágenes (fotos, escudos)
+  document.querySelectorAll('img').forEach(img => {
+    if (!img.complete) img.addEventListener('load', enviarAltura);
+  });
+
+  // Reenvío periódico corto como red de seguridad (transiciones CSS del acordeón, etc.)
+  let contadorAltura = 0;
+  const fallbackAltura = setInterval(() => {
+    enviarAltura();
+    if (++contadorAltura > 10) clearInterval(fallbackAltura);
+  }, 500);
   </script>
 </body>
 </html>
