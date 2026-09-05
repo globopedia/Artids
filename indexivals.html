@@ -1672,10 +1672,10 @@ const htmlGoleadores = `
               bloqueHTML = `
                 <div class="partido-card">
                   ${getTorneoImage(p.Torneo)}
-                  <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                  <img class="escudo-rival" loading="lazy" src="${getEscudo(p.Club)}" alt="${p.Club}" />
                   <div class="resultado2-box">${p.Resultado2}</div>
                   <div class="resultado1-box">${p.Resultado1}</div>
-                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" class="escudo-huracan">
+                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" loading="lazy" class="escudo-huracan">
                   <div><b>${p.Torneo}</b></div>
                   <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro)}</div>
                   <div>
@@ -1694,10 +1694,10 @@ ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias"
               bloqueHTML = `
                 <div class="partido-card">
                   ${getTorneoImage(p.Torneo)}
-                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" class="escudo-huracan">
+                  <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" loading="lazy" class="escudo-huracan">
                   <div class="resultado1-box">${p.Resultado1}</div>
                   <div class="resultado2-box">${p.Resultado2}</div>
-                  <img class="escudo-rival" src="${getEscudo(p.Club)}" alt="${p.Club}" />
+                  <img class="escudo-rival" loading="lazy" src="${getEscudo(p.Club)}" alt="${p.Club}" />
                   <div><b>${p.Torneo}</b></div>
                   <div><b>Estadio:</b> ${p.Estadio} - <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro)}</div>
                   <div>${ p.Estadio && getEstadioImage(p.Estadio)
