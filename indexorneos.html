@@ -318,80 +318,23 @@
       // cortando cada vez que hay un salto de más de 11 meses sin jugar (o
       // sea, más de una temporada entera saltada) — así distinguimos una
       // ida y vuelta real de un simple receso de fin de temporada.
-      function obtenerPeriodosJugador(nombreJugador) {
-        const partidosJugador = encuentros.filter(p =>
-          p.Huracán && norm(p.Huracán).includes(norm(nombreJugador))
-        );
-        if (!partidosJugador.length) return [];
-
-        const partidosOrdenados = partidosJugador
-          .map(p => ({ ...p, fechaObj: parseFecha(p.Fecha) }))
-          .filter(p => p.fechaObj instanceof Date && !isNaN(p.fechaObj))
-          .sort((a, b) => a.fechaObj - b.fechaObj);
-
-        if (!partidosOrdenados.length) return [];
-
-        const periodos = [];
-        let inicio = partidosOrdenados[0].fechaObj;
-        let anterior = inicio;
-
-        for (let i = 1; i < partidosOrdenados.length; i++) {
-          const actual = partidosOrdenados[i].fechaObj;
-          const diffMeses = (actual - anterior) / (1000 * 60 * 60 * 24 * 30);
-          if (diffMeses > 11) {
-            periodos.push({ primera: inicio, ultima: anterior });
-            inicio = actual;
-          }
-          anterior = actual;
-        }
-        periodos.push({ primera: inicio, ultima: anterior });
-        return periodos;
-      }
-
-      function indicePeriodoParaFecha(periodos, fechaObj) {
-        for (let i = 0; i < periodos.length; i++) {
-          const inicioSiguiente = periodos[i + 1] ? periodos[i + 1].primera : null;
-          if (fechaObj >= periodos[i].primera && (!inicioSiguiente || fechaObj < inicioSiguiente)) {
-            return i;
-          }
-        }
-        return periodos.length - 1;
-      }
-
-      // Devuelve la fila del CSV (con su Procedencia/Destino/Foto) que
-      // corresponde a la etapa del jugador en la que cae 'fechaObj' — esto
-      // es lo que resuelve el caso de jugadores con más de una etapa en el
-      // club (llegó, se fue, volvió): cada debut usa la fila de SU propia
-      // etapa, no siempre la primera fila que aparezca en el CSV.
-      function obtenerFilaParaFecha(nombreJugador, fechaObj) {
-        const filas = filasPorJugadorMap.get(norm(nombreJugador));
-        if (!filas || !filas.length) return null;
-        if (filas.length === 1) return filas[0];
-
-        const periodos = obtenerPeriodosJugador(nombreJugador);
-        if (!periodos.length) return filas[0];
-
-        const indice = indicePeriodoParaFecha(periodos, fechaObj);
-        return filas[Math.min(indice, filas.length - 1)];
-      }
-
       function calcularDebuts() {
         debutTotal = {};
         debutOficial = {};
         debutDomestico = {};
 
-        const partidosOrdenados = encuentros
-          .filter(p => p.Huracán && parseFecha(p.Fecha))
-          .slice()
-          .sort((a, b) => parseFecha(a.Fecha) - parseFecha(b.Fecha));
+        // Pre-agrupamos los partidos de CADA jugador conocido, en un único
+        // recorrido de todo el historial. Antes, por cada nombre de cada
+        // partido se volvía a recorrer/filtrar TODO 'encuentros' para
+        // calcular sus períodos — multiplicado por miles de apariciones en
+        // toda la carrera de un jugador prolífico, eso era lo que hacía
+        // tardar tanto la carga del menú de Torneos.
+        const partidosPorJugador = new Map(); // nombre normalizado -> sus partidos, ordenados
 
-        partidosOrdenados.forEach(p => {
-          const esAmistoso = norm(p.Torneo).includes("amistoso");
-          // "Aislado": internacional o Copa Argentina — ninguno de los dos
-          // cuenta como el debut "de verdad" en el campeonato argentino,
-          // aunque sea oficial (se juegan en fechas sueltas y confunden).
-          const esAislado = !esAmistoso && (esInternacional(p.Torneo) || esCopaArgentina(p.Torneo));
-          const fechaPartido = parseFecha(p.Fecha);
+        encuentros.forEach(p => {
+          if (!p.Huracán) return;
+          const fechaObj = parseFecha(p.Fecha);
+          if (!fechaObj) return;
 
           const nombresEnPartido = [...new Set(
             p.Huracán.split(/[,;().\n\r]+|\s+\b[ye]\b\s+|[()]+/)
@@ -400,29 +343,74 @@
           )];
 
           nombresEnPartido.forEach(nom => {
-            const existeJugador = futbolistasPorNombre.get(norm(nom));
-            if (!existeJugador) return;
-            const clave = existeJugador.futbolista;
+            const clave = norm(nom);
+            if (!futbolistasPorNombre.has(clave)) return; // no es un jugador conocido
+            if (!partidosPorJugador.has(clave)) partidosPorJugador.set(clave, []);
+            partidosPorJugador.get(clave).push({ ...p, fechaObj });
+          });
+        });
 
-            // Para saber "de dónde vino" en ESTE debut puntual, buscamos la
-            // fila que corresponde a la etapa donde cae la fecha de este
-            // partido (por si tuvo más de una etapa en el club), en vez de
-            // usar siempre la primera fila que haya del jugador.
-            const filaDeEstaEtapa = obtenerFilaParaFecha(nom, fechaPartido) || existeJugador;
+        partidosPorJugador.forEach(lista => lista.sort((a, b) => a.fechaObj - b.fechaObj));
 
-            if (!debutTotal[clave]) {
-              debutTotal[clave] = { partido: p, esAmistoso, datos: filaDeEstaEtapa };
+        // Para cada jugador (con sus filas del CSV ya agrupadas en
+        // 'filasPorJugadorMap'), separamos su carrera en ETAPAS -- cortando
+        // cada vez que hay un salto de más de 11 meses sin jugar -- y
+        // emparejamos la etapa 1 con la fila 1, la etapa 2 con la fila 2,
+        // etc. Cada etapa puede generar su propia "Incorporación" o "Nueva
+        // adquisición", así una vuelta al club (como la de Masantonio en
+        // 1945) no queda invisible por haber debutado antes, en 1931.
+        filasPorJugadorMap.forEach((filas, claveNorm) => {
+          const partidosJugador = partidosPorJugador.get(claveNorm);
+          if (!partidosJugador || !partidosJugador.length) return;
+
+          const nombreCanonico = filas[0].futbolista;
+
+          // Cortamos en etapas
+          const etapas = [];
+          let indiceInicio = 0;
+          let anterior = partidosJugador[0].fechaObj;
+          for (let i = 1; i < partidosJugador.length; i++) {
+            const actual = partidosJugador[i].fechaObj;
+            const diffMeses = (actual - anterior) / (1000 * 60 * 60 * 24 * 30);
+            if (diffMeses > 11) {
+              etapas.push({ desde: indiceInicio, hasta: i - 1 });
+              indiceInicio = i;
             }
-            if (!esAmistoso && !debutOficial[clave]) {
-              debutOficial[clave] = { partido: p, datos: filaDeEstaEtapa };
+            anterior = actual;
+          }
+          etapas.push({ desde: indiceInicio, hasta: partidosJugador.length - 1 });
+
+          debutTotal[nombreCanonico] = [];
+          debutOficial[nombreCanonico] = [];
+          debutDomestico[nombreCanonico] = [];
+
+          etapas.forEach((etapa, i) => {
+            const fila = filas[Math.min(i, filas.length - 1)];
+            const partidosDeEstaEtapa = partidosJugador.slice(etapa.desde, etapa.hasta + 1);
+
+            // Dentro de ESTA etapa puntual, buscamos: el primer amistoso
+            // (para "Incorporaciones"), el primer oficial de cualquier tipo,
+            // y el primer oficial "doméstico puro" (ni amistoso, ni
+            // internacional, ni Copa Argentina) -- igual que hacíamos antes,
+            // pero ahora repetido en cada etapa, no solo en la primera.
+            let primerAmistoso = null, primerOficial = null, primerDomestico = null;
+            for (const p of partidosDeEstaEtapa) {
+              const esAm = norm(p.Torneo).includes("amistoso");
+              const esAis = !esAm && (esInternacional(p.Torneo) || esCopaArgentina(p.Torneo));
+              if (esAm && !primerAmistoso) primerAmistoso = p;
+              if (!esAm && !primerOficial) primerOficial = p;
+              if (!esAm && !esAis && !primerDomestico) primerDomestico = p;
+              if (primerAmistoso && primerOficial && primerDomestico) break;
             }
-            // Debut "doméstico puro" (ni amistoso, ni internacional, ni Copa
-            // Argentina): si el debut oficial general de este jugador fue en
-            // uno de esos torneos "aislados", este campo va a marcar un
-            // partido DISTINTO y posterior — el primer campeonato argentino
-            // de verdad donde jugó — para no dejarlo "perdido" ahí.
-            if (!esAmistoso && !esAislado && !debutDomestico[clave]) {
-              debutDomestico[clave] = { partido: p, datos: filaDeEstaEtapa };
+
+            if (primerAmistoso) {
+              debutTotal[nombreCanonico].push({ partido: primerAmistoso, esAmistoso: true, datos: fila });
+            }
+            if (primerOficial) {
+              debutOficial[nombreCanonico].push({ partido: primerOficial, datos: fila });
+            }
+            if (primerDomestico && primerDomestico !== primerOficial) {
+              debutDomestico[nombreCanonico].push({ partido: primerDomestico, datos: fila });
             }
           });
         });
@@ -842,34 +830,51 @@ function mostrarTorneo() {
   );
 
   // Incorporaciones (debut REAL, en amistoso) y Nuevas adquisiciones (debut
-  // OFICIAL) que corresponden a este torneo puntual. Usamos referencia
-  // directa al objeto "partido" (no comparamos texto de torneo de nuevo),
-  // así queda 100% consistente con el mismo criterio de partidosTorneo.
-  const incorporaciones = Object.values(debutTotal)
-    .filter(info => info.esAmistoso && partidosTorneo.includes(info.partido))
-    .map(info => info.datos);
-
-  // "Nuevas adquisiciones" suma dos fuentes, sin duplicar a nadie dentro del
-  // mismo torneo: 1) su debut oficial general (puede ser un torneo
-  // internacional), y 2) si ese debut general fue justo en un torneo
-  // internacional, TAMBIÉN su primer torneo doméstico — para que no quede
-  // "perdido" y sí figure entre los adquiridos del campeonato argentino.
-  const nombresYaListados = new Set();
-  const nuevasAdquisiciones = [];
-
-  Object.entries(debutOficial).forEach(([nombre, info]) => {
-    if (partidosTorneo.includes(info.partido) && !nombresYaListados.has(nombre)) {
-      nuevasAdquisiciones.push(info.datos);
-      nombresYaListados.add(nombre);
-    }
+  // OFICIAL) que corresponden a este torneo puntual. Cada jugador puede
+  // tener MÁS DE UNA entrada (una por cada etapa distinta en el club, si se
+  // fue y volvió) — por eso recorremos arrays, no un valor único por
+  // jugador. Usamos referencia directa al objeto "partido" (no comparamos
+  // texto de torneo de nuevo), así queda 100% consistente con el mismo
+  // criterio de partidosTorneo.
+  const incorporaciones = [];
+  Object.values(debutTotal).forEach(eventos => {
+    eventos.forEach(info => {
+      if (info.esAmistoso && partidosTorneo.includes(info.partido)) {
+        incorporaciones.push(info.datos);
+      }
+    });
   });
 
-  Object.entries(debutDomestico).forEach(([nombre, info]) => {
-    const difiereDelOficialGeneral = debutOficial[nombre] && debutOficial[nombre].partido !== info.partido;
-    if (difiereDelOficialGeneral && partidosTorneo.includes(info.partido) && !nombresYaListados.has(nombre)) {
-      nuevasAdquisiciones.push(info.datos);
-      nombresYaListados.add(nombre);
-    }
+  // "Nuevas adquisiciones" suma dos fuentes por cada etapa, sin duplicar el
+  // mismo evento puntual dentro del mismo torneo: 1) el debut oficial de esa
+  // etapa (puede ser un torneo internacional o Copa Argentina), y 2) si ese
+  // debut fue justo en uno de esos torneos "aislados", TAMBIÉN el primer
+  // torneo doméstico de esa misma etapa — para que no quede "perdido".
+  const eventosYaListados = new Set();
+  const nuevasAdquisiciones = [];
+
+  function claveEvento(nombre, partido) {
+    return `${nombre}|${partido.Fecha}|${partido.Torneo}`;
+  }
+
+  Object.entries(debutOficial).forEach(([nombre, eventos]) => {
+    eventos.forEach(info => {
+      const clave = claveEvento(nombre, info.partido);
+      if (partidosTorneo.includes(info.partido) && !eventosYaListados.has(clave)) {
+        nuevasAdquisiciones.push(info.datos);
+        eventosYaListados.add(clave);
+      }
+    });
+  });
+
+  Object.entries(debutDomestico).forEach(([nombre, eventos]) => {
+    eventos.forEach(info => {
+      const clave = claveEvento(nombre, info.partido);
+      if (partidosTorneo.includes(info.partido) && !eventosYaListados.has(clave)) {
+        nuevasAdquisiciones.push(info.datos);
+        eventosYaListados.add(clave);
+      }
+    });
   });
 
   const PJ = partidosTorneo.length;
