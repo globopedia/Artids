@@ -2256,5 +2256,19 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
   </script>
+
+  <script>
+  // --- Aviso al padre (Blogger) de la altura real del contenido ---
+  // Esto es lo que permite que el <iframe> en globopedia.ar se ajuste
+  // a la altura real de esta página y no le queden dos scrolls.
+  function enviarAltura() {
+    parent.postMessage(
+      { type: "ajustarAltura", altura: document.documentElement.scrollHeight },
+      "*"
+    );
+  }
+  window.addEventListener("load", enviarAltura);
+  new ResizeObserver(enviarAltura).observe(document.body);
+  </script>
 </body>
 </html>
