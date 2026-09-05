@@ -104,6 +104,8 @@
     }
     .escudo-huracan, .escudo-rival { width: 45px; height: 45px; object-fit: contain; vertical-align: middle; }
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; margin: 6px 0; }
+    .debutante-link { transition: color 0.15s ease; }
+    .debutante-link:hover { color: #FF0000 !important; }
   </style>
 </head>
 <body>
@@ -125,6 +127,7 @@
     let encuentros = [];
     let futbolistas = [];
     let futbolistasPorNombre = new Map();
+    let filasPorJugadorMap = new Map();
     let clubesConFicha = new Set();
     let currentFocus = -1;
 
@@ -258,8 +261,21 @@
         // un .find() recorriendo TODO el array de futbolistas — multiplicado
         // por miles de nombres en todo el historial de partidos, eso era
         // el cuello de botella que hacía tardar tanto la carga inicial.
+        //
+        // Un jugador puede tener MÁS DE UNA fila en Utbolists.csv, si volvió
+        // al club más de una vez (llegó, se fue, volvió). 'futbolistasPorNombre'
+        // guarda solo la PRIMERA fila de cada uno (sirve para todo lo que no
+        // depende de la etapa: posición, foto, fecha de nacimiento). Para lo
+        // que sí depende de la etapa (de dónde vino en ESTE debut puntual),
+        // usamos 'filasPorJugadorMap', que guarda TODAS sus filas en orden.
         futbolistasPorNombre = new Map();
-        futbolistas.forEach(f => futbolistasPorNombre.set(norm(f.futbolista), f));
+        filasPorJugadorMap = new Map();
+        futbolistas.forEach(f => {
+          const clave = norm(f.futbolista);
+          if (!futbolistasPorNombre.has(clave)) futbolistasPorNombre.set(clave, f);
+          if (!filasPorJugadorMap.has(clave)) filasPorJugadorMap.set(clave, []);
+          filasPorJugadorMap.get(clave).push(f);
+        });
 
         // Cargar Partidos
         encuentros = csvsPartidos.flatMap(csv => 
@@ -298,6 +314,67 @@
       let debutOficial = {};   // nombre -> { partido, datos } -- primer partido NO amistoso (puede ser internacional)
       let debutDomestico = {}; // nombre -> { partido, datos } -- primer partido NI amistoso NI internacional
 
+      // Detecta los "períodos" reales de actividad de un jugador en Huracán,
+      // cortando cada vez que hay un salto de más de 11 meses sin jugar (o
+      // sea, más de una temporada entera saltada) — así distinguimos una
+      // ida y vuelta real de un simple receso de fin de temporada.
+      function obtenerPeriodosJugador(nombreJugador) {
+        const partidosJugador = encuentros.filter(p =>
+          p.Huracán && norm(p.Huracán).includes(norm(nombreJugador))
+        );
+        if (!partidosJugador.length) return [];
+
+        const partidosOrdenados = partidosJugador
+          .map(p => ({ ...p, fechaObj: parseFecha(p.Fecha) }))
+          .filter(p => p.fechaObj instanceof Date && !isNaN(p.fechaObj))
+          .sort((a, b) => a.fechaObj - b.fechaObj);
+
+        if (!partidosOrdenados.length) return [];
+
+        const periodos = [];
+        let inicio = partidosOrdenados[0].fechaObj;
+        let anterior = inicio;
+
+        for (let i = 1; i < partidosOrdenados.length; i++) {
+          const actual = partidosOrdenados[i].fechaObj;
+          const diffMeses = (actual - anterior) / (1000 * 60 * 60 * 24 * 30);
+          if (diffMeses > 11) {
+            periodos.push({ primera: inicio, ultima: anterior });
+            inicio = actual;
+          }
+          anterior = actual;
+        }
+        periodos.push({ primera: inicio, ultima: anterior });
+        return periodos;
+      }
+
+      function indicePeriodoParaFecha(periodos, fechaObj) {
+        for (let i = 0; i < periodos.length; i++) {
+          const inicioSiguiente = periodos[i + 1] ? periodos[i + 1].primera : null;
+          if (fechaObj >= periodos[i].primera && (!inicioSiguiente || fechaObj < inicioSiguiente)) {
+            return i;
+          }
+        }
+        return periodos.length - 1;
+      }
+
+      // Devuelve la fila del CSV (con su Procedencia/Destino/Foto) que
+      // corresponde a la etapa del jugador en la que cae 'fechaObj' — esto
+      // es lo que resuelve el caso de jugadores con más de una etapa en el
+      // club (llegó, se fue, volvió): cada debut usa la fila de SU propia
+      // etapa, no siempre la primera fila que aparezca en el CSV.
+      function obtenerFilaParaFecha(nombreJugador, fechaObj) {
+        const filas = filasPorJugadorMap.get(norm(nombreJugador));
+        if (!filas || !filas.length) return null;
+        if (filas.length === 1) return filas[0];
+
+        const periodos = obtenerPeriodosJugador(nombreJugador);
+        if (!periodos.length) return filas[0];
+
+        const indice = indicePeriodoParaFecha(periodos, fechaObj);
+        return filas[Math.min(indice, filas.length - 1)];
+      }
+
       function calcularDebuts() {
         debutTotal = {};
         debutOficial = {};
@@ -314,6 +391,7 @@
           // cuenta como el debut "de verdad" en el campeonato argentino,
           // aunque sea oficial (se juegan en fechas sueltas y confunden).
           const esAislado = !esAmistoso && (esInternacional(p.Torneo) || esCopaArgentina(p.Torneo));
+          const fechaPartido = parseFecha(p.Fecha);
 
           const nombresEnPartido = [...new Set(
             p.Huracán.split(/[,;().\n\r]+|\s+\b[ye]\b\s+|[()]+/)
@@ -322,15 +400,21 @@
           )];
 
           nombresEnPartido.forEach(nom => {
-            const datos = futbolistasPorNombre.get(norm(nom));
-            if (!datos) return;
-            const clave = datos.futbolista;
+            const existeJugador = futbolistasPorNombre.get(norm(nom));
+            if (!existeJugador) return;
+            const clave = existeJugador.futbolista;
+
+            // Para saber "de dónde vino" en ESTE debut puntual, buscamos la
+            // fila que corresponde a la etapa donde cae la fecha de este
+            // partido (por si tuvo más de una etapa en el club), en vez de
+            // usar siempre la primera fila que haya del jugador.
+            const filaDeEstaEtapa = obtenerFilaParaFecha(nom, fechaPartido) || existeJugador;
 
             if (!debutTotal[clave]) {
-              debutTotal[clave] = { partido: p, esAmistoso, datos };
+              debutTotal[clave] = { partido: p, esAmistoso, datos: filaDeEstaEtapa };
             }
             if (!esAmistoso && !debutOficial[clave]) {
-              debutOficial[clave] = { partido: p, datos };
+              debutOficial[clave] = { partido: p, datos: filaDeEstaEtapa };
             }
             // Debut "doméstico puro" (ni amistoso, ni internacional, ni Copa
             // Argentina): si el debut oficial general de este jugador fue en
@@ -338,7 +422,7 @@
             // partido DISTINTO y posterior — el primer campeonato argentino
             // de verdad donde jugó — para no dejarlo "perdido" ahí.
             if (!esAmistoso && !esAislado && !debutDomestico[clave]) {
-              debutDomestico[clave] = { partido: p, datos };
+              debutDomestico[clave] = { partido: p, datos: filaDeEstaEtapa };
             }
           });
         });
@@ -374,7 +458,7 @@
                 // Nombre del jugador -> siempre linkea (ya sabemos que existe
                 // en Utbolists.csv, porque salió de futbolistasPorNombre).
                 const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(datos.futbolista)}`;
-                const nombreHTML = `<a href="${urlJugador}" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">${escapeHTML(datos.futbolista)}</a>`;
+                const nombreHTML = `<a href="${urlJugador}" target="_blank" rel="noopener" class="debutante-link" style="color:inherit; text-decoration:none;">${escapeHTML(datos.futbolista)}</a>`;
 
                 // Club de procedencia -> solo linkea si tiene ficha propia en
                 // indexivals.html (Lubs.csv), y nunca si es "Inferiores"
@@ -383,7 +467,7 @@
                   clubesConFicha.has(procedenciaNorm);
                 const procedenciaTexto = escapeHTML(datos.procedencia || "S/D");
                 const procedenciaHTML = tieneFichaClub
-                  ? `<a href="https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(datos.procedencia)}" target="_blank" rel="noopener" style="color:#666; text-decoration:none;">${procedenciaTexto}</a>`
+                  ? `<a href="https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(datos.procedencia)}" target="_blank" rel="noopener" class="debutante-link" style="color:#666; text-decoration:none;">${procedenciaTexto}</a>`
                   : `<span style="color:#666;">${procedenciaTexto}</span>`;
 
                 return `
