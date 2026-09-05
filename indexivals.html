@@ -332,36 +332,52 @@ function sumarUnMes(date) {
 function obtenerTransferencias(nombreClub) {
   const lista = [];
 
-transfers.forEach(t => {
- const periodos = obtenerPeriodosJugador(t.jugador);
-if (!periodos.length) return;
-
-  // desde el rival hacia Huracán
-  if (norm(t.procedencia) === norm(nombreClub)) {
-    const periodo = periodos[0];
-
-    lista.push({
-      jugador: t.jugador,
-      foto: t.foto,
-      tipo: "llega",
-      fecha: formatMesAnio(periodo.primera),
-      fechaObj: periodo.primera
+  // Un mismo jugador puede tener MÁS DE UNA fila en Utbolists.csv, si volvió
+  // al club más de una vez (ej: llega de Platense en 1931, se va a Defensor
+  // en 1943, vuelve de Banfield en 1945). Agrupamos sus filas preservando el
+  // orden en que aparecen en el CSV -- asumimos que ese orden refleja el
+  // orden cronológico real de sus etapas en el club.
+  const filasPorJugador = {};
+  transfers.forEach(t => {
+    if (!filasPorJugador[t.jugador]) filasPorJugador[t.jugador] = [];
+    filasPorJugador[t.jugador].push(t);
   });
-  }
 
-  // desde Huracán hacia el rival
-  if (norm(t.destino) === norm(nombreClub)) {
-    const periodo = periodos[periodos.length - 1];
+  Object.entries(filasPorJugador).forEach(([nombreJugador, filas]) => {
+    const periodos = obtenerPeriodosJugador(nombreJugador);
+    if (!periodos.length) return;
 
-    lista.push({
-      jugador: t.jugador,
-      foto: t.foto,
-      tipo: "sale",
-      fecha: formatMesAnio(sumarUnMes(periodo.ultima)),
-      fechaObj: sumarUnMes(periodo.ultima)
-   });
-  }
-});
+    filas.forEach((t, i) => {
+      // Emparejamos la fila N con el período N (mismo orden cronológico) en
+      // vez de usar siempre el primer/último período de toda su carrera —
+      // así cada etapa de ida y vuelta queda con su fecha real, no todas
+      // apuntando al primer debut. Si hubiera más filas que períodos
+      // detectados (o menos), usamos el último disponible como resguardo.
+      const periodo = periodos[Math.min(i, periodos.length - 1)];
+
+      // desde el rival hacia Huracán
+      if (norm(t.procedencia) === norm(nombreClub)) {
+        lista.push({
+          jugador: t.jugador,
+          foto: t.foto,
+          tipo: "llega",
+          fecha: formatMesAnio(periodo.primera),
+          fechaObj: periodo.primera
+        });
+      }
+
+      // desde Huracán hacia el rival
+      if (norm(t.destino) === norm(nombreClub)) {
+        lista.push({
+          jugador: t.jugador,
+          foto: t.foto,
+          tipo: "sale",
+          fecha: formatMesAnio(sumarUnMes(periodo.ultima)),
+          fechaObj: sumarUnMes(periodo.ultima)
+        });
+      }
+    });
+  });
 
   return lista.sort((a,b) => a.fechaObj - b.fechaObj);
 }
@@ -1994,10 +2010,14 @@ function obtenerPeriodosJugador(nombreJugador) {
     for (let i = 1; i < partidosOrdenados.length; i++) {
       const actual = partidosOrdenados[i].fechaObj;
 
-      // Si hay un salto grande (ej: más de 6 meses), cortamos etapa
+      // Si hay un salto grande (más de 11 meses sin jugar, o sea más de una
+      // temporada entera saltada), cortamos etapa. Antes el corte era en 6
+      // meses, pero eso confundía un simple receso de fin de temporada
+      // (marzo a septiembre, por ejemplo) con una ida y vuelta real del
+      // jugador, fragmentando su carrera en decenas de "etapas" falsas.
       const diffMeses = (actual - anterior) / (1000 * 60 * 60 * 24 * 30);
 
-      if (diffMeses > 6) {
+      if (diffMeses > 11) {
         periodos.push({
           primera: inicio,
           ultima: anterior
