@@ -2255,6 +2255,35 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 500); 
   }
 });
+
+// ============================================================
+// === Ajuste automático de altura para el iframe de Blogger
+// ============================================================
+// Esta página vive embebida en un <iframe> en Blogger, que espera recibir
+// un mensaje {type:'ajustarAltura', altura:N} cada vez que cambia el
+// tamaño real del contenido — así el iframe crece o achica su alto y nunca
+// queda con scroll interno.
+(function() {
+  function enviarAltura() {
+    const altura = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: "ajustarAltura", altura: altura }, "*");
+  }
+
+  // Al cargar la página
+  window.addEventListener("load", enviarAltura);
+  document.addEventListener("DOMContentLoaded", enviarAltura);
+
+  // Y cada vez que el contenido cambia de tamaño (elegir un jugador, abrir
+  // un acordeón de partido, etc.) — ResizeObserver detecta esto solo, sin
+  // tener que llamarlo a mano desde cada función que cambia el DOM.
+  if (window.ResizeObserver) {
+    const observer = new ResizeObserver(() => enviarAltura());
+    observer.observe(document.body);
+  } else {
+    // Resguardo para navegadores muy viejos sin ResizeObserver
+    setInterval(enviarAltura, 500);
+  }
+})();
   </script>
 </body>
 </html>
