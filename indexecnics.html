@@ -43,7 +43,7 @@
       padding: 16px 8px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       position: relative;
       overflow: hidden;
     }
@@ -83,14 +83,23 @@
       transition: opacity 0.15s ease;
     }
     .jugador-cancha:hover { opacity: 0.8; }
+    .jugador-cancha.jugador-cancha-sin-link {
+      cursor: default;
+    }
+    .jugador-cancha.jugador-cancha-sin-link:hover { opacity: 1; }
     .jugador-cancha img {
       width: 48px; height: 62px; object-fit: cover;
       border-radius: 6px; border: 2px solid #fff;
       margin-bottom: 3px;
       background: #ddd;
     }
+    .jugador-cancha-arquero img {
+      border-color: #FFD700;
+      border-width: 3px;
+    }
     .jugador-cancha-nombre {
       display: block;
+      font-family: 'RobotoCondensed', sans-serif;
       font-size: 10px;
       font-weight: bold;
       line-height: 1.15;
@@ -99,6 +108,7 @@
     }
     .jugador-cancha-veces {
       display: block;
+      font-family: 'RobotoCondensed', sans-serif;
       font-size: 9px;
       color: #eaffea;
       text-shadow: 0 1px 2px rgba(0,0,0,0.7);
@@ -698,10 +708,12 @@ function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
   const lista = Object.values(conteo)
     .map(c => {
       const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(c.nombre));
+      const tieneFotoPropia = !!(datos && datos.foto1);
       return {
         nombre: c.nombre,
         veces: c.veces,
-        foto: datos ? datos.foto1 : "",
+        foto: tieneFotoPropia ? datos.foto1 : getEscudo("Huracán"),
+        esEscudo: !tieneFotoPropia,
         categoria: categorizarPosicion(datos ? datos.posicion : "")
       };
     })
@@ -720,15 +732,22 @@ function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
 // Ajustá esta constante si la página vive en otra dirección.
 const URL_PAGINA_FUTBOLISTAS = "https://globopedia.github.io/Artids/indexutbolists.html";
 
-function tarjetaJugadorCancha(j) {
-  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
-  return `
-    <a class="jugador-cancha" href="${url}" target="_blank" rel="noopener">
-      ${j.foto ? `<img src="${j.foto}" alt="${j.nombre}" onerror="this.style.display='none'">` : ""}
-      <span class="jugador-cancha-nombre">${j.nombre}</span>
-      <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
-    </a>
+function tarjetaJugadorCancha(j, esArquero = false) {
+  const claseArquero = esArquero ? " jugador-cancha-arquero" : "";
+  const contenido = `
+    <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
+    <span class="jugador-cancha-nombre">${j.nombre}</span>
+    <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
   `;
+
+  // Si no tiene foto propia (mostramos el escudo de Huracán como respaldo),
+  // no hay ficha de jugador a la que llevarlo — queda sin link.
+  if (j.esEscudo) {
+    return `<div class="jugador-cancha jugador-cancha-sin-link${claseArquero}">${contenido}</div>`;
+  }
+
+  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
+  return `<a class="jugador-cancha${claseArquero}" href="${url}" target="_blank" rel="noopener">${contenido}</a>`;
 }
 
 function renderFormacionTecnico(idTecnico, listaFutbolistas) {
@@ -740,7 +759,7 @@ function renderFormacionTecnico(idTecnico, listaFutbolistas) {
       .filter(j => categorias.includes(j.categoria))
       .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.veces - a.veces);
     if (!jugadoresFila.length) return "";
-    return `<div class="cancha-fila">${jugadoresFila.map(tarjetaJugadorCancha).join("")}</div>`;
+    return `<div class="cancha-fila">${jugadoresFila.map(j => tarjetaJugadorCancha(j)).join("")}</div>`;
   }).join("");
 
   // Jugadores sin posición reconocible en el CSV (dato vacío o atípico):
@@ -749,11 +768,11 @@ function renderFormacionTecnico(idTecnico, listaFutbolistas) {
   const categoriasConocidas = FILAS_CANCHA.flat();
   const sinCategoria = formacion.resto.filter(j => !categoriasConocidas.includes(j.categoria));
   const filaSinCategoria = sinCategoria.length
-    ? `<div class="cancha-fila">${sinCategoria.map(tarjetaJugadorCancha).join("")}</div>`
+    ? `<div class="cancha-fila">${sinCategoria.map(j => tarjetaJugadorCancha(j)).join("")}</div>`
     : "";
 
   const filaArquero = formacion.arquero
-    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacion.arquero)}</div>`
+    ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCancha(formacion.arquero, true)}</div>`
     : "";
 
   return `
