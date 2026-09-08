@@ -455,7 +455,7 @@
             let primerAmistoso = null, primerOficial = null, primerDomestico = null;
             for (const p of partidosDeEstaEtapa) {
               const esAm = norm(p.Torneo).includes("amistoso");
-              const esAis = !esAm && (esInternacional(p.Torneo) || esCopaArgentina(p.Torneo));
+              const esAis = !esAm && (esInternacional(p.Torneo) || esCopaArgentina(p.Torneo) || esCopaCompetencia(p.Torneo));
               if (esAm && !primerAmistoso) primerAmistoso = p;
               if (!esAm && !primerOficial) primerOficial = p;
               if (!esAm && !esAis && !primerDomestico) primerDomestico = p;
