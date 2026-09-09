@@ -411,7 +411,10 @@
             Huracán: (p.Huracán ?? "").trim(),
             Rival: (p.Rival ?? "").trim(),
             Foto: (p.Foto ?? "").trim(),
-            Incidencias: (p.Incidencias ?? "").trim()
+            Incidencias: (p.Incidencias ?? "").trim(),
+            FinPT: (p.FinPT ?? "").trim(),
+            Fin2T: (p.Fin2T ?? "").trim(),
+            Fin2E: (p.Fin2E ?? "").trim()
           }))
         );
 
@@ -734,9 +737,9 @@
 // ==========================================
 
 const COEF_BASE = {
-  Victoria: { Visitante: 0.4, Neutral: 0.3, Local: 0.2 },
-  Empate:   { Visitante: 0.2, Neutral: 0.1, Local: 0 },
-  Derrota:  { Visitante: 0,   Neutral: -0.1, Local: -0.2 }
+  Victoria: { Visitante: 0.6, Neutral: 0.5, Local: 0.4 },
+  Empate:   { Visitante: 0.4, Neutral: 0.3, Local: 0.2 },
+  Derrota:  { Visitante: 0.2, Neutral: 0.1, Local: 0.0 }
 };
 
 const CLASICOS = [
@@ -851,6 +854,72 @@ function esNacionalB(torneo) {
   return t.includes("nacional b") || t.includes("b nacional") || t.includes("reducido") || t.includes("bn");
 }
 
+// Rivales "coleros" (peleaban el descenso) por época — un triunfo ante ellos
+// pesa menos, y una derrota pesa más. Lista inicial, se va ampliando.
+const COLEROS = [
+  { club: "Tigre", desde: "1931-01", hasta: "1933-12" },
+  { club: "Tigre", desde: "1935-01", hasta: "1935-12" },
+  { club: "Lanús", desde: "1931-01", hasta: "1931-12" },
+  { club: "Atlanta", desde: "1931-01", hasta: "1933-12" },
+  { club: "Talleres", desde: "1932-01", hasta: "1933-12" },
+  { club: "Ferro Carril Oeste", desde: "1934-01", hasta: "1934-12" },
+  { club: "Argentinos Juniors", desde: "1934-01", hasta: "1935-12" },
+  { club: "Quilmes", desde: "1935-01", hasta: "1935-12" }
+];
+
+function esColero(rival, fecha) {
+  if (!rival || !fecha) return false;
+  const partes = fecha.split("/");
+  const m = Number(partes[1]);
+  const y = Number(partes[2]);
+  const partidoIndex = y * 12 + m;
+  const rivalNorm = rival.toLowerCase();
+  return COLEROS.some(c => {
+    const desde = ymToIndex(c.desde);
+    const hasta = ymToIndex(c.hasta);
+    return rivalNorm.includes(c.club.toLowerCase()) && partidoIndex >= desde && partidoIndex <= hasta;
+  });
+}
+
+// Para calcular el puntaje del jugador RIVAL (solo como referencia para
+// normalizar, nunca se muestra) hay que invertir resultado y condición:
+// si Huracán ganó de local, el rival perdió de visitante.
+function invertirSituacion(s) {
+  if (s === "Victoria") return "Derrota";
+  if (s === "Derrota") return "Victoria";
+  return s; // Empate se queda igual
+}
+function invertirCondicion(c) {
+  if (c === "Local") return "Visitante";
+  if (c === "Visitante") return "Local";
+  return c; // Neutral se queda igual
+}
+
+// Agrupa la posición real (Wing izquierdo, Lateral derecho, etc.) en las 4
+// categorías que definen qué bono individual aplica.
+function categoriaGrupo(posicionRaw) {
+  const p = norm(posicionRaw || "");
+  if (!p) return null;
+  if (p.includes("arquero")) return "arquero";
+  if (p.includes("lateral") || p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return "defensor";
+  if (p.includes("volante") || p.includes("enganche")) return "volante";
+  if (p.includes("wing") || p.includes("extremo") || p.includes("delantero")) return "delantero";
+  return null; // posición no reconocida: no le aplicamos ningún bono individual
+}
+
+// Cuenta los goles en contra de Huracán que NO sean de penal (para la valla
+// invicta del arquero, que sí perdona los penales convertidos).
+function golesEnContraSinPenal(incidencias) {
+  const eventos = (incidencias || "").split("</br>");
+  let cuenta = 0;
+  eventos.forEach(ev => {
+    const t = ev.trim();
+    const m = t.match(/GOL\s+[^(]+\(([^)]+)\)/i);
+    if (m && m[1].trim().toUpperCase() !== "HUR" && !/-penal-/i.test(t)) cuenta++;
+  });
+  return cuenta;
+}
+
 function obtenerMinutoIngreso(texto, nombre) {
   const nombreNorm = norm(nombre);
   const regex = /\((\d+(?:\+\d+)?)\s+([^)]+)\)/g;
@@ -903,17 +972,335 @@ function calcularMinutosJugador(p, nombre) {
   return minutosJugados;
 }
 
-function calcularPuntosPartido(p, minutos) {
-  const situacion = cap(norm(p.Situación));
-  const condicion = cap(norm(p.Condición));
+function estimarMinutoPorRepeticion(texto, tag) {
+  const regex = new RegExp(`\\b${tag}\\b`, "g");
+  const apariciones = (texto.match(regex) || []).length;
+  if (apariciones === 0) return null;
 
-  let coef = COEF_BASE[situacion]?.[condicion] ?? 0;
+  const base = tag === "ST" ? 45 : 0;
+  const aprox = Math.ceil(45 / (apariciones + 1));
+  return base + aprox;
+}
 
-  if (esInternacional(p.Torneo)) coef += 0.1;
-  if (esClasico(p.Club || p.Rival, p.Fecha)) coef += 0.1;
+function resolverMinutoEvento(minutoTexto, incidenciasCompletas) {
+  if (/^\d+(?:\+\d+)?$/.test(minutoTexto)) return parseMinuto(minutoTexto);
+  if (minutoTexto === "PT") return estimarMinutoPorRepeticion(incidenciasCompletas, "PT");
+  if (minutoTexto === "ST") return estimarMinutoPorRepeticion(incidenciasCompletas, "ST");
+  return null;
+}
+
+function ajustarMinuto(minuto, p) {
+  if (minuto == null) return null;
+  let m = minuto;
+  if (typeof m === "string" && m.includes("+")) {
+    m = m.split("+").map(Number).reduce((a,b)=>a+b);
+  } else {
+    m = Number(m);
+  }
+  const finPT = Number(p.FinPT) || 45;
+  if (m >= 46) {
+    return m + (finPT - 45);
+  }
+  return m;
+}
+
+// --- Goles y penales pateados por el propio jugador (en UN partido puntual) ---
+function contarGolesYPenales(nombreJugador, partidosDelJugador) {
+  const goles = { tiroLibre: 0, cabeza: 0, taquito: 0, rebote: 0, rabona: 0, penal: 0, otros: 0, total: 0 };
+  const penalesPateados = { convertidos: 0, atajados: 0, desviados: 0, poste: 0 };
+
+  partidosDelJugador.forEach(p => {
+    (p.Incidencias || "").split("</br>").forEach(ev => {
+      const t = ev.trim();
+
+      const mGol = t.match(/GOL\s+([^(]+)\(([^)]+)\)/i);
+      if (mGol && mGol[2].trim().toUpperCase() === "HUR" &&
+          norm(mGol[1]) === norm(nombreJugador)) {
+        goles.total++;
+        if (/-tiro libre-/i.test(t)) goles.tiroLibre++;
+        else if (/-cabezazo-/i.test(t)) goles.cabeza++;
+        else if (/-taquito-/i.test(t)) goles.taquito++;
+        else if (/-de rebote-/i.test(t)) goles.rebote++;
+        else if (/-rabona-/i.test(t)) goles.rabona++;
+        else if (/-penal-/i.test(t)) { goles.penal++; penalesPateados.convertidos++; }
+        else goles.otros++;
+        return;
+      }
+
+      const mAta = t.match(/\bATA\s+([^(]+)\(([^)]+)\)/i);
+      if (mAta && mAta[2].trim().toUpperCase() === "HUR" &&
+          norm(mAta[1]) === norm(nombreJugador)) {
+        if (/penal atajado/i.test(t)) penalesPateados.atajados++;
+        return;
+      }
+
+      const mDes = t.match(/\bDES\s+([^(]+)\(([^)]+)\)/i);
+      if (mDes && mDes[2].trim().toUpperCase() === "HUR" &&
+          norm(mDes[1]) === norm(nombreJugador)) {
+        penalesPateados.desviados++;
+        return;
+      }
+
+      const mPos = t.match(/\bPOS\s+([^(]+)\(([^)]+)\)/i);
+      if (mPos && mPos[2].trim().toUpperCase() === "HUR" &&
+          norm(mPos[1]) === norm(nombreJugador)) {
+        penalesPateados.poste++;
+      }
+    });
+  });
+
+  return { goles, penalesPateados };
+}
+
+// --- Arqueros de Huracán en un partido dado, y quién atajaba en un minuto puntual ---
+function obtenerArquerosDelPartido(partido, listaFutbolistas) {
+  const jugadores = (partido.Huracán || "")
+    .replace(/[()]/g, ",")
+    .replace(/\b\d+(?:\+\d+)?\s*/g, "")
+    .replace(/\.+/g, "")
+    .replace(/\by\s+/gi, ",")
+    .replace(/\s+e\s+/gi, ",")
+    .replace(/,,+/g, ",")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s+/g, ",")
+    .replace(/\s+/g, " ")
+    .split(/[,;]+/)
+    .map(j => j.trim())
+    .filter(j => j.length > 1);
+
+  return jugadores.filter(nombre => {
+    const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(nombre));
+    return datos && norm(datos.posicion) === "arquero";
+  });
+}
+
+function arqueroEnMinuto(partido, minuto, listaFutbolistas) {
+  if (minuto == null) return null;
+  const arqueros = obtenerArquerosDelPartido(partido, listaFutbolistas);
+  if (!arqueros.length) return null;
+
+  const texto = partido.Huracán || "";
+  const finReal = (partido.Fin2E && partido.Fin2E !== "0")
+    ? (parseMinuto(partido.Fin2E) || 120)
+    : (parseMinuto(partido.Fin2T) || 90);
+
+  for (const nombre of arqueros) {
+    let ingreso = ajustarMinuto(obtenerMinutoIngreso(texto, nombre), partido);
+    let salida  = ajustarMinuto(obtenerMinutoSalida(texto, nombre), partido);
+
+    const desde = ingreso !== null ? ingreso : 1;
+    const hasta = salida !== null ? salida - 1 : finReal;
+
+    if (minuto >= desde && minuto <= hasta) return nombre;
+  }
+  return arqueros[0]; // respaldo si algo no calzó
+}
+
+// --- Penales en contra (solo para arqueros, en UN partido puntual) ---
+function contarPenalesEnContra(nombreArquero, partidosDelArquero, listaFutbolistas) {
+  const enContra = { atajados: 0, convertidos: 0, desviados: 0, poste: 0 };
+
+  partidosDelArquero.forEach(p => {
+    const incidenciasCompletas = p.Incidencias || "";
+    incidenciasCompletas.split("</br>").forEach(ev => {
+      const t = ev.trim();
+
+      const mMin = t.match(/^(\d+(?:\+\d+)?|PT|ST)/i);
+      if (!mMin) return;
+      const minuto = resolverMinutoEvento(mMin[1].toUpperCase(), incidenciasCompletas);
+      if (minuto == null) return;
+
+      const mAta = t.match(/\bATA\s+([^(]+)\(([^)]+)\)/i);
+      if (mAta && mAta[2].trim().toUpperCase() !== "HUR" && /penal atajado/i.test(t)) {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.atajados++;
+        return;
+      }
+
+      const mGol = t.match(/GOL\s+([^(]+)\(([^)]+)\)/i);
+      if (mGol && mGol[2].trim().toUpperCase() !== "HUR" && /-penal-/i.test(t)) {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.convertidos++;
+        return;
+      }
+
+      const mDes = t.match(/\bDES\s+([^(]+)\(([^)]+)\)/i);
+      if (mDes && mDes[2].trim().toUpperCase() !== "HUR") {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.desviados++;
+        return;
+      }
+
+      const mPos = t.match(/\bPOS\s+([^(]+)\(([^)]+)\)/i);
+      if (mPos && mPos[2].trim().toUpperCase() !== "HUR") {
+        if (arqueroEnMinuto(p, minuto, listaFutbolistas) === nombreArquero) enContra.poste++;
+      }
+    });
+  });
+
+  return enContra;
+}
+
+// Cálculo de minutos jugados (y expulsión) reutilizable, para CUALQUIER
+// columna (Huracán o Rival) — necesario para poder comparar el puntaje de
+// un jugador contra los ~22 que jugaron el mismo partido.
+function calcularMinutosYExpulsion(p, nombreJugador, columna) {
+  const texto = p[columna] || "";
+  let finReal = (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
+  let minutosJugados = finReal;
+
+  let ingreso = obtenerMinutoIngreso(texto, nombreJugador);
+  let salida  = obtenerMinutoSalida(texto, nombreJugador);
+
+  if (ingreso !== null) {
+    let finJugador = salida !== null ? salida - 1 : finReal;
+    minutosJugados = Math.max(0, finJugador - ingreso + 1);
+  } else if (salida !== null) {
+    minutosJugados = Math.max(0, salida - 1);
+  } else {
+    minutosJugados = finReal;
+  }
+
+  const incidencias = p.Incidencias || "";
+  const nombreEscapado = nombreJugador.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const expulsionRegex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${nombreEscapado}`, "i");
+
+  let fueExpulsado = false;
+  let minutoExpulsion = null;
+  if (expulsionRegex.test(incidencias)) {
+    fueExpulsado = true;
+    const m = incidencias.match(expulsionRegex)[1];
+    minutoExpulsion = m.includes("+") ? m.split("+").map(Number).reduce((a, b) => a + b) : Number(m);
+    minutosJugados = ingreso === null ? Math.max(0, minutoExpulsion - 1) : Math.max(0, minutoExpulsion - ingreso + 1);
+  }
+
+  return { minutos: minutosJugados, fueExpulsado, minutoExpulsion, finReal };
+}
+
+// Puntaje CRUDO (sin normalizar) de un jugador en un partido puntual.
+// 'esDeHuracan' decide si aplicamos el aporte individual (goles, asistencias,
+// bonos por posición) — a los rivales solo les calculamos la parte general,
+// porque no sabemos su posición (no están en Utbolists.csv). Todo el aporte
+// se suma DENTRO de un único coeficiente, y recién al final se multiplica
+// por los minutos jugados una sola vez (así el que jugó más tiempo siempre
+// pesa más, en todos los componentes por igual) — la única excepción es la
+// expulsión, que se resta aparte, porque es un castigo por el tiempo que el
+// jugador NO llegó a jugar.
+function calcularPuntosCrudos(p, nombreJugador, minutos, esDeHuracan, listaFutbolistas, fueExpulsado, minutoExpulsion, finReal) {
+  let situacion = cap(norm(p.Situación));
+  let condicionPartido = cap(norm(p.Condición));
+
+  if (!esDeHuracan) {
+    situacion = invertirSituacion(situacion);
+    condicionPartido = invertirCondicion(condicionPartido);
+  }
+
+  let coef = COEF_BASE[situacion]?.[condicionPartido] ?? 0;
+
+  const esPartidoDuro = esInternacional(p.Torneo) || esClasico(p.Club, p.Fecha);
+  if (esPartidoDuro) coef += 0.1;
   if (esNacionalB(p.Torneo)) coef -= 0.1;
+  if (esColero(p.Club, p.Fecha)) coef -= 0.1;
 
-  return minutos * coef;
+  if (esDeHuracan) {
+    const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(nombreJugador));
+    const categoriaPos = datos ? categoriaGrupo(datos.posicion) : null;
+
+    const statsPartido = contarGolesYPenales(nombreJugador, [p]);
+    const cantidadGoles = statsPartido.goles.total;
+
+    const incidencias = p.Incidencias || "";
+    const nombreEscapado = nombreJugador.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const asistRegex = new RegExp(`asistencia\\s+de\\s+['"]?${nombreEscapado}['"]?\\s*\\(HUR\\)`, "gi");
+    const cantidadAsist = (incidencias.match(asistRegex) || []).length;
+
+    if (cantidadGoles > 0) {
+      const valorPorGol = (condicionPartido === "Visitante" ? 0.15 : condicionPartido === "Neutral" ? 0.10 : 0.05)
+                         + (situacion === "Victoria" ? 0.15 : situacion === "Empate" ? 0.10 : 0.05)
+                         + (esPartidoDuro ? 0.1 : 0);
+      coef += valorPorGol * (cantidadGoles >= 2 ? 2 : 1);
+    }
+
+    if (cantidadAsist > 0) {
+      const valorPorAsist = (condicionPartido === "Visitante" ? 0.075 : condicionPartido === "Neutral" ? 0.050 : 0.025)
+                           + (situacion === "Victoria" ? 0.075 : situacion === "Empate" ? 0.050 : 0.025)
+                           + (esPartidoDuro ? 0.05 : 0);
+      coef += valorPorAsist * (cantidadAsist >= 2 ? 2 : 1);
+    }
+
+    if (categoriaPos === "arquero") {
+      const enContraPartido = contarPenalesEnContra(nombreJugador, [p], listaFutbolistas);
+      if (enContraPartido.atajados > 0) coef += 0.15 * enContraPartido.atajados;
+      if (golesEnContraSinPenal(incidencias) === 0) coef += 0.10;
+    } else if (categoriaPos === "defensor") {
+      if ((parseInt(p.Resultado2) || 0) === 0) coef += 0.10;
+    } else if (categoriaPos === "volante") {
+      if ((parseInt(p.Resultado2) || 0) === 0 && (parseInt(p.Resultado1) || 0) > 0) coef += 0.10;
+    } else if (categoriaPos === "delantero") {
+      if ((parseInt(p.Resultado1) || 0) > 0) coef += 0.10;
+    }
+  }
+
+  let puntos = minutos * coef;
+
+  if (esDeHuracan && fueExpulsado && minutoExpulsion != null) {
+    const restante = Math.max(0, finReal - minutoExpulsion);
+    puntos -= 0.05 * restante;
+  }
+
+  return puntos;
+}
+
+// Extrae la lista de nombres de una columna (Huracán o Rival) — mismo
+// criterio de limpieza que ya usamos en el resto del sitio.
+function extraerNombresDeColumna(texto) {
+  return [...new Set(
+    (texto || "")
+      .split(/[,;().\n\r]+|\s+\b[ye]\b\s+|[()]+/)
+      .map(n => n.replace(/\b\d+(?:\+\d+)?'?\s*/g, "").trim())
+      .filter(n => n.length > 2)
+  )];
+}
+
+// Puntaje NORMALIZADO (4 a 10) de un jugador puntual en un partido puntual,
+// comparado contra los ~22 que jugaron ese partido (ambos equipos) — así el
+// mejor de un 6-0 en contra no puede terminar con "10", como pasaría si
+// solo comparáramos contra los compañeros de Huracán. El piso es 4, no 1,
+// para que no quede tan chocante como nota mínima.
+function calcularPuntajeNormalizadoPartido(p, nombreObjetivo, esDeHuracanObjetivo, listaFutbolistas) {
+  const participantes = [];
+
+  extraerNombresDeColumna(p.Huracán).forEach(nombre => {
+    const { minutos, fueExpulsado, minutoExpulsion, finReal } = calcularMinutosYExpulsion(p, nombre, "Huracán");
+    if (minutos <= 0) return;
+    participantes.push({
+      nombre,
+      esDeHuracan: true,
+      puntos: calcularPuntosCrudos(p, nombre, minutos, true, listaFutbolistas, fueExpulsado, minutoExpulsion, finReal)
+    });
+  });
+
+  extraerNombresDeColumna(p.Rival).forEach(nombre => {
+    const { minutos, fueExpulsado, minutoExpulsion, finReal } = calcularMinutosYExpulsion(p, nombre, "Rival");
+    if (minutos <= 0) return;
+    participantes.push({
+      nombre,
+      esDeHuracan: false,
+      puntos: calcularPuntosCrudos(p, nombre, minutos, false, listaFutbolistas, fueExpulsado, minutoExpulsion, finReal)
+    });
+  });
+
+  if (!participantes.length) return 7; // resguardo: no debería pasar nunca
+
+  const todosLosPuntos = participantes.map(x => x.puntos);
+  const max = Math.max(...todosLosPuntos);
+  const min = Math.min(...todosLosPuntos);
+
+  const objetivo = participantes.find(x =>
+    x.esDeHuracan === esDeHuracanObjetivo && norm(x.nombre) === norm(nombreObjetivo)
+  );
+  const puntosObjetivo = objetivo ? objetivo.puntos : min;
+
+  if (max === min) return 10;
+  const escalado = 4 + ((puntosObjetivo - min) / (max - min)) * 6;
+  return Math.min(10, Math.max(4, escalado));
 }
 
 function escapeHTML(valor) {
@@ -1065,12 +1452,16 @@ function mostrarTorneo() {
         else if (situacionPartido === "Empate") mapaJugadores[idJugador].pe += 1;
         else if (situacionPartido === "Derrota") mapaJugadores[idJugador].pp += 1;
 
-        // Cálculo exacto de minutos y puntaje del Hall Globopedia para este partido
-        const min = calcularMinutosJugador(p, nom);
-        const pts = calcularPuntosPartido(p, min);
-        
+        // Minutos (con el mismo mecanismo de siempre) y puntaje NORMALIZADO
+        // (4 a 10) de este partido puntual, comparado contra los ~22 que
+        // jugaron ese partido (ambos equipos) — 'globopediaScore' ahora
+        // acumula la SUMA de esos puntajes normalizados, para promediarlos
+        // más abajo (promedio = globopediaScore / pj).
+        const { minutos: min } = calcularMinutosYExpulsion(p, nom, "Huracán");
+        const puntajeNormalizadoPartido = calcularPuntajeNormalizadoPartido(p, nom, true, futbolistas);
+
         mapaJugadores[idJugador].minutos += min;
-        mapaJugadores[idJugador].globopediaScore += pts;
+        mapaJugadores[idJugador].globopediaScore += puntajeNormalizadoPartido;
 
         // Goles y expulsiones de ESTE jugador en ESTE partido, buscados en Incidencias
         const nombreEscapado = nom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1090,10 +1481,12 @@ function mostrarTorneo() {
         if (norm(match.posicion || "").includes("arquero")) {
           if ((parseInt(p.Resultado2) || 0) === 0) mapaJugadores[idJugador].vallasInvictas += 1;
 
-          // El penal atajado se registra en el texto de Incidencias del pateador,
-          // como "-ataja NombreDelArquero (HUR)-"
-          const penalAtajadoRegex = new RegExp(`ataja\\s+${nombreEscapado}\\s*\\(HUR\\)`, "gi");
-          mapaJugadores[idJugador].penalesAtajados += (incidenciasPartido.match(penalAtajadoRegex) || []).length;
+          // El penal atajado ahora se registra como "ATA Nombre (SIGLA)
+          // -penal atajado-", sin nombrar al arquero (se resuelve solo por
+          // minuto + entrada/salida) — reutilizamos la misma función que ya
+          // usa el resto del sitio para este cálculo.
+          const enContraDePartido = contarPenalesEnContra(nom, [p], futbolistas);
+          mapaJugadores[idJugador].penalesAtajados += enContraDePartido.atajados;
         }
       }
     });
@@ -1141,29 +1534,26 @@ function mostrarTorneo() {
   // uno solo tenga alguna, la fila aparece en todo el plantel del torneo.
   const hayAsistenciasEnTorneo = Object.values(mapaJugadores).some(item => item.asistencias > 0);
 
-  // Puntaje más alto y más bajo del plantel de Huracán EN ESTE TORNEO,
-  // para ubicar a cada jugador en su segmento (de 1 a 10) dentro de ese
-  // rango, y así armar la "barra de estrellas" tipo videojuego.
-  const puntajesDelTorneo = Object.values(mapaJugadores).map(item => item.globopediaScore);
-  const puntajeMaxTorneo = puntajesDelTorneo.length ? Math.max(...puntajesDelTorneo) : 0;
-  const puntajeMinTorneo = puntajesDelTorneo.length ? Math.min(...puntajesDelTorneo) : 0;
+  // Ya no necesitamos el mínimo/máximo del torneo para las estrellas ni para
+  // "El equipo": ahora 'globopediaScore' es la SUMA de puntajes ya
+  // normalizados (4 a 10) por partido, así que el promedio de cada jugador
+  // (globopediaScore / pj) ya viene en esa misma escala fija — no hace
+  // falta reescalarlo de nuevo relativo al torneo.
 
-  function calcularSegmentoEstrella(score, min, max) {
-    if (max === min) return 10; // todos empatados: no hay "peor", les damos el máximo
-    const paso = (max - min) / 10;
-    let segmento = Math.ceil((score - min) / paso);
+  // Convierte el promedio (4 a 10) en un segmento de 1 a 10 (medios de
+  // estrella: 1=media estrella, 10=cinco estrellas completas).
+  function calcularSegmentoEstrella(promedio) {
+    let segmento = Math.round(1 + ((promedio - 4) / 6) * 9);
     if (segmento < 1) segmento = 1;
     if (segmento > 10) segmento = 10;
     return segmento;
   }
 
-  // Puntaje "1.00 a 10.00" continuo (no en medias estrellas) para "El
-  // equipo": el que menos puntaje sacó en el torneo queda en 1.00, el que
-  // más sacó en 10.00, y el resto se reparte proporcionalmente en el medio.
-  function calcularPuntajeEscalado(score, min, max) {
-    if (max === min) return 10;
-    const escalado = 1 + ((score - min) / (max - min)) * 9;
-    return Math.min(10, Math.max(1, escalado));
+  // Para "El equipo": el promedio ya viene en la escala 4.00 a 10.00, así
+  // que solo lo dejamos a buen resguardo (por si algún promedio se pasara
+  // por redondeos).
+  function calcularPuntajeEscalado(promedio) {
+    return Math.min(10, Math.max(4, promedio));
   }
 
   // === "El equipo": los 11 que más MINUTOS jugaron en este torneo ===
@@ -1217,7 +1607,7 @@ function mostrarTorneo() {
     const candidatos = Object.values(mapaJugadores).map(item => ({
       nombre: item.datos.futbolista,
       minutos: item.minutos,
-      puntaje: calcularPuntajeEscalado(item.globopediaScore, puntajeMinTorneo, puntajeMaxTorneo),
+      puntaje: calcularPuntajeEscalado(item.pj > 0 ? item.globopediaScore / item.pj : 4),
       foto: item.datos.foto1 && item.datos.foto1 !== "-" ? item.datos.foto1 : getEscudo("Huracán"),
       esEscudo: !(item.datos.foto1 && item.datos.foto1 !== "-"),
       categoria: categorizarPosicion(item.datos.posicion)
@@ -1303,7 +1693,7 @@ function mostrarTorneo() {
           : "https://globopedia.github.io/Artids/logo_globopedia.png";
 
         const edad = calcularEdad(f.fechNac, primeraFechaTorneo);
-        const segmento = calcularSegmentoEstrella(j.globopediaScore, puntajeMinTorneo, puntajeMaxTorneo);
+        const segmento = calcularSegmentoEstrella(j.pj > 0 ? j.globopediaScore / j.pj : 4);
         const banderaHTML = renderBanderaPrincipal(f.pais);
         const nombreTorneoCorto = escapeHTML(
           (torneo.nombre || "")
