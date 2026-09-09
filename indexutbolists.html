@@ -607,8 +607,12 @@ function calcularPuntosCrudos(p, nombreJugador, minutos, esDeHuracan, listaFutbo
   if (esNacionalB(p.Torneo)) coef -= 0.1;
   if (esColero(p.Club, p.Fecha)) coef -= 0.1;
 
-  let puntos = minutos * coef;
-
+  // Todo el aporte individual (goles, asistencias, bono de posición) se
+  // suma DENTRO del mismo coeficiente — no se calcula aparte y se multiplica
+  // cada bono por su cuenta. Recién al final multiplicamos por los minutos
+  // jugados, UNA sola vez: así el que jugó más tiempo siempre pesa más, en
+  // todos los componentes por igual (antes el bono del delantero quedaba
+  // afuera de esta lógica, sumado fijo sin importar los minutos).
   if (esDeHuracan) {
     const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(nombreJugador));
     const categoriaPos = datos ? categoriaGrupo(datos.posicion) : null;
@@ -625,32 +629,37 @@ function calcularPuntosCrudos(p, nombreJugador, minutos, esDeHuracan, listaFutbo
       const valorPorGol = (condicionPartido === "Visitante" ? 0.15 : condicionPartido === "Neutral" ? 0.10 : 0.05)
                          + (situacion === "Victoria" ? 0.15 : situacion === "Empate" ? 0.10 : 0.05)
                          + (esPartidoDuro ? 0.1 : 0);
-      puntos += valorPorGol * (cantidadGoles >= 2 ? 2 : 1) * minutos;
+      coef += valorPorGol * (cantidadGoles >= 2 ? 2 : 1);
     }
 
     if (cantidadAsist > 0) {
       const valorPorAsist = (condicionPartido === "Visitante" ? 0.075 : condicionPartido === "Neutral" ? 0.050 : 0.025)
                            + (situacion === "Victoria" ? 0.075 : situacion === "Empate" ? 0.050 : 0.025)
                            + (esPartidoDuro ? 0.05 : 0);
-      puntos += valorPorAsist * (cantidadAsist >= 2 ? 2 : 1) * minutos;
+      coef += valorPorAsist * (cantidadAsist >= 2 ? 2 : 1);
     }
 
     if (categoriaPos === "arquero") {
       const enContraPartido = contarPenalesEnContra(nombreJugador, [p], listaFutbolistas);
-      if (enContraPartido.atajados > 0) puntos += 0.15 * enContraPartido.atajados * minutos;
-      if (golesEnContraSinPenal(incidencias) === 0) puntos += 0.10 * minutos;
+      if (enContraPartido.atajados > 0) coef += 0.15 * enContraPartido.atajados;
+      if (golesEnContraSinPenal(incidencias) === 0) coef += 0.10;
     } else if (categoriaPos === "defensor") {
-      if ((parseInt(p.Resultado2) || 0) === 0) puntos += 0.10 * minutos;
+      if ((parseInt(p.Resultado2) || 0) === 0) coef += 0.10;
     } else if (categoriaPos === "volante") {
-      if ((parseInt(p.Resultado2) || 0) === 0 && (parseInt(p.Resultado1) || 0) > 0) puntos += 0.10 * minutos;
+      if ((parseInt(p.Resultado2) || 0) === 0 && (parseInt(p.Resultado1) || 0) > 0) coef += 0.10;
     } else if (categoriaPos === "delantero") {
-      if ((parseInt(p.Resultado1) || 0) > 0) puntos += 0.10;
+      if ((parseInt(p.Resultado1) || 0) > 0) coef += 0.10;
     }
+  }
 
-    if (fueExpulsado && minutoExpulsion != null) {
-      const restante = Math.max(0, finReal - minutoExpulsion);
-      puntos -= 0.05 * restante;
-    }
+  let puntos = minutos * coef;
+
+  // La expulsión es la única excepción a "todo se multiplica por minutos
+  // jugados": no es un coeficiente del partido, es un castigo por el tiempo
+  // que el jugador NO estuvo (por la expulsión), así que se resta aparte.
+  if (esDeHuracan && fueExpulsado && minutoExpulsion != null) {
+    const restante = Math.max(0, finReal - minutoExpulsion);
+    puntos -= 0.05 * restante;
   }
 
   return puntos;
@@ -694,7 +703,7 @@ function calcularPuntajeNormalizadoPartido(p, nombreObjetivo, esDeHuracanObjetiv
     });
   });
 
-  if (!participantes.length) return 5.5; // resguardo: no debería pasar nunca
+  if (!participantes.length) return 7; // resguardo: no debería pasar nunca (mitad de la escala 4-10)
 
   const todosLosPuntos = participantes.map(x => x.puntos);
   const max = Math.max(...todosLosPuntos);
@@ -706,8 +715,10 @@ function calcularPuntajeNormalizadoPartido(p, nombreObjetivo, esDeHuracanObjetiv
   const puntosObjetivo = objetivo ? objetivo.puntos : min;
 
   if (max === min) return 10;
-  const escalado = 1 + ((puntosObjetivo - min) / (max - min)) * 9;
-  return Math.min(10, Math.max(1, escalado));
+  // Escala 4 a 10 (en vez de 1 a 10): el más flojo del partido queda en 4,
+  // no en 1 — un "1" quedaba muy chocante como nota mínima.
+  const escalado = 4 + ((puntosObjetivo - min) / (max - min)) * 6;
+  return Math.min(10, Math.max(4, escalado));
 }
     function bucketCompetencia(torneo) {
       const t = norm(torneo || "");
@@ -2077,7 +2088,7 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
   ` : ""}${iconoGol ? iconoGol + " " : ""}${condicion} (${minutosJugados}’) ·
   ${p.Resultado1}-${p.Resultado2}
   <span style="font-weight:bold; margin-left:6px;
-               color:${puntajeRedondeado >= 6 ? '#006400' : puntajeRedondeado >= 4 ? '#b8860b' : '#8B0000'}">
+               color:${puntajeRedondeado >= 7 ? '#006400' : puntajeRedondeado >= 5 ? '#b8860b' : '#8B0000'}">
     (${puntajeRedondeado})
   </span>
   <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
