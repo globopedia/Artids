@@ -106,6 +106,85 @@
     .resultado-con-escudo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content:center; margin: 6px 0; }
     .debutante-link { transition: color 0.15s ease; }
     .debutante-link:hover { color: #FF0000 !important; }
+
+    /* === "El equipo": canchita con los 11 que más minutos jugaron === */
+    .cancha {
+      background: linear-gradient(#2e7d32, #1b5e20);
+      border: 3px solid #fff;
+      border-radius: 10px;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cancha::before {
+      content: "";
+      position: absolute;
+      left: 8px; right: 8px; top: 50%;
+      border-top: 2px solid rgba(255,255,255,0.45);
+    }
+    .cancha::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 70px; height: 70px;
+      margin: -35px 0 0 -35px;
+      border: 2px solid rgba(255,255,255,0.45);
+      border-radius: 50%;
+    }
+    .cancha-fila {
+      display: flex;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .cancha-fila-arquero { justify-content: center; }
+    .jugador-cancha {
+      width: auto;
+      min-width: 76px;
+      max-width: 150px;
+      text-align: center;
+      color: #fff;
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+    .jugador-cancha:hover { opacity: 0.8; }
+    .jugador-cancha.jugador-cancha-sin-link {
+      cursor: default;
+    }
+    .jugador-cancha.jugador-cancha-sin-link:hover { opacity: 1; }
+    .jugador-cancha img {
+      width: 48px; height: 62px; object-fit: cover;
+      border-radius: 6px; border: 2px solid #fff;
+      margin-bottom: 3px;
+      background: #ddd;
+    }
+    .jugador-cancha-arquero img {
+      border-color: #FFD700;
+      border-width: 3px;
+    }
+    .jugador-cancha-nombre {
+      display: block;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 10px;
+      font-weight: bold;
+      line-height: 1.15;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    }
+    .jugador-cancha-veces {
+      display: block;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 9px;
+      color: #eaffea;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    }
   </style>
 </head>
 <body>
@@ -1078,6 +1157,108 @@ function mostrarTorneo() {
     return segmento;
   }
 
+  // Puntaje "1.00 a 10.00" continuo (no en medias estrellas) para "El
+  // equipo": el que menos puntaje sacó en el torneo queda en 1.00, el que
+  // más sacó en 10.00, y el resto se reparte proporcionalmente en el medio.
+  function calcularPuntajeEscalado(score, min, max) {
+    if (max === min) return 10;
+    const escalado = 1 + ((score - min) / (max - min)) * 9;
+    return Math.min(10, Math.max(1, escalado));
+  }
+
+  // === "El equipo": los 11 que más MINUTOS jugaron en este torneo ===
+  const FILAS_CANCHA = [
+    ["wing_izq", "delantero", "wing_der"],
+    ["extremo_izq", "enganche", "extremo_der"],
+    ["volante_izq", "volante_central", "volante_der"],
+    ["lateral_izq", "defensor_central", "lateral_der"]
+  ];
+
+  function categorizarPosicion(posicionRaw) {
+    const p = norm(posicionRaw || "");
+    if (!p) return "desconocida";
+    if (p.includes("arquero")) return "arquero";
+    if (p.includes("wing izquierdo")) return "wing_izq";
+    if (p.includes("wing derecho")) return "wing_der";
+    if (p.includes("extremo izquierdo") || p.includes("insider izquierdo")) return "extremo_izq";
+    if (p.includes("extremo derecho")) return "extremo_der";
+    if (p.includes("enganche")) return "enganche";
+    if (p.includes("volante izquierdo")) return "volante_izq";
+    if (p.includes("volante derecho") || p.includes("half derecho")) return "volante_der";
+    if (p.includes("volante central") || p === "volante") return "volante_central";
+    if (p.includes("lateral izquierdo") || p.includes("defensor izquierdo")) return "lateral_izq";
+    if (p.includes("lateral derecho") || p.includes("full-back") || p.includes("full back")) return "lateral_der";
+    if (p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return "defensor_central";
+    if (p.includes("delantero")) return "delantero";
+    return "desconocida";
+  }
+
+  const URL_PAGINA_FUTBOLISTAS = "https://globopedia.github.io/Artids/indexutbolists.html";
+
+  function tarjetaJugadorCanchaEquipo(j, esArquero = false) {
+    const claseArquero = esArquero ? " jugador-cancha-arquero" : "";
+    const contenido = `
+      <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
+      <span class="jugador-cancha-nombre">${j.nombre}</span>
+      <span class="jugador-cancha-veces">${j.puntaje.toFixed(2)}</span>
+    `;
+
+    if (j.esEscudo) {
+      return `<div class="jugador-cancha jugador-cancha-sin-link${claseArquero}">${contenido}</div>`;
+    }
+
+    const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
+    return `<a class="jugador-cancha${claseArquero}" href="${url}" target="_blank" rel="noopener">${contenido}</a>`;
+  }
+
+  function renderElEquipo() {
+    // Armamos la lista de candidatos a partir de 'mapaJugadores' (ya
+    // calculado para este torneo), con su categoría y puntaje 1-10.
+    const candidatos = Object.values(mapaJugadores).map(item => ({
+      nombre: item.datos.futbolista,
+      minutos: item.minutos,
+      puntaje: calcularPuntajeEscalado(item.globopediaScore, puntajeMinTorneo, puntajeMaxTorneo),
+      foto: item.datos.foto1 && item.datos.foto1 !== "-" ? item.datos.foto1 : getEscudo("Huracán"),
+      esEscudo: !(item.datos.foto1 && item.datos.foto1 !== "-"),
+      categoria: categorizarPosicion(item.datos.posicion)
+    })).sort((a, b) => b.minutos - a.minutos);
+
+    // El arquero titular: el que más minutos jugó, entre los arqueros
+    const arquero = candidatos.find(j => j.categoria === "arquero") || null;
+
+    // Los 10 de campo que más minutos jugaron (se excluyen arqueros)
+    const resto = candidatos.filter(j => j.categoria !== "arquero").slice(0, 10);
+
+    if (!arquero && !resto.length) return "";
+
+    const filasHTML = FILAS_CANCHA.map(categorias => {
+      const jugadoresFila = resto
+        .filter(j => categorias.includes(j.categoria))
+        .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.minutos - a.minutos);
+      if (!jugadoresFila.length) return "";
+      return `<div class="cancha-fila">${jugadoresFila.map(j => tarjetaJugadorCanchaEquipo(j)).join("")}</div>`;
+    }).join("");
+
+    const categoriasConocidas = FILAS_CANCHA.flat();
+    const sinCategoria = resto.filter(j => !categoriasConocidas.includes(j.categoria));
+    const filaSinCategoria = sinCategoria.length
+      ? `<div class="cancha-fila">${sinCategoria.map(j => tarjetaJugadorCanchaEquipo(j)).join("")}</div>`
+      : "";
+
+    const filaArquero = arquero
+      ? `<div class="cancha-fila cancha-fila-arquero">${tarjetaJugadorCanchaEquipo(arquero, true)}</div>`
+      : "";
+
+    return `
+      <h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">⚽ El equipo</h3>
+      <div class="cancha">
+        ${filasHTML}
+        ${filaSinCategoria}
+        ${filaArquero}
+      </div>
+    `;
+  }
+
   // 5 estrellas, coloreadas de a medias, según el segmento (1 a 10 = medias
   // estrellas). El "relleno" se logra con dos capas de texto superpuestas:
   // una gris de fondo con las 5 estrellas vacías, y otra dorada arriba,
@@ -1281,6 +1462,8 @@ function mostrarTorneo() {
 
     ${renderDebutantes(incorporaciones, "Incorporaciones", "🆕")}
     ${renderDebutantes(nuevasAdquisiciones, "Nuevas adquisiciones", "✍️")}
+
+    ${renderElEquipo()}
 
     ${htmlPlantel}
 
