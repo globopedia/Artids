@@ -181,7 +181,8 @@
     .jugador-cancha-veces {
       display: block;
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 9px;
+      font-size: 13px;
+      font-weight: bold;
       color: #eaffea;
       text-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
@@ -1853,13 +1854,13 @@ function mostrarTorneo() {
     ${renderDebutantes(incorporaciones, "Incorporaciones", "🆕")}
     ${renderDebutantes(nuevasAdquisiciones, "Nuevas adquisiciones", "✍️")}
 
-    ${renderElEquipo()}
-
     ${htmlPlantel}
 
     <hr style="border:none; border-top:1px solid #FF0000; margin:20px 0 15px;">
     <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
     ${htmlPartidos}
+
+    ${renderElEquipo()}
   `;
 }
 
