@@ -623,7 +623,10 @@
         Huracán: (p.Huracán ?? "").trim(),
         Rival: (p.Rival ?? "").trim(),
         Foto: (p.Foto ?? "").trim(),
-        Incidencias: (p.Incidencias ?? "").trim()
+        Incidencias: (p.Incidencias ?? "").trim(),
+        FinPT: (p.FinPT ?? "").trim(),
+        Fin2T: (p.Fin2T ?? "").trim(),
+        Fin2E: (p.Fin2E ?? "").trim()
       }));
 
       llenarSelectTecnicos();
@@ -678,6 +681,70 @@ const FILAS_CANCHA = [
   ["lateral_izq", "defensor_central", "lateral_der"]
 ];
 
+function parseMinuto(valor, fallback = 0) {
+  if (valor == null || valor === "") return fallback;
+  const limpio = String(valor).trim();
+  if (limpio.includes("+")) {
+    const [base, extra] = limpio.split("+").map(Number);
+    return (base || 0) + (extra || 0);
+  }
+  const n = Number(limpio);
+  return isNaN(n) ? fallback : n;
+}
+
+function obtenerMinutoIngreso(texto, nombre) {
+  const nombreNorm = norm(nombre);
+  const regex = /\((\d+(?:\+\d+)?)\s+([^)]+)\)/g;
+  let match;
+  while ((match = regex.exec(texto)) !== null) {
+    let minuto = match[1];
+    let bloque = norm(match[2]);
+    const jugadores = bloque.split(/y|,/).map(j => norm(j));
+    if (jugadores.includes(nombreNorm)) {
+      return minuto.includes("+") ? minuto.split("+").map(Number).reduce((a,b)=>a+b) : Number(minuto);
+    }
+  }
+  return null;
+}
+
+function obtenerMinutoSalida(texto, futbolista) {
+  const regex = new RegExp(`${futbolista}\\s*\\(\\s*(\\d+(?:\\+\\d+)?)\\s+[^()]+`, "i");
+  const match = texto.match(regex);
+  if (!match) return null;
+  const m = match[1];
+  return m.includes("+") ? m.split("+").map(Number).reduce((a,b)=>a+b) : Number(m);
+}
+
+// Minutos jugados por un jugador en un partido puntual (con la misma
+// lógica de titular/suplente/expulsión que ya usamos en el resto del sitio).
+function calcularMinutosJugador(p, nombre) {
+  const texto = p.Huracán || "";
+  let finReal = (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
+  let minutosJugados = finReal;
+
+  let ingreso = obtenerMinutoIngreso(texto, nombre);
+  let salida  = obtenerMinutoSalida(texto, nombre);
+
+  if (ingreso !== null) {
+    let finJugador = salida !== null ? salida - 1 : finReal;
+    minutosJugados = Math.max(0, finJugador - ingreso + 1);
+  } else if (salida !== null) {
+    minutosJugados = Math.max(0, salida - 1);
+  } else {
+    minutosJugados = finReal;
+  }
+
+  const incidencias = p.Incidencias || "";
+  const expulsionRegex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+EXP\\s+${nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "i");
+  if (expulsionRegex.test(incidencias)) {
+    const m = incidencias.match(expulsionRegex)[1];
+    let minutoExpulsion = m.includes("+") ? m.split("+").map(Number).reduce((a, b) => a + b) : Number(m);
+    minutosJugados = ingreso === null ? Math.max(0, minutoExpulsion - 1) : Math.max(0, minutoExpulsion - ingreso + 1);
+  }
+
+  return minutosJugados;
+}
+
 function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
   const partidosTecnico = encuentros.filter(p => norm(p.Técnico) === norm(idTecnico));
   if (!partidosTecnico.length) return null;
@@ -700,8 +767,13 @@ function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
 
     jugadores.forEach(nombre => {
       const clave = norm(nombre);
-      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0 };
+      if (!conteo[clave]) conteo[clave] = { nombre, veces: 0, minutos: 0 };
       conteo[clave].veces++;
+      // Minutos jugados EN ESTE partido puntual, para poder elegir a "Sus
+      // jugadores" por minutos en vez de por partidos jugados (un jugador
+      // que entró 2 minutos en 44 partidos no debería ganarle a uno que
+      // jugó pocos partidos pero completos).
+      conteo[clave].minutos += calcularMinutosJugador(p, nombre);
     });
   });
 
@@ -712,17 +784,18 @@ function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
       return {
         nombre: c.nombre,
         veces: c.veces,
+        minutos: c.minutos,
         foto: tieneFotoPropia ? datos.foto1 : getEscudo("Huracán"),
         esEscudo: !tieneFotoPropia,
         categoria: categorizarPosicion(datos ? datos.posicion : "")
       };
     })
-    .sort((a, b) => b.veces - a.veces);
+    .sort((a, b) => b.minutos - a.minutos);
 
-  // El arquero titular: el que más atajó, entre los que tienen esa posición
+  // El arquero titular: el que más MINUTOS atajó, entre los que tienen esa posición
   const arquero = lista.find(j => j.categoria === "arquero") || null;
 
-  // Los 10 jugadores de campo que más jugaron (se excluyen arqueros)
+  // Los 10 jugadores de campo que más MINUTOS jugaron (se excluyen arqueros)
   const resto = lista.filter(j => j.categoria !== "arquero").slice(0, 10);
 
   return { arquero, resto };
@@ -757,7 +830,7 @@ function renderFormacionTecnico(idTecnico, listaFutbolistas) {
   const filasHTML = FILAS_CANCHA.map(categorias => {
     const jugadoresFila = formacion.resto
       .filter(j => categorias.includes(j.categoria))
-      .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.veces - a.veces);
+      .sort((a, b) => categorias.indexOf(a.categoria) - categorias.indexOf(b.categoria) || b.minutos - a.minutos);
     if (!jugadoresFila.length) return "";
     return `<div class="cancha-fila">${jugadoresFila.map(j => tarjetaJugadorCancha(j)).join("")}</div>`;
   }).join("");
