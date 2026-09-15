@@ -276,7 +276,7 @@
     function enlazarJugadores(texto) {
       if (!texto) return "";
       
-      const partes = texto.split(/(\s*[,;().]+\s*|\s+\b[ye]\b\s+)/i);
+      const partes = texto.split(/(\s*[,;().]+|\s+\b[ye]\b\s+)/i);
       
       return partes.map(part => {
         if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
@@ -1378,6 +1378,15 @@ function escapeHTML(valor) {
     .replace(/'/g, "&#39;");
 }
 
+function getEstadioImage(estadio) {
+  if (!estadio) return "";
+  const fileName = estadio
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\./g, "")
+    .replace(/\s+/g, "") + ".png";
+  return "https://globopedia.github.io/Artids/Estadios/" + fileName;
+}
+
 function linkArbitroSiExiste(nombre) {
   const nombreSeguro = escapeHTML(nombre);
   if (!nombre) return nombreSeguro;
@@ -1922,8 +1931,14 @@ function mostrarTorneo() {
           </div>
           <div><b>${p.Torneo}</b></div>
           <div><b>Estadio:</b> ${p.Estadio || "S/D"} — <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro) || "S/D"}</div>
-          <div style="margin-top:4px;"><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
-          <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+          <div>${ p.Estadio ? `<img src="${getEstadioImage(p.Estadio)}" alt="" style="max-height:40px; display:block; margin:4px auto;" onerror="this.style.display='none'">` : "" }</div>
+          ${ esVisitante ? `
+            <div style="margin-top:4px;"><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+            <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+          ` : `
+            <div style="margin-top:4px;"><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
+            <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
+          `}
           ${ tieneFotoValida ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="" style="max-width:250px;border-radius:8px;" onerror="this.parentElement.style.display='none'"></div>` : "" }
           <div>${renderIncidencias(p.Incidencias)}</div>
         </div>
