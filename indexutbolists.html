@@ -1337,6 +1337,16 @@ const partidosURLs = [
     }));
 
   llenarSelectFutbolistas();
+
+  // Si la URL trae "?jugador=Nombre", seleccionamos automáticamente apenas
+  // terminan de cargar los datos — antes esperábamos medio segundo fijo,
+  // pero con más CSVs para cargar eso ya no alcanzaba siempre, y quedaba
+  // el nombre escrito en el buscador sin llegar a abrir la ficha.
+  const parametrosURL = new URLSearchParams(window.location.search);
+  const nombreJugadorURL = parametrosURL.get("jugador");
+  if (nombreJugadorURL) {
+    seleccionarFutbolista(nombreJugadorURL);
+  }
 });
     function llenarSelectFutbolistas() {
       const sel = document.getElementById("futbolistaSelect");
@@ -2671,19 +2681,6 @@ function parseMinuto(minutoStr) {
       body.classList.toggle("cerrado");
       header.classList.toggle("abierto");
     }
-  }
-});
-document.addEventListener("DOMContentLoaded", function() {
-  // Leemos la URL para ver si trae la etiqueta "?jugador="
-  const parametros = new URLSearchParams(window.location.search);
-  const nombreJugador = parametros.get("jugador");
-
-  if (nombreJugador) {
-    // Si trajo un nombre, le damos medio segundo para que tu CSV termine de cargar
-    // y disparamos la función que ya tenés armada
-    setTimeout(() => {
-      seleccionarFutbolista(nombreJugador);
-    }, 500); 
   }
 });
 
