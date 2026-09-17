@@ -217,8 +217,8 @@
                                 "Cuadrangular de Cali 1960","Cuadrangular de Medellín 1960","Campeonato 1960","Campeonato 1961","Campeonato 1962","Campeonato 1963","Copa Jorge Newbery 1964","Campeonato 1964",
                                 "Campeonato 1965","Campeonato 1966","Campeonato Metropolitano 1967","Torneo Minas Gerais 1967","Torneo Negrao de Lima 1967","Torneo Promocional 1967","Campeonato Metropolitano 1968","Gira por Europa 1968","Trofeo San Sebastián 1968","Campeonato Nacional 1968","Copa Argentina 1969","Campeonato Metropolitano 1969","Campeonato Nacional 1969",
                                 "Copa Argentina 1970","Campeonato Metropolitano 1970","Petit Torneo 1970","Torneo Reclasificatorio 1970","Campeonato Metropolitano 1971","Campeonato Nacional 1971","Campeonato Metropolitano 1972","Campeonato Nacional 1972","Copa de Oro 1973","Campeonato Metropolitano 1973","Campeonato Nacional 1973","Copa Libertadores 1974","Campeonato Metropolitano 1974","Campeonato Nacional 1974",
-                                "Campeonato Metropolitano 1975","Campeonato Nacional 1975","Clasificación 1975 Pre-Libertadores","Campeonato Metropolitano 1976","Campeonato Nacional 1976","Clasificación 1976 Pre-Libertadores","Campeonato Metropolitano 1977","Campeonato Nacional 1977","Campeonato Metropolitano 1978","Trofeo Costa del Sol 1978","Trofeo Naranja 1978","Campeonato Nacional 1978","Campeonato Metropolitano 1979","Campeonato Nacional 1979",
-                                "Copa Santiago 1980","Primera División 1980","Campeonato Nacional 1980","Primera División 1981","Campeonato Nacional 1981","Campeonato Nacional 1982","Primera División 1982","Trofeo Cartagena de Indias 1983","Campeonato Nacional 1983","Amistosos 1983","Primera División 1983","Campeonato Nacional 1984","Primera División 1984","Trofeo Ciudad de Badajoz 1984",
+                                "Campeonato Metropolitano 1975","Campeonato Nacional 1975","Clasificación 1975 Pre-Libertadores","Campeonato Metropolitano 1976","Campeonato Nacional 1976","Clasificación 1976 Pre-Libertadores","Campeonato Metropolitano 1977","Campeonato Nacional 1977","Pretemporada 1978","Campeonato Metropolitano 1978","Trofeo Costa del Sol 1978","Trofeo Naranja 1978","Campeonato Nacional 1978","Campeonato Metropolitano 1979","Copa del Mundo 1979","Campeonato Nacional 1979",
+                                "Copa Santiago 1980","Primera División 1980","Campeonato Nacional 1980","Pretemporada 1981","Primera División 1981","Campeonato Nacional 1981","Campeonato Nacional 1982","Primera División 1982","Trofeo Cartagena de Indias 1983","Campeonato Nacional 1983","Amistosos 1983","Primera División 1983","Campeonato Nacional 1984","Primera División 1984","Trofeo Ciudad de Badajoz 1984",
                                 "Pretemporada 1985/86","Campeonato Nacional 'Gral. San Martín' 1985","Amistosos 1985/86","Copa del Presidente 1985","Primera División 1985/86","Liguilla de Ascenso 1986","Nacional B 1986/87","Liguilla de Ascenso 1987","Nacional B 1987/88","Liguilla de Ascenso 1988","Nacional B 1988/89","Liguilla de Ascenso 1989","Pretemporada 1989/90","Nacional B 1989/90",
                                 "Pretemporada 1990/91","Campeonato 1990/91","Amistosos 1990/91","Copa Amistad 1991","Pretemporada 1991/92","Apertura 1991","Copa Libertad 1992","Copa Ciudad de Buenos Aires 1992","Amistosos 1991/92","Clausura 1992","Liguilla Pre-Libertadores 1992","Pretemporada 1992/93","Apertura 1992","Copa Libertad 1993","Amistosos 1992/93","Copa Libertad II 1993","Clausura 1993","Copa Centenario 1993","Copa Conmebol 1993","Apertura 1993","Amistosos 1993/94","Clausura 1994","Copa Carlos Menem 1994","Apertura 1994","Copa Conmebol 1994","Amistosos 1994/95",
                                 "Clausura 1995","Apertura 1995","Amistosos 1995/96","Copa Amistad 1996","Clausura 1996","Apertura 1996","Copa Necochea 1997","Clausura 1997","Apertura 1997","Copa Necochea 1998","Clausura 1998","Apertura 1998","Copa Provincia de Buenos Aires 1999","Clausura 1999","1°B Nacional 1999/2000","Apertura 2000","Clausura 2001","Apertura 2001","Clausura 2002","Apertura 2002","Clausura 2003","Apertura BN 2003","Clausura BN 2004","Apertura BN 2004",
@@ -1097,15 +1097,18 @@ function calcularPuntajeNormalizadoPartido(p, nombreObjetivo, esDeHuracanObjetiv
       if (t.includes("1976 pre")) return "Clasificación 1976 Pre-Libertadores";
       if (t.includes("metropolitano 1977")) return "Campeonato Metropolitano 1977";
       if (t.includes("nacional 1977")) return "Campeonato Nacional 1977";
+      if (t.includes("pretemporada 1978")) return "Pretemporada 1978";
       if (t.includes("metropolitano 1978")) return "Campeonato Metropolitano 1978";
       if (t.includes("costa del sol")) return "Trofeo Costa del Sol 1978";
       if (t.includes("naranja")) return "Trofeo Naranja 1978";
       if (t.includes("nacional 1978")) return "Campeonato Nacional 1978";
       if (t.includes("metropolitano 1979")) return "Campeonato Metropolitano 1979";
+      if (t.includes("mundo 1979")) return "Copa del Mundo 1979";
       if (t.includes("nacional 1979")) return "Campeonato Nacional 1979";
       if (t.includes("santiago 1980")) return "Copa Santiago 1980";
       if (t.includes("'a' 1980")) return "Primera División 1980";
       if (t.includes("nacional 1980")) return "Campeonato Nacional 1980";
+      if (t.includes("pretemporada 1981")) return "Pretemporada 1981";
       if (t.includes("'a' 1981")) return "Primera División 1981";
       if (t.includes("nacional 1981")) return "Campeonato Nacional 1981";
       if (t.includes("nacional 1982")) return "Campeonato Nacional 1982";
