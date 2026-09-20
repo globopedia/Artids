@@ -2724,7 +2724,11 @@ function parseMinuto(minutoStr) {
       }
 
       // Freno anti-ciclo: solo reenviamos si la altura realmente cambió.
-      if (altura === ultimaAlturaEnviada) return;
+      // Freno anti-ciclo con tolerancia: no solo evitamos reenviar si es
+      // EXACTAMENTE igual a la última altura, sino si está muy cerca (unos
+      // pocos píxeles) — así tampoco reaccionamos a una posible oscilación
+      // de ida y vuelta entre dos valores parecidos.
+      if (ultimaAlturaEnviada !== null && Math.abs(altura - ultimaAlturaEnviada) <= 3) return;
       ultimaAlturaEnviada = altura;
       window.parent.postMessage({ type: "ajustarAltura", altura: altura }, "*");
     }, 150);
