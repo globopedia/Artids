@@ -425,10 +425,12 @@ let debounceTimer;
   fetch(partidosURL7).then(r => r.text()),
   fetch(partidosURL8).then(r => r.text()),
   fetch(transfersURL).then(r => r.text()),
+  fetch(transfersURL2).then(r => r.text()),
+  fetch(transfersURL3).then(r => r.text()),
   fetch(arbitrosURL).then(r => r.text())
 ])
 
-.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8, csvTransfers, csvRbits]) => {
+.then(([csvClubes, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8, csvTransfersA, csvTransfersE, csvTransfersO, csvRbits]) => {
         clubes = Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.id ?? "").toString().trim(),
         club: (c.Club ?? c.club ?? "").toString().trim(),
@@ -443,7 +445,14 @@ let debounceTimer;
         escudo: c.Escudo ?? c.escudo ?? ""
       }));
       
-const transfersCSV = Papa.parse(csvTransfers, { header:true, skipEmptyLines:true }).data;
+// Utbolists.csv se dividió en tres (A, E, O) porque el archivo único se
+// había hecho muy largo; se combinan acá en un solo array, como si
+// siguiera siendo uno solo.
+const transfersCSV = [
+  ...Papa.parse(csvTransfersA, { header:true, skipEmptyLines:true }).data,
+  ...Papa.parse(csvTransfersE, { header:true, skipEmptyLines:true }).data,
+  ...Papa.parse(csvTransfersO, { header:true, skipEmptyLines:true }).data
+];
 
 transfers = transfersCSV
   .filter(t => t.Foto1 && t.Foto1.startsWith("http")) // 🔥 limpia basura
