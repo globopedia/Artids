@@ -1162,16 +1162,23 @@ urlsCSV.forEach((url, index) => {
   });
 });
 
-Papa.parse("https://artids.vercel.app/api/data?file=utbolists", {
-  download: true,
-  header: true,
-  complete: res => {
-    datosUtbolistas = res.data;
-    datosUtbolistas.forEach(j => {
-      indiceUtbolistas[norm(j["Futbolista"])] = j;
-    });
-    intentarGenerarRanking();
-  }
+// Utbolists.csv se dividió en tres (A, E, O) porque el archivo único se
+// había hecho muy largo; se combinan acá en un solo array antes de armar
+// el índice, como si siguiera siendo un solo archivo.
+Promise.all([
+  fetch("https://artids.vercel.app/api/data?file=utbolistsa").then(r => r.text()),
+  fetch("https://artids.vercel.app/api/data?file=utbolistse").then(r => r.text()),
+  fetch("https://artids.vercel.app/api/data?file=utbolistso").then(r => r.text())
+]).then(([csvUtbolistasA, csvUtbolistasE, csvUtbolistasO]) => {
+  datosUtbolistas = [
+    ...Papa.parse(csvUtbolistasA, { header: true, skipEmptyLines: true }).data,
+    ...Papa.parse(csvUtbolistasE, { header: true, skipEmptyLines: true }).data,
+    ...Papa.parse(csvUtbolistasO, { header: true, skipEmptyLines: true }).data
+  ];
+  datosUtbolistas.forEach(j => {
+    indiceUtbolistas[norm(j["Futbolista"])] = j;
+  });
+  intentarGenerarRanking();
 });
 
 function parseMinuto(valor, fallback = 0) {
