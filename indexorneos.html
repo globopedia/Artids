@@ -394,11 +394,13 @@
       Promise.all([
         fetch(torneosURL).then(r => r.text()),
         fetch(futbolistasURL).then(r => r.text()).catch(() => ""),
+        fetch(futbolistasURL2).then(r => r.text()).catch(() => ""),
+        fetch(futbolistasURL3).then(r => r.text()).catch(() => ""),
         fetch(clubesURL).then(r => r.text()).catch(() => ""),
         fetch(arbitrosURL).then(r => r.text()).catch(() => ""),
         ...partidosURLs.map(url => fetch(url).then(r => r.text()))
       ])
-      .then(([csvTorneos, csvFutbolistas, csvClubes, csvArbitros, ...csvsPartidos]) => {
+      .then(([csvTorneos, csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, csvClubes, csvArbitros, ...csvsPartidos]) => {
         
         // Cargar Torneos
         torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
@@ -428,17 +430,22 @@
           })).filter(a => a.nombre);
         }
 
-        // Cargar Futbolistas
-        if (csvFutbolistas) {
-          futbolistas = Papa.parse(csvFutbolistas, { header:true, skipEmptyLines:true }).data.map(f => ({
-            futbolista: (f.Futbolista ?? f.futbolista ?? f.Nombre ?? "").toString().trim(),
-            posicion: (f.Posición ?? f.posicion ?? f.Posicion ?? "").toString().trim(),
-            fechNac: (f.FechaNac ?? f.fechNac ?? f.FechNac ?? "").toString().trim(),
-            procedencia: (f.Procedencia ?? f.procedencia ?? "").toString().trim(),
-            pais: (f.País ?? f.Pais ?? f.pais ?? "").toString().trim(),
-            Foto1: (f.Foto1 ?? f.foto1 ?? "").toString().trim()
-          })).filter(f => f.futbolista && f.futbolista !== "-");
-        }
+        // Cargar Futbolistas — Utbolists.csv se dividió en tres (A, E, O)
+        // porque el archivo único se había hecho muy largo; se combinan
+        // acá en un solo array, como si siguiera siendo uno solo.
+        const mapearFutbolista = f => ({
+          futbolista: (f.Futbolista ?? f.futbolista ?? f.Nombre ?? "").toString().trim(),
+          posicion: (f.Posición ?? f.posicion ?? f.Posicion ?? "").toString().trim(),
+          fechNac: (f.FechaNac ?? f.fechNac ?? f.FechNac ?? "").toString().trim(),
+          procedencia: (f.Procedencia ?? f.procedencia ?? "").toString().trim(),
+          pais: (f.País ?? f.Pais ?? f.pais ?? "").toString().trim(),
+          Foto1: (f.Foto1 ?? f.foto1 ?? "").toString().trim()
+        });
+        futbolistas = [
+          ...(csvFutbolistasA ? Papa.parse(csvFutbolistasA, { header:true, skipEmptyLines:true }).data.map(mapearFutbolista) : []),
+          ...(csvFutbolistasE ? Papa.parse(csvFutbolistasE, { header:true, skipEmptyLines:true }).data.map(mapearFutbolista) : []),
+          ...(csvFutbolistasO ? Papa.parse(csvFutbolistasO, { header:true, skipEmptyLines:true }).data.map(mapearFutbolista) : [])
+        ].filter(f => f.futbolista && f.futbolista !== "-");
 
         // Mapa de nombre normalizado -> jugador, construido UNA sola vez.
         // Antes, cada búsqueda de un nombre dentro de una incidencia hacía
