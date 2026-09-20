@@ -1282,7 +1282,15 @@ const partidosURLs = [
 ];
   Promise.all([
   fetch(futbolistasURL).then(r => {
-    if (!r.ok) throw new Error("Futbolistas CSV no disponible");
+    if (!r.ok) throw new Error("Futbolistas CSV A no disponible");
+    return r.text();
+  }),
+  fetch(futbolistasURL2).then(r => {
+    if (!r.ok) throw new Error("Futbolistas CSV E no disponible");
+    return r.text();
+  }),
+  fetch(futbolistasURL3).then(r => {
+    if (!r.ok) throw new Error("Futbolistas CSV O no disponible");
     return r.text();
   }),
   ...partidosURLs.map((url, i) =>
@@ -1292,9 +1300,9 @@ const partidosURLs = [
     })
   )
 ])
-.then(([csvFutbolistas, ...csvPartidos]) => {
+.then(([csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, ...csvPartidos]) => {
 
-  futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
+  const mapearFutbolista = c => ({
     id: (c.ID ?? "").toString().trim(),
     futbolista: (c["Futbolista"] ?? "").toString().trim(),
     nombre: (c.Nombre ?? "").toString().trim(),
@@ -1312,7 +1320,16 @@ const partidosURLs = [
     biografía: (c.Biografía ?? "").toString().trim(),
     foto1: (c.Foto1 ?? "").toString().trim(),
     foto2: (c.Foto2 ?? "").toString().trim()
-  }));
+  });
+
+  // Utbolists.csv se dividió en tres (A, E, O) porque el archivo único se
+  // había hecho muy largo — se combinan acá en un solo array, como si
+  // siguiera siendo uno solo.
+  futbolistas = [
+    ...Papa.parse(csvFutbolistasA, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista),
+    ...Papa.parse(csvFutbolistasE, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista),
+    ...Papa.parse(csvFutbolistasO, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista)
+  ];
 
   const partidosParseados = csvPartidos.map(csv =>
     Papa.parse(csv, { header: true, skipEmptyLines: true }).data
