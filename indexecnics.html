@@ -151,7 +151,9 @@
 
   <script>
     const tecnicosURL = "https://globopedia.github.io/Ecnics/Ecnics.csv?v=" + Date.now();
-    const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolists";
+    const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolistsa";
+    const futbolistasURL2 = "https://artids.vercel.app/api/data?file=utbolistse";
+    const futbolistasURL3 = "https://artids.vercel.app/api/data?file=utbolistso";
     const partidosURL1 = "https://globopedia.github.io/Artids/Artids1910.csv?v=" + Date.now();
     const partidosURL2 = "https://globopedia.github.io/Artids/Artids1925.csv?v=" + Date.now();
     const partidosURL3 = "https://globopedia.github.io/Artids/Artids1940.csv?v=" + Date.now();
@@ -569,7 +571,9 @@
 
     Promise.all([
   fetch(tecnicosURL).then(r => { if(!r.ok) throw new Error("Técnicos CSV no disponible"); return r.text(); }),
-  fetch(futbolistasURL).then(r => { if(!r.ok) throw new Error("Futbolistas CSV no disponible"); return r.text(); }),
+  fetch(futbolistasURL1).then(r => { if(!r.ok) throw new Error("Futbolistas CSV 1 no disponible"); return r.text(); }),
+  fetch(futbolistasURL2).then(r => { if(!r.ok) throw new Error("Futbolistas CSV 2 no disponible"); return r.text(); }),
+  fetch(futbolistasURL3).then(r => { if(!r.ok) throw new Error("Futbolistas CSV 3 no disponible"); return r.text(); }),
   fetch(partidosURL1).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
   fetch(partidosURL2).then(r => { if(!r.ok) throw new Error("Partidos CSV 2 no disponible"); return r.text(); }),
   fetch(partidosURL3).then(r => { if(!r.ok) throw new Error("Partidos CSV 3 no disponible"); return r.text(); }),
@@ -579,7 +583,7 @@
   fetch(partidosURL7).then(r => { if(!r.ok) throw new Error("Partidos CSV 7 no disponible"); return r.text(); }),
   fetch(partidosURL8).then(r => { if(!r.ok) throw new Error("Partidos CSV 8 no disponible"); return r.text(); })
 ])
-.then(([csvEcnics, csvFutbolistas, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
+.then(([csvEcnics, csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, csvPartidos1, csvPartidos2, csvPartidos3, csvPartidos4, csvPartidos5, csvPartidos6, csvPartidos7, csvPartidos8]) => {
   
       tecnicos = Papa.parse(csvEcnics, { header:true, skipEmptyLines:true }).data.map(c => ({
         id: (c.ID ?? "").toString().trim(),
@@ -594,12 +598,22 @@
         foto: (c.Foto ?? "").toString().trim()
       }));
 
-      futbolistas = Papa.parse(csvFutbolistas, { header: true, skipEmptyLines: true }).data.map(c => ({
+      futbolistas = Papa.parse(csvFutbolistasA, { header: true, skipEmptyLines: true }).data.map(c => ({
         futbolista: (c["Futbolista"] ?? "").toString().trim(),
         posicion: (c.Posición ?? "").toString().trim(),
         foto1: (c.Foto1 ?? "").toString().trim()
       }));
 
+      futbolistas = Papa.parse(csvFutbolistasE, { header: true, skipEmptyLines: true }).data.map(c => ({
+        futbolista: (c["Futbolista"] ?? "").toString().trim(),
+        posicion: (c.Posición ?? "").toString().trim(),
+        foto1: (c.Foto1 ?? "").toString().trim()
+      }));
+      futbolistas = Papa.parse(csvFutbolistasO, { header: true, skipEmptyLines: true }).data.map(c => ({
+        futbolista: (c["Futbolista"] ?? "").toString().trim(),
+        posicion: (c.Posición ?? "").toString().trim(),
+        foto1: (c.Foto1 ?? "").toString().trim()
+      }));
       const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
       const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
       const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
