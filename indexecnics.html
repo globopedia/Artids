@@ -571,7 +571,7 @@
 
     Promise.all([
   fetch(tecnicosURL).then(r => { if(!r.ok) throw new Error("Técnicos CSV no disponible"); return r.text(); }),
-  fetch(futbolistasURL1).then(r => { if(!r.ok) throw new Error("Futbolistas CSV 1 no disponible"); return r.text(); }),
+  fetch(futbolistasURL).then(r => { if(!r.ok) throw new Error("Futbolistas CSV A no disponible"); return r.text(); }),
   fetch(futbolistasURL2).then(r => { if(!r.ok) throw new Error("Futbolistas CSV 2 no disponible"); return r.text(); }),
   fetch(futbolistasURL3).then(r => { if(!r.ok) throw new Error("Futbolistas CSV 3 no disponible"); return r.text(); }),
   fetch(partidosURL1).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
@@ -598,22 +598,16 @@
         foto: (c.Foto ?? "").toString().trim()
       }));
 
-      futbolistas = Papa.parse(csvFutbolistasA, { header: true, skipEmptyLines: true }).data.map(c => ({
+      const mapearFutbolista = c => ({
         futbolista: (c["Futbolista"] ?? "").toString().trim(),
         posicion: (c.Posición ?? "").toString().trim(),
         foto1: (c.Foto1 ?? "").toString().trim()
-      }));
-
-      futbolistas = Papa.parse(csvFutbolistasE, { header: true, skipEmptyLines: true }).data.map(c => ({
-        futbolista: (c["Futbolista"] ?? "").toString().trim(),
-        posicion: (c.Posición ?? "").toString().trim(),
-        foto1: (c.Foto1 ?? "").toString().trim()
-      }));
-      futbolistas = Papa.parse(csvFutbolistasO, { header: true, skipEmptyLines: true }).data.map(c => ({
-        futbolista: (c["Futbolista"] ?? "").toString().trim(),
-        posicion: (c.Posición ?? "").toString().trim(),
-        foto1: (c.Foto1 ?? "").toString().trim()
-      }));
+      });
+      futbolistas = [
+        ...Papa.parse(csvFutbolistasA, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista),
+        ...Papa.parse(csvFutbolistasE, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista),
+        ...Papa.parse(csvFutbolistasO, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista)
+      ];
       const partidos1 = Papa.parse(csvPartidos1, { header:true, skipEmptyLines:true }).data;
       const partidos2 = Papa.parse(csvPartidos2, { header:true, skipEmptyLines:true }).data;
       const partidos3 = Papa.parse(csvPartidos3, { header:true, skipEmptyLines:true }).data;
