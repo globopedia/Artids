@@ -2547,6 +2547,11 @@ function filtrarFutbolistas(termino) {
 
     suggestionsList.appendChild(li);
   });
+
+  // El desplegable es position:absolute, así que agrandarlo o vaciarlo NO
+  // cambia el alto "normal" de la página (scrollHeight) — el ResizeObserver
+  // que ajusta el iframe de Blogger no se entera solo. Le avisamos a mano.
+  if (window.enviarAltura) window.enviarAltura();
 }
 
     searchInput.addEventListener("input", debounce(e => filtrarFutbolistas(e.target.value), 200));
@@ -2555,6 +2560,7 @@ function seleccionarFutbolista(nombre) {
   // Acá también dejamos el nombre original directo del CSV
   searchInput.value = nombre;
   suggestionsList.innerHTML = "";
+  if (window.enviarAltura) window.enviarAltura();
   const hiddenSelect = document.getElementById("futbolistaSelect");
   hiddenSelect.innerHTML = `<option value="${nombre}" selected></option>`;
   hiddenSelect.value = nombre;
@@ -2568,6 +2574,7 @@ let selectedIndex = -1;
 
   if (e.key === "Escape") {
     suggestionsList.innerHTML = "";
+    if (window.enviarAltura) window.enviarAltura();
     selectedIndex = -1;
     searchInput.blur();
     return;
@@ -2625,6 +2632,7 @@ document.addEventListener("click", function(e) {
   const esClickEnLista = suggestionsList.contains(e.target);
   if (!esClickEnInput && !esClickEnLista) {
     suggestionsList.innerHTML = "";
+    if (window.enviarAltura) window.enviarAltura();
     selectedIndex = -1;
   }
 });
@@ -2695,18 +2703,43 @@ function parseMinuto(minutoStr) {
 // tamaño real del contenido — así el iframe crece o achica su alto y nunca
 // queda con scroll interno.
 (function() {
+  let ultimaAlturaEnviada = null;
+  let debounceAlturaTimer = null;
+
   function enviarAltura() {
-    const altura = document.documentElement.scrollHeight;
-    window.parent.postMessage({ type: "ajustarAltura", altura: altura }, "*");
+    clearTimeout(debounceAlturaTimer);
+    debounceAlturaTimer = setTimeout(() => {
+      let altura = document.documentElement.scrollHeight;
+
+      // El desplegable de sugerencias es position:absolute, así que NO
+      // afecta scrollHeight aunque esté visible ocupando espacio real —
+      // por eso medimos su borde inferior real aparte, y nos quedamos con
+      // el que sea más grande de los dos. Sin esto, el iframe nunca se
+      // agranda para hacerle lugar, y el desplegable queda recortado.
+      const desplegable = document.getElementById("autocompleteList");
+      if (desplegable && desplegable.children.length > 0) {
+        const rect = desplegable.getBoundingClientRect();
+        const bordeInferior = Math.ceil(rect.bottom + window.scrollY);
+        if (bordeInferior > altura) altura = bordeInferior;
+      }
+
+      // Freno anti-ciclo: solo reenviamos si la altura realmente cambió.
+      if (altura === ultimaAlturaEnviada) return;
+      ultimaAlturaEnviada = altura;
+      window.parent.postMessage({ type: "ajustarAltura", altura: altura }, "*");
+    }, 150);
   }
+
+  // La exponemos globalmente para poder llamarla a mano justo cuando el
+  // desplegable cambia (el ResizeObserver de acá abajo no se entera solo).
+  window.enviarAltura = enviarAltura;
 
   // Al cargar la página
   window.addEventListener("load", enviarAltura);
   document.addEventListener("DOMContentLoaded", enviarAltura);
 
-  // Y cada vez que el contenido cambia de tamaño (elegir un jugador, abrir
-  // un acordeón de partido, etc.) — ResizeObserver detecta esto solo, sin
-  // tener que llamarlo a mano desde cada función que cambia el DOM.
+  // Y cada vez que el contenido "normal" cambia de tamaño (elegir un
+  // jugador, abrir un acordeón de partido, etc.)
   if (window.ResizeObserver) {
     const observer = new ResizeObserver(() => enviarAltura());
     observer.observe(document.body);
