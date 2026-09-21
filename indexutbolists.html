@@ -2620,34 +2620,6 @@ function filtrarFutbolistas(termino) {
 
   if (window.enviarAltura) window.enviarAltura();
 }
-  console.timeEnd("  ⏱️ 1) buscar coincidencias en futbolistas[]");
-
-  console.time("  ⏱️ 2) crear los <li> del desplegable");
-  resultados.forEach(r => {
-    const li = document.createElement("li");
-    li.className = "autocomplete-item";
-
-    // Sin fotos acá a propósito: algunas pesan varios cientos de KB (hasta
-    // más de 1-2 MB), y con hasta 15 resultados por búsqueda, cargarlas
-    // todas de nuevo en cada letra tipeada es lo que estaba colgando la
-    // página. La foto grande ya se ve después, al elegir al jugador.
-    li.innerHTML = `<span>${r.futbolista}</span>`;
-
-    li.addEventListener("click", () => {
-      seleccionarFutbolista(r.futbolista);
-    });
-
-    suggestionsList.appendChild(li);
-  });
-  console.timeEnd("  ⏱️ 2) crear los <li> del desplegable");
-
-  // El desplegable es position:absolute, así que agrandarlo o vaciarlo NO
-  // cambia el alto "normal" de la página (scrollHeight) — el ResizeObserver
-  // que ajusta el iframe de Blogger no se entera solo. Le avisamos a mano.
-  console.time("  ⏱️ 3) enviarAltura()");
-  if (window.enviarAltura) window.enviarAltura();
-  console.timeEnd("  ⏱️ 3) enviarAltura()");
-}
 
     searchInput.addEventListener("input", debounce(e => {
       console.time("🕐 TOTAL desde que se dispara el input hasta que termina filtrarFutbolistas");
