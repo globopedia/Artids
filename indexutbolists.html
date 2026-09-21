@@ -1325,6 +1325,7 @@ const partidosURLs = [
   const mapearFutbolista = c => ({
     id: (c.ID ?? "").toString().trim(),
     futbolista: (c["Futbolista"] ?? "").toString().trim(),
+    futbolistaNorm: norm((c["Futbolista"] ?? "").toString().trim()),
     nombre: (c.Nombre ?? "").toString().trim(),
     posicion: (c.Posición ?? "").toString().trim(),
     fechanac: (c.FechaNac?? "").toString().trim(),
@@ -2590,11 +2591,12 @@ function filtrarFutbolistas(termino) {
   // de una vez, con Procedencia/Destino distintos por etapa) — acá solo nos
   // interesa mostrarlo UNA vez en la lista, quedándonos con la primera fila
   // que aparezca para ese nombre.
-  const vistos = new Set();
+const vistos = new Set();
   const resultados = [];
   for (const a of futbolistas) {
-    if (!norm(a.futbolista).includes(termNorm)) continue;
-    const clave = norm(a.futbolista);
+    // Acá usamos el nombre pre-procesado, anda como piña
+    if (!a.futbolistaNorm.includes(termNorm)) continue;
+    const clave = a.futbolistaNorm;
     if (vistos.has(clave)) continue;
     vistos.add(clave);
     resultados.push(a);
