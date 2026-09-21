@@ -1393,6 +1393,11 @@ const partidosURLs = [
 
   llenarSelectFutbolistas();
 
+  // Armamos el índice del buscador UNA sola vez, acá, con todo ya cargado.
+  // A partir de ahora cada tecla no vuelve a recorrer a los 5.000 y pico
+  // de futbolistas: mira solamente el cajón de la letra que corresponde.
+  construirIndiceBusqueda();
+
   // Ya está todo en memoria: reactivamos el buscador.
   (function reactivarBuscador() {
     const el = document.getElementById("futbolistaSearch");
@@ -1425,14 +1430,16 @@ const partidosURLs = [
     function llenarSelectFutbolistas() {
       const sel = document.getElementById("futbolistaSelect");
       sel.innerHTML = "<option value=''>-- Seleccionar --</option>";
-      futbolistas.forEach(a => {
-        if (a.futbolista) {
-          const opt = document.createElement("option");
-          opt.value = a.futbolista;
-          opt.textContent = InvertirNombre(a.futbolista);
-          sel.appendChild(opt);
-        }
-      });
+
+      // Antes acá se creaba un <option> por CADA futbolista (miles de
+      // elementos, con InvertirNombre() encima). Era trabajo al pedo: ese
+      // <select> está oculto (display:none) y nadie lo mira — el único que
+      // lo usa es mostrarFutbolistas(), que lee su .value, y ese value se
+      // lo pone seleccionarFutbolista() a mano cuando elegís un nombre.
+      // Sacarlo le quita un buen pedazo de laburo a la carga inicial.
+      // (Si algún día querés volver al desplegable clásico, acá iba el
+      //  forEach que armaba las opciones.)
+
       sel.addEventListener("change", mostrarFutbolistas);
     }
 
@@ -2579,44 +2586,129 @@ function debounce(func, delay) {
   };
 }
 
+// === ÍNDICE DEL BUSCADOR (se arma una sola vez, al terminar de cargar) ===
+//
+// El problema viejo: con cada tecla recorríamos a TODOS los futbolistas y
+// preguntábamos si la letra aparecía en cualquier lugar del nombre. Con una
+// "g" entraban "Marcelo Asteggiano" o "Diego Luna" — la g está en el medio,
+// no sirven de nada — y encima había que revisar la lista entera.
+//
+// Ahora guardamos, para cada futbolista, el nombre ya normalizado (sin
+// acentos y en minúscula) y sus palabras sueltas, y los repartimos en
+// "cajones" según la letra con la que arranca cada palabra. Al teclear "g"
+// abrimos el cajón de la G y listo: los demás ni se miran.
+const MAX_SUGERENCIAS = 20;
+let indiceFutbolistas = [];        // una entrada por futbolista (sin repetir)
+let indicePorLetra = new Map();    // "g" -> entradas con alguna palabra con g
+
+function construirIndiceBusqueda() {
+  indiceFutbolistas = [];
+  indicePorLetra = new Map();
+  const vistos = new Set();
+
+  for (const a of futbolistas) {
+    const nombre = (a.futbolista || "").trim();
+    if (!nombre) continue;
+    if (vistos.has(nombre)) continue;  // un jugador puede tener varias filas
+    vistos.add(nombre);
+
+    // futbolistaNorm ya viene calculado desde que se leyó el CSV
+    const nombreNorm = a.futbolistaNorm || norm(nombre);
+    const palabras = nombreNorm.split(/\s+/).filter(Boolean);
+
+    const entrada = {
+      nombre: nombre,
+      nombreNorm: nombreNorm,
+      palabras: palabras,
+      apellidoNorm: palabras.length ? palabras[palabras.length - 1] : ""
+    };
+    indiceFutbolistas.push(entrada);
+
+    const inicialesUsadas = new Set();
+    for (const palabra of palabras) {
+      const inicial = palabra.charAt(0);
+      if (!inicial || inicialesUsadas.has(inicial)) continue;
+      inicialesUsadas.add(inicial);
+      if (!indicePorLetra.has(inicial)) indicePorLetra.set(inicial, []);
+      indicePorLetra.get(inicial).push(entrada);
+    }
+  }
+
+  // Los ordenamos UNA sola vez acá (por apellido y después por nombre
+  // completo), así las sugerencias ya salen ordenadas como en una lista de
+  // buena fe — "Gallardo, Gallego, García, Gómez…" — sin tener que ordenar
+  // nada en cada tecla.
+  for (const lista of indicePorLetra.values()) {
+    lista.sort((x, y) =>
+      x.apellidoNorm.localeCompare(y.apellidoNorm) ||
+      x.nombreNorm.localeCompare(y.nombreNorm)
+    );
+  }
+}
+
 function filtrarFutbolistas(termino) {
-  // Lo pazamo' a minúzcula nomá', zin zacar lo' acento'
-  const term = termino.toLowerCase(); 
+  // norm() saca acentos y pasa a minúscula: "perez", "Perez" y "Pérez"
+  // son todos lo mismo, que es como lo queremos.
+  const term = norm(termino);
   suggestionsList.innerHTML = "";
   selectedIndex = -1;
 
-  if (!term) return;
-
-  const vistos = new Set();
-  const resultados = [];
-
-  for (const a of futbolistas) {
-    const nombreBuscado = (a.futbolista || "").toLowerCase();
-    
-    // Zi no coincide lo que tipió el uzuario, zigue de largo
-    if (!nombreBuscado.includes(term)) continue;
-
-    // Zi ya lo tenemo' anotado, zigue de largo para no repetir
-    if (vistos.has(nombreBuscado)) continue;
-    
-    vistos.add(nombreBuscado);
-    resultados.push(a);
-
-    // ACÁ EHTÁ EL FRENO MÁGICO (Punto 2)
-    // Cortamo' la buzqueda cuando ya encontramo' 15
-    if (resultados.length >= 15) break; 
+  if (!term) {
+    if (window.enviarAltura) window.enviarAltura();
+    return;
   }
 
-  // Recién acá armamo' el DOM, pero zolo con 15 como máximo. ¡Vuela!
-  resultados.forEach(r => {
+  // Solo el cajón de la primera letra, no la lista entera
+  const candidatos = indicePorLetra.get(term.charAt(0)) || [];
+
+  // Los que coinciden por APELLIDO van primero (es lo que uno busca casi
+  // siempre); después los que coinciden por nombre de pila.
+  const porApellido = [];
+  const porNombre = [];
+
+  for (const e of candidatos) {
+    if (e.apellidoNorm.startsWith(term)) {
+      porApellido.push(e);
+    } else if (e.palabras.some(p => p.startsWith(term))) {
+      porNombre.push(e);
+    }
+  }
+
+  let resultados = porApellido.concat(porNombre);
+
+  // Red de seguridad: si NINGUNA palabra empieza así (por ejemplo si se
+  // busca un pedacito del medio, "steggiano" o "guez"), recién ahí
+  // buscamos adentro del nombre, como se hacía antes. Como casi nunca
+  // entra acá, no molesta.
+  if (resultados.length === 0) {
+    for (const e of indiceFutbolistas) {
+      if (e.nombreNorm.includes(term)) {
+        resultados.push(e);
+        if (resultados.length >= MAX_SUGERENCIAS) break;
+      }
+    }
+  }
+
+  const totalEncontrados = resultados.length;
+  resultados = resultados.slice(0, MAX_SUGERENCIAS);
+
+  resultados.forEach(e => {
     const li = document.createElement("li");
     li.className = "autocomplete-item";
-    li.innerHTML = `<span>${r.futbolista}</span>`;
+    li.innerHTML = `<span>${e.nombre}</span>`;
     li.addEventListener("click", () => {
-      seleccionarFutbolista(r.futbolista);
+      seleccionarFutbolista(e.nombre);
     });
     suggestionsList.appendChild(li);
   });
+
+  // Si quedaron más afuera, lo avisamos en vez de mentir con una lista corta
+  if (totalEncontrados > resultados.length) {
+    const aviso = document.createElement("li");
+    aviso.style.cssText = "padding:6px;font-size:12px;color:#888;text-align:center;cursor:default;";
+    aviso.textContent = `y ${totalEncontrados - resultados.length} más… seguí escribiendo`;
+    suggestionsList.appendChild(aviso);
+  }
 
   if (window.enviarAltura) window.enviarAltura();
 }
@@ -2625,7 +2717,7 @@ function filtrarFutbolistas(termino) {
       console.time("🕐 TOTAL desde que se dispara el input hasta que termina filtrarFutbolistas");
       filtrarFutbolistas(e.target.value);
       console.timeEnd("🕐 TOTAL desde que se dispara el input hasta que termina filtrarFutbolistas");
-    }, 200));
+    }, 120));
 
 function seleccionarFutbolista(nombre) {
   // Acá también dejamos el nombre original directo del CSV
@@ -2641,7 +2733,8 @@ function seleccionarFutbolista(nombre) {
 let selectedIndex = -1;
 
     searchInput.addEventListener("keydown", function(e) {
-  const items = suggestionsList.querySelectorAll("li");
+  // Solo los nombres de verdad: el cartelito de "y N más…" no se navega
+  const items = suggestionsList.querySelectorAll("li.autocomplete-item");
 
   if (e.key === "Escape") {
     suggestionsList.innerHTML = "";
@@ -2714,9 +2807,14 @@ searchInput.addEventListener("focus", function(e) {
     filtrarFutbolistas(texto);
   }
 
-  // 🪄 Truco: seleccionar todo el texto después de un clic o foco
+  // 🪄 Truco: seleccionar todo el texto después de un clic o foco, para
+  // poder pisar de una lo que había escrito antes.
+  // OJO: solo si en esos 150 ms el usuario NO empezó a escribir. Si no,
+  // le seleccionábamos lo recién tipeado y la letra siguiente le borraba
+  // todo lo anterior (escribías "GU" y te quedaba "U").
+  const textoAlEntrar = searchInput.value;
   setTimeout(() => {
-    if (document.activeElement === searchInput) {
+    if (document.activeElement === searchInput && searchInput.value === textoAlEntrar) {
       searchInput.select();
     }
   }, 150);
