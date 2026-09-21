@@ -2580,28 +2580,46 @@ function debounce(func, delay) {
 }
 
 function filtrarFutbolistas(termino) {
-  console.time("  ⏱️ 1) buscar coincidencias en futbolistas[]");
-  const termNorm = norm(termino);
+  // Lo pazamo' a minúzcula nomá', zin zacar lo' acento'
+  const term = termino.toLowerCase(); 
   suggestionsList.innerHTML = "";
   selectedIndex = -1;
 
-  if (!termNorm) { console.timeEnd("  ⏱️ 1) buscar coincidencias en futbolistas[]"); return; }
+  if (!term) return;
 
-  // Un jugador puede tener más de una fila en el CSV (si volvió al club más
-  // de una vez, con Procedencia/Destino distintos por etapa) — acá solo nos
-  // interesa mostrarlo UNA vez en la lista, quedándonos con la primera fila
-  // que aparezca para ese nombre.
-const vistos = new Set();
+  const vistos = new Set();
   const resultados = [];
+
   for (const a of futbolistas) {
-    // Acá usamos el nombre pre-procesado, anda como piña
-    if (!a.futbolistaNorm.includes(termNorm)) continue;
-    const clave = a.futbolistaNorm;
-    if (vistos.has(clave)) continue;
-    vistos.add(clave);
+    const nombreBuscado = (a.futbolista || "").toLowerCase();
+    
+    // Zi no coincide lo que tipió el uzuario, zigue de largo
+    if (!nombreBuscado.includes(term)) continue;
+
+    // Zi ya lo tenemo' anotado, zigue de largo para no repetir
+    if (vistos.has(nombreBuscado)) continue;
+    
+    vistos.add(nombreBuscado);
     resultados.push(a);
-    if (resultados.length >= 15) break;
+
+    // ACÁ EHTÁ EL FRENO MÁGICO (Punto 2)
+    // Cortamo' la buzqueda cuando ya encontramo' 15
+    if (resultados.length >= 15) break; 
   }
+
+  // Recién acá armamo' el DOM, pero zolo con 15 como máximo. ¡Vuela!
+  resultados.forEach(r => {
+    const li = document.createElement("li");
+    li.className = "autocomplete-item";
+    li.innerHTML = `<span>${r.futbolista}</span>`;
+    li.addEventListener("click", () => {
+      seleccionarFutbolista(r.futbolista);
+    });
+    suggestionsList.appendChild(li);
+  });
+
+  if (window.enviarAltura) window.enviarAltura();
+}
   console.timeEnd("  ⏱️ 1) buscar coincidencias en futbolistas[]");
 
   console.time("  ⏱️ 2) crear los <li> del desplegable");
