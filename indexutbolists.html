@@ -2661,7 +2661,6 @@ function construirIndiceBusqueda() {
       nombre: nombre,
       nombreNorm: nombreNorm,
       palabras: palabras,
-      apellidoNorm: palabras.length ? palabras[palabras.length - 1] : "",
       foto: a.foto1 || ""
     };
     entradasPorNombre.set(nombre, entrada);
@@ -2677,16 +2676,14 @@ function construirIndiceBusqueda() {
     }
   }
 
-  // Los ordenamos UNA sola vez acá (por apellido y después por nombre
-  // completo), así las sugerencias ya salen ordenadas como en una lista de
-  // buena fe — "Gallardo, Gallego, García, Gómez…" — sin tener que ordenar
-  // nada en cada tecla.
-  for (const lista of indicePorLetra.values()) {
-    lista.sort((x, y) =>
-      x.apellidoNorm.localeCompare(y.apellidoNorm) ||
-      x.nombreNorm.localeCompare(y.nombreNorm)
-    );
-  }
+  // Orden alfabético por el nombre completo, tal cual se ve en la lista:
+  // "Gonzalo Bettini, Gonzalo García, Luis González, Mariano González".
+  // Se ordena UNA sola vez acá, al cargar. Después, al teclear, no se
+  // ordena nada más: el filtro recorre el cajón en orden y va guardando
+  // los que coinciden, así que las sugerencias ya salen ordenadas solas.
+  const alfabetico = (x, y) => x.nombreNorm.localeCompare(y.nombreNorm, "es");
+  indiceFutbolistas.sort(alfabetico);
+  for (const lista of indicePorLetra.values()) lista.sort(alfabetico);
 }
 
 function filtrarFutbolistas(termino) {
@@ -2707,20 +2704,15 @@ function filtrarFutbolistas(termino) {
   // Solo el cajón de la primera letra, no la lista entera
   const candidatos = indicePorLetra.get(term.charAt(0)) || [];
 
-  // Los que coinciden por APELLIDO van primero (es lo que uno busca casi
-  // siempre); después los que coinciden por nombre de pila.
-  const porApellido = [];
-  const porNombre = [];
+  // Una sola lista alfabética: da lo mismo si lo tipeado engancha con el
+  // nombre o con el apellido. Como el cajón ya viene ordenado de fábrica,
+  // filtrarlo acá no le rompe el orden — por eso no hay que ordenar en
+  // cada tecla, que es lo que sí podría ponerse lento.
+  let resultados = [];
 
   for (const e of candidatos) {
-    if (e.apellidoNorm.startsWith(term)) {
-      porApellido.push(e);
-    } else if (e.palabras.some(p => p.startsWith(term))) {
-      porNombre.push(e);
-    }
+    if (e.palabras.some(p => p.startsWith(term))) resultados.push(e);
   }
-
-  let resultados = porApellido.concat(porNombre);
 
   // Red de seguridad: si NINGUNA palabra empieza así (por ejemplo si se
   // busca un pedacito del medio, "steggiano" o "guez"), recién ahí
