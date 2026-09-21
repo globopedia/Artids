@@ -176,7 +176,7 @@
   </style>
 </head>
 <body>
-  <img src="https://globopedia.github.io/Artids/Íconos/Globopedia.png" alt="Globopedia" class="logo" />
+  <img src="https://globopedia.github.io/Artids/logo_globopedia.png" alt="Logo Huracán" class="logo" />
   <h1>📜 Futbolistas</h1>
 
 <div style="text-align:center; position:relative;">
@@ -2553,12 +2553,11 @@ function filtrarFutbolistas(termino) {
     const li = document.createElement("li");
     li.className = "autocomplete-item";
 
-    li.innerHTML = `
-      ${r.foto1
-        ? `<img src="${r.foto1}" onerror="this.style.display='none'">`
-        : `<div style="width:32px;height:42px;"></div>`}
-      <span>${r.futbolista}</span>
-    `;
+    // Sin fotos acá a propósito: algunas pesan varios cientos de KB (hasta
+    // más de 1-2 MB), y con hasta 15 resultados por búsqueda, cargarlas
+    // todas de nuevo en cada letra tipeada es lo que estaba colgando la
+    // página. La foto grande ya se ve después, al elegir al jugador.
+    li.innerHTML = `<span>${r.futbolista}</span>`;
 
     li.addEventListener("click", () => {
       seleccionarFutbolista(r.futbolista);
