@@ -124,7 +124,7 @@
     const CONDICIONES = ["Local","Neutral","Visitante"];
     const SITUACIONES = ["Victoria","Empate","Derrota"];
 
-    // Carga de CSVs
+    // Carga de CSV
     Promise.all([
       fetch(arbitrosURL).then(r => { if(!r.ok) throw new Error("Árbitros CSV no disponible"); return r.text(); }),
       fetch(partidosURL).then(r => { if(!r.ok) throw new Error("Partidos CSV 1 no disponible"); return r.text(); }),
