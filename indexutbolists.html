@@ -188,6 +188,25 @@
   <div id="futbolistaInfo" class="club-card" style="display:none;"></div>
 
   <script>
+  // Deshabilitamos el buscador hasta que terminen de llegar y parsearse los
+  // 11 CSV (historial completo de Huracán desde 1914): así evitamos que
+  // alguien escriba justo en esa ventana, que es lo que hacía que la
+  // primera búsqueda pareciera "tildada" durante varios segundos.
+  (function deshabilitarBuscadorInicial() {
+    const el = document.getElementById("futbolistaSearch");
+    if (el) {
+      el.disabled = true;
+      el.dataset.placeholderOriginal = el.placeholder;
+      el.placeholder = "Cargando futbolistas...";
+    }
+  })();
+
+  // Deja que el navegador respire (dibuje teclas, procese clics, etc.)
+  // antes de seguir con el próximo pedazo de trabajo pesado.
+  function cederAlNavegador() {
+    return new Promise(resolve => setTimeout(resolve, 0));
+  }
+
   const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolistsa";
   const futbolistasURL2 = "https://artids.vercel.app/api/data?file=utbolistse";
   const futbolistasURL3 = "https://artids.vercel.app/api/data?file=utbolistso";
@@ -1301,7 +1320,7 @@ const partidosURLs = [
     })
   )
 ])
-.then(([csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, ...csvPartidos]) => {
+.then(async ([csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, ...csvPartidos]) => {
 
   const mapearFutbolista = c => ({
     id: (c.ID ?? "").toString().trim(),
@@ -1326,15 +1345,27 @@ const partidosURLs = [
   // Utbolists.csv se dividió en tres (A, E, O) porque el archivo único se
   // había hecho muy largo — se combinan acá en un solo array, como si
   // siguiera siendo uno solo.
+  // Parseamos cada CSV por separado y cedemos el hilo entre uno y otro
+  // (en vez de encadenar los 11 parseos de un tirón) para no trabar el
+  // navegador varios segundos seguidos.
+  const datosA = Papa.parse(csvFutbolistasA, { header: true, skipEmptyLines: true }).data;
+  await cederAlNavegador();
+  const datosE = Papa.parse(csvFutbolistasE, { header: true, skipEmptyLines: true }).data;
+  await cederAlNavegador();
+  const datosO = Papa.parse(csvFutbolistasO, { header: true, skipEmptyLines: true }).data;
+  await cederAlNavegador();
+
   futbolistas = [
-    ...Papa.parse(csvFutbolistasA, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista),
-    ...Papa.parse(csvFutbolistasE, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista),
-    ...Papa.parse(csvFutbolistasO, { header: true, skipEmptyLines: true }).data.map(mapearFutbolista)
+    ...datosA.map(mapearFutbolista),
+    ...datosE.map(mapearFutbolista),
+    ...datosO.map(mapearFutbolista)
   ];
 
-  const partidosParseados = csvPartidos.map(csv =>
-    Papa.parse(csv, { header: true, skipEmptyLines: true }).data
-  );
+  const partidosParseados = [];
+  for (const csv of csvPartidos) {
+    partidosParseados.push(Papa.parse(csv, { header: true, skipEmptyLines: true }).data);
+    await cederAlNavegador();
+  }
 
   encuentros = partidosParseados
     .flat()
@@ -1361,6 +1392,15 @@ const partidosURLs = [
 
   llenarSelectFutbolistas();
 
+  // Ya está todo en memoria: reactivamos el buscador.
+  (function reactivarBuscador() {
+    const el = document.getElementById("futbolistaSearch");
+    if (el) {
+      el.disabled = false;
+      el.placeholder = el.dataset.placeholderOriginal || "Escribí un nombre...";
+    }
+  })();
+
   // Si la URL trae "?jugador=Nombre", seleccionamos automáticamente apenas
   // terminan de cargar los datos — antes esperábamos medio segundo fijo,
   // pero con más CSVs para cargar eso ya no alcanzaba siempre, y quedaba
@@ -1375,6 +1415,11 @@ const partidosURLs = [
 .catch(err => {
   console.timeEnd("⏱️ 0) CARGA INICIAL COMPLETA (desde que arrancan los 11 fetch hasta que termina de procesar todo)");
   console.error("Error cargando los datos:", err);
+  const el = document.getElementById("futbolistaSearch");
+  if (el) {
+    el.disabled = false;
+    el.placeholder = "Error al cargar los datos";
+  }
 });
     function llenarSelectFutbolistas() {
       const sel = document.getElementById("futbolistaSelect");
