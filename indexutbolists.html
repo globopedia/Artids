@@ -1280,6 +1280,7 @@ const partidosURLs = [
   partidosURL7,
   partidosURL8
 ];
+  console.time("⏱️ 0) CARGA INICIAL COMPLETA (desde que arrancan los 11 fetch hasta que termina de procesar todo)");
   Promise.all([
   fetch(futbolistasURL).then(r => {
     if (!r.ok) throw new Error("Futbolistas CSV A no disponible");
@@ -1369,6 +1370,11 @@ const partidosURLs = [
   if (nombreJugadorURL) {
     seleccionarFutbolista(nombreJugadorURL);
   }
+  console.timeEnd("⏱️ 0) CARGA INICIAL COMPLETA (desde que arrancan los 11 fetch hasta que termina de procesar todo)");
+})
+.catch(err => {
+  console.timeEnd("⏱️ 0) CARGA INICIAL COMPLETA (desde que arrancan los 11 fetch hasta que termina de procesar todo)");
+  console.error("Error cargando los datos:", err);
 });
     function llenarSelectFutbolistas() {
       const sel = document.getElementById("futbolistaSelect");
@@ -2528,11 +2534,12 @@ function debounce(func, delay) {
 }
 
 function filtrarFutbolistas(termino) {
+  console.time("  ⏱️ 1) buscar coincidencias en futbolistas[]");
   const termNorm = norm(termino);
   suggestionsList.innerHTML = "";
   selectedIndex = -1;
 
-  if (!termNorm) return;
+  if (!termNorm) { console.timeEnd("  ⏱️ 1) buscar coincidencias en futbolistas[]"); return; }
 
   // Un jugador puede tener más de una fila en el CSV (si volvió al club más
   // de una vez, con Procedencia/Destino distintos por etapa) — acá solo nos
@@ -2548,7 +2555,9 @@ function filtrarFutbolistas(termino) {
     resultados.push(a);
     if (resultados.length >= 15) break;
   }
+  console.timeEnd("  ⏱️ 1) buscar coincidencias en futbolistas[]");
 
+  console.time("  ⏱️ 2) crear los <li> del desplegable");
   resultados.forEach(r => {
     const li = document.createElement("li");
     li.className = "autocomplete-item";
@@ -2565,14 +2574,21 @@ function filtrarFutbolistas(termino) {
 
     suggestionsList.appendChild(li);
   });
+  console.timeEnd("  ⏱️ 2) crear los <li> del desplegable");
 
   // El desplegable es position:absolute, así que agrandarlo o vaciarlo NO
   // cambia el alto "normal" de la página (scrollHeight) — el ResizeObserver
   // que ajusta el iframe de Blogger no se entera solo. Le avisamos a mano.
+  console.time("  ⏱️ 3) enviarAltura()");
   if (window.enviarAltura) window.enviarAltura();
+  console.timeEnd("  ⏱️ 3) enviarAltura()");
 }
 
-    searchInput.addEventListener("input", debounce(e => filtrarFutbolistas(e.target.value), 200));
+    searchInput.addEventListener("input", debounce(e => {
+      console.time("🕐 TOTAL desde que se dispara el input hasta que termina filtrarFutbolistas");
+      filtrarFutbolistas(e.target.value);
+      console.timeEnd("🕐 TOTAL desde que se dispara el input hasta que termina filtrarFutbolistas");
+    }, 200));
 
 function seleccionarFutbolista(nombre) {
   // Acá también dejamos el nombre original directo del CSV
@@ -2727,6 +2743,7 @@ function parseMinuto(minutoStr) {
   function enviarAltura() {
     clearTimeout(debounceAlturaTimer);
     debounceAlturaTimer = setTimeout(() => {
+      console.time("  ⏱️ 4) enviarAltura - trabajo real (adentro del setTimeout)");
       let altura = document.documentElement.scrollHeight;
 
       // El desplegable de sugerencias es position:absolute, así que NO
@@ -2746,9 +2763,13 @@ function parseMinuto(minutoStr) {
       // EXACTAMENTE igual a la última altura, sino si está muy cerca (unos
       // pocos píxeles) — así tampoco reaccionamos a una posible oscilación
       // de ida y vuelta entre dos valores parecidos.
-      if (ultimaAlturaEnviada !== null && Math.abs(altura - ultimaAlturaEnviada) <= 3) return;
+      if (ultimaAlturaEnviada !== null && Math.abs(altura - ultimaAlturaEnviada) <= 3) {
+        console.timeEnd("  ⏱️ 4) enviarAltura - trabajo real (adentro del setTimeout)");
+        return;
+      }
       ultimaAlturaEnviada = altura;
       window.parent.postMessage({ type: "ajustarAltura", altura: altura }, "*");
+      console.timeEnd("  ⏱️ 4) enviarAltura - trabajo real (adentro del setTimeout)");
     }, 150);
   }
 
