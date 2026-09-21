@@ -39,17 +39,20 @@
  .autocomplete-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px;
+  gap: 12px;
+  padding: 8px 12px;
   cursor: pointer;
 }
 
-.autocomplete-item img {
-  width: 32px;
-  height: 42px;
-  object-fit: cover;
-  border-radius: 4px;
+/* Fotitos del desplegable: redonditas, igual que en el índice de Árbitros */
+.autocomplete-thumb {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;      /* que no se aplaste si el nombre es largo */
+  object-fit: cover;   /* recorta, no deforma la cara */
+  border-radius: 50%;  /* ← lo redondito */
   border: 1px solid #ccc;
+  background: #eee;
 }
 
  .bandera {
@@ -182,7 +185,7 @@
 <div style="text-align:center; position:relative;">
   <label for="futbolistaSearch">Buscá futbolista: </label>
   <input type="text" id="futbolistaSearch" placeholder="Escribí un nombre..." autocomplete="off" style="padding:8px;border-radius:8px;border:2px solid #FF0000;font-size:16px;margin-bottom:20px;"><select id="futbolistaSelect" style="display:none;"></select>
-  <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:300px;max-height:200px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;"></ul>
+  <ul id="autocompleteList" style="position:absolute;left:50%;transform:translateX(-50%);background:white;border:1px solid #ccc;border-radius:8px;width:320px;max-height:240px;overflow:auto;list-style:none;padding:0;margin-top:2px;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.15);"></ul>
 </div>
 
   <div id="futbolistaInfo" class="club-card" style="display:none;"></div>
@@ -2598,19 +2601,57 @@ function debounce(func, delay) {
 // "cajones" según la letra con la que arranca cada palabra. Al teclear "g"
 // abrimos el cajón de la G y listo: los demás ni se miran.
 const MAX_SUGERENCIAS = 20;
+
+// Redondelito gris para los que todavía no tienen foto cargada (el mismo
+// que usa el índice de Árbitros). Va como SVG adentro del propio código:
+// no es un pedido al servidor, no pesa nada y nunca falla.
+const CIRCULO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'><circle cx='15' cy='15' r='15' fill='%23ccc'/></svg>";
+
+// Las fotos se bajan recién cuando el renglón se ve DE VERDAD dentro del
+// desplegable (que muestra 5 o 6 a la vez y el resto queda para scrollear).
+// El loading="lazy" solo no alcanza: lo probé y el navegador se adelanta
+// igual y baja casi las 20. Con esto, una búsqueda pide 5 o 6 fotos en vez
+// de 20 — que con fotos de medio mega o más es la diferencia entre
+// bajar 3 MB o bajar 30. Hasta que le toca, cada una muestra el círculo gris.
+let observadorFotos = null;
+
+function observarFoto(img, url) {
+  if (!("IntersectionObserver" in window)) { img.src = url; return; }  // navegador viejo
+  if (!observadorFotos) {
+    observadorFotos = new IntersectionObserver((entradas, obs) => {
+      entradas.forEach(en => {
+        if (!en.isIntersecting) return;
+        const el = en.target;
+        if (el.dataset.src) {
+          el.src = el.dataset.src;
+          delete el.dataset.src;
+        }
+        obs.unobserve(el);
+      });
+    }, { root: suggestionsList, rootMargin: "60px" });
+  }
+  img.dataset.src = url;
+  observadorFotos.observe(img);
+}
 let indiceFutbolistas = [];        // una entrada por futbolista (sin repetir)
 let indicePorLetra = new Map();    // "g" -> entradas con alguna palabra con g
 
 function construirIndiceBusqueda() {
   indiceFutbolistas = [];
   indicePorLetra = new Map();
-  const vistos = new Set();
+  const entradasPorNombre = new Map();
 
   for (const a of futbolistas) {
     const nombre = (a.futbolista || "").trim();
     if (!nombre) continue;
-    if (vistos.has(nombre)) continue;  // un jugador puede tener varias filas
-    vistos.add(nombre);
+
+    // Un jugador puede tener varias filas (volvió al club más de una vez).
+    // Si la primera fila no traía foto y una posterior sí, la aprovechamos.
+    const yaEstaba = entradasPorNombre.get(nombre);
+    if (yaEstaba) {
+      if (!yaEstaba.foto && a.foto1) yaEstaba.foto = a.foto1;
+      continue;
+    }
 
     // futbolistaNorm ya viene calculado desde que se leyó el CSV
     const nombreNorm = a.futbolistaNorm || norm(nombre);
@@ -2620,8 +2661,10 @@ function construirIndiceBusqueda() {
       nombre: nombre,
       nombreNorm: nombreNorm,
       palabras: palabras,
-      apellidoNorm: palabras.length ? palabras[palabras.length - 1] : ""
+      apellidoNorm: palabras.length ? palabras[palabras.length - 1] : "",
+      foto: a.foto1 || ""
     };
+    entradasPorNombre.set(nombre, entrada);
     indiceFutbolistas.push(entrada);
 
     const inicialesUsadas = new Set();
@@ -2651,6 +2694,9 @@ function filtrarFutbolistas(termino) {
   // son todos lo mismo, que es como lo queremos.
   const term = norm(termino);
   suggestionsList.innerHTML = "";
+  // Soltamos las fotos del listado anterior: si no llegaron a verse, ya no
+  // interesan, y así el observador no queda arrastrando renglones viejos.
+  if (observadorFotos) observadorFotos.disconnect();
   selectedIndex = -1;
 
   if (!term) {
@@ -2695,7 +2741,31 @@ function filtrarFutbolistas(termino) {
   resultados.forEach(e => {
     const li = document.createElement("li");
     li.className = "autocomplete-item";
-    li.innerHTML = `<span>${e.nombre}</span>`;
+    // El nombre "limpio" va acá, aparte del contenido visible: así la
+    // navegación con flechas escribe el nombre y nada más.
+    li.dataset.nombre = e.nombre;
+
+    const img = document.createElement("img");
+    img.className = "autocomplete-thumb";
+    img.alt = "";
+    // loading="lazy": en el desplegable se ven 5 o 6 a la vez, así que el
+    // navegador baja SOLO esas y no las 20 de un saque. Es lo que hace que
+    // las fotos no vuelvan a pesar como pesaban antes.
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.width = 30;
+    img.height = 30;
+    // Arranca en gris y la foto entra cuando el renglón se ve
+    img.src = CIRCULO_GRIS;
+    // Si la URL de la foto está rota o el jugador no tiene, queda el gris
+    img.addEventListener("error", () => { img.src = CIRCULO_GRIS; });
+    if (e.foto) observarFoto(img, e.foto);
+    li.appendChild(img);
+
+    const span = document.createElement("span");
+    span.textContent = e.nombre;
+    li.appendChild(span);
+
     li.addEventListener("click", () => {
       seleccionarFutbolista(e.nombre);
     });
@@ -2769,8 +2839,10 @@ let selectedIndex = -1;
     const activo = i === selectedIndex;
     item.style.background = activo ? "#ffdddd" : "white";
     if (activo) {
-      // 👉 Mostrar texto completo en el input (typeahead visual)
-      const texto = item.textContent.trim();
+      // 👉 Mostrar texto completo en el input (typeahead visual).
+      // Usamos data-nombre y no textContent: así, si algún día el renglón
+      // lleva algo más que el nombre, no se cuela en el buscador.
+      const texto = item.dataset.nombre || item.textContent.trim();
       searchInput.value = texto;
     }
   });
