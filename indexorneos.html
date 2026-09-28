@@ -130,6 +130,43 @@
     .debutante-link { transition: color 0.15s ease; }
     .debutante-link:hover { color: #FF0000 !important; }
 
+    /* === Tabla de posiciones (columna "Posiciones" de Orneos.csv) === */
+    .tabla-pos-wrap { overflow-x: auto; margin: 10px 0 15px; }
+    .tabla-pos {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 14px;
+    }
+    .tabla-pos th {
+      background: #8B0000;
+      color: #fff;
+      padding: 7px 6px;
+      text-align: center;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tabla-pos td {
+      padding: 5px 6px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      white-space: nowrap;
+    }
+    .tabla-pos tbody tr:nth-child(even) { background: #f7f7f7; }
+    .tabla-pos td.col-equipo { text-align: left; }
+    .tabla-pos td.col-equipo img {
+      width: 22px; height: 22px; object-fit: contain;
+      vertical-align: middle; margin-right: 6px;
+    }
+    .tabla-pos td.col-pts { font-weight: 700; }
+    .tabla-pos tr.fila-huracan td {
+      background: #ffe0e0;
+      color: #8B0000;
+      font-weight: 700;
+    }
+    .tabla-pos a { color: inherit; text-decoration: none; }
+    .tabla-pos a:hover { color: #FF0000; }
+
     /* === "El equipo": canchita con los 11 que más minutos jugaron === */
     .cancha {
       background: linear-gradient(#2e7d32, #1b5e20);
@@ -408,7 +445,10 @@
           nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
           foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim(),
-          participantes: (c.Participantes ?? c.participantes ?? "").toString().trim()
+          participantes: (c.Participantes ?? c.participantes ?? "").toString().trim(),
+          // NUEVO: tabla de posiciones, en una sola celda.
+          // Formato: "Pos,Equipo,PJ,...|1,Racing Club,22,...|2,Estudiantes,..."
+          posiciones: (c.Posiciones ?? c.posiciones ?? "").toString().trim()
         })).filter(t => t.nombre);
 
         // Cargar Clubes (solo para saber cuáles tienen ficha propia en
@@ -1387,6 +1427,66 @@ function escapeHTML(valor) {
     .replace(/'/g, "&#39;");
 }
 
+// ==========================================
+// TABLA DE POSICIONES (columna "Posiciones" de Orneos.csv)
+// ==========================================
+// Formato de la celda (todo en una sola línea, entre comillas en el CSV):
+//   "Pos,Equipo,PJ,PG,PE,PP,GF,GC,Pts|1,Racing Club,22,...|2,Estudiantes (La Plata),22,..."
+// - La primera fila (antes del primer "|") es el encabezado.
+// - Cada "|" separa una fila; cada "," separa una columna.
+// - Un "|" sobrante al final no molesta.
+// - La columna que se llame "Equipo" (o "Club") lleva escudo y, si el club
+//   tiene ficha en indexivals.html, link a su ficha.
+// - La fila de Huracán se resalta sola.
+function renderTablaPosiciones(texto) {
+  if (!texto) return "";
+
+  const filas = texto.split("|").map(f => f.trim()).filter(Boolean);
+  if (filas.length < 2) return ""; // hace falta encabezado + al menos un equipo
+
+  const encabezado = filas[0].split(",").map(c => c.trim());
+  const cuerpo = filas.slice(1).map(f => f.split(",").map(c => c.trim()));
+
+  let idxEquipo = encabezado.findIndex(c => ["equipo", "club", "equipos", "clubes"].includes(norm(c)));
+  if (idxEquipo === -1) idxEquipo = 1; // por defecto, la segunda columna
+  const idxPts = encabezado.findIndex(c => ["pts", "puntos"].includes(norm(c)));
+
+  const thead = encabezado.map(c => `<th>${escapeHTML(c)}</th>`).join("");
+
+  const tbody = cuerpo.map(celdas => {
+    const equipo = celdas[idxEquipo] || "";
+    const esHuracan = norm(equipo).includes("huracan");
+
+    const tds = encabezado.map((_, i) => {
+      const valor = celdas[i] ?? "";
+
+      if (i === idxEquipo) {
+        const escudo = `<img src="${getEscudo(equipo)}" alt="" onerror="this.style.visibility='hidden'">`;
+        const tieneFicha = !esHuracan && clubesConFicha.has(norm(equipo));
+        const nombre = tieneFicha
+          ? `<a href="https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(equipo)}" target="_blank" rel="noopener">${escapeHTML(equipo)}</a>`
+          : escapeHTML(equipo);
+        return `<td class="col-equipo">${escudo}${nombre}</td>`;
+      }
+
+      const clase = i === idxPts ? ` class="col-pts"` : "";
+      return `<td${clase}>${escapeHTML(valor)}</td>`;
+    }).join("");
+
+    return `<tr${esHuracan ? ` class="fila-huracan"` : ""}>${tds}</tr>`;
+  }).join("");
+
+  return `
+    <h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">📊 Tabla de Posiciones</h3>
+    <div class="tabla-pos-wrap">
+      <table class="tabla-pos">
+        <thead><tr>${thead}</tr></thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>
+  `;
+}
+
 function getEstadioImage(estadio) {
   if (!estadio) return "";
   const fileName = estadio
@@ -1978,26 +2078,8 @@ function mostrarTorneo() {
     htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
   }
 
-  cont.innerHTML = `
-    <div class="club-header">
-      <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
-      <h2>${torneo.nombre}</h2>
-    </div>
-    ${renderParticipantesEscudos(torneo.participantes)}
-    ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
-    <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
-    <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
-
-    ${renderDebutantes(incorporaciones, "Incorporaciones", "🆕")}
-    ${renderDebutantes(nuevasAdquisiciones, "Nuevas adquisiciones", "✍️")}
-
-    ${htmlPlantel}
-
-    <hr style="border:none; border-top:1px solid #FF0000; margin:20px 0 15px;">
-    <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
-    ${htmlPartidos}
-  // === TABLA DE POSICIONES ===
-  const htmlPosiciones = renderTablaPositiones(torneo.posiciones || "");
+  // --- TABLA DE POSICIONES (si la columna "Posiciones" tiene datos) ---
+  const htmlPosiciones = renderTablaPosiciones(torneo.posiciones);
 
   cont.innerHTML = `
     <div class="club-header">
@@ -2020,8 +2102,6 @@ function mostrarTorneo() {
 
     ${htmlPosiciones}
 
-    ${renderElEquipo()}
-  `;
     ${renderElEquipo()}
   `;
 }
@@ -2091,84 +2171,6 @@ document.addEventListener("click", function(e) {
     reproducirTono(500, 70, 0.05);
   }
 });
-// ==========================================
-// FUNCIÓN PARA RENDERIZAR TABLA DE POSICIONES
-// ==========================================
-
-function renderTablaPositiones(posicionesTexto) {
-  if (!posicionesTexto || posicionesTexto.trim() === "") {
-    return ""; // Sin datos, no renderiza nada
-  }
-
-  const filas = posicionesTexto.split("|").map(f => f.trim()).filter(f => f.length > 0);
-  if (filas.length === 0) return "";
-
-  // Primera fila = encabezado
-  const encabezado = filas[0].split(",").map(c => c.trim());
-  const datos = filas.slice(1).map(fila => fila.split(",").map(c => c.trim()));
-
-  if (datos.length === 0) return "";
-
-  // Armar HTML de la tabla
-  let htmlTabla = `
-    <h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">📊 Tabla de Posiciones</h3>
-    <div style="overflow-x:auto; margin:15px 0;">
-      <table style="width:100%; border-collapse:collapse; font-family:'Chakra Petch', sans-serif; font-size:14px;">
-        <thead>
-          <tr style="background:#8B0000; color:#fff;">
-  `;
-
-  // Encabezado
-  encabezado.forEach(col => {
-    htmlTabla += `<th style="padding:10px; text-align:center; border:1px solid #ddd; font-weight:bold;">${escapeHTML(col)}</th>`;
-  });
-
-  htmlTabla += `
-          </tr>
-        </thead>
-        <tbody>
-  `;
-
-  // Filas de datos
-  datos.forEach((fila, idx) => {
-    const colorFondo = idx % 2 === 0 ? "#fafafa" : "#fff";
-    const esHuracan = fila.some(celda => norm(celda).includes("huracán"));
-    const colorBorde = esHuracan ? "3px solid #FF0000" : "1px solid #ddd";
-    
-    htmlTabla += `<tr style="background:${colorFondo};">`;
-    
-    fila.forEach((celda, colIdx) => {
-      const esNumero = !isNaN(celda) && celda !== "";
-      const esEscudo = colIdx === 1; // Asumo que columna 2 (índice 1) es el equipo
-      const alineacion = esNumero ? "center" : "left";
-      const esHuracanTexto = norm(celda).includes("huracán");
-      const colorTexto = esHuracanTexto ? "#8B0000" : "inherit";
-      const fontWeight = esHuracanTexto ? "bold" : "normal";
-      
-      htmlTabla += `
-        <td style="
-          padding:8px 10px; 
-          text-align:${alineacion}; 
-          border-left:${colorBorde};
-          color:${colorTexto};
-          font-weight:${fontWeight};
-        ">
-          ${escapeHTML(celda)}
-        </td>
-      `;
-    });
-    
-    htmlTabla += `</tr>`;
-  });
-
-  htmlTabla += `
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  return htmlTabla;
-}
   </script>
 </body>
 </html>
