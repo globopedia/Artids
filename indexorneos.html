@@ -1996,7 +1996,32 @@ function mostrarTorneo() {
     <hr style="border:none; border-top:1px solid #FF0000; margin:20px 0 15px;">
     <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
     ${htmlPartidos}
+  // === TABLA DE POSICIONES ===
+  const htmlPosiciones = renderTablaPositiones(torneo.posiciones || "");
 
+  cont.innerHTML = `
+    <div class="club-header">
+      <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
+      <h2>${torneo.nombre}</h2>
+    </div>
+    ${renderParticipantesEscudos(torneo.participantes)}
+    ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
+    <p>Huracán disputó <b>${PJ}</b> partidos: ganó <b>${PG}</b>, empató <b>${PE}</b> y perdió <b>${PP}</b>.</p>
+    <p>Goles a favor: <b>${GF}</b> | Goles en contra: <b>${GC}</b>.</p>
+
+    ${renderDebutantes(incorporaciones, "Incorporaciones", "🆕")}
+    ${renderDebutantes(nuevasAdquisiciones, "Nuevas adquisiciones", "✍️")}
+
+    ${htmlPlantel}
+
+    <hr style="border:none; border-top:1px solid #FF0000; margin:20px 0 15px;">
+    <h3 style="color:#FF0000; margin-bottom:10px;">🗓️ Listado de Partidos</h3>
+    ${htmlPartidos}
+
+    ${htmlPosiciones}
+
+    ${renderElEquipo()}
+  `;
     ${renderElEquipo()}
   `;
 }
