@@ -2066,6 +2066,84 @@ document.addEventListener("click", function(e) {
     reproducirTono(500, 70, 0.05);
   }
 });
+// ==========================================
+// FUNCIÓN PARA RENDERIZAR TABLA DE POSICIONES
+// ==========================================
+
+function renderTablaPositiones(posicionesTexto) {
+  if (!posicionesTexto || posicionesTexto.trim() === "") {
+    return ""; // Sin datos, no renderiza nada
+  }
+
+  const filas = posicionesTexto.split("|").map(f => f.trim()).filter(f => f.length > 0);
+  if (filas.length === 0) return "";
+
+  // Primera fila = encabezado
+  const encabezado = filas[0].split(",").map(c => c.trim());
+  const datos = filas.slice(1).map(fila => fila.split(",").map(c => c.trim()));
+
+  if (datos.length === 0) return "";
+
+  // Armar HTML de la tabla
+  let htmlTabla = `
+    <h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">📊 Tabla de Posiciones</h3>
+    <div style="overflow-x:auto; margin:15px 0;">
+      <table style="width:100%; border-collapse:collapse; font-family:'Chakra Petch', sans-serif; font-size:14px;">
+        <thead>
+          <tr style="background:#8B0000; color:#fff;">
+  `;
+
+  // Encabezado
+  encabezado.forEach(col => {
+    htmlTabla += `<th style="padding:10px; text-align:center; border:1px solid #ddd; font-weight:bold;">${escapeHTML(col)}</th>`;
+  });
+
+  htmlTabla += `
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  // Filas de datos
+  datos.forEach((fila, idx) => {
+    const colorFondo = idx % 2 === 0 ? "#fafafa" : "#fff";
+    const esHuracan = fila.some(celda => norm(celda).includes("huracán"));
+    const colorBorde = esHuracan ? "3px solid #FF0000" : "1px solid #ddd";
+    
+    htmlTabla += `<tr style="background:${colorFondo};">`;
+    
+    fila.forEach((celda, colIdx) => {
+      const esNumero = !isNaN(celda) && celda !== "";
+      const esEscudo = colIdx === 1; // Asumo que columna 2 (índice 1) es el equipo
+      const alineacion = esNumero ? "center" : "left";
+      const esHuracanTexto = norm(celda).includes("huracán");
+      const colorTexto = esHuracanTexto ? "#8B0000" : "inherit";
+      const fontWeight = esHuracanTexto ? "bold" : "normal";
+      
+      htmlTabla += `
+        <td style="
+          padding:8px 10px; 
+          text-align:${alineacion}; 
+          border-left:${colorBorde};
+          color:${colorTexto};
+          font-weight:${fontWeight};
+        ">
+          ${escapeHTML(celda)}
+        </td>
+      `;
+    });
+    
+    htmlTabla += `</tr>`;
+  });
+
+  htmlTabla += `
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  return htmlTabla;
+}
   </script>
 </body>
 </html>
