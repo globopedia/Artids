@@ -165,6 +165,15 @@
       font-weight: 700;
     }
     .tabla-pos a { color: inherit; text-decoration: none; }
+    /* Tabla metida entre los partidos (fase clasificatoria, zona, etc.) */
+    .tabla-intermedia {
+      margin: 14px 0 18px;
+      padding: 2px 10px 6px;
+      border: 1px dashed #FF0000;
+      border-radius: 8px;
+      background: #fffafa;
+    }
+    .tabla-intermedia h3 { margin-top: 8px !important; }
     .tabla-pos a:hover { color: #FF0000; }
 
     /* === "El equipo": canchita con los 11 que más minutos jugaron === */
@@ -1438,7 +1447,40 @@ function escapeHTML(valor) {
 // - La columna que se llame "Equipo" (o "Club") lleva escudo y, si el club
 //   tiene ficha en indexivals.html, link a su ficha.
 // - La fila de Huracán se resalta sola.
-function renderTablaPosiciones(texto) {
+// VARIAS TABLAS EN UN MISMO TORNEO (fase clasificatoria + fase final, zonas, etc.):
+// - Cada tabla se separa de la siguiente con "#".
+// - Cada tabla puede empezar con un TÍTULO (una parte sin comas, antes del
+//   primer "|"), y opcionalmente "@N" = mostrarla después del partido N
+//   del listado (contando las barritas del listado, de arriba hacia abajo).
+// - Sin "@N", la tabla va al final, después de todos los partidos.
+// Ej.:
+//   "Fase clasificatoria@10|Pos,Equipo,...|1,Racing Club,...#Fase final|Pos,Equipo,...|1,..."
+// Una tabla sola y sin título (el formato de siempre) sigue funcionando igual.
+function parsearTablasPosiciones(texto) {
+  if (!texto) return [];
+  return texto.split("#")
+    .map(bloque => bloque.trim())
+    .filter(Boolean)
+    .map(bloque => {
+      const partes = bloque.split("|").map(f => f.trim()).filter(Boolean);
+      let titulo = "";
+      let despues = null;
+      if (partes.length && !partes[0].includes(",")) {
+        const cabecera = partes.shift();
+        const m = cabecera.match(/^(.*?)\s*@\s*(\d+)\s*$/);
+        if (m) {
+          titulo = m[1].trim();
+          despues = parseInt(m[2], 10);
+        } else {
+          titulo = cabecera;
+        }
+      }
+      return { despues, html: renderTablaPosiciones(partes.join("|"), titulo) };
+    })
+    .filter(t => t.html);
+}
+
+function renderTablaPosiciones(texto, titulo = "") {
   if (!texto) return "";
 
   const filas = texto.split("|").map(f => f.trim()).filter(Boolean);
@@ -1477,7 +1519,7 @@ function renderTablaPosiciones(texto) {
   }).join("");
 
   return `
-    <h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">📊 Tabla de Posiciones</h3>
+    <h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">📊 Tabla de Posiciones${titulo ? ` — ${escapeHTML(titulo)}` : ""}</h3>
     <div class="tabla-pos-wrap">
       <table class="tabla-pos">
         <thead><tr>${thead}</tr></thead>
@@ -2009,9 +2051,12 @@ function mostrarTorneo() {
   // --- TARJETAS DE PARTIDOS ---
   const imgTorneoUrl = torneo.foto ? torneo.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
 
+  // Tablas de posiciones de este torneo (puede haber una, varias o ninguna)
+  const tablasPosiciones = parsearTablasPosiciones(torneo.posiciones);
+
   let htmlPartidos = "";
   if (partidosTorneo.length > 0) {
-    partidosTorneo.forEach(p => {
+    partidosTorneo.forEach((p, idxPartido) => {
       const esVisitante = norm(p.Condición) === "visitante";
 
       // Ojo: Resultado1 SIEMPRE es el resultado de Huracán (sea local o
@@ -2073,13 +2118,27 @@ function mostrarTorneo() {
           <div class="acordeon-body cerrado">${tarjetaHTML}</div>
         </div>
       `;
+
+      // Tablas "intermedias": las que llevan "@N" con N = este partido
+      // (si N es el último partido, se muestran al final, igual que las demás).
+      const numeroPartido = idxPartido + 1;
+      if (numeroPartido < partidosTorneo.length) {
+        tablasPosiciones
+          .filter(t => t.despues === numeroPartido)
+          .forEach(t => { htmlPartidos += `<div class="tabla-intermedia">${t.html}</div>`; });
+      }
     });
   } else {
     htmlPartidos = "<i>No se encontraron partidos registrados para este torneo.</i>";
   }
 
   // --- TABLA DE POSICIONES (si la columna "Posiciones" tiene datos) ---
-  const htmlPosiciones = renderTablaPosiciones(torneo.posiciones);
+  // Al final van las tablas sin "@N", y las que tengan un número que no
+  // cae entre dos partidos (0, el último partido o uno mayor al total).
+  const htmlPosiciones = tablasPosiciones
+    .filter(t => t.despues === null || t.despues < 1 || t.despues >= partidosTorneo.length)
+    .map(t => t.html)
+    .join("");
 
   cont.innerHTML = `
     <div class="club-header">
