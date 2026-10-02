@@ -159,23 +159,27 @@
       vertical-align: middle; margin-right: 6px;
     }
     .tabla-pos td.col-pts { font-weight: 700; }
+    /* Huracán: sin fondo propio (para no confundirse con los colores de
+       clasificación), solo letra en negrita y rojo sangre. */
     .tabla-pos tr.fila-huracan td {
-      background: #ffe0e0;
-      color: #8B0000;
+      color: #D00000;
       font-weight: 700;
     }
-    /* Colores de clasificación (letra al final de la posición: v, a, r, n, p).
-       Van después de .fila-huracan, así que si Huracán tiene color, manda el color. */
+    /* Colores de clasificación (letra al final de la posición: v, a, r, n, p, c, s). */
     .tabla-pos tr.fila-verde td    { background: #d6f0da; }
     .tabla-pos tr.fila-amarillo td { background: #fff1b8; }
     .tabla-pos tr.fila-rojo td     { background: #f6b8b8; }
     .tabla-pos tr.fila-naranja td  { background: #ffdcb5; }
     .tabla-pos tr.fila-violeta td  { background: #e4d7f5; }
+    .tabla-pos tr.fila-celeste td  { background: #d2ecfb; }
+    .tabla-pos tr.fila-rosa td     { background: #fcd9ec; }
     .tabla-pos tr.fila-verde td:first-child    { box-shadow: inset 4px 0 #2e7d32; }
     .tabla-pos tr.fila-amarillo td:first-child { box-shadow: inset 4px 0 #e0b000; }
     .tabla-pos tr.fila-rojo td:first-child     { box-shadow: inset 4px 0 #c62828; }
     .tabla-pos tr.fila-naranja td:first-child  { box-shadow: inset 4px 0 #ef6c00; }
     .tabla-pos tr.fila-violeta td:first-child  { box-shadow: inset 4px 0 #6a1b9a; }
+    .tabla-pos tr.fila-celeste td:first-child  { box-shadow: inset 4px 0 #0288d1; }
+    .tabla-pos tr.fila-rosa td:first-child     { box-shadow: inset 4px 0 #d81b84; }
     .tabla-pos a { color: inherit; text-decoration: none; }
     /* Tabla metida entre los partidos (fase clasificatoria, zona, etc.) */
     .tabla-intermedia {
@@ -1510,19 +1514,21 @@ function renderTablaPosiciones(texto, titulo = "") {
   // Color de fila: una letra pegada al final de la PRIMERA columna (la
   // posición) tiñe toda la fila, y la letra no se muestra. Ej.: "20°r".
   //   v = verde · a = amarillo · r = rojo · n = naranja · p = violeta (púrpura)
-  const COLORES_FILA = { v: "verde", a: "amarillo", r: "rojo", n: "naranja", p: "violeta" };
+  //   c = celeste · s = rosa
+  const COLORES_FILA = { v: "verde", a: "amarillo", r: "rojo", n: "naranja", p: "violeta", c: "celeste", s: "rosa" };
 
   const tbody = cuerpo.map(celdas => {
     celdas = [...celdas];
     let colorFila = "";
-    const mColor = (celdas[0] || "").match(/^(.*?)\s*([varnp])$/i);
+    const mColor = (celdas[0] || "").match(/^(.*?)\s*([varnpcs])$/i);
     if (mColor && mColor[1] !== "") {
       colorFila = COLORES_FILA[mColor[2].toLowerCase()];
       celdas[0] = mColor[1];
     }
 
     const equipo = celdas[idxEquipo] || "";
-    const esHuracan = norm(equipo).includes("huracan");
+    // Solo el nombre exacto "Huracán" (no "Huracán (Tres Arroyos)", etc.)
+    const esHuracan = norm(equipo) === "huracan";
 
     const tds = encabezado.map((_, i) => {
       const valor = celdas[i] ?? "";
@@ -1540,8 +1546,8 @@ function renderTablaPosiciones(texto, titulo = "") {
       return `<td${clase}>${escapeHTML(valor)}</td>`;
     }).join("");
 
-    // Si la fila tiene color de clasificación, manda ese color (también para
-    // Huracán, que igual conserva su letra roja oscura y en negrita).
+    // Huracán va siempre con letra roja y negrita; si además tiene letra de
+    // clasificación, la fila toma ese color de fondo como cualquier otra.
     const clases = [
       esHuracan ? "fila-huracan" : "",
       colorFila ? `fila-${colorFila}` : ""
