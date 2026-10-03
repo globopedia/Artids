@@ -1,5 +1,24 @@
+// Solo las páginas de Globopedia pueden pedir datos. Un pedido desde otro
+// sitio, o directo desde la barra del navegador / un programa de descarga
+// (que no manda "Origin"), recibe un 403.
+const ORIGENES_PERMITIDOS = [
+  "https://globopedia.github.io",
+  "https://www.globopedia.ar",
+  "https://globopedia.ar",
+  "https://globopedia.blogspot.com",
+  "https://artids.vercel.app"
+];
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const origen = req.headers.origin;
+  // La caché de Vercel guarda una copia distinta por cada origen, así un
+  // pedido sin origen válido nunca recibe la copia guardada de otro.
+  res.setHeader("Vary", "Origin");
+  if (!origen || !ORIGENES_PERMITIDOS.includes(origen)) {
+    res.setHeader("Cache-Control", "no-store");
+    return res.status(403).send("Acceso no permitido");
+  }
+  res.setHeader("Access-Control-Allow-Origin", origen);
   const file = req.query.file;
 
   const archivos = {
@@ -10,14 +29,14 @@ export default async function handler(req, res) {
     orneos: { repo: "Lubs", path: "Orneos.csv" },
     rbits: { repo: "Lubs", path: "Rbits.csv" },
     ankg: { repo: "Artids", path: "Ankg.csv" },
-    artids1910: { repo: "Artids", path: "Artids1910.csv" },
-    artids1925: { repo: "Artids", path: "Artids1925.csv" },
-    artids1940: { repo: "Artids", path: "Artids1940.csv" },
-    artids1955: { repo: "Artids", path: "Artids1955.csv" },
-    artids1970: { repo: "Artids", path: "Artids1970.csv" },
-    artids1985: { repo: "Artids", path: "Artids1985.csv" },
-    artids2000: { repo: "Artids", path: "Artids2000.csv" },
-    artids2015: { repo: "Artids", path: "Artids2015.csv" }
+    artids1910: { repo: "Lubs", path: "Artids1910.csv" },
+    artids1925: { repo: "Lubs", path: "Artids1925.csv" },
+    artids1940: { repo: "Lubs", path: "Artids1940.csv" },
+    artids1955: { repo: "Lubs", path: "Artids1955.csv" },
+    artids1970: { repo: "Lubs", path: "Artids1970.csv" },
+    artids1985: { repo: "Lubs", path: "Artids1985.csv" },
+    artids2000: { repo: "Lubs", path: "Artids2000.csv" },
+    artids2015: { repo: "Lubs", path: "Artids2015.csv" }
   };
 
   if (!archivos[file]) {
