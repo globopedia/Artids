@@ -844,14 +844,14 @@ function parsearFormacionColumna(texto) {
 // línea se saltea (no se descarta del todo el concepto de "quién jugó más":
 // simplemente cede su lugar al que sigue en la lista, que sí entra en una
 // línea con espacio disponible).
-function seleccionarRestoConTope(listaOrdenada, maxPorLinea = 5, maxTotal = 10) {
-  const contadorPorFila = FILAS_CANCHA.map(() => 0);
+function seleccionarRestoConTope(listaOrdenada, maxPorLinea = 5, maxTotal = 10, filas = FILAS_CANCHA) {
+  const contadorPorFila = filas.map(() => 0);
   const elegidos = [];
 
   for (const jugador of listaOrdenada) {
     if (elegidos.length >= maxTotal) break;
 
-    const filaIndex = FILAS_CANCHA.findIndex(categorias => categorias.includes(jugador.categoria));
+    const filaIndex = filas.findIndex(categorias => categorias.includes(jugador.categoria));
 
     // Categoría no reconocida (cae en la fila "sin categoría" al renderizar):
     // no le aplicamos tope de línea, porque no compite por un lugar fijo.
@@ -1059,24 +1059,33 @@ function obtenerVendidosYConversos(nombreClubRival) {
   return { vendidos, conversos };
 }
 
+// Las tres líneas para el tope de 5 (distinto de la canchita, que divide
+// el ataque en dos): defensores, volantes (con el enganche) y atacantes.
+const LINEAS_PASE = [
+  ["lateral_der", "defensor_central", "lateral_izq"],
+  ["volante_der", "volante_central", "volante_izq", "enganche"],
+  ["wing_der", "extremo_der", "delantero", "extremo_izq", "wing_izq"]
+];
+
 // Arma "el equipo": un arquero + hasta 10 con tope de 5 por línea.
 function elegirOnce(jugadores) {
   const ordenados = [...jugadores].sort((a, b) => b.veces - a.veces || a.nombre.localeCompare(b.nombre));
   const arquero = ordenados.find(j => j.categoria === "arquero") || null;
   const candidatos = ordenados.filter(j => j.categoria !== "arquero");
-  const resto = seleccionarRestoConTope(candidatos, 5, 10);
+  const resto = seleccionarRestoConTope(candidatos, 5, 10, LINEAS_PASE);
   return { arquero, resto };
 }
 
 // Orden de izquierda a derecha, inspirado en las formaciones de antes.
-// Arriba: arquero, defensores centrales, volante derecho, volante central
-// y volante izquierdo. Abajo: wing derecho, extremo derecho, delantero,
-// extremo izquierdo y wing izquierdo.
-// Las posiciones modernas se ubican en el lugar más parecido.
-const ORDEN_FOTO_VIEJA = [
+// Fila de arriba: arquero, defensores, volante derecho, volante central
+// y volante izquierdo. Fila de abajo: wing derecho, extremo derecho,
+// delantero, enganche, extremo izquierdo y wing izquierdo.
+const FILA_ARRIBA_PASE = [
   "arquero",
   "lateral_der", "defensor_central", "lateral_izq",
-  "volante_der", "volante_central", "volante_izq",
+  "volante_der", "volante_central", "volante_izq"
+];
+const FILA_ABAJO_PASE = [
   "wing_der", "extremo_der", "delantero", "enganche", "extremo_izq", "wing_izq",
   "desconocida"
 ];
@@ -1084,7 +1093,7 @@ const ORDEN_FOTO_VIEJA = [
 function tarjetaJugadorPase(j) {
   const claseArquero = j.categoria === "arquero" ? " jugador-pase-arquero" : "";
   const nombre = escapeHTML(j.nombre);
-  const titulo = `${nombre} · ${j.veces} ${j.veces === 1 ? "partido" : "partidos"} en Huracán`;
+  const titulo = `${j.veces} PJ en Huracán`;
   const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
   return `
     <a class="jugador-pase${claseArquero}" href="${url}" target="_blank" rel="noopener" title="${titulo}">
@@ -1096,20 +1105,20 @@ function tarjetaJugadorPase(j) {
 function bloquePaseHTML(titulo, explicacion, jugadores) {
   if (!jugadores.length) return "";
   const { arquero, resto } = elegirOnce(jugadores);
-  const equipo = (arquero ? [arquero, ...resto] : resto).sort((a, b) =>
-    ORDEN_FOTO_VIEJA.indexOf(a.categoria) - ORDEN_FOTO_VIEJA.indexOf(b.categoria) || b.veces - a.veces);
+  const equipo = arquero ? [arquero, ...resto] : resto;
 
-  // Seis arriba y cinco abajo; si son menos de 11, se reparten parecido
-  // (la fila de arriba con uno más cuando el total es impar).
-  const enFilaDeArriba = Math.ceil(equipo.length / 2);
-  const filaArriba = equipo.slice(0, enFilaDeArriba);
-  const filaAbajo = equipo.slice(enFilaDeArriba);
+  // Cada jugador va a la fila que le corresponde por su posición (no por
+  // cantidad), ordenado de izquierda a derecha según la lista de esa fila.
+  const ordenarSegun = orden => (a, b) =>
+    orden.indexOf(a.categoria) - orden.indexOf(b.categoria) || b.veces - a.veces;
+  const filaArriba = equipo.filter(j => FILA_ARRIBA_PASE.includes(j.categoria)).sort(ordenarSegun(FILA_ARRIBA_PASE));
+  const filaAbajo = equipo.filter(j => !FILA_ARRIBA_PASE.includes(j.categoria)).sort(ordenarSegun(FILA_ABAJO_PASE));
 
   return `
     <div class="pase-bloque">
       <h4>${titulo}</h4>
       <p class="pase-explica">${explicacion}</p>
-      <div class="pase-fila">${filaArriba.map(tarjetaJugadorPase).join("")}</div>
+      ${filaArriba.length ? `<div class="pase-fila">${filaArriba.map(tarjetaJugadorPase).join("")}</div>` : ""}
       ${filaAbajo.length ? `<div class="pase-fila">${filaAbajo.map(tarjetaJugadorPase).join("")}</div>` : ""}
     </div>`;
 }
@@ -1120,7 +1129,7 @@ function renderVendidosYConversos(nombreClubRival) {
   const rival = escapeHTML(nombreClubRival);
   return `
     <div class="stats" style="margin-top:20px;">
-      <h3 style="color:#FF0000;">🔁 Los vendidos y los conversos</h3>
+      <h3 style="color:#FF0000;">🔁 Con ambas camisetas</h3>
       ${bloquePaseHTML("💸 Los vendidos", `Jugaron primero en Huracán y después en ${rival}.`, vendidos)}
       ${bloquePaseHTML("🙏 Los conversos", `Jugaron primero en ${rival} y después en Huracán.`, conversos)}
     </div>
