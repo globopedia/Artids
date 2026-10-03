@@ -1,0 +1,5 @@
+# Vercel solo necesita la función api/data.js.
+# Las páginas e imágenes se sirven desde GitHub Pages, no desde Vercel.
+/*
+!/api
+!/vercel.json
