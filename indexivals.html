@@ -233,6 +233,60 @@
   color: #eaffea;
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
+
+/* === "Los vendidos" y "Los conversos": jugadores que pasaron por ambos clubes ===
+   Sin canchita: circulitos con la foto y el nombre debajo, en dos filas
+   (seis arriba y cinco abajo, como las formaciones de antes). */
+.pase-bloque { margin-top: 14px; }
+.pase-bloque h4 {
+  color: #FF0000;
+  margin: 0 0 2px;
+  font-size: 17px;
+}
+.pase-bloque .pase-explica {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #555;
+}
+.pase-fila {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-bottom: 10px;
+}
+.jugador-pase {
+  width: 82px;
+  text-align: center;
+  color: #222;
+  text-decoration: none;
+  display: block;
+  transition: opacity 0.15s ease;
+}
+.jugador-pase:hover { opacity: 0.8; }
+.jugador-pase img {
+  width: 62px;
+  height: 62px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+  border: 2px solid #FF0000;
+  background: #eee;
+  display: block;
+  margin: 0 auto 4px;
+}
+/* El arquero con borde dorado, igual que en la canchita */
+.jugador-pase-arquero img {
+  border-color: #FFD700;
+  border-width: 3px;
+}
+.jugador-pase-nombre {
+  display: block;
+  font-family: 'RobotoCondensed', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.15;
+}
   </style>
 </head>
 <body>
@@ -469,7 +523,8 @@ console.log("TRANSFERS:", transfers);
 futbolistas = transfersCSV.map(t => ({
   futbolista: (t.Futbolista || "").trim(),
   posicion: (t["Posición"] || "").trim(),
-  foto1: (t.Foto1 || "").trim()
+  foto1: (t.Foto1 || "").trim(),
+  trayectoria: (t.Trayectoria || "").trim()
 }));
 
 arbitros = Papa.parse(csvRbits, { header: true, skipEmptyLines: true }).data.map(c => ({
@@ -920,6 +975,158 @@ function renderFormacionRival(nombreClubRival) {
   `;
 }
 
+// ============================================================
+// === "Los vendidos" y "Los conversos"
+// ============================================================
+// Vendidos: jugaron primero en Huracán y DESPUÉS en el rival.
+// Conversos: jugaron primero en el rival y DESPUÉS en Huracán.
+// Sale de la columna Trayectoria de Utbolists (A, E, O), que lista los
+// clubes en orden cronológico separados por coma. Si un jugador fue y
+// vino (rival → Huracán → rival) entra en los dos cuadros.
+// Selección, igual que en la canchita: un solo arquero (el que más jugó
+// en Huracán) y hasta 5 por línea; si una línea ya está llena, el que
+// sigue en la lista pasa de largo y entra el siguiente de otra línea.
+// Si hay más de 11, quedan los 11 que más jugaron en Huracán; si hay
+// menos, van los que haya.
+
+// Partidos jugados en Huracán por cada jugador (titular o suplente que
+// entró), contado una vez por partido. Se calcula una sola vez, la
+// primera vez que se necesita, porque recorre todos los partidos.
+let cachePartidosEnHuracan = null;
+function obtenerPartidosEnHuracan() {
+  if (cachePartidosEnHuracan) return cachePartidosEnHuracan;
+  const conteo = {}; // norm(nombre) -> { veces, categoriasDeducidas }
+  encuentros.forEach(p => {
+    const yaContados = new Set();
+    parsearFormacionColumna(p.Huracán || "").forEach(({ nombre, categoria }) => {
+      const clave = norm(nombre);
+      if (yaContados.has(clave)) return;
+      yaContados.add(clave);
+      if (!conteo[clave]) conteo[clave] = { veces: 0, categoriasDeducidas: {} };
+      conteo[clave].veces++;
+      conteo[clave].categoriasDeducidas[categoria] = (conteo[clave].categoriasDeducidas[categoria] || 0) + 1;
+    });
+  });
+  cachePartidosEnHuracan = conteo;
+  return conteo;
+}
+
+// Devuelve { vendidos, conversos } con los jugadores que cumplen cada
+// condición respecto de nombreClubRival (sin recortar todavía a 11).
+function obtenerVendidosYConversos(nombreClubRival) {
+  const claveRival = norm(nombreClubRival);
+  const claveHuracan = norm("Huracán");
+  const partidosEnHuracan = obtenerPartidosEnHuracan();
+
+  const vendidos = [];
+  const conversos = [];
+  const vistos = new Set(); // un jugador puede tener varias filas (idas y vueltas)
+
+  futbolistas.forEach(f => {
+    const claveJugador = norm(f.futbolista);
+    if (!claveJugador || vistos.has(claveJugador)) return;
+
+    const clubes = f.trayectoria.split(",").map(c => norm(c)).filter(Boolean);
+    const posHuracan = clubes.map((c, i) => c === claveHuracan ? i : -1).filter(i => i >= 0);
+    const posRival = clubes.map((c, i) => c === claveRival ? i : -1).filter(i => i >= 0);
+    // Tiene que haber pasado por los dos clubes; si solo jugó en Huracán, no entra.
+    if (!posHuracan.length || !posRival.length) return;
+    vistos.add(claveJugador);
+
+    // Posición: la real cargada en Utbolists; si no está, la que más se
+    // le dedujo de las formaciones de Huracán (mismo criterio que la canchita).
+    const datosPartidos = partidosEnHuracan[claveJugador] || { veces: 0, categoriasDeducidas: {} };
+    let categoria = categorizarPosicion(f.posicion);
+    if (categoria === "desconocida") {
+      const deducida = Object.entries(datosPartidos.categoriasDeducidas).sort((a, b) => b[1] - a[1])[0];
+      if (deducida) categoria = deducida[0];
+    }
+
+    const jugador = {
+      nombre: f.futbolista,
+      foto: f.foto1,
+      veces: datosPartidos.veces,
+      categoria
+    };
+
+    // Cuenta solo el PRIMER cruce entre los dos clubes: si Huracán aparece
+    // antes que el rival es vendido; si el rival aparece antes, converso.
+    // Las idas y vueltas posteriores no cambian nada (nunca va en los dos).
+    if (Math.min(...posHuracan) < Math.min(...posRival)) vendidos.push(jugador);
+    else conversos.push(jugador);
+  });
+
+  return { vendidos, conversos };
+}
+
+// Arma "el equipo": un arquero + hasta 10 con tope de 5 por línea.
+function elegirOnce(jugadores) {
+  const ordenados = [...jugadores].sort((a, b) => b.veces - a.veces || a.nombre.localeCompare(b.nombre));
+  const arquero = ordenados.find(j => j.categoria === "arquero") || null;
+  const candidatos = ordenados.filter(j => j.categoria !== "arquero");
+  const resto = seleccionarRestoConTope(candidatos, 5, 10);
+  return { arquero, resto };
+}
+
+// Orden de izquierda a derecha, inspirado en las formaciones de antes.
+// Arriba: arquero, defensores centrales, volante derecho, volante central
+// y volante izquierdo. Abajo: wing derecho, extremo derecho, delantero,
+// extremo izquierdo y wing izquierdo.
+// Las posiciones modernas se ubican en el lugar más parecido.
+const ORDEN_FOTO_VIEJA = [
+  "arquero",
+  "lateral_der", "defensor_central", "lateral_izq",
+  "volante_der", "volante_central", "volante_izq",
+  "wing_der", "extremo_der", "delantero", "enganche", "extremo_izq", "wing_izq",
+  "desconocida"
+];
+
+function tarjetaJugadorPase(j) {
+  const claseArquero = j.categoria === "arquero" ? " jugador-pase-arquero" : "";
+  const nombre = escapeHTML(j.nombre);
+  const titulo = `${nombre} · ${j.veces} ${j.veces === 1 ? "partido" : "partidos"} en Huracán`;
+  const url = `${URL_PAGINA_FUTBOLISTAS}?jugador=${encodeURIComponent(j.nombre)}`;
+  return `
+    <a class="jugador-pase${claseArquero}" href="${url}" target="_blank" rel="noopener" title="${titulo}">
+      <img src="${j.foto}" alt="${nombre}" loading="lazy" onerror="this.style.visibility='hidden'">
+      <span class="jugador-pase-nombre">${nombre}</span>
+    </a>`;
+}
+
+function bloquePaseHTML(titulo, explicacion, jugadores) {
+  if (!jugadores.length) return "";
+  const { arquero, resto } = elegirOnce(jugadores);
+  const equipo = (arquero ? [arquero, ...resto] : resto).sort((a, b) =>
+    ORDEN_FOTO_VIEJA.indexOf(a.categoria) - ORDEN_FOTO_VIEJA.indexOf(b.categoria) || b.veces - a.veces);
+
+  // Seis arriba y cinco abajo; si son menos de 11, se reparten parecido
+  // (la fila de arriba con uno más cuando el total es impar).
+  const enFilaDeArriba = Math.ceil(equipo.length / 2);
+  const filaArriba = equipo.slice(0, enFilaDeArriba);
+  const filaAbajo = equipo.slice(enFilaDeArriba);
+
+  return `
+    <div class="pase-bloque">
+      <h4>${titulo}</h4>
+      <p class="pase-explica">${explicacion}</p>
+      <div class="pase-fila">${filaArriba.map(tarjetaJugadorPase).join("")}</div>
+      ${filaAbajo.length ? `<div class="pase-fila">${filaAbajo.map(tarjetaJugadorPase).join("")}</div>` : ""}
+    </div>`;
+}
+
+function renderVendidosYConversos(nombreClubRival) {
+  const { vendidos, conversos } = obtenerVendidosYConversos(nombreClubRival);
+  if (!vendidos.length && !conversos.length) return "";
+  const rival = escapeHTML(nombreClubRival);
+  return `
+    <div class="stats" style="margin-top:20px;">
+      <h3 style="color:#FF0000;">🔁 Los vendidos y los conversos</h3>
+      ${bloquePaseHTML("💸 Los vendidos", `Jugaron primero en Huracán y después en ${rival}.`, vendidos)}
+      ${bloquePaseHTML("🙏 Los conversos", `Jugaron primero en ${rival} y después en Huracán.`, conversos)}
+    </div>
+  `;
+}
+
 function mostrarClub() {
       const clubId = document.getElementById("clubSelect").value;
       const club = clubes.find(c => (c.id||"").trim() === (clubId||"").trim());
@@ -952,6 +1159,7 @@ function mostrarClub() {
         ${stats.html}
         </div>
         ${renderFormacionRival(club.club)}
+        ${renderVendidosYConversos(club.club)}
       `;
   setTimeout(() => {
   dibujarTorta(stats.ganados, stats.empatados, stats.perdidos);
