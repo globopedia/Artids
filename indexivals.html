@@ -439,6 +439,9 @@ function obtenerTransferencias(nombreClub) {
 }
     function bucketCompetencia(torneo) {
       const t = norm(torneo);
+      // Primero los amistosos: si el nombre dice "(amistoso)", no es oficial
+      // aunque también diga "Torneo", "Campeonato", "Copa", etc.
+      if (t.includes("amistoso")) return "No oficiales";
       if (t.includes("copa libertadores")) return "Copa Libertadores";
       if (t.includes("sudamericana")) return "Copa Sudamericana";
       if (t.includes("conmebol")) return "Copa Conmebol";
@@ -456,7 +459,6 @@ function obtenerTransferencias(nombreClub) {
       if (t.includes("liga anglo")) return "Liga Anglo-Argentina";
       if (t.includes("liga 43")) return "Liga 43";
       if (t.includes("centenario 1909")) return "Liga Centenario";
-      if (t.includes("amistoso")) return "No oficiales";
       return "Otros"
     }
 
