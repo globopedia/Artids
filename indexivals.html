@@ -453,14 +453,14 @@ function obtenerTransferencias(nombreClub) {
       if (t.includes("maradona")) return "Copa Maradona 2020";
       if (t.includes("b nacional") || t.includes("nacional b") || t.includes("reducido") || t.includes("bn") || t.includes("nb")) return "2° Categoría";
       if (t.includes("campeonato") || t.includes("promocion") || t.includes("torneo") || t.includes("descenso") || t.includes("pre-libertadores")) return "Campeonato de 1° División";
-      if (t.includes("Liga Anglo")) return "Liga Anglo-Argentina";
-      if (t.includes("Liga 43")) return "Liga 43";
+      if (t.includes("liga anglo")) return "Liga Anglo-Argentina";
+      if (t.includes("liga 43")) return "Liga 43";
       if (t.includes("centenario 1909")) return "Liga Centenario";
       if (t.includes("amistoso")) return "No oficiales";
       return "Otros"
     }
 
-    const ORDEN_COMPETENCIAS = ["Campeonato de 1° División","Copa Argentina","Supercopa","Copa Libertadores","Copa Sudamericana","Copa Conmebol","Copa Competencia","Copa de Honor","Campeonato Béccar Varela","Copa Escobar","Copa Suecia 1958","Copa Centenario 1993","Copa Maradona 2020","2° Categoría","No oficiales"];
+    const ORDEN_COMPETENCIAS = ["Campeonato de 1° División","Copa Argentina","Supercopa","Copa Libertadores","Copa Sudamericana","Copa Conmebol","Copa Competencia","Copa de Honor","Campeonato Béccar Varela","Copa Escobar","Copa Suecia 1958","Copa Centenario 1993","Copa Maradona 2020","2° Categoría","Liga Centenario","Liga 43","Liga Anglo-Argentina","No oficiales"];
     const CONDICIONES = ["Local","Neutral","Visitante"];
     const SITUACIONES = ["Victoria","Empate","Derrota"];
 
@@ -1136,6 +1136,16 @@ function renderVendidosYConversos(nombreClubRival) {
   `;
 }
 
+// Muestra un dato de la ficha del club solo si está cargado, igual que en
+// las otras páginas: si viene vacío, con "-", con "x" o con el nombre de la
+// propia columna (ej. "Web", "Estadio", "fundacion"), no se publica.
+function campoClub(label, valor) {
+  const v = (valor || "").toString().trim();
+  const n = norm(v);
+  if (!v || n === "-" || n === "x" || n === norm(label)) return "";
+  return `<p><b>${label}:</b> ${v}</p>`;
+}
+
 function mostrarClub() {
       const clubId = document.getElementById("clubSelect").value;
       const club = clubes.find(c => (c.id||"").trim() === (clubId||"").trim());
@@ -1156,13 +1166,13 @@ function mostrarClub() {
 
 <canvas id="graficoResumen" width="120" height="120" style="margin:auto;"></canvas>
         </div>
-        <p><b>Fundación:</b> ${club.fundacion}</p>
-        <p><b>Dirección:</b> ${club.direccion}</p>
-        <p><b>Web:</b> ${club.web}</p>
-        <p><b>Colores:</b> ${club.colores}</p>
-        <p><b>Títulos:</b> ${club.titulos}</p>
-        <p><b>Estadio:</b> ${club.estadio}</p>
-        <p><b>Curiosidades:</b> ${club.curiosidades}</p>
+        ${campoClub("Fundación", club.fundacion)}
+        ${campoClub("Dirección", club.direccion)}
+        ${campoClub("Web", club.web)}
+        ${campoClub("Colores", club.colores)}
+        ${campoClub("Títulos", club.titulos)}
+        ${campoClub("Estadio", club.estadio)}
+        ${campoClub("Curiosidades", club.curiosidades)}
         <div class="stats">
           <h3 style="color:#FF0000;">📊 Historial</h3>
         ${stats.html}
