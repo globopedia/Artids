@@ -1641,9 +1641,24 @@ html += `
 // ============================================================
 // === "Rachas y campañas": estadísticas de racha/sequía frente a este rival
 // ============================================================
-function esVictoria(p) { return cap(norm(p.Situación)) === "Victoria"; }
-function esEmpate(p) { return cap(norm(p.Situación)) === "Empate"; }
-function esDerrota(p) { return cap(norm(p.Situación)) === "Derrota"; }
+// Resultado del partido ("Victoria" / "Empate" / "Derrota", o null si no se
+// sabe). Manda la columna Situación (así un partido ganado por penales sigue
+// contando como victoria aunque el marcador diga 1-1), tolerando errores de
+// tipeo como "derota" o "vitoria". Si la Situación no se entiende ("-",
+// "desconocido"...), se deduce del marcador; si tampoco hay marcador, null.
+function resultadoPartido(p) {
+  const s = norm(p.Situación);
+  if (/^(victoria|vitoria|vicctoria|vctoria|victora)$/.test(s)) return "Victoria";
+  if (/^(derrota|derota|derrrota)$/.test(s)) return "Derrota";
+  if (/^(empate|empte)$/.test(s)) return "Empate";
+  const r1 = (p.Resultado1 || "").trim(), r2 = (p.Resultado2 || "").trim();
+  if (!/^\d+$/.test(r1) || !/^\d+$/.test(r2)) return null;
+  const g1 = parseInt(r1), g2 = parseInt(r2);
+  return g1 > g2 ? "Victoria" : g1 < g2 ? "Derrota" : "Empate";
+}
+function esVictoria(p) { return resultadoPartido(p) === "Victoria"; }
+function esEmpate(p) { return resultadoPartido(p) === "Empate"; }
+function esDerrota(p) { return resultadoPartido(p) === "Derrota"; }
 function esInvicto(p) { return esVictoria(p) || esEmpate(p); }
 function esSinGanar(p) { return esEmpate(p) || esDerrota(p); }
 function noRecibioGoles(p) { return (parseInt(p.Resultado2) || 0) === 0; }
@@ -1659,12 +1674,40 @@ function calcularRachaConsecutiva(partidosAsc, predicado) {
   }
   return count;
 }
-// Devuelve el partido más antiguo dentro de la racha actual (o sea, en el
-// que arrancó), para poder decir "no pierde desde LA (torneo)".
-function partidoQueInicioRacha(partidosAsc, predicado) {
+// Devuelve el partido que CORTÓ la racha actual, o sea el inmediatamente
+// anterior a su comienzo (la última derrota, para "no pierde desde"; la
+// última victoria, para "no le gana desde"). null si la racha abarca todo.
+function partidoAnteriorARacha(partidosAsc, predicado) {
   const n = calcularRachaConsecutiva(partidosAsc, predicado);
-  if (n === 0) return null;
-  return partidosAsc[partidosAsc.length - n];
+  const idx = partidosAsc.length - n - 1;
+  return idx >= 0 ? partidosAsc[idx] : null;
+}
+
+// Antepone el artículo que corresponde al nombre del torneo, para que la
+// frase quede bien: "LA 11° FECHA...", "EL 8VO DE FINAL...", "LOS 16VOS...".
+function torneoConArticulo(torneo) {
+  const t = (torneo || "").trim().replace(/\s+/g, " ");
+  if (!t) return "";
+  const palabras = t.split(" ");
+  const p0 = norm(palabras[0]);
+  const p1 = norm(palabras[1] || "");
+  let articulo = "la";
+  if (/^\d+°$/.test(p0)) {
+    // "11° fecha", "2° fase", "1° ronda"... son femeninos; "8° de final",
+    // "1° desempate", "6° Apertura" son masculinos.
+    articulo = /^(fecha|fase|ronda|rueda|eliminatoria|final)$/.test(p1) ? "la" : "el";
+  } else if (/^\d+(vos|avos)$/.test(p0) || /^(octavos|cuartos)$/.test(p0)) {
+    articulo = "los";
+  } else if (/^\d+(vo|to|avo)$/.test(p0) ||
+             /^(octavo|cuarto|tercer|triangular|cuadrangular|campeonato|torneo|reducido|repechaje|desempate|partido)$/.test(p0)) {
+    articulo = "el";
+  }
+  return `${articulo} ${t}`;
+}
+// "de" + "el" = "del"; "en" + "el" queda igual.
+function deTorneo(torneo) {
+  const conArt = torneoConArticulo(torneo);
+  return conArt.startsWith("el ") ? "del " + conArt.slice(3) : "de " + conArt;
 }
 
 // Arma el bloque de texto de rachas para un subconjunto de partidos ya
@@ -1672,13 +1715,15 @@ function partidoQueInicioRacha(partidosAsc, predicado) {
 // o 1 se considera "exiguo" y esa línea (o esa cláusula puntual, en el caso
 // de ganó/empató/perdió) se omite directamente.
 function armarBloqueRachas(nombreClub, partidosSubset) {
+  // Los partidos sin resultado conocido no cuentan ni cortan rachas.
+  partidosSubset = partidosSubset.filter(p => resultadoPartido(p) !== null);
   if (!partidosSubset.length) return "";
 
   const nombreRivalUpper = escapeHTML(nombreClub).toUpperCase();
   const ultimos10 = partidosSubset.slice(-10);
   let a = 0, b = 0, c = 0;
   ultimos10.forEach(p => {
-    const sit = cap(norm(p.Situación));
+    const sit = resultadoPartido(p);
     if (sit === "Victoria") a++;
     else if (sit === "Empate") b++;
     else if (sit === "Derrota") c++;
@@ -1705,9 +1750,9 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
 
   const e = calcularRachaConsecutiva(partidosSubset, esInvicto);
   if (e >= 2) {
-    if (totalDerrotas > 0) {
-      const pi = partidoQueInicioRacha(partidosSubset, esInvicto);
-      lineas.push(`ARRASTRA ${e} PARTIDOS SIN PERDER, PUES NO CAE DESDE LA ${pi ? pi.Torneo : ""}.`);
+    const ultimaDerrota = partidoAnteriorARacha(partidosSubset, esInvicto);
+    if (ultimaDerrota) {
+      lineas.push(`ARRASTRA ${e} PARTIDOS SIN PERDER, PUES NO CAE DESDE ${torneoConArticulo(ultimaDerrota.Torneo)}.`);
     } else {
       // Nunca perdió en todo el historial registrado: no hay "desde cuándo"
       // que mencionar, sería inventar una referencia que no existió.
@@ -1720,9 +1765,9 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
 
   const g = calcularRachaConsecutiva(partidosSubset, esSinGanar);
   if (g >= 2) {
-    if (totalVictorias > 0) {
-      const pig = partidoQueInicioRacha(partidosSubset, esSinGanar);
-      lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE, PUES NO LO HACE DESDE ${pig ? pig.Torneo : ""}.`);
+    const ultimaVictoria = partidoAnteriorARacha(partidosSubset, esSinGanar);
+    if (ultimaVictoria) {
+      lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE, PUES NO LO HACE DESDE ${torneoConArticulo(ultimaVictoria.Torneo)}.`);
     } else {
       // Nunca ganó en todo el historial registrado: mismo caso, sin "desde cuándo".
       lineas.push(`ARRASTRA UNA SEQUÍA DE ${g} PARTIDOS SIN GANARLE.`);
@@ -1749,7 +1794,7 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
       if (dif === difMx && (parseInt(p.Resultado1) || 0) > (parseInt(mx.Resultado1) || 0)) return p;
       return mx;
     }, null);
-    if (mejor) fraseMejor = `LA MAYOR GOLEADA DE HURACÁN FUE EL ${mejor.Resultado1}-${mejor.Resultado2} EN LA ${mejor.Torneo}`;
+    if (mejor) fraseMejor = `LA MAYOR GOLEADA DE HURACÁN FUE EL ${mejor.Resultado1}-${mejor.Resultado2} EN ${torneoConArticulo(mejor.Torneo)}`;
   }
 
   let frasePeor = "";
@@ -1763,7 +1808,7 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
       if (dif === difMx && (parseInt(p.Resultado2) || 0) > (parseInt(mx.Resultado2) || 0)) return p;
       return mx;
     }, null);
-    if (peor) frasePeor = `LA MAYOR GOLEADA DE ${nombreRivalUpper} FUE EL ${peor.Resultado2}-${peor.Resultado1} DE LA ${peor.Torneo}`;
+    if (peor) frasePeor = `LA MAYOR GOLEADA DE ${nombreRivalUpper} FUE EL ${peor.Resultado2}-${peor.Resultado1} ${deTorneo(peor.Torneo)}`;
   }
 
   if (fraseMejor && frasePeor) {
