@@ -559,7 +559,7 @@ encuentros = [...partidos1, ...partidos2, ...partidos3, ...partidos4, ...partido
         Árbitro: (p.Árbitro ?? "").trim(),
         Huracán: (p.Huracán ?? "").trim(),
         Rival: (p.Rival ?? "").trim(),
-        FotoB: (p.FotoB ?? "").trim(),
+        Foto: (p.Foto ?? p.FotoB ?? "").trim(),
         // Incidencias: en los CSV cada renglón se separa con "|"; acá se pasa al salto de línea que usa la página.
         Incidencias: (p.Incidencias ?? "").trim().replace(/\s*\|\s*/g, "</br>")
       }));
@@ -1991,7 +1991,7 @@ const htmlGoleadores = `
 </div>
 <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
                   <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
-${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+${ /^https?:\/\//i.test(p.Foto || "") ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
                 </div>
               `;
@@ -2012,7 +2012,7 @@ ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias"
 </div>
 <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
                   <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
-                ${ p.FotoB ? `<div style="margin:6px 0;"><img src="${p.FotoB}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
+                ${ /^https?:\/\//i.test(p.Foto || "") ? `<div style="margin:6px 0;"><img src="${p.Foto}" alt="Incidencias" style="max-width:250px;border-radius:8px;"></div>` : "" }
                   <div>${renderIncidencias(p.Incidencias)}</div>
               `;
             }

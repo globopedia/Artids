@@ -2100,7 +2100,7 @@ function mostrarTorneo() {
       // Ojo: Resultado1 SIEMPRE es el resultado de Huracán (sea local o
       // visitante) — antes acá se invertía mal cuando Huracán jugaba de
       // visitante, y terminaba mostrando el resultado al revés.
-      const tieneFotoValida = p.Foto && p.Foto !== "-" && p.Foto.trim().toLowerCase() !== "foto";
+      const tieneFotoValida = /^https?:\/\//i.test((p.Foto || "").trim());
       const tieneFormacionValida = p.Formación && p.Formación !== "-" && p.Formación.trim().toLowerCase() !== "formación";
       const tieneCamisetaValida = p.Camiseta && p.Camiseta !== "-" && p.Camiseta.trim().toLowerCase() !== "camiseta";
 

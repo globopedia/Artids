@@ -2243,7 +2243,7 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
               <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
           <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
           <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
-              ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+              ${ /^https?:\/\//i.test(p.Foto || "") ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
               <div>${renderIncidencias(p.Incidencias)}</div>
             </div>
           `;
@@ -2261,7 +2261,7 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
               <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
 <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
 <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
-              ${ p.Foto ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+              ${ /^https?:\/\//i.test(p.Foto || "") ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
               <div>${renderIncidencias(p.Incidencias)}</div>
             </div>
           `;
