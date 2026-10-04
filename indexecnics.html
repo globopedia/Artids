@@ -631,7 +631,8 @@
         Huracán: (p.Huracán ?? "").trim(),
         Rival: (p.Rival ?? "").trim(),
         Foto: (p.Foto ?? "").trim(),
-        Incidencias: (p.Incidencias ?? "").trim(),
+        // Incidencias: en los CSV cada renglón se separa con "|"; acá se pasa al salto de línea que usa la página.
+        Incidencias: (p.Incidencias ?? "").trim().replace(/\s*\|\s*/g, "</br>"),
         FinPT: (p.FinPT ?? "").trim(),
         Fin2T: (p.Fin2T ?? "").trim(),
         Fin2E: (p.Fin2E ?? "").trim()

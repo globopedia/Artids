@@ -170,7 +170,8 @@
         Huracán: (p.Huracán ?? "").trim(),
         Rival: (p.Rival ?? "").trim(),
         Foto: (p.Foto ?? "").trim(),
-        Incidencias: (p.Incidencias ?? "").trim()
+        // Incidencias: en los CSV cada renglón se separa con "|"; acá se pasa al salto de línea que usa la página.
+        Incidencias: (p.Incidencias ?? "").trim().replace(/\s*\|\s*/g, "</br>")
       }));
 
       llenarSelectArbitros();
@@ -347,8 +348,8 @@
         D: delArbitro.filter(p => norm(p.Situación) === "derrota").length,
         E: delArbitro.reduce((s,p) => s + (parseInt(p.Resultado1)||0), 0),
         F: delArbitro.reduce((s,p) => s + (parseInt(p.Resultado2)||0), 0),
-        G: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/EXP.*\(HUR\)/gi) || []).length), 0),
-        H: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/EXP.*\((?!HUR)[^)]+\)/gi) || []).length), 0),
+        G: delArbitro.reduce((s,p) => s + p.Incidencias.split("</br>").filter(ev => /\bEXP\b.*\(HUR\)/i.test(ev)).length, 0),
+        H: delArbitro.reduce((s,p) => s + p.Incidencias.split("</br>").filter(ev => /\bEXP\b/i.test(ev) && /\((?!HUR\))[A-Z]{3}\)/.test(ev)).length, 0),
         I: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/\(HUR\)\s*-penal/g)||[]).length), 0),
         J: delArbitro.reduce((s,p) => s + ((p.Incidencias.match(/-penal/g)||[]).length), 0)
       };
