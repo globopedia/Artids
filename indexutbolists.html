@@ -1679,6 +1679,13 @@ function renderGolesYPenales(nombreJugador, partidosDelJugador, posicion, listaF
 }
 
 // --- Frase de historial por AFA / CONMEBOL / Amistosos ---
+// Ligas en las que jugó Huracán antes de afiliarse a la AFA (Liga Centenario
+// 1909, Liga 43 1910/1912, Liga Anglo-Argentina 1911): son partidos oficiales
+// de esas ligas, pero NO cuentan como AFA.
+function esLigaNoAfiliada(torneo) {
+  const t = norm(torneo);
+  return t.includes("liga centenario") || t.includes("centenario 1909") || t.includes("liga 43") || t.includes("liga anglo");
+}
 function calcularResumenCompetencia(nombreJugador, partidos, tipo) {
   let filtrados = [];
 
@@ -1686,8 +1693,10 @@ function calcularResumenCompetencia(nombreJugador, partidos, tipo) {
     filtrados = partidos.filter(p => esInternacional(p.Torneo));
   } else if (tipo === "AMISTOSO") {
     filtrados = partidos.filter(p => norm(p.Torneo).includes("amistoso"));
-  } else { // AFA = todo lo que no sea CONMEBOL ni amistoso
-    filtrados = partidos.filter(p => !esInternacional(p.Torneo) && !norm(p.Torneo).includes("amistoso"));
+  } else if (tipo === "LIGAS") {
+    filtrados = partidos.filter(p => !norm(p.Torneo).includes("amistoso") && esLigaNoAfiliada(p.Torneo));
+  } else { // AFA = todo lo que no sea CONMEBOL, amistoso ni liga no afiliada
+    filtrados = partidos.filter(p => !esInternacional(p.Torneo) && !norm(p.Torneo).includes("amistoso") && !esLigaNoAfiliada(p.Torneo));
   }
 
   if (!filtrados.length) return "";
@@ -1740,6 +1749,8 @@ function calcularResumenCompetencia(nombreJugador, partidos, tipo) {
   let texto = "";
   if (tipo === "AFA") {
     texto = `POR AFA JUGÓ ${A} ${A === 1 ? "PARTIDO" : "PARTIDOS"} ${rangoAnios}.`;
+  } else if (tipo === "LIGAS") {
+    texto = `POR LIGAS NO AFILIADAS A LA AFA JUGÓ ${A} ${A === 1 ? "PARTIDO" : "PARTIDOS"} ${rangoAnios}.`;
   } else if (tipo === "CONMEBOL") {
     texto = `POR CONMEBOL JUGÓ ${A} ${A === 1 ? "PARTIDO" : "PARTIDOS"} ${rangoAnios}.`;
   } else {
@@ -1834,6 +1845,7 @@ function mostrarFutbolistas() {
   const historialTexto =
     calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "AFA") +
     calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "CONMEBOL") +
+    calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "LIGAS") +
     calcularResumenCompetencia(futbolista.futbolista, partidosJugador, "AMISTOSO");
 
   // 🔹 Función para validar y renderizar campos individuales

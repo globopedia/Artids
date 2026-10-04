@@ -1190,6 +1190,14 @@ function mostrarClub() {
 }, 0);
     }
 
+// Ligas en las que jugó Huracán antes de afiliarse a la AFA (Liga Centenario
+// 1909, Liga 43 1910/1912, Liga Anglo-Argentina 1911): son partidos oficiales
+// de esas ligas, pero NO cuentan como AFA.
+function esLigaNoAfiliada(torneo) {
+  const t = norm(torneo);
+  return t.includes("liga centenario") || t.includes("centenario 1909") || t.includes("liga 43") || t.includes("liga anglo");
+}
+
 function calcularResumenGlobal(partidos, nombreClub, tipo) {
   let filtrados = [];
 
@@ -1199,8 +1207,13 @@ function calcularResumenGlobal(partidos, nombreClub, tipo) {
       return comp !== "Copa Libertadores" &&
              comp !== "Copa Sudamericana" &&
              comp !== "Copa Conmebol" &&
-             comp !== "No oficiales";
+             comp !== "No oficiales" &&
+             !esLigaNoAfiliada(p.Torneo);
     });
+  }
+
+  if (tipo === "LIGAS") {
+    filtrados = partidos.filter(p => esLigaNoAfiliada(p.Torneo));
   }
 
   if (tipo === "CONMEBOL") {
@@ -1291,6 +1304,7 @@ function calcularResumenGlobal(partidos, nombreClub, tipo) {
   let encabezado = "";
   if (tipo === "AFA") encabezado = "POR AFA";
   if (tipo === "CONMEBOL") encabezado = "POR CONMEBOL";
+  if (tipo === "LIGAS") encabezado = "POR LIGAS NO AFILIADAS A LA AFA";
   if (tipo === "AMISTOSOS") encabezado = "";
 
   // frase final
@@ -1539,6 +1553,7 @@ delClub.forEach(p => {
 });
 const resumenAFA = calcularResumenGlobal(delClub, nombreClub, "AFA");
       const resumenCONMEBOL = calcularResumenGlobal(delClub, nombreClub, "CONMEBOL");
+      const resumenLIGAS = calcularResumenGlobal(delClub, nombreClub, "LIGAS");
       const resumenAMISTOSOS = calcularResumenGlobal(delClub, nombreClub, "AMISTOSOS");
       const agg = {};
       for (const e of delClub) {
@@ -1843,7 +1858,7 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
 
 function renderRachasYCampanas(nombreClub) {
   const partidosOficiales = encuentros
-    .filter(p => norm(p.Club) === norm(nombreClub) && !norm(p.Torneo).includes("amistoso"))
+    .filter(p => norm(p.Club) === norm(nombreClub) && !norm(p.Torneo).includes("amistoso") && !esLigaNoAfiliada(p.Torneo))
     .filter(p => parseFecha(p.Fecha))
     .sort((p1, p2) => parseFecha(p1.Fecha) - parseFecha(p2.Fecha));
 
@@ -1929,6 +1944,7 @@ const htmlGoleadores = `
   resumen: `
     ${resumenAFA}
     ${resumenCONMEBOL}
+    ${resumenLIGAS}
     ${resumenAMISTOSOS}
   `,
   html: html 

@@ -117,11 +117,13 @@
       // Primero los amistosos (aunque el nombre diga "Torneo", "Campeonato", etc.)
       if (t.includes("amistoso")) return "Amistosos";
       if (t.includes("libertadores") || t.includes("conmebol") || t.includes("sudamericana")) return "Conmebol";
+      // Ligas anteriores a la afiliación a la AFA (no son AFA)
+      if (t.includes("liga centenario") || t.includes("centenario 1909") || t.includes("liga 43") || t.includes("liga anglo")) return "Ligas no afiliadas";
       if (t.includes("argentina") || t.includes("superliga") || t.includes("maradona") || t.includes("supercopa") || t.includes("promocion") || t.includes("nacional b") || t.includes("b nacional") || t.includes("campeonato") || t.includes("torneo") || t.includes("suecia") || t.includes("beccar varela") || t.includes("competencia") || t.includes("escobar") || t.includes("ibarguren") || t.includes("aldao") || t.includes("estimulo") || t.includes("liguilla de ascenso") || t.includes("segundo ascenso") || t.includes("copa de honor") || t.includes("reducido") || t.includes("republica") || t.includes("descenso") || t.includes("copa centenario")) return "AFA";
       return "Otros";
     }
 
-    const ORDEN_COMPETENCIAS = ["Conmebol","AFA","Amistosos","Otros"];
+    const ORDEN_COMPETENCIAS = ["Conmebol","AFA","Ligas no afiliadas","Amistosos","Otros"];
     const CONDICIONES = ["Local","Neutral","Visitante"];
     const SITUACIONES = ["Victoria","Empate","Derrota"];
 
