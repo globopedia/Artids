@@ -191,6 +191,41 @@
   <div id="futbolistaInfo" class="club-card" style="display:none;"></div>
 
   <script>
+// === Fotos de partidos ===
+// La columna "Foto" de los CSV puede traer:
+//  - un link completo (https://...): se usa tal cual;
+//  - un código de fecha AAAAMMDD (ej. 19931205): la foto se busca en el repo
+//    Artids, carpeta Artido/AAAA/ (ej. Artido/1993/19931205.jpg). Se prueba
+//    primero .jpg y, si no existe, .png y .jpeg. También se puede escribir el
+//    código con extensión (ej. 19931205.png) o con una letra al final para un
+//    segundo partido del mismo día (ej. 19931205b).
+// Si no hay foto (vacío, "Foto", "-") o el archivo no existe, no se muestra nada.
+const URL_FOTOS_PARTIDOS = "https://globopedia.github.io/Artids/Artido/";
+const EXT_FOTOS_PARTIDOS = ["jpg", "png", "jpeg"];
+function urlFotoPartido(valor) {
+  const v = (valor || "").trim();
+  if (/^https?:\/\//i.test(v)) return v;
+  const m = v.match(/^(\d{4})\d{4}[a-z]?(\.(jpe?g|png|webp|gif))?$/i);
+  if (!m) return "";
+  return URL_FOTOS_PARTIDOS + m[1] + "/" + (m[2] ? v : v + "." + EXT_FOTOS_PARTIDOS[0]);
+}
+function fotoPartidoSiguienteFormato(img) {
+  const i = parseInt(img.dataset.ext || "0", 10) + 1;
+  if (img.dataset.codigo !== "1" || i >= EXT_FOTOS_PARTIDOS.length) {
+    img.parentElement.style.display = "none";
+    return;
+  }
+  img.dataset.ext = String(i);
+  img.src = img.src.replace(/\.[^./]+$/, "." + EXT_FOTOS_PARTIDOS[i]);
+}
+function htmlFotoPartido(valor, alt = "") {
+  const url = urlFotoPartido(valor);
+  if (!url) return "";
+  const v = (valor || "").trim();
+  const esCodigoSinExtension = /^\d{8}[a-z]?$/i.test(v) ? "1" : "0";
+  return `<div style="margin:6px 0;"><img src="${url}" alt="${alt}" data-codigo="${esCodigoSinExtension}" loading="lazy" style="max-width:250px;border-radius:8px;" onerror="fotoPartidoSiguienteFormato(this)"></div>`;
+}
+
   // Deshabilitamos el buscador hasta que terminen de llegar y parsearse los
   // 11 CSV (historial completo de Huracán desde 1914): así evitamos que
   // alguien escriba justo en esa ventana, que es lo que hacía que la
@@ -2243,7 +2278,7 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
               <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
           <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
           <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
-              ${ /^https?:\/\//i.test(p.Foto || "") ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+              ${ htmlFotoPartido(p.Foto, "") }
               <div>${renderIncidencias(p.Incidencias)}</div>
             </div>
           `;
@@ -2261,7 +2296,7 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
               <div>${ p.Estadio && getEstadioImage(p.Estadio) ? `<img src="${getEstadioImage(p.Estadio)}" style="max-height:40px;">` : "" }</div>
 <div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>
 <div><b>${p.Club}:</b> ${enlazarJugadores(p.Rival)}</div>
-              ${ /^https?:\/\//i.test(p.Foto || "") ? `<div style="margin:6px 0;"><img src="${p.Foto}" style="max-width:250px;border-radius:8px;"></div>` : "" }
+              ${ htmlFotoPartido(p.Foto, "") }
               <div>${renderIncidencias(p.Incidencias)}</div>
             </div>
           `;
