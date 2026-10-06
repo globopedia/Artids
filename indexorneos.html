@@ -522,6 +522,7 @@ function htmlFotoPartido(valor, alt = "") {
         .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:18px;height:18px;'>")
         .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:18px;height:18px;'>")
         .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:18px;height:18px;'>")
+        .replace(/\bREI\b/g, "<span title='reingreso' style='font-size:17px;'>↩️</span>")
         .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:18px;height:18px;'>")
         .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:18px;height:18px;'>")
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:18px;height:18px;'>");
@@ -1176,6 +1177,28 @@ function obtenerMinutoSalida(texto, futbolista) {
   return m.includes("+") ? m.split("+").map(Number).reduce((a,b)=>a+b) : Number(m);
 }
 
+// Lesión (LES) y reingreso (REI): el jugador que sale lesionado deja de sumar
+// minutos desde ese momento; si vuelve a la cancha (REI), los recupera desde
+// el reingreso. Solo se cargan las ausencias de 10 minutos o más.
+function ajustarMinutosPorLesion(minutos, incidencias, nombre, ingreso) {
+  if (!incidencias || !nombre || !(minutos > 0)) return minutos;
+  const esc = nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const leer = (cod) => {
+    const m = incidencias.match(new RegExp(`(\\d+)(?:\\+(\\d+))?\\s+${cod}\\s+${esc}\\s*\\(`, "i"));
+    return m ? Number(m[1]) + Number(m[2] || 0) : null;
+  };
+  const les = leer("LES");
+  if (les === null) return minutos;
+  const inicio = ingreso != null ? ingreso : 1;
+  const fin = inicio + minutos - 1;
+  if (les < inicio || les > fin) return minutos;
+  const rei = leer("REI");
+  // El minuto de la lesión cuenta como jugado (salió en ese minuto); el
+  // del reingreso también (volvió en ese minuto).
+  if (rei !== null && rei > les) return Math.max(0, minutos - Math.max(0, Math.min(rei, fin + 1) - les - 1));
+  return Math.max(0, les - inicio + 1);
+}
+
 function calcularMinutosJugador(p, nombre) {
   const texto = p.Huracán || "";
   let finReal = (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
@@ -1201,6 +1224,7 @@ function calcularMinutosJugador(p, nombre) {
     let minutoExpulsion = m.includes("+") ? m.split("+").map(Number).reduce((a, b) => a + b) : Number(m);
     minutosJugados = ingreso === null ? Math.max(0, minutoExpulsion - 1) : Math.max(0, minutoExpulsion - ingreso + 1);
   }
+  minutosJugados = ajustarMinutosPorLesion(minutosJugados, incidencias, nombre, ingreso);
 
   return minutosJugados;
 }
@@ -1403,6 +1427,7 @@ function calcularMinutosYExpulsion(p, nombreJugador, columna) {
     minutoExpulsion = m.includes("+") ? m.split("+").map(Number).reduce((a, b) => a + b) : Number(m);
     minutosJugados = ingreso === null ? Math.max(0, minutoExpulsion - 1) : Math.max(0, minutoExpulsion - ingreso + 1);
   }
+  minutosJugados = ajustarMinutosPorLesion(minutosJugados, incidencias, nombreJugador, ingreso);
 
   return { minutos: minutosJugados, fueExpulsado, minutoExpulsion, finReal };
 }

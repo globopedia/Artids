@@ -580,7 +580,9 @@ function obtenerMinutoSalida(texto, futbolista) {
 
 function obtenerMinutoSalidaForzada(incidencias, nombre) {
   if (!incidencias) return null;
-  const regex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+(EXP|LES)\\s+${nombre}`, "i");
+  // Si volvió a la cancha (REI), la lesión no cuenta como salida definitiva.
+  const reingreso = new RegExp(`\\s+REI\\s+${nombre}`, "i").test(incidencias);
+  const regex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+(${reingreso ? "EXP" : "EXP|LES"})\\s+${nombre}`, "i");
   const match = incidencias.match(regex);
   if (!match) return null;
   const m = match[1];
@@ -1249,6 +1251,28 @@ function parseMinuto(valor, fallback = 0) {
   return isNaN(n) ? fallback : n;
 }
 
+// Lesión (LES) y reingreso (REI): el jugador que sale lesionado deja de sumar
+// minutos desde ese momento; si vuelve a la cancha (REI), los recupera desde
+// el reingreso. Solo se cargan las ausencias de 10 minutos o más.
+function ajustarMinutosPorLesion(minutos, incidencias, nombre, ingreso) {
+  if (!incidencias || !nombre || !(minutos > 0)) return minutos;
+  const esc = nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const leer = (cod) => {
+    const m = incidencias.match(new RegExp(`(\\d+)(?:\\+(\\d+))?\\s+${cod}\\s+${esc}\\s*\\(`, "i"));
+    return m ? Number(m[1]) + Number(m[2] || 0) : null;
+  };
+  const les = leer("LES");
+  if (les === null) return minutos;
+  const inicio = ingreso != null ? ingreso : 1;
+  const fin = inicio + minutos - 1;
+  if (les < inicio || les > fin) return minutos;
+  const rei = leer("REI");
+  // El minuto de la lesión cuenta como jugado (salió en ese minuto); el
+  // del reingreso también (volvió en ese minuto).
+  if (rei !== null && rei > les) return Math.max(0, minutos - Math.max(0, Math.min(rei, fin + 1) - les - 1));
+  return Math.max(0, les - inicio + 1);
+}
+
 function calcularMinutosJugador(p, nombre) {
   const texto = p.Huracán || "";
   let finReal = (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
@@ -1278,6 +1302,7 @@ function calcularMinutosJugador(p, nombre) {
       minutosJugados = Math.max(0, minutoExpulsion - ingreso + 1);
     }
   }
+  minutosJugados = ajustarMinutosPorLesion(minutosJugados, incidencias, nombre, ingreso);
 
   return minutosJugados;
 }
