@@ -316,6 +316,63 @@ Hasta: <input type="date" id="fechaHasta">
 <div id="ranking">Cargando datos...</div>
 
 <script>
+// === Fotos de futbolistas ===
+// El nombre del archivo se arma solo con la columna "Futbolista": primero el
+// apellido y después el nombre (y la inicial, si la hay), más " 01" (foto de
+// la ficha) o " 02" (foto de adentro). La carpeta es la primera letra del
+// apellido, sin tilde. Ej.: "Leandro J Díaz" -> Utbolists/UtbolistsD/Díaz Leandro J 01.jpg
+// La columna "Foto" del CSV es solo para excepciones:
+//  - "-" o vacía: se usa el nombre automático;
+//  - un nombre (ej. "Díaz Luis Alfredo"): se usa ese nombre en lugar del automático;
+//  - un link (https://...): se usa tal cual; "link1|link2" para la 01 y la 02.
+// Si la foto no existe (ni .jpg ni .png), se muestra la genérica de Huracán (CAH01/CAH02).
+const URL_FOTOS_FUTBOLISTAS = "https://globopedia.github.io/Artids/Utbolists/";
+function nombreArchivoFutbolista(nombre) {
+  const t = (nombre || "").trim().split(/\s+/).filter(Boolean);
+  if (t.length < 2) return t.join(" ");
+  let i = 1;
+  while (i < t.length - 1 && /^[A-ZÁÉÍÓÚÑ]\.?$/.test(t[i])) i++;
+  return [...t.slice(i), ...t.slice(0, i)].join(" ");
+}
+function urlFotoFutbolista(fila, n) {
+  const futbolista = (fila.Futbolista || "").trim();
+  const partes = (fila.Foto || "").split("|").map(s => s.trim());
+  const excepcion = partes[n - 1] !== undefined ? partes[n - 1] : partes[0];
+  if (/^https?:\/\//i.test(excepcion)) return excepcion;
+  const usarExcepcion = excepcion && !/^(-|foto\d?)$/i.test(excepcion) && !/^https?:/i.test(excepcion);
+  const nombre = (usarExcepcion ? excepcion : nombreArchivoFutbolista(futbolista)).normalize("NFC");
+  if (!nombre) return "";
+  const letra = nombre.normalize("NFD").replace(/[̀-ͯ]/g, "").charAt(0).toUpperCase();
+  return URL_FOTOS_FUTBOLISTAS + "Utbolists" + letra + "/" + encodeURIComponent(nombre + " 0" + n) + ".jpg";
+}
+// Completa Foto1/Foto2 de cada fila a partir del nombre (o de la excepción),
+// así el resto de la página las usa igual que antes.
+function prepararFotosFutbolistas(filas) {
+  (filas || []).forEach(f => {
+    if (!f || !("Foto" in f) || !(f.Futbolista || "").trim()) return;
+    f.Foto1 = urlFotoFutbolista(f, 1);
+    f.Foto2 = urlFotoFutbolista(f, 2);
+  });
+  return filas;
+}
+// Si una foto de futbolista no existe: probar .png y, si tampoco, la genérica.
+document.addEventListener("error", ev => {
+  const img = ev.target;
+  if (!img || img.tagName !== "IMG") return;
+  const src = img.currentSrc || img.src || "";
+  if (src.indexOf("/Artids/Utbolists/") === -1 || /\/CAH0[12]\./.test(src)) return;
+  const m = decodeURIComponent(src).match(/ 0([12])\.(jpg|png)$/i);
+  const n = m ? m[1] : "1";
+  ev.stopPropagation();
+  img.style.visibility = "";
+  if (/\.jpg$/i.test(src) && !img.dataset.probePng) {
+    img.dataset.probePng = "1";
+    img.src = src.replace(/\.jpg$/i, ".png");
+  } else {
+    img.src = URL_FOTOS_FUTBOLISTAS + "UtbolistsH/CAH0" + n + ".jpg";
+  }
+}, true);
+
 let rankingActual = [];
 let rankingBase = [];
 let ordenActual = { campo: "globopedia", asc: true };
@@ -1171,9 +1228,9 @@ Promise.all([
   fetch("https://artids.vercel.app/api/data?file=utbolistso").then(r => r.text())
 ]).then(([csvUtbolistasA, csvUtbolistasE, csvUtbolistasO]) => {
   datosUtbolistas = [
-    ...Papa.parse(csvUtbolistasA, { header: true, skipEmptyLines: true }).data,
-    ...Papa.parse(csvUtbolistasE, { header: true, skipEmptyLines: true }).data,
-    ...Papa.parse(csvUtbolistasO, { header: true, skipEmptyLines: true }).data
+    ...prepararFotosFutbolistas(Papa.parse(csvUtbolistasA, { header: true, skipEmptyLines: true }).data),
+    ...prepararFotosFutbolistas(Papa.parse(csvUtbolistasE, { header: true, skipEmptyLines: true }).data),
+    ...prepararFotosFutbolistas(Papa.parse(csvUtbolistasO, { header: true, skipEmptyLines: true }).data)
   ];
   datosUtbolistas.forEach(j => {
     indiceUtbolistas[norm(j["Futbolista"])] = j;
