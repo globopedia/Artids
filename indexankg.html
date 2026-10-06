@@ -580,8 +580,8 @@ function obtenerMinutoSalida(texto, futbolista) {
 
 function obtenerMinutoSalidaForzada(incidencias, nombre) {
   if (!incidencias) return null;
-  // Si volvió a la cancha (REI), la lesión no cuenta como salida definitiva.
-  const reingreso = new RegExp(`\\s+REI\\s+${nombre}`, "i").test(incidencias);
+  // Si volvió a la cancha (REG), la lesión no cuenta como salida definitiva.
+  const reingreso = new RegExp(`\\s+REG\\s+${nombre}`, "i").test(incidencias);
   const regex = new RegExp(`(\\d+(?:\\+\\d+)?)\\s+(${reingreso ? "EXP" : "EXP|LES"})\\s+${nombre}`, "i");
   const match = incidencias.match(regex);
   if (!match) return null;
@@ -1251,8 +1251,8 @@ function parseMinuto(valor, fallback = 0) {
   return isNaN(n) ? fallback : n;
 }
 
-// Lesión (LES) y reingreso (REI): el jugador que sale lesionado deja de sumar
-// minutos desde ese momento; si vuelve a la cancha (REI), los recupera desde
+// Lesión (LES) y regreso (REG): el jugador que sale lesionado deja de sumar
+// minutos desde ese momento; si vuelve a la cancha (REG), los recupera desde
 // el reingreso. Solo se cargan las ausencias de 10 minutos o más.
 function ajustarMinutosPorLesion(minutos, incidencias, nombre, ingreso) {
   if (!incidencias || !nombre || !(minutos > 0)) return minutos;
@@ -1266,7 +1266,7 @@ function ajustarMinutosPorLesion(minutos, incidencias, nombre, ingreso) {
   const inicio = ingreso != null ? ingreso : 1;
   const fin = inicio + minutos - 1;
   if (les < inicio || les > fin) return minutos;
-  const rei = leer("REI");
+  const rei = leer("REG");
   // El minuto de la lesión cuenta como jugado (salió en ese minuto); el
   // del reingreso también (volvió en ese minuto).
   if (rei !== null && rei > les) return Math.max(0, minutos - Math.max(0, Math.min(rei, fin + 1) - les - 1));

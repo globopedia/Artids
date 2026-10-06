@@ -2198,7 +2198,7 @@ function enlazarJugadores(texto) {
     // SOLO si ese nombre existe en la base de futbolistas de Huracán.
     function linkearNombresEnIncidencia(texto) {
       if (typeof futbolistas === "undefined") return texto;
-      return texto.replace(/\b(GOL|EXP|LES|REI|ATA|DES|POS)\b(\s+)([^(]+?)(\s*\()/g, (match, tag, espacio, nombre, apertura) => {
+      return texto.replace(/\b(GOL|EXP|LES|REG|ATA|DES|POS)\b(\s+)([^(]+?)(\s*\()/g, (match, tag, espacio, nombre, apertura) => {
         const nombreLimpio = nombre.trim();
         if (!nombreLimpio) return match;
         const existe = futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio));
@@ -2213,7 +2213,8 @@ function enlazarJugadores(texto) {
         .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:20px;height:20px;'>")
         .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:20px;height:20px;'>")
         .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:20px;height:20px;'>")
-        .replace(/\bREI\b/g, "<span title='reingreso' style='font-size:17px;'>↩️</span>")
+        .replace(/\bREG\b/g, "<span title='regreso' style='font-size:17px;'>↩️</span>")
+        .replace(/\bFIN\b/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fin.png' alt='final' style='width:20px;height:20px;'>")
         .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:20px;height:20px;'>")
         .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:20px;height:20px;'>")
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");

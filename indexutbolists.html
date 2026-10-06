@@ -802,8 +802,8 @@ function esClasico(rival, fecha) {
 // suelto adentro del render del checklist; ahora lo necesitamos también
 // para calcular los minutos de CUALQUIER otro jugador del mismo partido
 // (compañeros y rivales), para poder comparar puntajes.
-// Lesión (LES) y reingreso (REI): el jugador que sale lesionado deja de sumar
-// minutos desde ese momento; si vuelve a la cancha (REI), los recupera desde
+// Lesión (LES) y regreso (REG): el jugador que sale lesionado deja de sumar
+// minutos desde ese momento; si vuelve a la cancha (REG), los recupera desde
 // el reingreso. Solo se cargan las ausencias de 10 minutos o más.
 function ajustarMinutosPorLesion(minutos, incidencias, nombre, ingreso) {
   if (!incidencias || !nombre || !(minutos > 0)) return minutos;
@@ -817,7 +817,7 @@ function ajustarMinutosPorLesion(minutos, incidencias, nombre, ingreso) {
   const inicio = ingreso != null ? ingreso : 1;
   const fin = inicio + minutos - 1;
   if (les < inicio || les > fin) return minutos;
-  const rei = leer("REI");
+  const rei = leer("REG");
   // El minuto de la lesión cuenta como jugado (salió en ese minuto); el
   // del reingreso también (volvió en ese minuto).
   if (rei !== null && rei > les) return Math.max(0, minutos - Math.max(0, Math.min(rei, fin + 1) - les - 1));
@@ -2627,7 +2627,8 @@ function enlazarJugadores(texto) {
         .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:20px;height:20px;'>")
         .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:20px;height:20px;'>")
         .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:20px;height:20px;'>")
-        .replace(/\bREI\b/g, "<span title='reingreso' style='font-size:17px;'>↩️</span>")
+        .replace(/\bREG\b/g, "<span title='regreso' style='font-size:17px;'>↩️</span>")
+        .replace(/\bFIN\b/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fin.png' alt='final' style='width:20px;height:20px;'>")
         .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:20px;height:20px;'>")
         .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:20px;height:20px;'>")
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
