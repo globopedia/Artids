@@ -442,6 +442,10 @@ const arbitrosURL = "https://artids.vercel.app/api/data?file=rbits";
 
    // Normalizaciones y utilidades
 const norm = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+// Nombres anteriores de un club (columna "Anterior" de Ivals.csv, separados por "|"):
+// se aceptan como si fueran el nombre actual al filtrar partidos, pases y trayectorias.
+let ALIAS_CLUB = {};
+const normClub = (t) => { const k = norm(t); return ALIAS_CLUB[k] || k; };
 const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
 
 function plural(n, singular, plural) {
@@ -504,7 +508,7 @@ function obtenerTransferencias(nombreClub) {
       const periodo = periodos[Math.min(i, periodos.length - 1)];
 
       // desde el rival hacia Huracán
-      if (norm(t.procedencia) === norm(nombreClub)) {
+      if (normClub(t.procedencia) === normClub(nombreClub)) {
         lista.push({
           jugador: t.jugador,
           foto: t.foto,
@@ -515,7 +519,7 @@ function obtenerTransferencias(nombreClub) {
       }
 
       // desde Huracán hacia el rival
-      if (norm(t.destino) === norm(nombreClub)) {
+      if (normClub(t.destino) === normClub(nombreClub)) {
         lista.push({
           jugador: t.jugador,
           foto: t.foto,
@@ -593,8 +597,15 @@ let debounceTimer;
         titulos: c.Titulos ?? c.titulos ?? "",
         estadio: c.Estadio ?? c.estadio ?? "",
         curiosidades: c.Curiosidades ?? c.curiosidades ?? "",
-        escudo: c.Escudo ?? c.escudo ?? ""
+        escudo: c.Escudo ?? c.escudo ?? "",
+        anterior: (c.Anterior ?? c.anterior ?? "").toString().trim()
       }));
+      ALIAS_CLUB = {};
+      clubes.forEach(c => {
+        if (!c.club || !c.anterior || c.anterior === "-") return;
+        c.anterior.split(/[|;]/).map(a => a.trim()).filter(a => a && a !== "-")
+          .forEach(a => { ALIAS_CLUB[norm(a)] = norm(c.club); });
+      });
       
 // Utbolists.csv se dividió en tres (A, E, O) porque el archivo único se
 // había hecho muy largo; se combinan acá en un solo array, como si
@@ -1035,7 +1046,7 @@ function filaFormacionHTML(categorias, jugadores) {
 }
 
 function renderFormacionRival(nombreClubRival) {
-  const partidosClub = encuentros.filter(p => norm(p.Club) === norm(nombreClubRival));
+  const partidosClub = encuentros.filter(p => normClub(p.Club) === normClub(nombreClubRival));
   if (!partidosClub.length) return "";
 
   const formacionRival = obtenerFormacionEquipo(partidosClub, "Rival", futbolistas, nombreClubRival);
@@ -1112,7 +1123,7 @@ function obtenerPartidosEnHuracan() {
 // Devuelve { vendidos, conversos } con los jugadores que cumplen cada
 // condición respecto de nombreClubRival (sin recortar todavía a 11).
 function obtenerVendidosYConversos(nombreClubRival) {
-  const claveRival = norm(nombreClubRival);
+  const claveRival = normClub(nombreClubRival);
   const claveHuracan = norm("Huracán");
   const partidosEnHuracan = obtenerPartidosEnHuracan();
 
@@ -1124,7 +1135,7 @@ function obtenerVendidosYConversos(nombreClubRival) {
     const claveJugador = norm(f.futbolista);
     if (!claveJugador || vistos.has(claveJugador)) return;
 
-    const clubes = f.trayectoria.split(",").map(c => norm(c)).filter(Boolean);
+    const clubes = f.trayectoria.split(",").map(c => normClub(c)).filter(Boolean);
     const posHuracan = clubes.map((c, i) => c === claveHuracan ? i : -1).filter(i => i >= 0);
     const posRival = clubes.map((c, i) => c === claveRival ? i : -1).filter(i => i >= 0);
     // Tiene que haber pasado por los dos clubes; si solo jugó en Huracán, no entra.
@@ -1264,6 +1275,7 @@ function mostrarClub() {
 
 <canvas id="graficoResumen" width="120" height="120" style="margin:auto;"></canvas>
         </div>
+        ${campoClub("Nombres anteriores", (club.anterior || "").split(/[|;]/).map(x => x.trim()).filter(x => x && x !== "-").join(", "))}
         ${campoClub("Fundación", club.fundacion)}
         ${campoClub("Dirección", club.direccion)}
         ${campoClub("Web", club.web)}
@@ -1631,8 +1643,8 @@ function renderGoleadoresRival(goleadoresRival, nombreClubRival) {
   }).join("");
 }
     function renderEstadisticas(nombreClub) {
-      const clubNorm = norm(nombreClub);
-      const delClub = encuentros.filter(p => norm(p.Club) === clubNorm);
+      const clubNorm = normClub(nombreClub);
+      const delClub = encuentros.filter(p => normClub(p.Club) === clubNorm);
       const goleadores = obtenerGoleadores(delClub, nombreClub);
       let ganados = 0, empatados = 0, perdidos = 0;
 
@@ -1951,7 +1963,7 @@ function armarBloqueRachas(nombreClub, partidosSubset) {
 
 function renderRachasYCampanas(nombreClub) {
   const partidosOficiales = encuentros
-    .filter(p => norm(p.Club) === norm(nombreClub) && !norm(p.Torneo).includes("amistoso") && !esLigaNoAfiliada(p.Torneo))
+    .filter(p => normClub(p.Club) === normClub(nombreClub) && !norm(p.Torneo).includes("amistoso") && !esLigaNoAfiliada(p.Torneo))
     .filter(p => parseFecha(p.Fecha))
     .sort((p1, p2) => parseFecha(p1.Fecha) - parseFecha(p2.Fecha));
 
@@ -2057,7 +2069,7 @@ const htmlGoleadores = `
       if (e.target.checked) {
         const { comp, cond, sit, club } = e.target.dataset;
         const partidos = encuentros.filter(p =>
-          norm(p.Club) === norm(club) &&
+          normClub(p.Club) === normClub(club) &&
           bucketCompetencia(p.Torneo) === comp &&
           cap(norm(p.Condición)) === cond &&
           cap(norm(p.Situación)) === sit
