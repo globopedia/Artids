@@ -720,7 +720,7 @@ function activarBuscadorClubes() {
     if (!texto) return;
 
     const filtrados = clubes
-      .filter(c => c.club && c.club.toLowerCase().includes(texto))
+      .filter(c => c.club && (c.club.toLowerCase().includes(texto) || (c.anterior && c.anterior !== "-" && c.anterior.toLowerCase().includes(texto))))
       .slice(0, 15);
 
     filtrados.forEach(c => {
@@ -2655,7 +2655,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   if (nombreClub) {
     setTimeout(() => {
-      const encontrado = clubes.find(c => norm(c.club) === norm(nombreClub));
+      const encontrado = clubes.find(c => norm(c.club) === norm(nombreClub)) || clubes.find(c => normClub(c.club) === normClub(nombreClub));
       if (encontrado) seleccionarClub(encontrado.id);
     }, 500);
   }

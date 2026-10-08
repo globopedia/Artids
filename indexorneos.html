@@ -413,6 +413,8 @@ function htmlFotoPartido(valor, alt = "") {
     let futbolistasPorNombre = new Map();
     let filasPorJugadorMap = new Map();
     let clubesConFicha = new Set();
+    let clubFichaDe = {}; // nombre (actual o anterior) normalizado -> nombre actual del club
+    const urlFichaClub = (nombre) => "https://globopedia.github.io/Artids/indexivals.html?club=" + encodeURIComponent(clubFichaDe[norm(nombre)] || nombre);
     let arbitros = [];
     let currentFocus = -1;
 
@@ -573,10 +575,18 @@ function htmlFotoPartido(valor, alt = "") {
         // Cargar Clubes (solo para saber cuáles tienen ficha propia en
         // indexivals.html, y así poder linkearlos con seguridad)
         clubesConFicha = new Set();
+        clubFichaDe = {};
         if (csvClubes) {
           Papa.parse(csvClubes, { header:true, skipEmptyLines:true }).data.forEach(c => {
             const nombreClub = (c.Club ?? c.club ?? "").toString().trim();
-            if (nombreClub) clubesConFicha.add(norm(nombreClub));
+            if (!nombreClub) return;
+            clubesConFicha.add(norm(nombreClub));
+            clubFichaDe[norm(nombreClub)] = nombreClub;
+            // Nombres anteriores (columna "Anterior", separados por "|"):
+            // linkean a la ficha del club con su nombre actual.
+            (c.Anterior ?? c.anterior ?? "").toString().split(/[|;]/).map(x => x.trim())
+              .filter(x => x && x !== "-")
+              .forEach(x => { clubesConFicha.add(norm(x)); clubFichaDe[norm(x)] = nombreClub; });
           });
         }
 
@@ -831,7 +841,7 @@ function htmlFotoPartido(valor, alt = "") {
                   clubesConFicha.has(procedenciaNorm);
                 const procedenciaTexto = escapeHTML(datos.procedencia || "S/D");
                 const procedenciaHTML = tieneFichaClub
-                  ? `<a href="https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(datos.procedencia)}" target="_blank" rel="noopener" class="debutante-link" style="color:#666; text-decoration:none;">${procedenciaTexto}</a>`
+                  ? `<a href="${urlFichaClub(datos.procedencia)}" target="_blank" rel="noopener" class="debutante-link" style="color:#666; text-decoration:none;">${procedenciaTexto}</a>`
                   : `<span style="color:#666;">${procedenciaTexto}</span>`;
 
                 return `
@@ -1656,7 +1666,7 @@ function renderTablaPosiciones(texto, titulo = "") {
         const escudo = `<img src="${getEscudo(equipo)}" alt="" onerror="this.style.visibility='hidden'">`;
         const tieneFicha = !esHuracan && clubesConFicha.has(norm(equipo));
         const nombre = tieneFicha
-          ? `<a href="https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(equipo)}" target="_blank" rel="noopener">${escapeHTML(equipo)}</a>`
+          ? `<a href="${urlFichaClub(equipo)}" target="_blank" rel="noopener">${escapeHTML(equipo)}</a>`
           : escapeHTML(equipo);
         return `<td class="col-equipo">${escudo}${nombre}</td>`;
       }
