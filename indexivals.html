@@ -368,6 +368,20 @@ function prepararFotosFutbolistas(filas) {
   });
   return filas;
 }
+// Escudo de un nombre anterior (ej. "Sportivo del Norte"): si todavía no hay
+// un png con ese nombre, se muestra el escudo del club con su nombre actual.
+document.addEventListener("error", ev => {
+  const img = ev.target;
+  if (!img || img.tagName !== "IMG" || img.dataset.escudoActual) return;
+  const src = img.currentSrc || img.src || "";
+  if (src.indexOf("/Artids/escudos/") === -1) return;
+  const nombre = decodeURIComponent(src.split("/escudos/").pop()).replace(/\.png$/i, "");
+  const clave = norm(nombre);
+  const actual = (typeof clubes !== "undefined" ? clubes : []).find(c => ALIAS_CLUB[clave] && norm(c.club) === ALIAS_CLUB[clave]);
+  if (!actual) return;
+  img.dataset.escudoActual = "1";
+  img.src = getEscudo(actual.club);
+}, true);
 // Si una foto de futbolista no existe: probar .png y, si tampoco, la genérica.
 document.addEventListener("error", ev => {
   const img = ev.target;
