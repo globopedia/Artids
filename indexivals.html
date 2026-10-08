@@ -2326,7 +2326,7 @@ function filtrarClubes(termino) {
   if (!texto) return;
 
  const resultados = clubes
-  .filter(c => norm(c.club).includes(texto))
+  .filter(c => norm(c.club).includes(texto) || (c.anterior && c.anterior !== "-" && norm(c.anterior).includes(texto)))
   .slice(0, 15);
 
   resultados.forEach(r => {

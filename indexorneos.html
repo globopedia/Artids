@@ -414,7 +414,8 @@ function htmlFotoPartido(valor, alt = "") {
     let filasPorJugadorMap = new Map();
     let clubesConFicha = new Set();
     let clubFichaDe = {}; // nombre (actual o anterior) normalizado -> nombre actual del club
-    const urlFichaClub = (nombre) => "https://globopedia.github.io/Artids/indexivals.html?club=" + encodeURIComponent(clubFichaDe[norm(nombre)] || nombre);
+    const normFicha = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+    const urlFichaClub = (nombre) => "https://globopedia.github.io/Artids/indexivals.html?club=" + encodeURIComponent(clubFichaDe[normFicha(nombre)] || nombre);
     let arbitros = [];
     let currentFocus = -1;
 
@@ -581,12 +582,12 @@ function htmlFotoPartido(valor, alt = "") {
             const nombreClub = (c.Club ?? c.club ?? "").toString().trim();
             if (!nombreClub) return;
             clubesConFicha.add(norm(nombreClub));
-            clubFichaDe[norm(nombreClub)] = nombreClub;
+            clubFichaDe[normFicha(nombreClub)] = nombreClub;
             // Nombres anteriores (columna "Anterior", separados por "|"):
             // linkean a la ficha del club con su nombre actual.
             (c.Anterior ?? c.anterior ?? "").toString().split(/[|;]/).map(x => x.trim())
               .filter(x => x && x !== "-")
-              .forEach(x => { clubesConFicha.add(norm(x)); clubFichaDe[norm(x)] = nombreClub; });
+              .forEach(x => { clubesConFicha.add(norm(x)); clubFichaDe[normFicha(x)] = nombreClub; });
           });
         }
 
