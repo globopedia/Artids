@@ -1849,6 +1849,9 @@ function mostrarTorneo() {
 
   // --- PROCESAR PLANTEL DEL TORNEO ---
   const mapaJugadores = {};
+  // Puntaje del EQUIPO en cada partido (suma y cantidad de jugadores de
+  // Huracán puntuados), para las estrellas de los directores técnicos.
+  const puntajeEquipoPorPartido = new Map();
   const primeraFechaTorneo = partidosTorneo.length > 0 ? partidosTorneo[0].Fecha : "";
 
   partidosTorneo.forEach(p => {
@@ -1900,6 +1903,9 @@ function mostrarTorneo() {
 
         mapaJugadores[idJugador].minutos += min;
         mapaJugadores[idJugador].globopediaScore += puntajeNormalizadoPartido;
+        if (!puntajeEquipoPorPartido.has(p)) puntajeEquipoPorPartido.set(p, { suma: 0, cant: 0 });
+        puntajeEquipoPorPartido.get(p).suma += puntajeNormalizadoPartido;
+        puntajeEquipoPorPartido.get(p).cant += 1;
 
         // Goles y expulsiones de ESTE jugador en ESTE partido, buscados en Incidencias
         const nombreEscapado = nom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -2257,7 +2263,7 @@ function mostrarTorneo() {
     const mapaDT = {};
     partidosTorneo.forEach(p => {
       tecnicosDelPartido(p).forEach(({ clave: k, id, ficha }) => {
-        if (!mapaDT[k]) mapaDT[k] = { orden: Object.keys(mapaDT).length, id, ficha, pj: 0, pg: 0, pe: 0, pp: 0, minutos: 0, gf: 0, gc: 0, puntos: 0, puntosPosibles: 0, primeraFecha: p.Fecha };
+        if (!mapaDT[k]) mapaDT[k] = { orden: Object.keys(mapaDT).length, id, ficha, pj: 0, pg: 0, pe: 0, pp: 0, minutos: 0, gf: 0, gc: 0, puntos: 0, puntosPosibles: 0, sumaEquipo: 0, partidosConPuntaje: 0, primeraFecha: p.Fecha };
         const d = mapaDT[k];
         const sit = norm(p.Situación);
         const fecha = parseFecha(p.Fecha);
@@ -2271,6 +2277,8 @@ function mostrarTorneo() {
         d.gf += parseInt(p.Resultado1) || 0;
         d.gc += parseInt(p.Resultado2) || 0;
         d.minutos += (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
+        const eq = puntajeEquipoPorPartido.get(p);
+        if (eq && eq.cant > 0) { d.sumaEquipo += eq.suma / eq.cant; d.partidosConPuntaje += 1; }
       });
     });
 
@@ -2288,9 +2296,14 @@ function mostrarTorneo() {
       const nac = nacEcnics || (comoJugador ? comoJugador.fechNac : "");
       const edad = calcularEdad(nac, d.primeraFecha);
       const banderaHTML = comoJugador ? renderBanderaPrincipal(comoJugador.pais) : "";
-      // Estrellas: efectividad (puntos obtenidos sobre los posibles).
-      const efectividad = d.puntosPosibles > 0 ? d.puntos / d.puntosPosibles : 0;
-      const segmento = Math.min(10, Math.max(1, Math.round(1 + efectividad * 9)));
+      // Estrellas: promedio del puntaje del equipo (4 a 10) en cada partido
+      // que dirigió, con la misma escala que las de los jugadores. Para que
+      // un interino de uno o dos partidos no quede en los extremos, a ese
+      // promedio se le suman PARTIDOS_ANCLA partidos "neutros" (7 puntos):
+      // con muchos partidos casi no pesan; con pocos, lo acercan al medio.
+      const PARTIDOS_ANCLA = 3, PUNTAJE_NEUTRO = 7;
+      const promedioDT = (d.sumaEquipo + PARTIDOS_ANCLA * PUNTAJE_NEUTRO) / (d.partidosConPuntaje + PARTIDOS_ANCLA);
+      const segmento = calcularSegmentoEstrella(promedioDT);
       const urlDT = ficha
         ? `https://globopedia.github.io/Artids/indexecnics.html?tecnico=${encodeURIComponent(ficha.id)}`
         : "https://globopedia.github.io/Artids/indexecnics.html";
