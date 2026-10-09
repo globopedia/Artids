@@ -417,6 +417,7 @@ function htmlFotoPartido(valor, alt = "") {
     const normFicha = (t) => (t || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
     const urlFichaClub = (nombre) => "https://globopedia.github.io/Artids/indexivals.html?club=" + encodeURIComponent(clubFichaDe[normFicha(nombre)] || nombre);
     let arbitros = [];
+    let tecnicosPorId = new Map(); // ID (columna Técnico de Artids) -> datos de Ecnics.csv
     let currentFocus = -1;
 
     // Función auxiliar única para limpiar acentos y mayúsculas
@@ -539,6 +540,7 @@ function htmlFotoPartido(valor, alt = "") {
       const futbolistasURL3 = "https://artids.vercel.app/api/data?file=utbolistso";
       const clubesURL = "https://artids.vercel.app/api/data?file=lubs";
       const arbitrosURL = "https://artids.vercel.app/api/data?file=rbits";
+      const tecnicosURL = "https://globopedia.github.io/Ecnics/Ecnics.csv?v=" + Date.now();
       const partidosURLs = [
         "https://artids.vercel.app/api/data?file=artids1910",
         "https://artids.vercel.app/api/data?file=artids1925",
@@ -557,9 +559,10 @@ function htmlFotoPartido(valor, alt = "") {
         fetch(futbolistasURL3).then(r => r.text()).catch(() => ""),
         fetch(clubesURL).then(r => r.text()).catch(() => ""),
         fetch(arbitrosURL).then(r => r.text()).catch(() => ""),
+        fetch(tecnicosURL).then(r => r.ok ? r.text() : "").catch(() => ""),
         ...partidosURLs.map(url => fetch(url).then(r => r.text()))
       ])
-      .then(([csvTorneos, csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, csvClubes, csvArbitros, ...csvsPartidos]) => {
+      .then(([csvTorneos, csvFutbolistasA, csvFutbolistasE, csvFutbolistasO, csvClubes, csvArbitros, csvTecnicos, ...csvsPartidos]) => {
         
         // Cargar Torneos
         torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
@@ -598,6 +601,22 @@ function htmlFotoPartido(valor, alt = "") {
             id: (c.ID ?? "").toString().trim(),
             nombre: (c["Árbitro"] ?? "").toString().trim()
           })).filter(a => a.nombre);
+        }
+
+        // Cargar Técnicos (Ecnics.csv): el ID es lo que figura en la columna
+        // "Técnico" de cada partido de Artids.
+        tecnicosPorId = new Map();
+        if (csvTecnicos) {
+          Papa.parse(csvTecnicos, { header:true, skipEmptyLines:true }).data.forEach(c => {
+            const id = (c.ID ?? "").toString().trim();
+            if (!id) return;
+            tecnicosPorId.set(norm(id), {
+              id,
+              tecnico: (c["Técnico"] ?? "").toString().trim(),
+              nacimiento: (c.Nacimiento ?? "").toString().trim(),
+              foto: (c.Foto ?? "").toString().trim()
+            });
+          });
         }
 
         // Cargar Futbolistas — Utbolists.csv se dividió en tres (A, E, O)
@@ -2104,64 +2123,27 @@ function mostrarTorneo() {
   let htmlPlantel = `<h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">👥 Plantel en este Torneo</h3>`;
   htmlPlantel += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:10px; margin-bottom:15px;">`;
 
-  plantelOrdenado.forEach(j => {
-      const f = j.datos;
-      
-        // Foto desde columna Foto1 del CSV
-        const fotoUrl = (f.Foto1 && f.Foto1.trim() !== "" && f.Foto1.trim() !== "-") 
-          ? f.Foto1.trim() 
-          : "https://globopedia.github.io/Artids/logo_globopedia.png";
+  // Carta (jugador o director técnico): mismo diseño para ambos.
+  const nombreTorneoCorto = escapeHTML(
+    (torneo.nombre || "")
+      .replace(/campeonato\s*/gi, "")
+      .replace(/-?\s*LPF/gi, "")
+      .replace(/metropolitano/gi, "METRO")
+      .replace(/copa\s+libertadores/gi, "Libertadores")
+      .trim()
+  ).toUpperCase();
+  // El nombre del torneo se ajusta verticalmente para que SIEMPRE entre
+  // en el espacio disponible: si es corto se ESTIRA y si es largo se ACHICA.
+  const alturaDisponibleCinta = 81;
+  const anchoTextoEstimado = nombreTorneoCorto.length * 13.5;
+  let escalaCinta = anchoTextoEstimado > 0 ? alturaDisponibleCinta / anchoTextoEstimado : 1;
+  if (!isFinite(escalaCinta)) escalaCinta = 1;
+  if (escalaCinta < 0.62) escalaCinta = 0.62;
+  if (escalaCinta > 1.3) escalaCinta = 1.3;
 
-        const edad = calcularEdad(f.fechNac, primeraFechaTorneo);
-        const segmento = calcularSegmentoEstrella(j.pj > 0 ? j.globopediaScore / j.pj : 4);
-        const banderaHTML = renderBanderaPrincipal(f.pais);
-        const nombreTorneoCorto = escapeHTML(
-          (torneo.nombre || "")
-            .replace(/campeonato\s*/gi, "")
-            .replace(/-?\s*LPF/gi, "")
-            .replace(/metropolitano/gi, "METRO")
-            .replace(/copa\s+libertadores/gi, "Libertadores")
-            .trim()
-        ).toUpperCase();
-        const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(f.futbolista)}`;
-        const esArquero = norm(f.posicion || "").includes("arquero");
-
-        // El nombre del torneo se ajusta verticalmente para que SIEMPRE entre
-        // en el espacio disponible: si es corto (por ej. solo el año) se
-        // ESTIRA para no quedar apretadito, y si es largo se ACHICA para que
-        // no se pase del límite (antes solo estirábamos, nunca achicábamos,
-        // y por eso los nombres largos no llegaban a entrar).
-        const alturaDisponibleCinta = 81; // px aprox. de alto útil de la cinta, ya con más aire arriba/abajo
-        const anchoTextoEstimado = nombreTorneoCorto.length * 13.5; // ~13.5px por letra a font-size 13
-        let escalaCinta = anchoTextoEstimado > 0 ? alturaDisponibleCinta / anchoTextoEstimado : 1;
-        if (!isFinite(escalaCinta)) escalaCinta = 1;
-        if (escalaCinta < 0.62) escalaCinta = 0.62; // tope para que no quede ilegible de chiquito
-        if (escalaCinta > 1.3) escalaCinta = 1.3;
-
-        // Filas de estadísticas: para arqueros, "Vallas invictas" y "Penales
-        // atajados" en vez de "Goles" y "Asistencias" (que no tienen sentido
-        // para ellos). "Asistencias" además solo se muestra si hay al menos
-        // una cargada en TODO el torneo (para no publicar "0" en cadena).
-        const filasStats = esArquero
-          ? [
-              ["Partidos jugados", j.pj],
-              ["Partidos ganados", j.pg],
-              ["Minutos jugados", j.minutos],
-              ["Vallas invictas", j.vallasInvictas],
-              ["Penales atajados", j.penalesAtajados],
-              ["Expulsiones", j.expulsiones]
-            ]
-          : [
-              ["Partidos jugados", j.pj],
-              ["Partidos ganados", j.pg],
-              ["Minutos jugados", j.minutos],
-              ["Goles", j.goles],
-              ...(hayAsistenciasEnTorneo ? [["Asistencias", j.asistencias]] : []),
-              ["Expulsiones", j.expulsiones]
-            ];
-
-        htmlPlantel += `
-          <a href="${urlJugador}" target="_blank" rel="noopener"
+  function tarjetaCarta({ url, fotoUrl, nombre, posicion, edad, banderaHTML, segmento, filas }) {
+    return `
+          <a href="${url}" target="_blank" rel="noopener"
              style="display:block; border:2px solid #222; border-radius:12px; overflow:hidden; text-align:center; background:#fafafa; font-family:'Chakra Petch', sans-serif; position:relative; text-decoration:none; color:inherit; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);">
             <div style="position:relative;">
               <img src="${fotoUrl}" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';" style="width:100%; height:215px; object-fit:cover; object-position:center 15%; display:block;">
@@ -2189,10 +2171,10 @@ function mostrarTorneo() {
                    franja vidriada, no desde el margen izquierdo, para que la
                    banda nunca lo tape ni le reste contraste. -->
               <div style="position:absolute; left:24px; right:0; bottom:0; background:linear-gradient(transparent, rgba(139,0,0,.88) 45%); color:#fff; padding:22px 8px 6px; text-align:center;">
-                <div style="font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase;">${f.futbolista}</div>
+                <div style="font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase;">${nombre}</div>
                 <div style="font-size:11px; display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
                   ${banderaHTML}
-                  <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${f.posicion || "S/D"}</span>
+                  <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${posicion}</span>
                   <span>·</span>
                   <span style="white-space:nowrap;">${edad}${edad === "S/D" ? " años" : ""}</span>
                 </div>
@@ -2201,7 +2183,7 @@ function mostrarTorneo() {
             <div style="padding:3px 8px 8px;">
               ${renderEstrellas(segmento)}
               <div style="margin-top:3px; font-size:11px; background:#fff; border-radius:6px; border:1px solid #eee; overflow:hidden;">
-                ${filasStats.map(([etiqueta, valor], idx) => `
+                ${filas.map(([etiqueta, valor], idx) => `
                   <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 8px; ${idx % 2 === 0 ? "background:#f7f7f7;" : ""}">
                     <span style="text-align:left; color:#555;">${etiqueta}:</span>
                     <span style="text-align:right; font-weight:bold; color:#8B0000;">${valor}</span>
@@ -2211,9 +2193,111 @@ function mostrarTorneo() {
             </div>
           </a>
         `;
+  }
+
+  plantelOrdenado.forEach(j => {
+      const f = j.datos;
+      const fotoUrl = (f.Foto1 && f.Foto1.trim() !== "" && f.Foto1.trim() !== "-")
+        ? f.Foto1.trim()
+        : "https://globopedia.github.io/Artids/logo_globopedia.png";
+      const edad = calcularEdad(f.fechNac, primeraFechaTorneo);
+      const segmento = calcularSegmentoEstrella(j.pj > 0 ? j.globopediaScore / j.pj : 4);
+      const banderaHTML = renderBanderaPrincipal(f.pais);
+      const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(f.futbolista)}`;
+      const esArquero = norm(f.posicion || "").includes("arquero");
+
+      // Filas de estadísticas: para arqueros, "Vallas invictas" y "Penales
+      // atajados" en vez de "Goles" y "Asistencias". "Asistencias" además
+      // solo se muestra si hay al menos una cargada en TODO el torneo.
+      const filasStats = esArquero
+        ? [
+            ["Partidos jugados", j.pj],
+            ["Partidos ganados", j.pg],
+            ["Minutos jugados", j.minutos],
+            ["Vallas invictas", j.vallasInvictas],
+            ["Penales atajados", j.penalesAtajados],
+            ["Expulsiones", j.expulsiones]
+          ]
+        : [
+            ["Partidos jugados", j.pj],
+            ["Partidos ganados", j.pg],
+            ["Minutos jugados", j.minutos],
+            ["Goles", j.goles],
+            ...(hayAsistenciasEnTorneo ? [["Asistencias", j.asistencias]] : []),
+            ["Expulsiones", j.expulsiones]
+          ];
+
+      htmlPlantel += tarjetaCarta({ url: urlJugador, fotoUrl, nombre: f.futbolista, posicion: f.posicion || "S/D", edad, banderaHTML, segmento, filas: filasStats });
   });
 
+  htmlPlantel += htmlCuerpoTecnico();
   htmlPlantel += `</div>`;
+
+  // === Directores técnicos del torneo, con el mismo formato de carta ===
+  // Un mismo partido puede tener dos técnicos ("Morresi-Carrizo"): si el
+  // texto completo no es un ID de Ecnics pero sus partes sí, se le suma
+  // el partido a cada uno. "-" o vacío = sin dato.
+  function tecnicosDelPartido(p) {
+    const t = (p.Técnico || "").trim();
+    if (!t || t === "-") return [];
+    if (tecnicosPorId.has(norm(t))) return [t];
+    const partes = t.split(/\s*-\s*/).map(x => x.trim()).filter(Boolean);
+    if (partes.length > 1 && partes.every(x => tecnicosPorId.has(norm(x)))) return partes;
+    return [t];
+  }
+
+  function htmlCuerpoTecnico() {
+    const mapaDT = {};
+    partidosTorneo.forEach(p => {
+      tecnicosDelPartido(p).forEach(id => {
+        const k = norm(id);
+        if (!mapaDT[k]) mapaDT[k] = { id, pj: 0, pg: 0, pe: 0, pp: 0, minutos: 0, gf: 0, gc: 0, puntos: 0, puntosPosibles: 0, primeraFecha: p.Fecha };
+        const d = mapaDT[k];
+        const sit = norm(p.Situación);
+        const fecha = parseFecha(p.Fecha);
+        // 3 puntos por victoria desde el Apertura 1995; antes, 2.
+        const valorVictoria = (fecha && fecha >= new Date(1995, 7, 1)) ? 3 : 2;
+        d.pj += 1;
+        if (sit === "victoria") { d.pg += 1; d.puntos += valorVictoria; }
+        else if (sit === "empate") { d.pe += 1; d.puntos += 1; }
+        else if (sit === "derrota") d.pp += 1;
+        d.puntosPosibles += valorVictoria;
+        d.gf += parseInt(p.Resultado1) || 0;
+        d.gc += parseInt(p.Resultado2) || 0;
+        d.minutos += (p.Fin2E && p.Fin2E !== "0") ? parseMinuto(p.Fin2E, 120) : parseMinuto(p.Fin2T, 90);
+      });
+    });
+
+    return Object.values(mapaDT).sort((a, b) => b.pj - a.pj).map(d => {
+      const ficha = tecnicosPorId.get(norm(d.id)) || null;
+      const nombre = (ficha && ficha.tecnico) || d.id;
+      // Si también fue jugador de Huracán, de ahí sacamos lo que falte
+      // (foto, fecha de nacimiento, nacionalidad).
+      const comoJugador = futbolistasPorNombre.get(norm(nombre)) || null;
+      const fotoEcnics = ficha && /^https?:/i.test(ficha.foto) ? ficha.foto : "";
+      const fotoJugador = comoJugador && comoJugador.Foto1 && comoJugador.Foto1 !== "-" ? comoJugador.Foto1 : "";
+      const fotoUrl = fotoEcnics || fotoJugador || (URL_FOTOS_FUTBOLISTAS + "UtbolistsH/CAH01.jpg");
+      const nacEcnics = ficha && /\d{1,2}\/\d{1,2}\/\d{4}/.test(ficha.nacimiento) ? ficha.nacimiento : "";
+      const nac = nacEcnics || (comoJugador ? comoJugador.fechNac : "");
+      const edad = calcularEdad(nac, d.primeraFecha);
+      const banderaHTML = comoJugador ? renderBanderaPrincipal(comoJugador.pais) : "";
+      // Estrellas: efectividad (puntos obtenidos sobre los posibles).
+      const efectividad = d.puntosPosibles > 0 ? d.puntos / d.puntosPosibles : 0;
+      const segmento = Math.min(10, Math.max(1, Math.round(1 + efectividad * 9)));
+      const urlDT = ficha
+        ? `https://globopedia.github.io/Artids/indexecnics.html?tecnico=${encodeURIComponent(ficha.id)}`
+        : "https://globopedia.github.io/Artids/indexecnics.html";
+      const filas = [
+        ["Partidos dirigidos", d.pj],
+        ["Partidos ganados", d.pg],
+        ["Minutos dirigidos", d.minutos],
+        ["Goles a favor", d.gf],
+        ["Goles recibidos", d.gc],
+        ["Puntos conseguidos", d.puntos]
+      ];
+      return tarjetaCarta({ url: urlDT, fotoUrl, nombre, posicion: "Director Técnico", edad, banderaHTML, segmento, filas });
+    }).join("");
+  }
 
   // --- TARJETAS DE PARTIDOS ---
   const imgTorneoUrl = torneo.foto ? torneo.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";

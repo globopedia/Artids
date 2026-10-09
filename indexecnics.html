@@ -745,6 +745,18 @@ function htmlFotoPartido(valor, alt = "") {
         }
       });
       sel.addEventListener("change", mostrarTecnico);
+
+      // Link directo desde otras páginas: indexecnics.html?tecnico=ID
+      const idURL = new URLSearchParams(window.location.search).get("tecnico");
+      if (idURL) {
+        const t = tecnicos.find(a => norm(a.id) === norm(idURL));
+        if (t) {
+          sel.value = t.id;
+          const input = document.getElementById("tecnicoSearch");
+          if (input) input.value = InvertirNombre(t.tecnico);
+          mostrarTecnico();
+        }
+      }
     }
 
 // ============================================================
