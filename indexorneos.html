@@ -2257,7 +2257,7 @@ function mostrarTorneo() {
     const mapaDT = {};
     partidosTorneo.forEach(p => {
       tecnicosDelPartido(p).forEach(({ clave: k, id, ficha }) => {
-        if (!mapaDT[k]) mapaDT[k] = { id, ficha, pj: 0, pg: 0, pe: 0, pp: 0, minutos: 0, gf: 0, gc: 0, puntos: 0, puntosPosibles: 0, primeraFecha: p.Fecha };
+        if (!mapaDT[k]) mapaDT[k] = { orden: Object.keys(mapaDT).length, id, ficha, pj: 0, pg: 0, pe: 0, pp: 0, minutos: 0, gf: 0, gc: 0, puntos: 0, puntosPosibles: 0, primeraFecha: p.Fecha };
         const d = mapaDT[k];
         const sit = norm(p.Situación);
         const fecha = parseFecha(p.Fecha);
@@ -2274,7 +2274,8 @@ function mostrarTorneo() {
       });
     });
 
-    return Object.values(mapaDT).sort((a, b) => b.pj - a.pj).map(d => {
+    // Orden de aparición en el torneo (el primero que dirigió va primero).
+    return Object.values(mapaDT).sort((a, b) => a.orden - b.orden).map(d => {
       const ficha = d.ficha;
       const nombre = (ficha && ficha.tecnico) || d.id;
       // Si también fue jugador de Huracán, de ahí sacamos lo que falte
