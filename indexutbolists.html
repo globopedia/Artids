@@ -16,6 +16,7 @@
     .club-header { display:flex; align-items:center; gap:15px; border-bottom:2px solid #FF0000; padding-bottom:10px; margin-bottom:10px; }
     h2 { margin:0; color:#FF0000; font-size:22px; }
     /* Encabezado de la ficha: apodo como volanta y apellido grande */
+    .ficha-titulo { display:inline-block; text-align:left; }
     .ficha-volanta { font-family:'Chakra Petch', sans-serif; font-style:italic; font-weight:700; font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#111; text-shadow:1px 1px 0 rgba(0,0,0,.18); line-height:1; margin:0 0 2px; }
     .ficha-apellido { font-family:'Anton', 'Chakra Petch', sans-serif; font-weight:400; font-size:44px; line-height:1.05; letter-spacing:1px; color:#FF0000; text-shadow:2px 2px 0 rgba(0,0,0,.22); margin:0 0 4px; }
     .stats { margin-top:20px; }
@@ -2038,8 +2039,10 @@ function mostrarFutbolistas() {
               onerror="this.style.display='none'">` 
         : ""}
       <div style="text-align:center;">
-        ${volantaApodo(futbolista.apodo)}
-        <h2 class="ficha-apellido" title="${futbolista.futbolista}">${apellidoVisible(futbolista)}</h2>
+        <div class="ficha-titulo">
+          ${volantaApodo(futbolista.apodo)}
+          <h2 class="ficha-apellido" title="${futbolista.futbolista}">${apellidoVisible(futbolista)}</h2>
+        </div>
         <div style="font-size:14px; color:black; font-family:Helvetica, sans-serif;">
           ${datosHuracan.resumen}
         </div>
