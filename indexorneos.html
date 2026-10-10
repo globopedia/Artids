@@ -1993,6 +1993,29 @@ function mostrarTorneo() {
     return segmento;
   }
 
+  // Ajustes de estrellas (en "segmentos": 1 segmento = media estrella).
+  // Actividad: % de los partidos del torneo en los que participó.
+  function ajusteActividad(pj, partidosDelTorneo) {
+    if (!(partidosDelTorneo > 0) || !(pj > 0)) return 0;
+    const pct = pj / partidosDelTorneo * 100;
+    if (pct <= 25) return -2;   // 1%-25%: -1 estrella
+    if (pct <= 50) return -1;   // 26%-50%: -media estrella
+    if (pct <= 75) return 1;    // 51%-75%: +media estrella
+    return 2;                   // más de 75%: +1 estrella
+  }
+  // Edad (al comienzo del torneo), solo jugadores.
+  function ajusteEdad(edadTexto) {
+    const m = /^(\d+)/.exec(edadTexto || "");
+    if (!m) return 0;
+    const e = parseInt(m[1], 10);
+    if (e >= 16 && e <= 21) return -1;  // -media estrella
+    if (e >= 22 && e <= 27) return 2;   // +1 estrella
+    if (e >= 28 && e <= 33) return 1;   // +media estrella
+    if (e >= 34 && e <= 40) return -2;  // -1 estrella
+    return 0;
+  }
+  function limitarSegmento(x) { return Math.max(1, Math.min(10, x)); }
+
   // Para "El equipo": el promedio ya viene en la escala 4.00 a 10.00, así
   // que solo lo dejamos a buen resguardo (por si algún promedio se pasara
   // por redondeos).
@@ -2212,7 +2235,7 @@ function mostrarTorneo() {
         ? f.Foto1.trim()
         : "https://globopedia.github.io/Artids/logo_globopedia.png";
       const edad = calcularEdad(f.fechNac, primeraFechaTorneo);
-      const segmento = calcularSegmentoEstrella(j.pj > 0 ? j.globopediaScore / j.pj : 4);
+      const segmento = limitarSegmento(calcularSegmentoEstrella(j.pj > 0 ? j.globopediaScore / j.pj : 4) + ajusteActividad(j.pj, partidosTorneo.length) + ajusteEdad(edad));
       const banderaHTML = renderBanderaPrincipal(f.pais);
       const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(f.futbolista)}`;
       const esArquero = norm(f.posicion || "").includes("arquero");
@@ -2297,13 +2320,9 @@ function mostrarTorneo() {
       const edad = calcularEdad(nac, d.primeraFecha);
       const banderaHTML = comoJugador ? renderBanderaPrincipal(comoJugador.pais) : "";
       // Estrellas: promedio del puntaje del equipo (4 a 10) en cada partido
-      // que dirigió, con la misma escala que las de los jugadores. Para que
-      // un interino de uno o dos partidos no quede en los extremos, a ese
-      // promedio se le suman PARTIDOS_ANCLA partidos "neutros" (7 puntos):
-      // con muchos partidos casi no pesan; con pocos, lo acercan al medio.
-      const PARTIDOS_ANCLA = 3, PUNTAJE_NEUTRO = 7;
-      const promedioDT = (d.sumaEquipo + PARTIDOS_ANCLA * PUNTAJE_NEUTRO) / (d.partidosConPuntaje + PARTIDOS_ANCLA);
-      const segmento = calcularSegmentoEstrella(promedioDT);
+      // que dirigió, más el ajuste por actividad (sin ajuste por edad).
+      const promedioDT = d.partidosConPuntaje > 0 ? d.sumaEquipo / d.partidosConPuntaje : 4;
+      const segmento = limitarSegmento(calcularSegmentoEstrella(promedioDT) + ajusteActividad(d.pj, partidosTorneo.length));
       const urlDT = ficha
         ? `https://globopedia.github.io/Artids/indexecnics.html?tecnico=${encodeURIComponent(ficha.id)}`
         : "https://globopedia.github.io/Artids/indexecnics.html";
