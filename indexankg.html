@@ -521,7 +521,8 @@ function aplicarFiltrosLivianos() {
     document.querySelectorAll('#filtroPosiciones input:checked')
   ).map(c => c.value);
 
-  ranking = ranking.filter(j => String(j.posicion || "").split("/").some(p => posicionesActivas.includes(p.trim())));
+  const activasMin = posicionesActivas.map(p => p.toLowerCase());
+  ranking = ranking.filter(j => String(j.posicion || "").split("/").some(p => activasMin.includes(p.trim().toLowerCase())));
   
   if (document.getElementById("soloExtranjeros").checked) ranking = ranking.filter(j => esExtranjero(j.nombre));
   if (document.getElementById("soloInferiores").checked) ranking = ranking.filter(j => esDeInferiores(j.nombre));
