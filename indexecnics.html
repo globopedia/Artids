@@ -767,7 +767,7 @@ function htmlFotoPartido(valor, alt = "") {
 // Contempla variantes/erratas reales encontradas en el CSV
 // (mayúsculas sueltas, "Zaguero", "Defensor", "Full-Back", etc.)
 function categorizarPosicion(posicionRaw) {
-  const p = norm(posicionRaw);
+  const p = norm(String(posicionRaw || "").split("/")[0]);
   if (!p) return "desconocida";
   if (p.includes("arquero")) return "arquero";
   if (p.includes("wing izquierdo")) return "wing_izq";

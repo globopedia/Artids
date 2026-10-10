@@ -1164,7 +1164,7 @@ function invertirCondicion(c) {
 // Agrupa la posición real (Wing izquierdo, Lateral derecho, etc.) en las 4
 // categorías que definen qué bono individual aplica.
 function categoriaGrupo(posicionRaw) {
-  const p = norm(posicionRaw || "");
+  const p = norm(String(posicionRaw || "").split("/")[0]);
   if (!p) return null;
   if (p.includes("arquero")) return "arquero";
   if (p.includes("lateral") || p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return "defensor";
@@ -1359,7 +1359,7 @@ function obtenerArquerosDelPartido(partido, listaFutbolistas) {
 
   return jugadores.filter(nombre => {
     const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(nombre));
-    return datos && norm(datos.posicion) === "arquero";
+    return datos && norm((datos.posicion || "").split("/")[0]) === "arquero";
   });
 }
 
@@ -1922,7 +1922,7 @@ function mostrarTorneo() {
         mapaJugadores[idJugador].asistencias += (incidenciasPartido.match(asistRegex) || []).length;
 
         // Vallas invictas y penales atajados, solo tienen sentido para arqueros
-        if (norm(match.posicion || "").includes("arquero")) {
+        if (norm((match.posicion || "").split("/")[0]).includes("arquero")) {
           if ((parseInt(p.Resultado2) || 0) === 0) mapaJugadores[idJugador].vallasInvictas += 1;
 
           // El penal atajado ahora se registra como "ATA Nombre (SIGLA)
@@ -1947,7 +1947,7 @@ function mostrarTorneo() {
   ];
 
   function indicePosicion(posicionRaw) {
-    const p = norm(posicionRaw || "");
+    const p = norm(String(posicionRaw || "").split("/")[0]);
     if (!p) return ORDEN_POSICIONES.length;
     if (p.includes("arquero")) return 0;
     if (p.includes("lateral derecho")) return 1;
@@ -2032,7 +2032,7 @@ function mostrarTorneo() {
   ];
 
   function categorizarPosicion(posicionRaw) {
-    const p = norm(posicionRaw || "");
+    const p = norm(String(posicionRaw || "").split("/")[0]);
     if (!p) return "desconocida";
     if (p.includes("arquero")) return "arquero";
     if (p.includes("wing izquierdo")) return "wing_izq";
@@ -2238,7 +2238,7 @@ function mostrarTorneo() {
       const segmento = limitarSegmento(calcularSegmentoEstrella(j.pj > 0 ? j.globopediaScore / j.pj : 4) + ajusteActividad(j.pj, partidosTorneo.length) + ajusteEdad(edad));
       const banderaHTML = renderBanderaPrincipal(f.pais);
       const urlJugador = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(f.futbolista)}`;
-      const esArquero = norm(f.posicion || "").includes("arquero");
+      const esArquero = norm((f.posicion || "").split("/")[0]).includes("arquero");
 
       // Filas de estadísticas: para arqueros, "Vallas invictas" y "Penales
       // atajados" en vez de "Goles" y "Asistencias". "Asistencias" además

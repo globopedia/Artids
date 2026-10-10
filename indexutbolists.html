@@ -771,7 +771,7 @@ function invertirCondicion(c) {
 // Agrupa la posición real (Wing izquierdo, Lateral derecho, etc.) en las 4
 // categorías que definen qué bono individual aplica.
 function categoriaGrupo(posicionRaw) {
-  const p = norm(posicionRaw || "");
+  const p = norm(String(posicionRaw || "").split("/")[0]);
   if (!p) return null;
   if (p.includes("arquero")) return "arquero";
   if (p.includes("lateral") || p.includes("defensor central") || p.includes("defensa central") || p.includes("zaguero") || p === "defensor") return "defensor";
@@ -1691,7 +1691,7 @@ function obtenerArquerosDelPartido(partido, listaFutbolistas) {
 
   return jugadores.filter(nombre => {
     const datos = listaFutbolistas.find(f => norm(f.futbolista) === norm(nombre));
-    return datos && norm(datos.posicion) === "arquero";
+    return datos && norm((datos.posicion || "").split("/")[0]) === "arquero";
   });
 }
 
@@ -1796,7 +1796,7 @@ function renderGolesYPenales(nombreJugador, partidosDelJugador, posicion, listaF
     cuerpo += itemGolPen("En el poste", penalesPateados.poste);
   }
 
-  if (norm(posicion) === "arquero") {
+  if (norm((posicion || "").split("/")[0]) === "arquero") {
     const enContra = contarPenalesEnContra(nombreJugador, partidosDelJugador, listaFutbolistas);
     const totalEnContra = enContra.atajados + enContra.convertidos +
                            enContra.desviados + enContra.poste;
