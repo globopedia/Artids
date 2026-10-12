@@ -1593,8 +1593,8 @@ function partidosDeJugador(nombreJugador, columna = "Huracán") {
       .replace(/[()]/g, ",")
       .replace(/\b\d+(?:\+\d+)?\s*/g, "")
       .replace(/\.+/g, "")
-      .replace(/\by\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
+      .replace(/\by\s+/g, ",")
+      .replace(/\s+e\s+/g, ",")
       .replace(/,,+/g, ",")
       .replace(/\s+,/g, ",")
       .replace(/,\s+/g, ",")
@@ -1679,8 +1679,8 @@ function obtenerArquerosDelPartido(partido, listaFutbolistas) {
     .replace(/[()]/g, ",")
     .replace(/\b\d+(?:\+\d+)?\s*/g, "")
     .replace(/\.+/g, "")
-   .replace(/\by\s+/gi, ",")
-    .replace(/\s+e\s+/gi, ",")
+   .replace(/\by\s+/g, ",")
+    .replace(/\s+e\s+/g, ",")
     .replace(/,,+/g, ",")
     .replace(/\s+,/g, ",")
     .replace(/,\s+/g, ",")
@@ -1904,8 +1904,8 @@ function obtenerCompaneros(nombreJugador, partidosDelJugador, listaFutbolistas, 
       .replace(/[()]/g, ",")
       .replace(/\b\d+(?:\+\d+)?\s*/g, "")
       .replace(/\.+/g, "")
-     .replace(/\by\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
+     .replace(/\by\s+/g, ",")
+      .replace(/\s+e\s+/g, ",")
       .replace(/,,+/g, ",")
       .replace(/\s+,/g, ",")
       .replace(/,\s+/g, ",")
@@ -2145,8 +2145,8 @@ function getResumenRendimientoFutbolista(nombreFutbolista) {
       .replace(/[()]/g, ",")
       .replace(/\b\d+(?:\+\d+)?\s*/g, "")
       .replace(/\.+/g, "")
-     .replace(/\by\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
+     .replace(/\by\s+/g, ",")
+      .replace(/\s+e\s+/g, ",")
       .replace(/,,+/g, ",")
       .replace(/\s+,/g, ",")
       .replace(/,\s+/g, ",")
@@ -2208,8 +2208,8 @@ function renderEstadisticas(nombreFutbolista, lado = "Huracan") {
       .replace(/[()]/g, ",")
       .replace(/\b\d+(?:\+\d+)?\s*/g, "")
       .replace(/\.+/g, "")
-     .replace(/\by\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
+     .replace(/\by\s+/g, ",")
+      .replace(/\s+e\s+/g, ",")
       .replace(/,,+/g, ",")
       .replace(/\s+,/g, ",")
       .replace(/,\s+/g, ",")
@@ -2350,8 +2350,8 @@ document.addEventListener("change", function(e) {
         .replace(/[()]/g, ",")
         .replace(/\b\d+(?:\+\d+)?\s*/g, "")
         .replace(/\.+/g, "")
-       .replace(/\by\s+/gi, ",")
-        .replace(/\s+e\s+/gi, ",")
+       .replace(/\by\s+/g, ",")
+        .replace(/\s+e\s+/g, ",")
         .replace(/,,+/g, ",")
         .replace(/\s+,/g, ",")
         .replace(/,\s+/g, ",")
@@ -2535,8 +2535,8 @@ function getDatosCarreraHuracan(nombreFutbolista) {
       .replace(/[()]/g, ",")
       .replace(/\b\d+(?:\+\d+)?\s*/g, "")
       .replace(/\.+/g, "")
-     .replace(/\by\s+/gi, ",")
-      .replace(/\s+e\s+/gi, ",")
+     .replace(/\by\s+/g, ",")
+      .replace(/\s+e\s+/g, ",")
       .replace(/,,+/g, ",")
       .replace(/\s+,/g, ",")
       .replace(/,\s+/g, ",")
@@ -2604,11 +2604,11 @@ function enlazarJugadores(texto) {
   if (!texto) return "";
   
   // Separamos por comas, punto y coma, paréntesis, puntos y conjunciones "y" / "e"
-  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/i);
+  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/);
   
   return partes.map(part => {
     // Si la parte es un separador o signo de puntuación, la devolvemos tal cual
-    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/i.test(part)) {
+    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/.test(part)) {
       return part;
     }
 
