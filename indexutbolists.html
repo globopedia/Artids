@@ -1989,15 +1989,18 @@ function mostrarFutbolistas() {
     return `<p><b>${label}:</b> ${valor}${sufijo}</p>`;
   };
 
+  // 🔹 Fechas incompletas: 00/00/1893 -> 1893 ; 00/05/1893 -> 05/1893
+  const fmtFecha = (v) => (v || "").trim().replace(/^00\/00\//, "").replace(/^00\//, "");
+
   // 🔹 Lógica especial para Nacimiento (combina fecha y lugar)
   let htmlNacimiento = "";
   const tieneFechaNac = futbolista.fechanac && futbolista.fechanac.trim() !== "" && futbolista.fechanac.trim() !== "-";
   const tieneLugarNac = futbolista.lugarnac && futbolista.lugarnac.trim() !== "" && futbolista.lugarnac.trim() !== "-";
 
   if (tieneFechaNac && tieneLugarNac) {
-    htmlNacimiento = `<p><b>Nacimiento:</b> ${futbolista.fechanac}, en ${futbolista.lugarnac}</p>`;
+    htmlNacimiento = `<p><b>Nacimiento:</b> ${fmtFecha(futbolista.fechanac)}, en ${futbolista.lugarnac}</p>`;
   } else if (tieneFechaNac) {
-    htmlNacimiento = `<p><b>Nacimiento:</b> ${futbolista.fechanac}</p>`;
+    htmlNacimiento = `<p><b>Nacimiento:</b> ${fmtFecha(futbolista.fechanac)}</p>`;
   } else if (tieneLugarNac) {
     htmlNacimiento = `<p><b>Lugar de nacimiento:</b> ${futbolista.lugarnac}</p>`;
   }
@@ -2008,9 +2011,9 @@ function mostrarFutbolistas() {
   const tieneLugarMuerte = futbolista.lugarmuerte && futbolista.lugarmuerte.trim() !== "" && futbolista.lugarmuerte.trim() !== "-";
 
   if (tieneFechaMuerte && tieneLugarMuerte) {
-    htmlMuerte = `<p><b>Muerte:</b> ${futbolista.fechamuerte}, en ${futbolista.lugarmuerte}</p>`;
+    htmlMuerte = `<p><b>Muerte:</b> ${fmtFecha(futbolista.fechamuerte)}, en ${futbolista.lugarmuerte}</p>`;
   } else if (tieneFechaMuerte) {
-    htmlMuerte = `<p><b>Muerte:</b> ${futbolista.fechamuerte}</p>`;
+    htmlMuerte = `<p><b>Muerte:</b> ${fmtFecha(futbolista.fechamuerte)}</p>`;
   } else if (tieneLugarMuerte) {
     htmlMuerte = `<p><b>Lugar de muerte:</b> ${futbolista.lugarmuerte}</p>`;
   }
