@@ -28,6 +28,7 @@ export default async function handler(req, res) {
     utbolistso: { repo: "Lubs", path: "UtbolistsO.csv" },
     orneos: { repo: "Lubs", path: "Orneos.csv" },
     rbits: { repo: "Lubs", path: "Rbits.csv" },
+    efemerides: { repo: "Lubs", path: "Efemerides.csv" },
     ankg: { repo: "Artids", path: "Ankg.csv" },
     artids1910: { repo: "Lubs", path: "Artids1910.csv" },
     artids1925: { repo: "Lubs", path: "Artids1925.csv" },

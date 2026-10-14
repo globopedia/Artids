@@ -11,6 +11,7 @@
       --rojo: #d60000;
       --rojo-oscuro: #9c0000;
       --rojo-suave: #fff1f1;
+      --rojo-medio: #ea6a6a;  /* solapa elegida: entre el rojo y el rojo tenue */
       --texto: #1d1d1f;
       --gris: #6b6b70;
       --borde: #eedada;
@@ -21,7 +22,7 @@
     body { font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.5; }
     a { color: var(--rojo); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .contenedor { max-width: 100%; margin: 0; padding: 0 0 16px; }
+    .contenedor { max-width: 100%; margin: 0; padding: 0 0 2px; }
 
     /* ---------- 1) Consigna de derechos ---------- */
     .consigna {
@@ -56,17 +57,20 @@
       font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 24px;
       color: var(--rojo); margin: 0; letter-spacing: .5px; text-transform: uppercase;
     }
-    .efem-sub { color: var(--gris); font-size: 13px; margin: 0 0 10px; }
-    .efem-titulo, .efem-sub { padding: 0 4px; }
-    .pestanas { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 2px solid var(--rojo); }
+    .efem-titulo { padding: 0 4px 10px; }
+    /* Solapas tipo fichero: la elegida se continúa en la ficha (mismo color, sin línea abajo);
+       las otras quedan blancas y con la línea abajo, "cortadas" de la ficha. */
+    .pestanas { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-end; }
     .pestana {
       font: 700 13px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: .5px;
-      background: var(--rojo-suave); color: var(--rojo); border: 2px solid var(--rojo); border-bottom: none;
-      border-radius: 10px 10px 0 0; padding: 7px 14px; cursor: pointer; margin-bottom: -2px;
+      background: #fff; color: var(--rojo); border: 2px solid var(--rojo-medio);
+      border-radius: 10px 10px 0 0; padding: 7px 14px; cursor: pointer;
+      border-bottom: 3px solid var(--rojo); margin-bottom: 2px;  /* la línea que la "corta" de la ficha */
     }
+    .pestana:hover { background: var(--rojo-suave); }
     .pestana small { display: block; font: 500 11px 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
-    .pestana.activa { background: var(--rojo); color: #fff; }
-    .panel { border: 2px solid var(--rojo); border-top: none; border-radius: 0 0 14px 14px; padding: 14px; }
+    .pestana.activa { background: var(--rojo-medio); color: #fff; border-bottom: none; margin-bottom: 0; padding-top: 10px; padding-bottom: 12px; text-shadow: 0 1px 1px rgba(0,0,0,.18); }
+    .panel { border: 2px solid var(--rojo-medio); border-top: 6px solid var(--rojo-medio); border-radius: 0 14px 14px 14px; padding: 14px; }
     .bloque + .bloque { margin-top: 18px; }
     .bloque h3 {
       font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--rojo-oscuro);
@@ -150,10 +154,10 @@
   <!-- 2) Efemérides -->
   <section class="efemerides">
     <h2 class="efem-titulo">Efemérides quemeras</h2>
-    <p class="efem-sub">Partidos ganados e hitos, futbolistas y clubes del día, según la base de datos de Globopedia.</p>
     <div class="pestanas" role="tablist">
       <button class="pestana activa" data-dia="0" role="tab">Un día como hoy<small id="etiquetaHoy"></small></button>
       <button class="pestana" data-dia="1" role="tab">Un día como mañana<small id="etiquetaManiana"></small></button>
+      <button class="pestana" data-dia="2" role="tab">Un día como pasado mañana<small id="etiquetaPasado"></small></button>
     </div>
     <div class="panel" id="panel"><div class="cargando">Cargando efemérides…</div></div>
   </section>
@@ -188,18 +192,14 @@ const REVISTAS = [
   { n: 10, tapa: "https://blogger.googleusercontent.com/img/a/AVvXsEjmFbVARJcL4Vlxs1GfgBBK-of2xCHFM_7HhQW6xFx1vcwS-gm4IY2DGfcs0wxzbD5Y6h1RG6Jq0cHVtf7qOvFKVS19u01GclHtEgmk1akWwOe0AUTLho9APZvJjbzpN7L-KX9JAEuJXW1l3C_HfE-wiToAsGBsVUsg7W_ur0tbSHzEgc5KU3fRtse9Croi=w94-h132", link: "https://drive.google.com/file/d/1m1ObSrkC8i_DOzF33lYo-adyTI_ztzmD/view?usp=sharing" }
 ];
 
-// HECHOS ESPECIALES — se cargan a mano, a medida que vayan surgiendo.
-//  - Con la fecha de un partido (dd/mm/aaaa): ese partido se muestra
-//    AUNQUE no haya sido victoria, destacado, y con este texto agregado.
-//  - Con una fecha que no tiene partido: se muestra como hito suelto
-//    (en ese caso, poner un "titulo" corto).
-// Ejemplo para agregar uno:
-//   { fecha: "dd/mm/aaaa", texto: "Texto que se agrega al partido de ese día." },
-const HECHOS_ESPECIALES = [
-  { fecha: "01/11/1908", titulo: "Fundación del Club Atlético Huracán", texto: "" },
-  { fecha: "07/09/1947", texto: "Fue el partido inaugural del estadio Tomás Adolfo Ducó, ante unos 80.000 espectadores." },
-  { fecha: "26/11/2014", texto: "Huracán ganó la definición por penales y se consagró campeón de la Copa Argentina 2014." }
-];
+// HECHOS ESPECIALES: viven en Efemerides.csv (repo Lubs), con las columnas
+//   Fecha (dd/mm/aaaa), Titulo, Texto, Foto
+//  - Si la Fecha es la de un partido: ese partido se muestra AUNQUE no haya
+//    sido victoria, destacado, y con el Texto agregado (ej. "A pesar de la
+//    derrota, Huracán fue campeón...").
+//  - Si ese día no hubo partido: se muestra como hito suelto, con el Titulo
+//    en negrita, el Texto y la Foto (un link, o un código AAAAMMDD de Artido).
+let HECHOS_ESPECIALES = [];
 
 // Cuántos futbolistas mostrar por día (los de más partidos en Huracán).
 const MAX_FUTBOLISTAS = 5;
@@ -381,7 +381,7 @@ function goleadores(p) {
     const notas = [];
     if (g.goles > 1) notas.push(String(g.goles));
     if (g.enContra) notas.push("en contra");
-    if (g.penales) notas.push(g.goles === 1 ? "de penal" : g.penales === g.goles ? "todos de penal" : g.penales === 1 ? "uno de penal" : g.penales + " de penal");
+    if (g.penales) notas.push(g.goles === 1 ? "penal" : g.penales === g.goles ? "todos de penal" : g.penales === 1 ? "uno de penal" : g.penales + " de penal");
     return notas.length ? `${g.nombre} (${notas.join(", ")})` : g.nombre;
   });
 }
@@ -439,10 +439,17 @@ async function traer(archivo) {
 const parsear = csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
 
 async function cargarDatos() {
-  const [ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
+  const [efemerides, ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
+    traer("efemerides").catch(() => ""),   // si falta, la página igual funciona
     traer("lubs"), traer("utbolistsa"), traer("utbolistse"), traer("utbolistso"),
     ...ARCHIVOS_PARTIDOS.map(traer)
   ]);
+
+  // Hechos especiales (Efemerides.csv)
+  HECHOS_ESPECIALES = parsear(efemerides).map(h => ({
+    fecha: limpiar(h.Fecha), titulo: vacio(h.Titulo ?? h.Título) ? "" : limpiar(h.Titulo ?? h.Título),
+    texto: vacio(h.Texto) ? "" : limpiar(h.Texto), foto: vacio(h.Foto) ? "" : limpiar(h.Foto)
+  })).filter(h => leerFecha(h.fecha));
 
   // Partidos (en orden cronológico real)
   const partidos = partidosCsv.flatMap(parsear).map(p => {
@@ -531,13 +538,12 @@ let textosParaCopiar = [];
 function htmlPartido(p, obj, especiales) {
   const hace = obj.anio - p.f.anio;
   const especial = especiales.get(p.Fecha);
-  const hitos = [...(especial ? [especial.texto] : []), ...hitosAutomaticos(p, DATOS.partidos)];
+  const hitos = [...(especial ? [[especial.titulo, especial.texto].filter(Boolean).join(": ")].filter(Boolean) : []), ...hitosAutomaticos(p, DATOS.partidos)];
   const goles = goleadores(p);
   const relato = relatoPartido(p);
   const detalles = [];
-  if (goles.length) detalles.push("Goles de Huracán: " + listaConY(goles) + ".");
+  if (goles.length) detalles.push("Goles: " + listaConY(goles) + ".");
   if (!vacio(p.Estadio) && !/desconocido/i.test(p.Estadio)) detalles.push("Cancha: " + p.Estadio.replace(/^Tomás A Ducó$/, "Tomás A. Ducó") + ".");
-  if (!vacio(p.Técnico)) detalles.push("DT: " + p.Técnico + ".");
 
   const texto = `Un ${textoFecha(p.f)} de ${p.f.anio} (${haceTexto(hace)}), ${relato}` +
     (hitos.length ? " " + hitos.join(" ") : "") + (goles.length ? " " + detalles[0] : "");
@@ -571,9 +577,14 @@ function htmlHitoSuelto(h, obj) {
   const hace = obj.anio - f.anio;
   const texto = `Un ${textoFecha(f)} de ${f.anio} (${haceTexto(hace)}): ${[h.titulo, h.texto].filter(Boolean).join(". ")}.`.replace(/\.\.$/, ".");
   const idx = textosParaCopiar.push(texto) - 1;
+  const foto = urlFotoPartido(h.foto);
+  const codigo = /^\d{8}[a-z]?$/i.test(h.foto) ? "1" : "0";
   return `
-  <article class="partido especial" style="grid-template-columns:90px 1fr">
-    <div class="partido-media"><div class="escudos"><img src="${urlEscudo("Huracán")}" alt="Huracán" style="width:64px;height:64px"></div></div>
+  <article class="partido especial"${foto ? "" : ' style="grid-template-columns:90px 1fr"'}>
+    <div class="partido-media">
+      ${foto ? `<img class="foto" src="${foto}" data-codigo="${codigo}" alt="${esc(h.titulo || h.texto)}" style="display:none" onerror="fotoPartidoError(this)" onload="this.style.display='';enviarAltura()">` : ""}
+      <div class="escudos"><img src="${urlEscudo("Huracán")}" alt="Huracán" style="width:${foto ? 40 : 64}px;height:${foto ? 40 : 64}px"></div>
+    </div>
     <div>
       <div class="anio">${f.anio} <span>· ${haceTexto(hace)}</span></div>
       <p class="relato">${h.titulo ? `<b>${esc(h.titulo)}</b>` : ""}${h.titulo && h.texto ? " — " : ""}${esc(h.texto || "")}</p>
@@ -588,10 +599,9 @@ function htmlJugador(j, obj) {
   if (j.tipo === "nac") {
     etiqueta = `<span class="etiqueta">Nació en ${j.fecha.anio}</span>`;
     dato = j.muerte ? `Hoy cumpliría ${anios} años` : `Cumple ${anios} años`;
-    if (j.lugarNac) dato += ` · ${j.lugarNac}`;
   } else {
     etiqueta = `<span class="etiqueta luto">Falleció en ${j.fecha.anio}</span>`;
-    dato = `Se cumplen ${plural(anios, "año", "años")} de su muerte`;
+    dato = anios > 0 ? `Se cumplen ${plural(anios, "año", "años")} de su muerte` : "Falleció este año";
   }
   const texto = j.tipo === "nac"
     ? `Un ${textoFecha(j.fecha)} de ${j.fecha.anio} nació ${j.nombre}${j.lugarNac ? " en " + j.lugarNac : ""}, que jugó ${plural(j.partidos, "partido", "partidos")} en Huracán.`
@@ -604,7 +614,7 @@ function htmlJugador(j, obj) {
     <span class="nombre">${esc(j.nombre)}</span>
     ${etiqueta}
     <div class="dato">${esc(dato)}</div>
-    <div class="dato">${esc([j.posicion, plural(j.partidos, "partido", "partidos") + " en Huracán"].filter(Boolean).join(" · "))}</div>
+    <div class="dato">${esc([j.posicion, plural(j.partidos, "partido", "partidos")].filter(Boolean).join(" · "))}</div>
   </a>`;
 }
 
@@ -653,7 +663,7 @@ function dibujar(desplazamiento) {
     bloques.push(h + `</div>`);
   }
 
-  const encabezado = `${desplazamiento ? "Un día como mañana" : "Un día como hoy"}, ${textoFecha(obj)}`;
+  const encabezado = `${["Un día como hoy", "Un día como mañana", "Un día como pasado mañana"][desplazamiento]}, ${textoFecha(obj)}`;
   panel.innerHTML = (bloques.length ? bloques.join("") : `<div class="vacio">Todavía no hay efemérides cargadas para el ${textoFecha(obj)}.</div>`) +
     `<div class="pie-efem"><p>Fuente: Globopedia (www.globopedia.ar). Se permite reproducir citando la fuente.</p>` +
     (bloques.length ? `<button class="copiar copiar-todo" data-copiar="todo">Copiar todas las efemérides del día</button>` : "") + `</div>`;
@@ -738,7 +748,10 @@ let ultimaAltura = null, timerAltura = null;
 function enviarAltura() {
   clearTimeout(timerAltura);
   timerAltura = setTimeout(() => {
-    const altura = document.documentElement.scrollHeight;
+    // Se mide dónde termina el contenido (no el alto de la ventana del iframe,
+    // que nunca achicaría y dejaría un hueco en blanco abajo).
+    const fin = document.querySelector(".contenedor");
+    const altura = Math.ceil(fin.getBoundingClientRect().bottom + window.scrollY);
     if (ultimaAltura !== null && Math.abs(altura - ultimaAltura) <= 3) return;
     ultimaAltura = altura;
     window.parent.postMessage({ type: "ajustarAltura", altura }, "*");
@@ -754,6 +767,7 @@ if (window.ResizeObserver) new ResizeObserver(enviarAltura).observe(document.bod
 // ============================================================
 document.getElementById("etiquetaHoy").textContent = textoFecha(diaObjetivo(0));
 document.getElementById("etiquetaManiana").textContent = textoFecha(diaObjetivo(1));
+document.getElementById("etiquetaPasado").textContent = textoFecha(diaObjetivo(2));
 cargarDatos()
   .then(() => dibujar(0))
   .catch(err => {
