@@ -204,6 +204,9 @@ let HECHOS_ESPECIALES = [];
 // Cuántos futbolistas mostrar por día (los de más partidos en Huracán).
 const MAX_FUTBOLISTAS = 5;
 
+// Debut y despedida: solo de los futbolistas con al menos esta cantidad de partidos.
+const MIN_PARTIDOS_DEBUT = 20;
+
 // A dónde llevan los links (páginas de Blogger del sitio).
 const URL_PAGINA_FUTBOLISTAS = "https://www.globopedia.ar/p/herminio.html";
 const URL_PAGINA_RIVALES = "https://www.globopedia.ar/p/historiales_22.html";
@@ -492,7 +495,30 @@ async function cargarDatos() {
     escudo: limpiar(c.Escudo)
   })).filter(c => c.club && c.fund);
 
-  DATOS = { partidos, futbolistas, clubes };
+  // Debut y despedida (partidos oficiales) de los futbolistas con al menos
+  // MIN_PARTIDOS_DEBUT partidos en Huracán. La despedida no se muestra si el
+  // último partido es del último año de datos (puede seguir en el plantel).
+  const debutDespedida = new Map();   // orden del partido -> [{ tipo, nombre, total }]
+  const nombres = new Map(futbolistas.filter(f => f.partidos >= MIN_PARTIDOS_DEBUT).map(f => [norm(f.nombre), f]));
+  const primero = new Map(), ultimo = new Map();
+  partidos.forEach(p => {
+    if (!esOficial(p) || !p.f) return;
+    new Set(jugadoresDeFormacion(p.Huracán).map(norm)).forEach(n => {
+      if (!nombres.has(n)) return;
+      if (!primero.has(n)) primero.set(n, p);
+      ultimo.set(n, p);
+    });
+  });
+  const ultimaFecha = partidos.reduce((m, p) => p.f && esOficial(p) ? p : m, null);
+  const limite = ultimaFecha ? Date.UTC(ultimaFecha.f.anio - 1, ultimaFecha.f.mes - 1, ultimaFecha.f.dia) : 0;
+  const anotar = (p, item) => { if (!debutDespedida.has(p.orden)) debutDespedida.set(p.orden, []); debutDespedida.get(p.orden).push(item); };
+  nombres.forEach((f, n) => {
+    const a = primero.get(n), b = ultimo.get(n);
+    if (a) anotar(a, { tipo: "debut", nombre: f.nombre, total: f.partidos });
+    if (b && b !== a && Date.UTC(b.f.anio, b.f.mes - 1, b.f.dia) < limite) anotar(b, { tipo: "despedida", nombre: f.nombre, total: f.partidos });
+  });
+
+  DATOS = { partidos, futbolistas, clubes, debutDespedida };
 }
 
 // ============================================================
@@ -504,8 +530,8 @@ function efemeridesDelDia(obj) {
 
   // Partidos: victorias + los marcados como especiales
   const delDia = partidos.filter(p => p.f && coincide(p.f.dia, p.f.mes, obj) && !esAnulado(p));
-  const elegidos = delDia.filter(p => p.Situación === "victoria" || especiales.has(p.Fecha));
-  const oficiales = elegidos.filter(p => esOficial(p) || especiales.has(p.Fecha));
+  const elegidos = delDia.filter(p => p.Situación === "victoria" || especiales.has(p.Fecha) || DATOS.debutDespedida.has(p.orden));
+  const oficiales = elegidos.filter(p => esOficial(p) || especiales.has(p.Fecha) || DATOS.debutDespedida.has(p.orden));
   const amistosos = elegidos.filter(p => !oficiales.includes(p));
 
   // Hechos especiales sin partido ese día
@@ -538,12 +564,19 @@ let textosParaCopiar = [];
 function htmlPartido(p, obj, especiales) {
   const hace = obj.anio - p.f.anio;
   const especial = especiales.get(p.Fecha);
-  const hitos = [...(especial ? [[especial.titulo, especial.texto].filter(Boolean).join(": ")].filter(Boolean) : []), ...hitosAutomaticos(p, DATOS.partidos)];
+  const dd = DATOS.debutDespedida.get(p.orden) || [];
+  const hitos = [
+    ...(especial ? [[especial.titulo, especial.texto].filter(Boolean).join(": ")].filter(Boolean) : []),
+    ...dd.filter(x => x.tipo === "debut").map(x => `Debut de ${x.nombre} en Huracán (jugó ${plural(x.total, "partido", "partidos")}).`),
+    ...dd.filter(x => x.tipo === "despedida").map(x => `Despedida de ${x.nombre}: último de sus ${x.total} partidos en Huracán.`),
+    ...hitosAutomaticos(p, DATOS.partidos)
+  ];
   const goles = goleadores(p);
   const relato = relatoPartido(p);
   const detalles = [];
   if (goles.length) detalles.push("Goles: " + listaConY(goles) + ".");
   if (!vacio(p.Estadio) && !/desconocido/i.test(p.Estadio)) detalles.push("Cancha: " + p.Estadio.replace(/^Tomás A Ducó$/, "Tomás A. Ducó") + ".");
+  if (dd.length && !vacio(p.Huracán)) detalles.push("Huracán: " + limpiar(p.Huracán).replace(/\.$/, "") + ".");
 
   const texto = `Un ${textoFecha(p.f)} de ${p.f.anio} (${haceTexto(hace)}), ${relato}` +
     (hitos.length ? " " + hitos.join(" ") : "") + (goles.length ? " " + detalles[0] : "");
