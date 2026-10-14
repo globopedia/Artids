@@ -48,8 +48,8 @@
       color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.6);
       border-radius: 20px; padding: 2px 8px; cursor: pointer;
     }
-    .audio #reproductorMarcha { width: 16px; height: 16px; overflow: hidden; border-radius: 3px; }
-    .audio #reproductorMarcha iframe { width: 16px; height: 16px; }
+    /* El reproductor de YouTube queda invisible: solo se ve el botón */
+    #reproductorMarcha, #reproductorMarcha iframe { position: fixed; left: -10px; top: -10px; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; }
 
     /* ---------- 2) Efemérides ---------- */
     .efemerides { margin-top: 18px; }
@@ -107,7 +107,10 @@
     /* Cumpleaños y aniversarios: futbolistas y clubes con la misma ficha */
     .grilla-fichas { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 10px; }
     .ficha { display: block; text-align: center; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 8px; color: var(--texto); background: #fff; }
-    .ficha:hover { text-decoration: none; border-color: var(--rojo); }
+    a.ficha { cursor: pointer; transition: background .15s, border-color .15s; }
+    a.ficha:hover { text-decoration: none; border-color: var(--rojo); background: var(--rojo-suave); }
+    .ficha.persona .imagen { background: #fff; }
+    .ficha.persona .imagen img { width: 72%; height: 72%; object-fit: contain; }
     .ficha .imagen { width: 86px; height: 86px; margin: 0 auto; border-radius: 50%; border: 3px solid var(--rojo); background: #f2f2f2; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .ficha .imagen img { width: 100%; height: 100%; object-fit: cover; }
     .ficha.club .imagen { background: #fff; }
@@ -147,7 +150,7 @@
     Esta enciclopedia no depende de grupos privados ni partidarios y acepta la reproducción de su contenido siempre que sea citada la fuente.
     <div class="audio" id="audio">
       <div id="reproductorMarcha"></div>
-      <button type="button" id="botonAudio" title="Escuchar la marcha de Huracán">♪ AUDIO ON</button>
+      <button type="button" id="botonAudio" title="Prender o apagar la marcha de Huracán">♪ AUDIO ON</button>
     </div>
   </header>
 
@@ -355,13 +358,41 @@ const anteRival = club => /^selección/i.test(club) ? "ante la " + club : "ante 
 const esClasico = club => /san lorenzo/i.test(club);
 
 function lugar(p) {
-  const est = limpiar(p.Estadio).replace(/^Tomás A Ducó$/, "Tomás A. Ducó");
-  if (p.Condición === "local" && /^(Tomás A\. Ducó|El Palacio)$/.test(est)) return "en el Palacio Ducó";
-  if (p.Condición === "local" && /^La Quema$/.test(est)) return "en La Quema";
   if (p.Condición === "local") return "como local";
   if (p.Condición === "visitante") return "como visitante";
   if (p.Condición === "neutral") return "en cancha neutral";
   return "";
+}
+
+// Solo el apellido: para los de Huracán se usa la columna Apellido del CSV de
+// futbolistas (sin las iniciales que distinguen homónimos); para el resto,
+// se saca el primer nombre y las iniciales ("Rodrigo Fernández Cedrés" -> "Fernández Cedrés").
+function soloApellido(nombre) {
+  const n = limpiar(nombre);
+  const f = DATOS && DATOS.porNombre.get(norm(n));
+  if (f) {
+    const a = limpiar(f.apellido.replace(/\s*\(.*?\)\s*/g, " ")).replace(/(\s+[A-ZÁÉÍÓÚÑ]{1,3}\.?)+$/, "").trim();
+    if (a) return a;
+  }
+  const t = n.split(" ");
+  if (t.length < 2) return n;
+  let i = 1;
+  while (i < t.length - 1 && /^[A-ZÁÉÍÓÚÑ]\.?$/.test(t[i])) i++;
+  return t.slice(i).join(" ");
+}
+// Formación con solo apellidos, respetando la puntuación y los cambios ("(88 Nervo)").
+// Si dos jugadores del mismo partido comparten apellido, a esos se los deja con el nombre completo.
+function formacionApellidos(texto) {
+  const base = limpiar(texto).replace(/\.$/, "");
+  const recorrer = fn => base.replace(/[^;,()]+/g, trozo =>
+    trozo.split(/(\s+[ye]\s+)/).map(parte => {
+      if (/^\s+[ye]\s+$/.test(parte)) return parte;
+      const m = parte.match(/^(\s*(?:\d+(?:\+\d+)?\s+)?)(.*?)(\s*)$/);
+      return m && m[2] ? m[1] + fn(m[2]) + m[3] : parte;
+    }).join(""));
+  const porApellido = new Map();
+  recorrer(n => { const a = soloApellido(n); if (!porApellido.has(a)) porApellido.set(a, new Set()); porApellido.get(a).add(norm(n)); return n; });
+  return recorrer(n => { const a = soloApellido(n); return porApellido.get(a).size > 1 ? limpiar(n) : a; });
 }
 
 // Goleadores de Huracán a partir de Incidencias ("9 GOL Oscar Cortés (HUR) -tiro libre-").
@@ -371,7 +402,7 @@ function goleadores(p) {
   (p.Incidencias || "").split(/\s*\|\s*|<\/?br\s*\/?>/i).forEach(linea => {
     const m = linea.match(/^\s*[\d+]*\s*GOL\s+(.+?)\s+\(HUR\)\s*(-[^-]*-)?/i);
     if (!m) return;
-    let nombre = limpiar(m[1]);
+    let nombre = soloApellido(m[1]);
     if (/^NN$/i.test(nombre)) nombre = "sin datos";
     const enContra = /en contra/i.test(m[2] || "");
     const clave = nombre + (enContra ? "|ec" : "");
@@ -442,8 +473,9 @@ async function traer(archivo) {
 const parsear = csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
 
 async function cargarDatos() {
-  const [efemerides, ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
+  const [efemerides, personajesCsv, ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
     traer("efemerides").catch(() => ""),   // si falta, la página igual funciona
+    traer("personajes").catch(() => ""),
     traer("lubs"), traer("utbolistsa"), traer("utbolistse"), traer("utbolistso"),
     ...ARCHIVOS_PARTIDOS.map(traer)
   ]);
@@ -484,7 +516,9 @@ async function cargarDatos() {
       lugarNac: vacio(f.LugarNac) ? "" : limpiar(f.LugarNac),
       lugarMuerte: vacio(f.LugarMuerte) ? "" : limpiar(f.LugarMuerte),
       posicion: vacio(f.Posición) ? "" : limpiar(f.Posición).split(" / ")[0],
-      partidos: partidosPorJugador.get(norm(nombre)) || 0
+      partidos: partidosPorJugador.get(norm(nombre)) || 0,
+      apellido: limpiar(f.Apellido),
+      fallecido: !vacio(f.FechaMuerte)
     });
   });
 
@@ -495,21 +529,21 @@ async function cargarDatos() {
     escudo: limpiar(c.Escudo)
   })).filter(c => c.club && c.fund);
 
-  // Debut y despedida (partidos oficiales) de los futbolistas con al menos
+  // Debut y despedida (todos los partidos, amistosos incluidos) de los futbolistas con al menos
   // MIN_PARTIDOS_DEBUT partidos en Huracán. La despedida no se muestra si el
   // último partido es del último año de datos (puede seguir en el plantel).
   const debutDespedida = new Map();   // orden del partido -> [{ tipo, nombre, total }]
   const nombres = new Map(futbolistas.filter(f => f.partidos >= MIN_PARTIDOS_DEBUT).map(f => [norm(f.nombre), f]));
   const primero = new Map(), ultimo = new Map();
   partidos.forEach(p => {
-    if (!esOficial(p) || !p.f) return;
+    if (esAnulado(p) || !p.f) return;
     new Set(jugadoresDeFormacion(p.Huracán).map(norm)).forEach(n => {
       if (!nombres.has(n)) return;
       if (!primero.has(n)) primero.set(n, p);
       ultimo.set(n, p);
     });
   });
-  const ultimaFecha = partidos.reduce((m, p) => p.f && esOficial(p) ? p : m, null);
+  const ultimaFecha = partidos.reduce((m, p) => p.f ? p : m, null);
   const limite = ultimaFecha ? Date.UTC(ultimaFecha.f.anio - 1, ultimaFecha.f.mes - 1, ultimaFecha.f.dia) : 0;
   const anotar = (p, item) => { if (!debutDespedida.has(p.orden)) debutDespedida.set(p.orden, []); debutDespedida.get(p.orden).push(item); };
   nombres.forEach((f, n) => {
@@ -518,7 +552,15 @@ async function cargarDatos() {
     if (b && b !== a && Date.UTC(b.f.anio, b.f.mes - 1, b.f.dia) < limite) anotar(b, { tipo: "despedida", nombre: f.nombre, total: f.partidos });
   });
 
-  DATOS = { partidos, futbolistas, clubes, debutDespedida };
+  // Personajes (no futbolistas): nacimientos y muertes, en Personajes.csv
+  const personajes = parsear(personajesCsv).map(x => ({
+    nombre: limpiar(x.Nombre), desc: vacio(x.Descripcion) ? "" : limpiar(x.Descripcion),
+    nac: leerFecha(x.FechaNac), muerte: leerFecha(x.FechaMuerte), fallecido: !vacio(x.FechaMuerte),
+    foto: vacio(x.Foto) ? "" : limpiar(x.Foto)
+  })).filter(x => x.nombre);
+
+  DATOS = { partidos, futbolistas, clubes, debutDespedida, personajes,
+            porNombre: new Map(futbolistas.map(f => [norm(f.nombre), f])) };
 }
 
 // ============================================================
@@ -553,7 +595,15 @@ function efemeridesDelDia(obj) {
   const cumpleClubes = clubes.filter(c => coincide(c.fund.dia, c.fund.mes, obj))
     .sort((a, b) => a.fund.anio - b.fund.anio);
 
-  return { oficiales, amistosos, hitosSueltos, jugadores: jugadores.slice(0, MAX_FUTBOLISTAS), clubes: cumpleClubes, especiales };
+  // Personajes (no futbolistas): nacimientos y muertes
+  const personas = [];
+  DATOS.personajes.forEach(x => {
+    if (x.nac && coincide(x.nac.dia, x.nac.mes, obj)) personas.push({ ...x, tipo: "nac", fecha: x.nac });
+    if (x.muerte && coincide(x.muerte.dia, x.muerte.mes, obj)) personas.push({ ...x, tipo: "muerte", fecha: x.muerte });
+  });
+  personas.sort((a, b) => a.fecha.anio - b.fecha.anio);
+
+  return { oficiales, amistosos, hitosSueltos, jugadores: jugadores.slice(0, MAX_FUTBOLISTAS), clubes: cumpleClubes, personas, especiales };
 }
 
 // ============================================================
@@ -574,12 +624,13 @@ function htmlPartido(p, obj, especiales) {
   const goles = goleadores(p);
   const relato = relatoPartido(p);
   const detalles = [];
-  if (goles.length) detalles.push("Goles: " + listaConY(goles) + ".");
+  if (!vacio(p.Huracán) && !/sin datos/i.test(p.Huracán)) detalles.push("Huracán: " + formacionApellidos(p.Huracán) + ".");
   if (!vacio(p.Estadio) && !/desconocido/i.test(p.Estadio)) detalles.push("Cancha: " + p.Estadio.replace(/^Tomás A Ducó$/, "Tomás A. Ducó") + ".");
-  if (dd.length && !vacio(p.Huracán)) detalles.push("Huracán: " + limpiar(p.Huracán).replace(/\.$/, "") + ".");
+  const lineaGoles = goles.length ? "Goles: " + listaConY(goles) + "." : "";
+  if (lineaGoles) detalles.push(lineaGoles);
 
   const texto = `Un ${textoFecha(p.f)} de ${p.f.anio} (${haceTexto(hace)}), ${relato}` +
-    (hitos.length ? " " + hitos.join(" ") : "") + (goles.length ? " " + detalles[0] : "");
+    (hitos.length ? " " + hitos.join(" ") : "") + (lineaGoles ? " " + lineaGoles : "");
   const idx = textosParaCopiar.push(texto) - 1;
 
   const foto = urlFotoPartido(p.Foto);
@@ -599,7 +650,7 @@ function htmlPartido(p, obj, especiales) {
       <div class="anio">${p.f.anio} <span>· ${haceTexto(hace)}</span></div>
       <p class="relato">${esc(relato)}</p>
       ${hitos.map(h => `<div class="hito">★ ${esc(h)}</div>`).join("")}
-      <div class="detalle">${detalles.map(esc).join(" ")}</div>
+      <div class="detalle">${detalles.map(d => `<div>${esc(d)}</div>`).join("")}</div>
       <button class="copiar" data-copiar="${idx}">Copiar texto</button>
     </div>
   </article>`;
@@ -631,7 +682,8 @@ function htmlJugador(j, obj) {
   let etiqueta, dato;
   if (j.tipo === "nac") {
     etiqueta = `<span class="etiqueta">Nació en ${j.fecha.anio}</span>`;
-    dato = j.muerte ? `Hoy cumpliría ${anios} años` : `Cumple ${anios} años`;
+    dato = (j.fallecido || anios >= 100) ? `Hoy cumpliría ${anios} años` : `Cumple ${anios} años`;
+    if (j.muerte) dato += ` · falleció en ${j.muerte.anio}`;
   } else {
     etiqueta = `<span class="etiqueta luto">Falleció en ${j.fecha.anio}</span>`;
     dato = anios > 0 ? `Se cumplen ${plural(anios, "año", "años")} de su muerte` : "Falleció este año";
@@ -665,6 +717,30 @@ function htmlClub(c, obj) {
   </a>`;
 }
 
+function htmlPersona(x, obj) {
+  const anios = obj.anio - x.fecha.anio;
+  let etiqueta, dato;
+  if (x.tipo === "nac") {
+    etiqueta = `<span class="etiqueta">Nació en ${x.fecha.anio}</span>`;
+    dato = (x.fallecido || anios >= 100) ? `Hoy cumpliría ${anios} años` : `Cumple ${anios} años`;
+    if (x.muerte) dato += ` · falleció en ${x.muerte.anio}`;
+    textosParaCopiar.push(`Un ${textoFecha(x.fecha)} de ${x.fecha.anio} nació ${x.nombre}${x.desc ? " (" + x.desc.charAt(0).toLowerCase() + x.desc.slice(1) + ")" : ""}.`);
+  } else {
+    etiqueta = `<span class="etiqueta luto">Falleció en ${x.fecha.anio}</span>`;
+    dato = anios > 0 ? `Se cumplen ${plural(anios, "año", "años")} de su muerte` : "Falleció este año";
+    textosParaCopiar.push(`Un ${textoFecha(x.fecha)} de ${x.fecha.anio} falleció ${x.nombre}${x.desc ? " (" + x.desc.charAt(0).toLowerCase() + x.desc.slice(1) + ")" : ""}.`);
+  }
+  const img = x.foto ? (/^https?:/.test(x.foto) ? x.foto : URL_FOTOS_FUTBOLISTAS + x.foto) : urlEscudo("Huracán");
+  return `
+  <div class="ficha persona">
+    <div class="imagen"><img src="${esc(img)}" alt="${esc(x.nombre)}" loading="lazy" onerror="this.style.visibility='hidden'"></div>
+    <span class="nombre">${esc(x.nombre)}</span>
+    ${etiqueta}
+    ${x.desc ? `<div class="dato">${esc(x.desc)}</div>` : ""}
+    <div class="dato">${esc(dato)}</div>
+  </div>`;
+}
+
 let diaActual = 0;
 function dibujar(desplazamiento) {
   diaActual = desplazamiento;
@@ -676,9 +752,9 @@ function dibujar(desplazamiento) {
   const bloques = [];
 
   // 1) Cumpleaños y aniversarios: futbolistas y clubes juntos, adelante
-  if (e.jugadores.length || e.clubes.length) {
+  if (e.jugadores.length || e.clubes.length || e.personas.length) {
     bloques.push(`<div class="bloque"><h3>Cumpleaños y aniversarios</h3><div class="grilla-fichas">` +
-      e.jugadores.map(j => htmlJugador(j, obj)).join("") + e.clubes.map(c => htmlClub(c, obj)).join("") + `</div></div>`);
+      e.jugadores.map(j => htmlJugador(j, obj)).join("") + e.clubes.map(c => htmlClub(c, obj)).join("") + e.personas.map(x => htmlPersona(x, obj)).join("") + `</div></div>`);
   }
   // 2) Partidos e hitos, del más nuevo al más antiguo
   if (e.hitosSueltos.length || e.oficiales.length || e.amistosos.length) {
@@ -743,10 +819,12 @@ document.getElementById("tapas").innerHTML = REVISTAS.map(r =>
 
 // ============================================================
 // AUDIO DE LA MARCHA (YouTube, solo sonido)
-// Los navegadores no dejan arrancar con sonido sin un clic,
-// así que suena cuando el visitante toca el botón.
+// Arranca encendido. Algunos navegadores no dejan sonar nada hasta que el
+// visitante toca algo en la página: en ese caso empieza con el primer clic,
+// toque o tecla. Si alguien lo apaga, se recuerda en su navegador.
 // ============================================================
-let reproductor = null, sonando = false;
+let reproductor = null, quiereSonar = true;
+try { quiereSonar = localStorage.getItem("marchaApagada") !== "1"; } catch (e) {}
 function cargarApiYouTube() {
   return new Promise(res => {
     if (window.YT && window.YT.Player) return res();
@@ -756,23 +834,35 @@ function cargarApiYouTube() {
     document.head.appendChild(s);
   });
 }
-document.getElementById("botonAudio").addEventListener("click", async () => {
-  const boton = document.getElementById("botonAudio");
-  const caja = document.getElementById("audio");
-  if (!reproductor) {
-    boton.textContent = "♪ …";
-    await cargarApiYouTube();
-    reproductor = new YT.Player("reproductorMarcha", {
-      width: 16, height: 16, videoId: ID_VIDEO_MARCHA,
-      playerVars: { autoplay: 1, controls: 0, playsinline: 1, rel: 0 },
-      events: { onReady: e => e.target.playVideo() }
-    });
-    sonando = true;
-  } else if (sonando) { reproductor.pauseVideo(); sonando = false; }
-  else { reproductor.playVideo(); sonando = true; }
-  boton.textContent = sonando ? "♪ AUDIO OFF" : "♪ AUDIO ON";
-  caja.classList.toggle("sonando", sonando);
+function mostrarEstadoAudio() {
+  document.getElementById("botonAudio").textContent = quiereSonar ? "♪ AUDIO ON" : "♪ AUDIO OFF";
+  document.getElementById("audio").classList.toggle("sonando", quiereSonar);
+}
+function aplicarAudio() {
+  if (!reproductor || !reproductor.playVideo) return;
+  if (quiereSonar) { reproductor.unMute(); reproductor.setVolume(70); reproductor.playVideo(); }
+  else reproductor.pauseVideo();
+}
+cargarApiYouTube().then(() => {
+  reproductor = new YT.Player("reproductorMarcha", {
+    width: 1, height: 1, videoId: ID_VIDEO_MARCHA,
+    playerVars: { autoplay: quiereSonar ? 1 : 0, controls: 0, playsinline: 1, rel: 0, loop: 1, playlist: ID_VIDEO_MARCHA },
+    events: { onReady: aplicarAudio }
+  });
 });
+// Si el navegador bloqueó el arranque, suena con la primera interacción
+const primerToque = () => {
+  if (quiereSonar && reproductor && reproductor.getPlayerState && reproductor.getPlayerState() !== 1) aplicarAudio();
+};
+["pointerdown", "keydown", "touchstart"].forEach(ev => document.addEventListener(ev, primerToque, { capture: true }));
+document.getElementById("botonAudio").addEventListener("click", ev => {
+  ev.stopPropagation();
+  quiereSonar = !quiereSonar;
+  try { localStorage.setItem("marchaApagada", quiereSonar ? "0" : "1"); } catch (e) {}
+  mostrarEstadoAudio();
+  aplicarAudio();
+});
+mostrarEstadoAudio();
 
 // ============================================================
 // ALTURA DEL IFRAME (Blogger ajusta el alto con este mensaje)
