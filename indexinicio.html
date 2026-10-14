@@ -552,7 +552,7 @@ function htmlPartido(p, obj, especiales) {
   return `
   <article class="partido${especial ? " especial" : ""}">
     <div class="partido-media">
-      ${foto ? `<img class="foto" src="${foto}" data-codigo="${codigo}" alt="Huracán vs. ${esc(p.Club)}, ${esc(p.Fecha)}" loading="lazy" style="display:none" onerror="fotoPartidoError(this)" onload="this.style.display='';enviarAltura()">` : ""}
+      ${foto ? `<img class="foto" src="${foto}" data-codigo="${codigo}" alt="Huracán vs. ${esc(p.Club)}, ${esc(p.Fecha)}" style="display:none" onerror="fotoPartidoError(this)" onload="this.style.display='';enviarAltura()">` : ""}
       <div class="escudos">${marcador}</div>
     </div>
     <div>
