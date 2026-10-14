@@ -8,12 +8,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --rojo: #b51200;
-      --rojo-oscuro: #7d0c00;
-      --rojo-suave: #fff3f1;
+      --rojo: #d60000;
+      --rojo-oscuro: #9c0000;
+      --rojo-suave: #fff1f1;
       --texto: #1d1d1f;
       --gris: #6b6b70;
-      --borde: #ecdcd9;
+      --borde: #eedada;
       --fondo: #ffffff;
     }
     * { box-sizing: border-box; }
@@ -21,7 +21,7 @@
     body { font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.5; }
     a { color: var(--rojo); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .contenedor { max-width: 980px; margin: 0 auto; padding: 0 12px 16px; }
+    .contenedor { max-width: 100%; margin: 0; padding: 0 0 16px; }
 
     /* ---------- 1) Consigna de derechos ---------- */
     .consigna {
@@ -57,6 +57,7 @@
       color: var(--rojo); margin: 0; letter-spacing: .5px; text-transform: uppercase;
     }
     .efem-sub { color: var(--gris); font-size: 13px; margin: 0 0 10px; }
+    .efem-titulo, .efem-sub { padding: 0 4px; }
     .pestanas { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 2px solid var(--rojo); }
     .pestana {
       font: 700 13px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: .5px;
@@ -79,7 +80,7 @@
       display: grid; grid-template-columns: 210px 1fr; gap: 14px;
       border: 1px solid var(--borde); border-radius: 12px; padding: 10px; background: #fff;
     }
-    .partido + .partido { margin-top: 10px; }
+    .lista-partidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 10px; align-items: start; }
     .partido.especial { border-color: var(--rojo); box-shadow: 0 0 0 1px var(--rojo) inset; }
     .partido-media { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
     .partido-media .foto { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: #f3f3f3; }
@@ -96,25 +97,22 @@
     }
     .copiar.ok { background: var(--rojo); color: #fff; }
     .amistosos { margin-top: 10px; }
+    .amistosos .lista-partidos { margin-top: 8px; }
     .amistosos summary { cursor: pointer; color: var(--gris); font-size: 13px; }
 
-    /* Futbolistas */
-    .grilla-jugadores { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
-    .jugador { text-align: center; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 8px; }
-    .jugador img { width: 86px; height: 86px; object-fit: cover; border-radius: 50%; border: 3px solid var(--rojo); background: #eee; }
-    .jugador .nombre { font: 700 14px 'Poppins', sans-serif; margin-top: 4px; display: block; }
-    .jugador .etiqueta { display: inline-block; font: 700 10px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: .5px;
+    /* Cumpleaños y aniversarios: futbolistas y clubes con la misma ficha */
+    .grilla-fichas { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 10px; }
+    .ficha { display: block; text-align: center; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 8px; color: var(--texto); background: #fff; }
+    .ficha:hover { text-decoration: none; border-color: var(--rojo); }
+    .ficha .imagen { width: 86px; height: 86px; margin: 0 auto; border-radius: 50%; border: 3px solid var(--rojo); background: #f2f2f2; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .ficha .imagen img { width: 100%; height: 100%; object-fit: cover; }
+    .ficha.club .imagen { background: #fff; }
+    .ficha.club .imagen img { width: 72%; height: 72%; object-fit: contain; }
+    .ficha .nombre { font: 700 14px 'Poppins', sans-serif; margin-top: 4px; display: block; color: var(--texto); line-height: 1.25; }
+    .ficha .etiqueta { display: inline-block; font: 700 10px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: .5px;
       color: #fff; background: var(--rojo); border-radius: 20px; padding: 1px 8px; margin: 4px 0 2px; }
-    .jugador .etiqueta.luto { background: #3a3a3c; }
-    .jugador .dato { font-size: 12.5px; color: var(--gris); }
-
-    /* Clubes */
-    .grilla-clubes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-    .club { display: flex; align-items: center; gap: 8px; border: 1px solid var(--borde); border-radius: 12px; padding: 8px; }
-    .club img { width: 38px; height: 38px; object-fit: contain; flex: 0 0 38px; }
-    .club .nombre { font: 600 13px 'Poppins', sans-serif; line-height: 1.2; }
-    .club .dato { font-size: 12px; color: var(--gris); }
-    .club.huracan { border-color: var(--rojo); background: var(--rojo-suave); }
+    .ficha .etiqueta.luto { background: #3a3a3c; }
+    .ficha .dato { font-size: 12.5px; color: var(--gris); }
 
     .pie-efem { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
     .pie-efem p { margin: 0; font-size: 12px; color: var(--gris); }
@@ -401,7 +399,7 @@ function hitosAutomaticos(p, todos) {
     hitos.push(`Fue la primera victoria oficial de Huracán ante ${p.Club}.`);
   }
   const dif = p.g1 - p.g2;
-  if (dif >= 3) {
+  if (dif >= 4) {
     const max = Math.max(...victorias.map(x => x.g1 - x.g2));
     const iguales = victorias.filter(x => x.g1 - x.g2 === max);
     if (dif === max) hitos.push(iguales.length === 1
@@ -418,7 +416,7 @@ function relatoPartido(p) {
   if (p.Situación === "victoria" && g1 === g2) verbo = `le ganó por penales ${aRival(p.Club)}, tras igualar ${g1} a ${g2}`;
   else if (p.Situación === "victoria") {
     if (esClasico(p.Club)) verbo = `le ganó el clásico ${g1} a ${g2} ${aRival(p.Club)}`;
-    else if (g1 - g2 >= 3) verbo = `goleó ${g1} a ${g2} ${aRival(p.Club)}`;
+    else if (g1 - g2 >= 4) verbo = `goleó ${g1} a ${g2} ${aRival(p.Club)}`;
     else verbo = `le ganó ${g1} a ${g2} ${aRival(p.Club)}`;
   }
   else if (p.Situación === "empate") verbo = `igualó ${g1} a ${g2} ${conRival(p.Club)}`;
@@ -600,13 +598,13 @@ function htmlJugador(j, obj) {
   textosParaCopiar.push(texto);
   const link = URL_PAGINA_FUTBOLISTAS + "?jugador=" + encodeURIComponent(j.nombre);
   return `
-  <div class="jugador">
-    <a href="${link}" target="_top"><img src="${urlFotoFutbolista(j.fila)}" alt="${esc(j.nombre)}" loading="lazy" onerror="fotoJugadorError(this)"></a>
-    <a class="nombre" href="${link}" target="_top">${esc(j.nombre)}</a>
+  <a class="ficha" href="${link}" target="_top">
+    <div class="imagen"><img src="${urlFotoFutbolista(j.fila)}" alt="${esc(j.nombre)}" loading="lazy" onerror="fotoJugadorError(this)"></div>
+    <span class="nombre">${esc(j.nombre)}</span>
     ${etiqueta}
     <div class="dato">${esc(dato)}</div>
     <div class="dato">${esc([j.posicion, plural(j.partidos, "partido", "partidos") + " en Huracán"].filter(Boolean).join(" · "))}</div>
-  </div>`;
+  </a>`;
 }
 
 function htmlClub(c, obj) {
@@ -615,9 +613,11 @@ function htmlClub(c, obj) {
   const link = URL_PAGINA_RIVALES + "?club=" + encodeURIComponent(c.club);
   const escudo = c.escudo && /^https?:/.test(c.escudo) ? c.escudo : urlEscudo(c.club);
   return `
-  <a class="club" href="${link}" target="_top" title="Fundado el ${textoFecha(c.fund)} de ${c.fund.anio}">
-    <img src="${esc(escudo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-    <div><div class="nombre">${esc(c.club)}</div><div class="dato">Cumple ${anios} años · ${c.fund.anio}</div></div>
+  <a class="ficha club" href="${link}" target="_top">
+    <div class="imagen"><img src="${esc(escudo)}" alt="${esc(c.club)}" loading="lazy" onerror="this.style.visibility='hidden'"></div>
+    <span class="nombre">${esc(c.club)}</span>
+    <span class="etiqueta">Fundado en ${c.fund.anio}</span>
+    <div class="dato">Cumple ${anios} años</div>
   </a>`;
 }
 
@@ -631,21 +631,25 @@ function dibujar(desplazamiento) {
   const e = efemeridesDelDia(obj);
   const bloques = [];
 
+  // 1) Cumpleaños y aniversarios: futbolistas y clubes juntos, adelante
+  if (e.jugadores.length || e.clubes.length) {
+    bloques.push(`<div class="bloque"><h3>Cumpleaños y aniversarios</h3><div class="grilla-fichas">` +
+      e.jugadores.map(j => htmlJugador(j, obj)).join("") + e.clubes.map(c => htmlClub(c, obj)).join("") + `</div></div>`);
+  }
+  // 2) Partidos e hitos, del más nuevo al más antiguo
   if (e.hitosSueltos.length || e.oficiales.length || e.amistosos.length) {
-    let h = `<div class="bloque"><h3>Partidos e hitos</h3>`;
-    h += e.hitosSueltos.map(x => htmlHitoSuelto(x, obj)).join("");
-    h += e.oficiales.map(p => htmlPartido(p, obj, e.especiales)).join("");
+    const anioDe = x => x.f ? x.f.anio : leerFecha(x.fecha).anio;
+    const items = [
+      ...e.hitosSueltos.map(x => ({ anio: anioDe(x), html: () => htmlHitoSuelto(x, obj) })),
+      ...e.oficiales.map(p => ({ anio: p.f.anio, orden: p.orden, html: () => htmlPartido(p, obj, e.especiales) }))
+    ].sort((a, b) => b.anio - a.anio || (b.orden ?? 0) - (a.orden ?? 0));
+    let h = `<div class="bloque"><h3>Partidos e hitos</h3><div class="lista-partidos">` + items.map(i => i.html()).join("") + `</div>`;
     if (e.amistosos.length) {
-      h += `<details class="amistosos"${e.oficiales.length ? "" : " open"}><summary>${e.oficiales.length ? "Además, " : ""}${plural(e.amistosos.length, "triunfo", "triunfos")} en amistosos</summary>`;
-      h += e.amistosos.map(p => htmlPartido(p, obj, e.especiales)).join("") + `</details>`;
+      const amis = [...e.amistosos].sort((a, b) => b.f.anio - a.f.anio || b.orden - a.orden);
+      h += `<details class="amistosos"${e.oficiales.length || e.hitosSueltos.length ? "" : " open"}><summary>${e.oficiales.length ? "Además, " : ""}${plural(amis.length, "triunfo", "triunfos")} en amistosos</summary>`;
+      h += `<div class="lista-partidos">` + amis.map(p => htmlPartido(p, obj, e.especiales)).join("") + `</div></details>`;
     }
     bloques.push(h + `</div>`);
-  }
-  if (e.jugadores.length) {
-    bloques.push(`<div class="bloque"><h3>Futbolistas</h3><div class="grilla-jugadores">${e.jugadores.map(j => htmlJugador(j, obj)).join("")}</div></div>`);
-  }
-  if (e.clubes.length) {
-    bloques.push(`<div class="bloque"><h3>Clubes que cumplen años</h3><div class="grilla-clubes">${e.clubes.map(c => htmlClub(c, obj)).join("")}</div></div>`);
   }
 
   const encabezado = `${desplazamiento ? "Un día como mañana" : "Un día como hoy"}, ${textoFecha(obj)}`;
