@@ -158,6 +158,7 @@
   <section class="efemerides">
     <h2 class="efem-titulo">Efemérides quemeras</h2>
     <div class="pestanas" role="tablist">
+      <button class="pestana" data-dia="-1" role="tab">Un día como ayer<small id="etiquetaAyer"></small></button>
       <button class="pestana activa" data-dia="0" role="tab">Un día como hoy<small id="etiquetaHoy"></small></button>
       <button class="pestana" data-dia="1" role="tab">Un día como mañana<small id="etiquetaManiana"></small></button>
       <button class="pestana" data-dia="2" role="tab">Un día como pasado mañana<small id="etiquetaPasado"></small></button>
@@ -208,7 +209,7 @@ let HECHOS_ESPECIALES = [];
 const MAX_FUTBOLISTAS = 5;
 
 // Debut y despedida: solo de los futbolistas con al menos esta cantidad de partidos.
-const MIN_PARTIDOS_DEBUT = 20;
+const MIN_PARTIDOS_DEBUT = 25;
 
 // A dónde llevan los links (páginas de Blogger del sitio).
 const URL_PAGINA_FUTBOLISTAS = "https://www.globopedia.ar/p/herminio.html";
@@ -772,7 +773,7 @@ function dibujar(desplazamiento) {
     bloques.push(h + `</div>`);
   }
 
-  const encabezado = `${["Un día como hoy", "Un día como mañana", "Un día como pasado mañana"][desplazamiento]}, ${textoFecha(obj)}`;
+  const encabezado = `${{ "-1": "Un día como ayer", "0": "Un día como hoy", "1": "Un día como mañana", "2": "Un día como pasado mañana" }[desplazamiento]}, ${textoFecha(obj)}`;
   panel.innerHTML = (bloques.length ? bloques.join("") : `<div class="vacio">Todavía no hay efemérides cargadas para el ${textoFecha(obj)}.</div>`) +
     `<div class="pie-efem"><p>Fuente: Globopedia (www.globopedia.ar). Se permite reproducir citando la fuente.</p>` +
     (bloques.length ? `<button class="copiar copiar-todo" data-copiar="todo">Copiar todas las efemérides del día</button>` : "") + `</div>`;
@@ -889,6 +890,7 @@ if (window.ResizeObserver) new ResizeObserver(enviarAltura).observe(document.bod
 // ARRANQUE
 // ============================================================
 document.getElementById("etiquetaHoy").textContent = textoFecha(diaObjetivo(0));
+document.getElementById("etiquetaAyer").textContent = textoFecha(diaObjetivo(-1));
 document.getElementById("etiquetaManiana").textContent = textoFecha(diaObjetivo(1));
 document.getElementById("etiquetaPasado").textContent = textoFecha(diaObjetivo(2));
 cargarDatos()
