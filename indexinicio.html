@@ -214,6 +214,7 @@ const MIN_PARTIDOS_DEBUT = 25;
 // A dónde llevan los links (páginas de Blogger del sitio).
 const URL_PAGINA_FUTBOLISTAS = "https://www.globopedia.ar/p/herminio.html";
 const URL_PAGINA_RIVALES = "https://www.globopedia.ar/p/historiales_22.html";
+const URL_PAGINA_TECNICOS = "https://www.globopedia.ar/p/tecnicos_20.html";
 
 // Datos (puente de Vercel hacia el repo privado Lubs).
 const API = "https://artids.vercel.app/api/data?file=";
@@ -474,9 +475,10 @@ async function traer(archivo) {
 const parsear = csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
 
 async function cargarDatos() {
-  const [efemerides, personajesCsv, ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
+  const [efemerides, personajesCsv, ecnicsCsv, ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
     traer("efemerides").catch(() => ""),   // si falta, la página igual funciona
     traer("personajes").catch(() => ""),
+    traer("ecnics").catch(() => ""),
     traer("lubs"), traer("utbolistsa"), traer("utbolistse"), traer("utbolistso"),
     ...ARCHIVOS_PARTIDOS.map(traer)
   ]);
@@ -560,8 +562,25 @@ async function cargarDatos() {
     foto: vacio(x.Foto) ? "" : limpiar(x.Foto)
   })).filter(x => x.nombre);
 
-  DATOS = { partidos, futbolistas, clubes, debutDespedida, personajes,
-            porNombre: new Map(futbolistas.map(f => [norm(f.nombre), f])) };
+  // Técnicos (Ecnics.csv): el ID es lo que figura en la columna "Técnico" de
+  // los partidos; una dupla comparte ID (dos filas). Se cuentan los partidos dirigidos.
+  const dirigidos = new Map();
+  partidos.forEach(p => { const k = norm(p.Técnico); if (k) dirigidos.set(k, (dirigidos.get(k) || 0) + 1); });
+  const porNombre = new Map(futbolistas.map(f => [norm(f.nombre), f]));
+  const tecnicos = parsear(ecnicsCsv).map(t => {
+    const nombre = limpiar(t["Técnico"]), muerteTxt = limpiar(t.Muerte);
+    return {
+      id: limpiar(t.ID), nombre,
+      nac: leerFecha(t.Nacimiento), muerte: leerFecha(t.Muerte),
+      fallecido: !!leerFecha(t.Muerte) || /^\d{4}$/.test(muerteTxt),
+      foto: /^https?:\/\//i.test(limpiar(t.Foto)) ? limpiar(t.Foto) : "",
+      dirigidos: dirigidos.get(norm(t.ID)) || 0,
+      jugador: porNombre.get(norm(nombre)) || null
+    };
+  }).filter(t => t.id && t.nombre);
+
+  DATOS = { partidos, futbolistas, clubes, debutDespedida, personajes, tecnicos, porNombre,
+            tecnicoPorNombre: new Map(tecnicos.map(t => [norm(t.nombre), t])) };
 }
 
 // ============================================================
@@ -592,6 +611,16 @@ function efemeridesDelDia(obj) {
   });
   jugadores.sort((a, b) => b.partidos - a.partidos || a.fecha.anio - b.fecha.anio);
 
+  // Técnicos: nacimientos y fallecimientos. Si ya aparece como futbolista
+  // ese día, no se repite: se le agrega el dato de DT a su ficha de jugador.
+  const mostrados = new Set(jugadores.slice(0, MAX_FUTBOLISTAS).map(j => norm(j.nombre) + "|" + j.tipo));
+  const tecnicosDia = [];
+  DATOS.tecnicos.forEach(t => {
+    if (t.nac && coincide(t.nac.dia, t.nac.mes, obj) && !mostrados.has(norm(t.nombre) + "|nac")) tecnicosDia.push({ ...t, tipo: "nac", fecha: t.nac });
+    if (t.muerte && coincide(t.muerte.dia, t.muerte.mes, obj) && !mostrados.has(norm(t.nombre) + "|muerte")) tecnicosDia.push({ ...t, tipo: "muerte", fecha: t.muerte });
+  });
+  tecnicosDia.sort((a, b) => b.dirigidos - a.dirigidos || a.fecha.anio - b.fecha.anio);
+
   // Clubes: todos los que cumplen años
   const cumpleClubes = clubes.filter(c => coincide(c.fund.dia, c.fund.mes, obj))
     .sort((a, b) => a.fund.anio - b.fund.anio);
@@ -604,7 +633,7 @@ function efemeridesDelDia(obj) {
   });
   personas.sort((a, b) => a.fecha.anio - b.fecha.anio);
 
-  return { oficiales, amistosos, hitosSueltos, jugadores: jugadores.slice(0, MAX_FUTBOLISTAS), clubes: cumpleClubes, personas, especiales };
+  return { oficiales, amistosos, hitosSueltos, jugadores: jugadores.slice(0, MAX_FUTBOLISTAS), tecnicos: tecnicosDia, clubes: cumpleClubes, personas, especiales };
 }
 
 // ============================================================
@@ -680,6 +709,7 @@ function htmlHitoSuelto(h, obj) {
 
 function htmlJugador(j, obj) {
   const anios = obj.anio - j.fecha.anio;
+  const dt = DATOS.tecnicoPorNombre.get(norm(j.nombre));
   let etiqueta, dato;
   if (j.tipo === "nac") {
     etiqueta = `<span class="etiqueta">Nació en ${j.fecha.anio}</span>`;
@@ -701,6 +731,32 @@ function htmlJugador(j, obj) {
     ${etiqueta}
     <div class="dato">${esc(dato)}</div>
     <div class="dato">${esc([j.posicion, plural(j.partidos, "partido", "partidos")].filter(Boolean).join(" · "))}</div>
+    ${dt && dt.dirigidos ? `<div class="dato">También DT · ${plural(dt.dirigidos, "partido", "partidos")}</div>` : ""}
+  </a>`;
+}
+
+function htmlTecnico(t, obj) {
+  const anios = obj.anio - t.fecha.anio;
+  let etiqueta, dato;
+  if (t.tipo === "nac") {
+    etiqueta = `<span class="etiqueta">Nació en ${t.fecha.anio}</span>`;
+    dato = (t.fallecido || anios >= 100) ? `Hoy cumpliría ${anios} años` : `Cumple ${anios} años`;
+    if (t.muerte) dato += ` · falleció en ${t.muerte.anio}`;
+  } else {
+    etiqueta = `<span class="etiqueta luto">Falleció en ${t.fecha.anio}</span>`;
+    dato = anios > 0 ? `Se cumplen ${plural(anios, "año", "años")} de su muerte` : "Falleció este año";
+  }
+  const dirigio = t.dirigidos ? `, que dirigió a Huracán en ${plural(t.dirigidos, "partido", "partidos")}` : ", director técnico de Huracán";
+  textosParaCopiar.push(`Un ${textoFecha(t.fecha)} de ${t.fecha.anio} ${t.tipo === "nac" ? "nació" : "falleció"} ${t.nombre}${dirigio}.`);
+  const foto = t.foto || (t.jugador ? urlFotoFutbolista(t.jugador.fila) : URL_FOTOS_FUTBOLISTAS + "UtbolistsH/CAH01.jpg");
+  const link = URL_PAGINA_TECNICOS + "?tecnico=" + encodeURIComponent(t.id);
+  return `
+  <a class="ficha" href="${link}" target="_top">
+    <div class="imagen"><img src="${esc(foto)}" alt="${esc(t.nombre)}" loading="lazy" onerror="fotoJugadorError(this)"></div>
+    <span class="nombre">${esc(t.nombre)}</span>
+    ${etiqueta}
+    <div class="dato">${esc(dato)}</div>
+    <div class="dato">${esc(["Director técnico", t.dirigidos ? plural(t.dirigidos, "partido", "partidos") : ""].filter(Boolean).join(" · "))}</div>
   </a>`;
 }
 
@@ -753,9 +809,9 @@ function dibujar(desplazamiento) {
   const bloques = [];
 
   // 1) Cumpleaños y aniversarios: futbolistas y clubes juntos, adelante
-  if (e.jugadores.length || e.clubes.length || e.personas.length) {
+  if (e.jugadores.length || e.tecnicos.length || e.clubes.length || e.personas.length) {
     bloques.push(`<div class="bloque"><h3>Cumpleaños y aniversarios</h3><div class="grilla-fichas">` +
-      e.jugadores.map(j => htmlJugador(j, obj)).join("") + e.clubes.map(c => htmlClub(c, obj)).join("") + e.personas.map(x => htmlPersona(x, obj)).join("") + `</div></div>`);
+      e.jugadores.map(j => htmlJugador(j, obj)).join("") + e.tecnicos.map(t => htmlTecnico(t, obj)).join("") + e.clubes.map(c => htmlClub(c, obj)).join("") + e.personas.map(x => htmlPersona(x, obj)).join("") + `</div></div>`);
   }
   // 2) Partidos e hitos, del más nuevo al más antiguo
   if (e.hitosSueltos.length || e.oficiales.length || e.amistosos.length) {

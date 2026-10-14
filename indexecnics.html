@@ -242,7 +242,7 @@ function htmlFotoPartido(valor, alt = "") {
   return `<div style="margin:6px 0;"><img src="${url}" alt="${alt}" data-codigo="${esCodigoSinExtension}" loading="lazy" style="max-width:250px;border-radius:8px;" onerror="fotoPartidoSiguienteFormato(this)"></div>`;
 }
 
-    const tecnicosURL = "https://globopedia.github.io/Ecnics/Ecnics.csv?v=" + Date.now();
+    const tecnicosURL = "https://artids.vercel.app/api/data?file=ecnics";
     const futbolistasURL = "https://artids.vercel.app/api/data?file=utbolistsa";
     const futbolistasURL2 = "https://artids.vercel.app/api/data?file=utbolistse";
     const futbolistasURL3 = "https://artids.vercel.app/api/data?file=utbolistso";
