@@ -264,6 +264,7 @@ function leerFecha(texto) {
 }
 const textoFecha = f => `${f.dia === 1 ? "1°" : f.dia} de ${MESES[f.mes - 1]}`;
 const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+const haceTexto = n => n <= 0 ? "este año" : "hace " + plural(n, "año", "años");
 
 function urlEscudo(club) { return URL_ESCUDOS + encodeURIComponent(limpiar(club)) + ".png"; }
 
@@ -538,7 +539,7 @@ function htmlPartido(p, obj, especiales) {
   if (!vacio(p.Estadio) && !/desconocido/i.test(p.Estadio)) detalles.push("Cancha: " + p.Estadio.replace(/^Tomás A Ducó$/, "Tomás A. Ducó") + ".");
   if (!vacio(p.Técnico)) detalles.push("DT: " + p.Técnico + ".");
 
-  const texto = `Un ${textoFecha(p.f)} de ${p.f.anio} (hace ${plural(hace, "año", "años")}), ${relato}` +
+  const texto = `Un ${textoFecha(p.f)} de ${p.f.anio} (${haceTexto(hace)}), ${relato}` +
     (hitos.length ? " " + hitos.join(" ") : "") + (goles.length ? " " + detalles[0] : "");
   const idx = textosParaCopiar.push(texto) - 1;
 
@@ -556,7 +557,7 @@ function htmlPartido(p, obj, especiales) {
       <div class="escudos">${marcador}</div>
     </div>
     <div>
-      <div class="anio">${p.f.anio} <span>· hace ${plural(hace, "año", "años")}</span></div>
+      <div class="anio">${p.f.anio} <span>· ${haceTexto(hace)}</span></div>
       <p class="relato">${esc(relato)}</p>
       ${hitos.map(h => `<div class="hito">★ ${esc(h)}</div>`).join("")}
       <div class="detalle">${detalles.map(esc).join(" ")}</div>
@@ -568,13 +569,13 @@ function htmlPartido(p, obj, especiales) {
 function htmlHitoSuelto(h, obj) {
   const f = leerFecha(h.fecha);
   const hace = obj.anio - f.anio;
-  const texto = `Un ${textoFecha(f)} de ${f.anio} (hace ${plural(hace, "año", "años")}): ${[h.titulo, h.texto].filter(Boolean).join(". ")}.`.replace(/\.\.$/, ".");
+  const texto = `Un ${textoFecha(f)} de ${f.anio} (${haceTexto(hace)}): ${[h.titulo, h.texto].filter(Boolean).join(". ")}.`.replace(/\.\.$/, ".");
   const idx = textosParaCopiar.push(texto) - 1;
   return `
   <article class="partido especial" style="grid-template-columns:90px 1fr">
     <div class="partido-media"><div class="escudos"><img src="${urlEscudo("Huracán")}" alt="Huracán" style="width:64px;height:64px"></div></div>
     <div>
-      <div class="anio">${f.anio} <span>· hace ${plural(hace, "año", "años")}</span></div>
+      <div class="anio">${f.anio} <span>· ${haceTexto(hace)}</span></div>
       <p class="relato">${h.titulo ? `<b>${esc(h.titulo)}</b>` : ""}${h.titulo && h.texto ? " — " : ""}${esc(h.texto || "")}</p>
       <button class="copiar" data-copiar="${idx}">Copiar texto</button>
     </div>
