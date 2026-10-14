@@ -92,25 +92,26 @@
     return null;
   }
 
+  // Marca sutil: horizontal, abajo a la derecha, de un ancho cercano a un
+  // cuarto del lado más corto de la foto.
   function dibujarMarca(ctx, w, h) {
     const m = Math.min(w, h);
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(-0.33);
-    let tam = m * 0.2;
-    const fuente = t => `800 ${t}px Poppins, "Arial Black", Arial, sans-serif`;
+    const margen = Math.max(3, m * 0.035);
+    const fuente = t => `700 ${t}px Poppins, "Arial Black", Arial, sans-serif`;
+    let tam = m * 0.1;
     ctx.font = fuente(tam);
     const ancho = ctx.measureText("Globopedia").width || 1;
-    tam = tam * (m * 0.8) / ancho;
+    tam = Math.max(7, tam * (m * 0.27) / ancho);
+    ctx.save();
     ctx.font = fuente(tam);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "bottom";
     ctx.lineJoin = "round";
-    ctx.lineWidth = Math.max(1, tam * 0.07);
-    ctx.strokeStyle = "rgba(0,0,0,0.30)";
-    ctx.fillStyle = "rgba(255,255,255,0.45)";
-    ctx.strokeText("Globopedia", 0, 0);
-    ctx.fillText("Globopedia", 0, 0);
+    ctx.lineWidth = Math.max(1, tam * 0.12);
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.strokeText("Globopedia", w - margen, h - margen);
+    ctx.fillText("Globopedia", w - margen, h - margen);
     ctx.restore();
   }
 
