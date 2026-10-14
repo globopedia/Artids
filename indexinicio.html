@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inicio — Globopedia</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rojo: #b51200;
+      --rojo-oscuro: #7d0c00;
+      --rojo-suave: #fff3f1;
+      --texto: #1d1d1f;
+      --gris: #6b6b70;
+      --borde: #ecdcd9;
+      --fondo: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--fondo); color: var(--texto); }
+    body { font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.5; }
+    a { color: var(--rojo); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .contenedor { max-width: 980px; margin: 0 auto; padding: 0 12px 16px; }
+
+    /* ---------- 1) Consigna de derechos ---------- */
+    .consigna {
+      position: relative;
+      background: var(--rojo);
+      color: #fff;
+      text-align: center;
+      border-radius: 0 0 14px 14px;
+      padding: 14px 18px 16px;
+      font-size: 15px;
+    }
+    .consigna b { font-family: 'Poppins', sans-serif; letter-spacing: .5px; }
+
+    /* Botón de audio: casi imperceptible, en la esquina de la consigna */
+    .audio {
+      position: absolute; right: 8px; bottom: 6px;
+      display: flex; align-items: center; gap: 4px;
+      opacity: .55; transition: opacity .2s;
+    }
+    .audio:hover, .audio.sonando { opacity: 1; }
+    .audio button {
+      font: 600 10px 'Poppins', sans-serif; letter-spacing: .5px;
+      color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.6);
+      border-radius: 20px; padding: 2px 8px; cursor: pointer;
+    }
+    .audio #reproductorMarcha { width: 16px; height: 16px; overflow: hidden; border-radius: 3px; }
+    .audio #reproductorMarcha iframe { width: 16px; height: 16px; }
+
+    /* ---------- 2) Efemérides ---------- */
+    .efemerides { margin-top: 18px; }
+    .efem-titulo {
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 24px;
+      color: var(--rojo); margin: 0; letter-spacing: .5px; text-transform: uppercase;
+    }
+    .efem-sub { color: var(--gris); font-size: 13px; margin: 0 0 10px; }
+    .pestanas { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 2px solid var(--rojo); }
+    .pestana {
+      font: 700 13px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: .5px;
+      background: var(--rojo-suave); color: var(--rojo); border: 2px solid var(--rojo); border-bottom: none;
+      border-radius: 10px 10px 0 0; padding: 7px 14px; cursor: pointer; margin-bottom: -2px;
+    }
+    .pestana small { display: block; font: 500 11px 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
+    .pestana.activa { background: var(--rojo); color: #fff; }
+    .panel { border: 2px solid var(--rojo); border-top: none; border-radius: 0 0 14px 14px; padding: 14px; }
+    .bloque + .bloque { margin-top: 18px; }
+    .bloque h3 {
+      font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--rojo-oscuro);
+      text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; padding-bottom: 4px;
+      border-bottom: 1px solid var(--borde);
+    }
+    .cargando, .vacio { color: var(--gris); text-align: center; padding: 18px 0; }
+
+    /* Partidos */
+    .partido {
+      display: grid; grid-template-columns: 210px 1fr; gap: 14px;
+      border: 1px solid var(--borde); border-radius: 12px; padding: 10px; background: #fff;
+    }
+    .partido + .partido { margin-top: 10px; }
+    .partido.especial { border-color: var(--rojo); box-shadow: 0 0 0 1px var(--rojo) inset; }
+    .partido-media { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+    .partido-media .foto { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: #f3f3f3; }
+    .escudos { display: flex; align-items: center; gap: 6px; font: 800 22px 'Poppins', sans-serif; color: var(--rojo); }
+    .escudos img { width: 40px; height: 40px; object-fit: contain; }
+    .anio { font: 800 13px 'Poppins', sans-serif; color: var(--rojo); letter-spacing: .5px; }
+    .anio span { color: var(--gris); font-weight: 600; }
+    .relato { margin: 2px 0 4px; }
+    .detalle { color: var(--gris); font-size: 13px; }
+    .hito { margin-top: 4px; font-weight: 600; color: var(--rojo-oscuro); }
+    .copiar {
+      margin-top: 6px; font: 600 11px 'Poppins', sans-serif; color: var(--rojo); background: #fff;
+      border: 1px solid var(--rojo); border-radius: 20px; padding: 3px 10px; cursor: pointer;
+    }
+    .copiar.ok { background: var(--rojo); color: #fff; }
+    .amistosos { margin-top: 10px; }
+    .amistosos summary { cursor: pointer; color: var(--gris); font-size: 13px; }
+
+    /* Futbolistas */
+    .grilla-jugadores { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+    .jugador { text-align: center; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 8px; }
+    .jugador img { width: 86px; height: 86px; object-fit: cover; border-radius: 50%; border: 3px solid var(--rojo); background: #eee; }
+    .jugador .nombre { font: 700 14px 'Poppins', sans-serif; margin-top: 4px; display: block; }
+    .jugador .etiqueta { display: inline-block; font: 700 10px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: .5px;
+      color: #fff; background: var(--rojo); border-radius: 20px; padding: 1px 8px; margin: 4px 0 2px; }
+    .jugador .etiqueta.luto { background: #3a3a3c; }
+    .jugador .dato { font-size: 12.5px; color: var(--gris); }
+
+    /* Clubes */
+    .grilla-clubes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .club { display: flex; align-items: center; gap: 8px; border: 1px solid var(--borde); border-radius: 12px; padding: 8px; }
+    .club img { width: 38px; height: 38px; object-fit: contain; flex: 0 0 38px; }
+    .club .nombre { font: 600 13px 'Poppins', sans-serif; line-height: 1.2; }
+    .club .dato { font-size: 12px; color: var(--gris); }
+    .club.huracan { border-color: var(--rojo); background: var(--rojo-suave); }
+
+    .pie-efem { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .pie-efem p { margin: 0; font-size: 12px; color: var(--gris); }
+    .copiar-todo { font-size: 12px; padding: 6px 14px; }
+
+    /* ---------- 3) Revistas ---------- */
+    .revistas { margin-top: 22px; background: #210808; color: #fff; border-radius: 14px; padding: 14px; text-align: center; }
+    .revistas h2 { font: 800 18px 'Poppins', sans-serif; letter-spacing: 1px; margin: 0 0 10px; }
+    .tapas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .tapas a { display: block; transition: transform .15s; }
+    .tapas a:hover { transform: translateY(-3px); }
+    .tapas img { width: 90px; height: 120px; object-fit: cover; border-radius: 4px; box-shadow: 0 3px 10px rgba(0,0,0,.5); display: block; }
+
+    @media (max-width: 620px) {
+      .partido { grid-template-columns: 1fr; }
+      .partido-media .foto { max-width: 340px; }
+      .efem-titulo { font-size: 20px; }
+      .audio { position: static; justify-content: center; margin-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="contenedor">
+
+  <!-- 1) Consigna de derechos -->
+  <header class="consigna">
+    <b>Globopedia</b> es producto de una apasionada investigación para el fomento del conocimiento de la historia de Huracán.<br>
+    Esta enciclopedia no depende de grupos privados ni partidarios y acepta la reproducción de su contenido siempre que sea citada la fuente.
+    <div class="audio" id="audio">
+      <div id="reproductorMarcha"></div>
+      <button type="button" id="botonAudio" title="Escuchar la marcha de Huracán">♪ AUDIO ON</button>
+    </div>
+  </header>
+
+  <!-- 2) Efemérides -->
+  <section class="efemerides">
+    <h2 class="efem-titulo">Efemérides quemeras</h2>
+    <p class="efem-sub">Partidos ganados e hitos, futbolistas y clubes del día, según la base de datos de Globopedia.</p>
+    <div class="pestanas" role="tablist">
+      <button class="pestana activa" data-dia="0" role="tab">Un día como hoy<small id="etiquetaHoy"></small></button>
+      <button class="pestana" data-dia="1" role="tab">Un día como mañana<small id="etiquetaManiana"></small></button>
+    </div>
+    <div class="panel" id="panel"><div class="cargando">Cargando efemérides…</div></div>
+  </section>
+
+  <!-- 3) Revistas -->
+  <section class="revistas">
+    <h2>DESCARGÁ LA REVISTA GLOBOPEDIA</h2>
+    <div class="tapas" id="tapas"></div>
+  </section>
+
+</div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN
+// ============================================================
+
+// Video de YouTube con la marcha de Huracán (solo se usa el audio).
+const ID_VIDEO_MARCHA = "ge0iijszYyE";
+
+// Revistas: tapa y link de descarga (en orden).
+const REVISTAS = [
+  { n: 1,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgITpRBAtIiQi7M3g051qMapqWcwZFzOn9MpQcAk6sWpTLqPpOAAm6Qws6hMFnJVMOhJhleRv-X1zdQ2wS5iqB9heP8d0LQxHPPfTGY-fBogcN3kdnTAzFeLRwMCpWszFpKTBXodA3sVoss/w100-h120/Tapa+revista+Globopedia.png.jpg", link: "https://drive.google.com/file/d/1EIhinbfU_4jO1AczXiR5-gZpVEXE3lWH/view?usp=sharing" },
+  { n: 2,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHDF3Vm1ywCGe87dzUCaxMO0MjZzF_GYW9IzpjnGhuHIRpxdXxjnz22c9KncdlKFJx84putF4HjhHHrQk5h9LUpk4NvZkVEvGpPe3rsFkyymHRKJK0zRRoMjRA6Rn5DwMHpr66pm5CJSm_/w90-h120/Revista+Globopedia+2.jpg", link: "https://drive.google.com/file/d/1SiYsTJIkcGojeSIYih_cW-9xRWxMjN-H/view?usp=sharing" },
+  { n: 3,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKhLg2I67AYh_1XoAYB4aE7jUt-_8KCA1QkeaS3_wyaxL5HlPeVrupRbPUNda-ey_R6bvgyqjQUJiMhHHSwiq0RcTk6PAAcDFCYYMQtIox0Nsu8OoMK33FQhRbUddZ9Z8OZp7Ok_pzAGaw/w90-h120/Globopedia+tapa3.jpg", link: "https://drive.google.com/file/d/1qJd9ZYWUJ_Qt3_ArkXT5xlp8Y9gKhH78/view?usp=sharing" },
+  { n: 4,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj8wFAHPFFQbiAAZiKLtd38qFuPb9Lu36mHjmv0n3pNaDTOnRKKypMLagm5yyz7JzzrAprW6wQDA2qfHTUR8M46q7_feRNkf3wNdSi8C9x-VfogB11B6_CTXdo2B22jLBkVUwdKUZbH9356/w90-h120/Captura+de+pantalla+completa+20072020+094051+p.m..bmp.jpg", link: "https://drive.google.com/file/d/1ebyebk_nH-KQNkka0g25i8QvD_xlsHoX/view?usp=sharing" },
+  { n: 5,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjkT1PC7R_8fL6_SQXRBlZU_tc9iZzTCQEBdeWeyzh7i7g_VvMtKVnd79jW0rsbaDQ_mVDBcRiLWkfFkZbKr3fVhpR7VLGH56WWzMn06qSYh4iR8ebY4QDqItTApOwRdvuy-CrwWx_wvgBn/w90-h120/Tapa+Globopedia+5.jpg", link: "https://drive.google.com/file/d/1jOPfC9IcgefJF2K6l0OjsQDjDZ79DAiq/view?usp=sharing" },
+  { n: 6,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhrYGkXU8VCKj6gWIANOLL2W06FDz07t0RFFLZQtm88UAv288Uzk5HQRk-Khqn8Ng7I3CZHdfivayPk99f9JjZfEMNngKd0Qq2rYFRREU1qEi5DsW5NX8f_dOtC_aWAZPI1uzjsmMEOhMPJ/w90-h120/Revista+Globopedia+6+tapa.png.jpg", link: "https://drive.google.com/file/d/1k9W1DxlUS3rShufc2yyqHZCvxV8HF_Xy/view?usp=sharing" },
+  { n: 7,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi_2kojaxW8TTSgMWwLtiLlOvg4GjBlT0BIwvCBL3yL-a-TTSAmE13ttRl4jkpAlM3v2zhkQSx0yfOU_XX0CGV5C_vx3JNiLyoMhi8VaRkamQWTWw1CO1s8wPt_DizomyP8gTz3k6rmK_7j/w90-h120/Tapa+Globopedia+7.jpg", link: "https://drive.google.com/file/d/1nVLySyYsHGz_vR1mKPCruv6IY11d_32c/view?usp=sharing" },
+  { n: 8,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhNuHqableCi84-Vn4Oh5v3l92fef5ksxHzGXq4ln964VFb-Q0k4o5TYxPpn-JQiNbErJvkhDa12TKI8HjQEIxtmLEBEsrZpWAkaaCRnEoeGhDecZPY2ZduChd7fkzutakpIUcLZvDoOBq0/w90-h120/Tapa+Globopedia+8.jpg", link: "https://drive.google.com/file/d/1FNjUiKPSYXU-5pPL14rB-mnwTO0JPslT/view?usp=sharing" },
+  { n: 9,  tapa: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjWaoYSjUrX-XhxnlwFnCsTbk9WZBFKV1obAtW2AArgQ4dv8V8Utr8DSBCzGfvNdYKEzVaqDNawjXi1lyRhEjEksvOrmg6O94tDc54XNd_B3zMRnLz14PRABFDXQct6UXOGT_8a5EqkFq08/w98-h120/globopedia9.jpg", link: "https://drive.google.com/file/d/1gF4dksVTEovbgD0Nket1HtrYlwRzlp1Y/view?usp=sharing" },
+  { n: 10, tapa: "https://blogger.googleusercontent.com/img/a/AVvXsEjmFbVARJcL4Vlxs1GfgBBK-of2xCHFM_7HhQW6xFx1vcwS-gm4IY2DGfcs0wxzbD5Y6h1RG6Jq0cHVtf7qOvFKVS19u01GclHtEgmk1akWwOe0AUTLho9APZvJjbzpN7L-KX9JAEuJXW1l3C_HfE-wiToAsGBsVUsg7W_ur0tbSHzEgc5KU3fRtse9Croi=w94-h132", link: "https://drive.google.com/file/d/1m1ObSrkC8i_DOzF33lYo-adyTI_ztzmD/view?usp=sharing" }
+];
+
+// HECHOS ESPECIALES — se cargan a mano, a medida que vayan surgiendo.
+//  - Con la fecha de un partido (dd/mm/aaaa): ese partido se muestra
+//    AUNQUE no haya sido victoria, destacado, y con este texto agregado.
+//  - Con una fecha que no tiene partido: se muestra como hito suelto
+//    (en ese caso, poner un "titulo" corto).
+// Ejemplo para agregar uno:
+//   { fecha: "dd/mm/aaaa", texto: "Texto que se agrega al partido de ese día." },
+const HECHOS_ESPECIALES = [
+  { fecha: "01/11/1908", titulo: "Fundación del Club Atlético Huracán", texto: "" },
+  { fecha: "07/09/1947", texto: "Fue el partido inaugural del estadio Tomás Adolfo Ducó, ante unos 80.000 espectadores." },
+  { fecha: "26/11/2014", texto: "Huracán ganó la definición por penales y se consagró campeón de la Copa Argentina 2014." }
+];
+
+// Cuántos futbolistas mostrar por día (los de más partidos en Huracán).
+const MAX_FUTBOLISTAS = 5;
+
+// A dónde llevan los links (páginas de Blogger del sitio).
+const URL_PAGINA_FUTBOLISTAS = "https://www.globopedia.ar/p/herminio.html";
+const URL_PAGINA_RIVALES = "https://www.globopedia.ar/p/historiales_22.html";
+
+// Datos (puente de Vercel hacia el repo privado Lubs).
+const API = "https://artids.vercel.app/api/data?file=";
+const ARCHIVOS_PARTIDOS = ["artids1910","artids1925","artids1940","artids1955","artids1970","artids1985","artids2000","artids2015"];
+const URL_FOTOS_PARTIDOS = "https://globopedia.github.io/Artids/Artido/";
+const URL_FOTOS_FUTBOLISTAS = "https://globopedia.github.io/Artids/Utbolists/";
+const URL_ESCUDOS = "https://globopedia.github.io/Artids/escudos/";
+
+// ============================================================
+// UTILIDADES
+// ============================================================
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const limpiar = s => String(s ?? "").replace(/[ ​-‍﻿]/g, " ").replace(/\s+/g, " ").trim();
+const vacio = s => { const v = limpiar(s).toLowerCase(); return !v || v === "-" || v === "x"; };
+const dd = n => String(n).padStart(2, "0");
+
+// "Hoy" y "mañana" según la hora de Argentina (aunque el visitante esté en otro país).
+// Para probar otro día: agregar ?fecha=dd/mm a la dirección de la página.
+function fechaBase() {
+  const param = new URLSearchParams(location.search).get("fecha");
+  const m = param && param.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/);
+  if (m) return new Date(Date.UTC(+(m[3] || new Date().getFullYear()), +m[2] - 1, +m[1]));
+  const partes = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Argentina/Buenos_Aires", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(new Date()).map(p => [p.type, p.value]));
+  return new Date(Date.UTC(+partes.year, +partes.month - 1, +partes.day));
+}
+function diaObjetivo(desplazamiento) {
+  const f = new Date(fechaBase().getTime() + desplazamiento * 86400000);
+  return { dia: f.getUTCDate(), mes: f.getUTCMonth() + 1, anio: f.getUTCFullYear() };
+}
+const esBisiesto = a => (a % 4 === 0 && a % 100 !== 0) || a % 400 === 0;
+// ¿La fecha (día/mes) cae en el día buscado? El 29/2 se recuerda el 28/2 en años no bisiestos.
+function coincide(d, m, obj) {
+  if (d === obj.dia && m === obj.mes) return true;
+  return d === 29 && m === 2 && obj.dia === 28 && obj.mes === 2 && !esBisiesto(obj.anio);
+}
+
+// Lee una fecha "dd/mm/aaaa" o "25 de mayo de 1905" / "1° de mayo de 1906."
+// Devuelve null si falta el día o el mes (00, solo el año, etc.).
+function leerFecha(texto) {
+  const t = limpiar(texto).replace(/\.$/, "");
+  let m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    const d = +m[1], me = +m[2], a = +m[3];
+    return d && me ? { dia: d, mes: me, anio: a } : null;
+  }
+  m = t.toLowerCase().match(/^(\d{1,2})\s*[°º]?\s+de\s+([a-záéíóú]+)\s+de\s+(\d{4})$/);
+  if (m) {
+    const me = MESES.indexOf(m[2].replace("setiembre", "septiembre")) + 1;
+    return me ? { dia: +m[1], mes: me, anio: +m[3] } : null;
+  }
+  return null;
+}
+const textoFecha = f => `${f.dia === 1 ? "1°" : f.dia} de ${MESES[f.mes - 1]}`;
+const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+
+function urlEscudo(club) { return URL_ESCUDOS + encodeURIComponent(limpiar(club)) + ".png"; }
+
+// Foto del futbolista (misma regla que la página de Futbolistas).
+function nombreArchivoFutbolista(nombre) {
+  const t = limpiar(nombre).split(" ").filter(Boolean);
+  if (t.length < 2) return t.join(" ");
+  let i = 1;
+  while (i < t.length - 1 && /^[A-ZÁÉÍÓÚÑ]\.?$/.test(t[i])) i++;
+  return [...t.slice(i), ...t.slice(0, i)].join(" ");
+}
+function urlFotoFutbolista(fila) {
+  const futbolista = limpiar(fila.Futbolista);
+  const excepcion = limpiar((fila.Foto || "").split("|")[0]);
+  if (/^https?:\/\//i.test(excepcion)) return excepcion;
+  const usarExcepcion = excepcion && !/^(-|foto\d?)$/i.test(excepcion);
+  const nombre = (usarExcepcion ? excepcion : nombreArchivoFutbolista(futbolista)).normalize("NFC");
+  if (!nombre) return "";
+  const letra = nombre.normalize("NFD").replace(/[̀-ͯ]/g, "").charAt(0).toUpperCase();
+  return URL_FOTOS_FUTBOLISTAS + "Utbolists" + letra + "/" + encodeURIComponent(nombre + " 01") + ".jpg";
+}
+// Si la foto no está en .jpg prueba .png; si tampoco, la genérica de Huracán.
+function fotoJugadorError(img) {
+  if (/\.jpg$/i.test(img.src) && !img.dataset.png) { img.dataset.png = "1"; img.src = img.src.replace(/\.jpg$/i, ".png"); }
+  else { img.onerror = null; img.src = URL_FOTOS_FUTBOLISTAS + "UtbolistsH/CAH01.jpg"; }
+}
+
+// Foto del partido: código AAAAMMDD (o link). Prueba .jpg, .png y .jpeg; si no hay, se oculta.
+const EXT_FOTOS = ["jpg", "png", "jpeg"];
+function urlFotoPartido(valor) {
+  const v = limpiar(valor);
+  if (/^https?:\/\//i.test(v)) return v;
+  const m = v.match(/^(\d{4})\d{4}[a-z]?(\.(jpe?g|png|webp|gif))?$/i);
+  if (!m || /^\d{4}0000/.test(v)) return "";
+  return URL_FOTOS_PARTIDOS + m[1] + "/" + (m[2] ? v : v + "." + EXT_FOTOS[0]);
+}
+function fotoPartidoError(img) {
+  const i = (+img.dataset.ext || 0) + 1;
+  if (img.dataset.codigo !== "1" || i >= EXT_FOTOS.length) { img.remove(); enviarAltura(); return; }
+  img.dataset.ext = String(i);
+  img.src = img.src.replace(/\.[^./]+$/, "." + EXT_FOTOS[i]);
+}
+
+// Nombres de una formación (mismo criterio que la página de Futbolistas).
+function jugadoresDeFormacion(texto) {
+  return (texto || "")
+    .replace(/[()]/g, ",").replace(/\b\d+(?:\+\d+)?\s*/g, "").replace(/\.+/g, "")
+    .replace(/\by\s+/g, ",").replace(/\s+e\s+/g, ",")
+    .split(/[,;]+/).map(j => limpiar(j)).filter(j => j.length > 1);
+}
+const norm = s => limpiar(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+// ============================================================
+// REDACCIÓN DE LOS PARTIDOS
+// ============================================================
+const esAmistoso = p => /amistoso|gira por|pretemporada/i.test(p.Torneo);
+const esAnulado = p => /anulado/i.test(p.Torneo);
+const esOficial = p => !esAmistoso(p) && !esAnulado(p);
+
+// "10° fecha del Campeonato X" -> "por la 10° fecha del Campeonato X", etc.
+function frasetorneo(torneo) {
+  const t = limpiar(torneo).replace(/\s*\((amistoso|Amistoso)\)\s*$/, "");
+  if (!t) return "";
+  if (/^amistoso/i.test(t)) return "en un partido amistoso";
+  if (/^(pretemporada|gira por)/i.test(t)) return "en un amistoso (" + t + ")";
+  if (/^día de/i.test(t)) return "en un amistoso por el " + t;
+  if (/^\d+\S*\s+(fecha|fase|ronda|rueda|eliminatoria)/i.test(t)) return "por la " + t;
+  if (/^\d+\S*\s+desempate/i.test(t)) return "por el " + t;
+  if (/^\d+(vo|avo|to)\s+de/i.test(t)) {
+    const r = t.replace(/^(\d+)(vo|avo|to)\s+de\s+(final\s+)?(del\s+|de\s+la\s+|de\s+)?/i, (m, n, suf, fin, de) => {
+      const ronda = n === "4" ? "cuartos" : n === "8" ? "octavos" : n + "avos";
+      return ronda + " de final " + (de ? de.toLowerCase() : "de ");
+    });
+    return "por los " + r;
+  }
+  if (/^(final|semifinal|semi|fase|promoción|eliminatoria|liguilla|copa|reválida)/i.test(t)) {
+    return "por la " + t.charAt(0).toLowerCase() + t.slice(1).replace(/^semi de/i, "semifinal de");
+  }
+  if (/^desempate/i.test(t)) return "por el " + t.charAt(0).toLowerCase() + t.slice(1);
+  return "por el " + t;
+}
+const aRival = club => /^selección/i.test(club) ? "a la " + club : "a " + club;
+const conRival = club => /^selección/i.test(club) ? "con la " + club : "con " + club;
+const anteRival = club => /^selección/i.test(club) ? "ante la " + club : "ante " + club;
+const esClasico = club => /san lorenzo/i.test(club);
+
+function lugar(p) {
+  const est = limpiar(p.Estadio).replace(/^Tomás A Ducó$/, "Tomás A. Ducó");
+  if (p.Condición === "local" && /^(Tomás A\. Ducó|El Palacio)$/.test(est)) return "en el Palacio Ducó";
+  if (p.Condición === "local" && /^La Quema$/.test(est)) return "en La Quema";
+  if (p.Condición === "local") return "como local";
+  if (p.Condición === "visitante") return "como visitante";
+  if (p.Condición === "neutral") return "en cancha neutral";
+  return "";
+}
+
+// Goleadores de Huracán a partir de Incidencias ("9 GOL Oscar Cortés (HUR) -tiro libre-").
+// Se agrupan por jugador: "Orlando Peloso (2, uno de penal)".
+function goleadores(p) {
+  const lista = new Map();
+  (p.Incidencias || "").split(/\s*\|\s*|<\/?br\s*\/?>/i).forEach(linea => {
+    const m = linea.match(/^\s*[\d+]*\s*GOL\s+(.+?)\s+\(HUR\)\s*(-[^-]*-)?/i);
+    if (!m) return;
+    let nombre = limpiar(m[1]);
+    if (/^NN$/i.test(nombre)) nombre = "sin datos";
+    const enContra = /en contra/i.test(m[2] || "");
+    const clave = nombre + (enContra ? "|ec" : "");
+    const g = lista.get(clave) || { nombre, enContra, goles: 0, penales: 0 };
+    g.goles++;
+    if (/penal/i.test(m[2] || "")) g.penales++;
+    lista.set(clave, g);
+  });
+  return [...lista.values()].map(g => {
+    const notas = [];
+    if (g.goles > 1) notas.push(String(g.goles));
+    if (g.enContra) notas.push("en contra");
+    if (g.penales) notas.push(g.goles === 1 ? "de penal" : g.penales === g.goles ? "todos de penal" : g.penales === 1 ? "uno de penal" : g.penales + " de penal");
+    return notas.length ? `${g.nombre} (${notas.join(", ")})` : g.nombre;
+  });
+}
+function listaConY(arr) {
+  if (arr.length <= 1) return arr.join("");
+  return arr.slice(0, -1).join(", ") + " y " + arr[arr.length - 1];
+}
+
+// Datos automáticos sobre el partido: primera victoria oficial y mayor goleada ante ese rival.
+function hitosAutomaticos(p, todos) {
+  const hitos = [];
+  if (!esOficial(p) || p.Situación !== "victoria") return hitos;
+  const club = norm(p.Club);
+  const victorias = todos.filter(x => norm(x.Club) === club && esOficial(x) && x.Situación === "victoria");
+  if (victorias.length && victorias[0] === p && todos.some(x => norm(x.Club) === club && esOficial(x) && x.orden < p.orden)) {
+    hitos.push(`Fue la primera victoria oficial de Huracán ante ${p.Club}.`);
+  }
+  const dif = p.g1 - p.g2;
+  if (dif >= 3) {
+    const max = Math.max(...victorias.map(x => x.g1 - x.g2));
+    const iguales = victorias.filter(x => x.g1 - x.g2 === max);
+    if (dif === max) hitos.push(iguales.length === 1
+      ? `Es la goleada más amplia de Huracán ${anteRival(p.Club)} en partidos oficiales.`
+      : `Es una de las goleadas más amplias de Huracán ${anteRival(p.Club)} en partidos oficiales.`);
+  }
+  return hitos;
+}
+
+// Arma la oración principal del partido.
+function relatoPartido(p) {
+  const g1 = p.g1, g2 = p.g2;
+  let verbo;
+  if (p.Situación === "victoria" && g1 === g2) verbo = `le ganó por penales ${aRival(p.Club)}, tras igualar ${g1} a ${g2}`;
+  else if (p.Situación === "victoria") {
+    if (esClasico(p.Club)) verbo = `le ganó el clásico ${g1} a ${g2} ${aRival(p.Club)}`;
+    else if (g1 - g2 >= 3) verbo = `goleó ${g1} a ${g2} ${aRival(p.Club)}`;
+    else verbo = `le ganó ${g1} a ${g2} ${aRival(p.Club)}`;
+  }
+  else if (p.Situación === "empate") verbo = `igualó ${g1} a ${g2} ${conRival(p.Club)}`;
+  else if (p.Situación === "derrota") verbo = `cayó ${g1} a ${g2} ${anteRival(p.Club)}`;
+  else verbo = `jugó ${anteRival(p.Club)}`;
+  return ["Huracán", verbo, lugar(p), frasetorneo(p.Torneo)].filter(Boolean).join(" ").replace(/\s+,/g, ",") + ".";
+}
+
+// ============================================================
+// CARGA DE DATOS
+// ============================================================
+let DATOS = null;
+
+async function traer(archivo) {
+  const r = await fetch(API + archivo);
+  if (!r.ok) throw new Error(archivo + " no disponible");
+  return r.text();
+}
+const parsear = csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
+
+async function cargarDatos() {
+  const [ivals, futA, futE, futO, ...partidosCsv] = await Promise.all([
+    traer("lubs"), traer("utbolistsa"), traer("utbolistse"), traer("utbolistso"),
+    ...ARCHIVOS_PARTIDOS.map(traer)
+  ]);
+
+  // Partidos (en orden cronológico real)
+  const partidos = partidosCsv.flatMap(parsear).map(p => {
+    const o = {};
+    for (const k in p) o[limpiar(k)] = limpiar(p[k]);
+    o.f = leerFecha(o.Fecha);
+    o.g1 = parseInt(o.Resultado1, 10) || 0;
+    o.g2 = parseInt(o.Resultado2, 10) || 0;
+    return o;
+  });
+  partidos.forEach((p, i) => p.orden = i);
+
+  // Partidos jugados por cada futbolista (columna Huracán)
+  const partidosPorJugador = new Map();
+  partidos.forEach(p => {
+    new Set(jugadoresDeFormacion(p.Huracán).map(norm)).forEach(n => partidosPorJugador.set(n, (partidosPorJugador.get(n) || 0) + 1));
+  });
+
+  // Futbolistas: una sola ficha por jugador (las idas y vueltas repiten la fila)
+  const vistos = new Set();
+  const futbolistas = [];
+  [...parsear(futA), ...parsear(futE), ...parsear(futO)].forEach(f => {
+    const nombre = limpiar(f.Futbolista);
+    if (!nombre || vistos.has(norm(nombre))) return;
+    vistos.add(norm(nombre));
+    futbolistas.push({
+      fila: f, nombre,
+      nac: leerFecha(f.FechaNac), muerte: leerFecha(f.FechaMuerte),
+      lugarNac: vacio(f.LugarNac) ? "" : limpiar(f.LugarNac),
+      lugarMuerte: vacio(f.LugarMuerte) ? "" : limpiar(f.LugarMuerte),
+      posicion: vacio(f.Posición) ? "" : limpiar(f.Posición).split(" / ")[0],
+      partidos: partidosPorJugador.get(norm(nombre)) || 0
+    });
+  });
+
+  // Clubes
+  const clubes = parsear(ivals).map(c => ({
+    club: limpiar(c.Club), id: limpiar(c.id),
+    fund: leerFecha(c.Fundacion),
+    escudo: limpiar(c.Escudo)
+  })).filter(c => c.club && c.fund);
+
+  DATOS = { partidos, futbolistas, clubes };
+}
+
+// ============================================================
+// EFEMÉRIDES DE UN DÍA
+// ============================================================
+function efemeridesDelDia(obj) {
+  const { partidos, futbolistas, clubes } = DATOS;
+  const especiales = new Map(HECHOS_ESPECIALES.map(h => [h.fecha, h]));
+
+  // Partidos: victorias + los marcados como especiales
+  const delDia = partidos.filter(p => p.f && coincide(p.f.dia, p.f.mes, obj) && !esAnulado(p));
+  const elegidos = delDia.filter(p => p.Situación === "victoria" || especiales.has(p.Fecha));
+  const oficiales = elegidos.filter(p => esOficial(p) || especiales.has(p.Fecha));
+  const amistosos = elegidos.filter(p => !oficiales.includes(p));
+
+  // Hechos especiales sin partido ese día
+  const fechasConPartido = new Set(delDia.map(p => p.Fecha));
+  const hitosSueltos = HECHOS_ESPECIALES.filter(h => {
+    const f = leerFecha(h.fecha);
+    return f && coincide(f.dia, f.mes, obj) && !fechasConPartido.has(h.fecha);
+  });
+
+  // Futbolistas: nacimientos y fallecimientos, los de más partidos
+  const jugadores = [];
+  futbolistas.forEach(f => {
+    if (f.nac && coincide(f.nac.dia, f.nac.mes, obj)) jugadores.push({ ...f, tipo: "nac", fecha: f.nac });
+    if (f.muerte && coincide(f.muerte.dia, f.muerte.mes, obj)) jugadores.push({ ...f, tipo: "muerte", fecha: f.muerte });
+  });
+  jugadores.sort((a, b) => b.partidos - a.partidos || a.fecha.anio - b.fecha.anio);
+
+  // Clubes: todos los que cumplen años
+  const cumpleClubes = clubes.filter(c => coincide(c.fund.dia, c.fund.mes, obj))
+    .sort((a, b) => a.fund.anio - b.fund.anio);
+
+  return { oficiales, amistosos, hitosSueltos, jugadores: jugadores.slice(0, MAX_FUTBOLISTAS), clubes: cumpleClubes, especiales };
+}
+
+// ============================================================
+// DIBUJO
+// ============================================================
+let textosParaCopiar = [];
+
+function htmlPartido(p, obj, especiales) {
+  const hace = obj.anio - p.f.anio;
+  const especial = especiales.get(p.Fecha);
+  const hitos = [...(especial ? [especial.texto] : []), ...hitosAutomaticos(p, DATOS.partidos)];
+  const goles = goleadores(p);
+  const relato = relatoPartido(p);
+  const detalles = [];
+  if (goles.length) detalles.push("Goles de Huracán: " + listaConY(goles) + ".");
+  if (!vacio(p.Estadio) && !/desconocido/i.test(p.Estadio)) detalles.push("Cancha: " + p.Estadio.replace(/^Tomás A Ducó$/, "Tomás A. Ducó") + ".");
+  if (!vacio(p.Técnico)) detalles.push("DT: " + p.Técnico + ".");
+
+  const texto = `Un ${textoFecha(p.f)} de ${p.f.anio} (hace ${plural(hace, "año", "años")}), ${relato}` +
+    (hitos.length ? " " + hitos.join(" ") : "") + (goles.length ? " " + detalles[0] : "");
+  const idx = textosParaCopiar.push(texto) - 1;
+
+  const foto = urlFotoPartido(p.Foto);
+  const codigo = /^\d{8}[a-z]?$/i.test(limpiar(p.Foto)) ? "1" : "0";
+  const local = p.Condición !== "visitante";
+  const escH = `<img src="${urlEscudo("Huracán")}" alt="Huracán" title="Huracán" onerror="this.style.visibility='hidden'">`;
+  const escR = `<img src="${urlEscudo(p.Club)}" alt="${esc(p.Club)}" title="${esc(p.Club)}" onerror="this.style.visibility='hidden'">`;
+  const marcador = local ? `${escH}<span>${p.g1}-${p.g2}</span>${escR}` : `${escR}<span>${p.g2}-${p.g1}</span>${escH}`;
+
+  return `
+  <article class="partido${especial ? " especial" : ""}">
+    <div class="partido-media">
+      ${foto ? `<img class="foto" src="${foto}" data-codigo="${codigo}" alt="Huracán vs. ${esc(p.Club)}, ${esc(p.Fecha)}" loading="lazy" onerror="fotoPartidoError(this)" onload="enviarAltura()">` : ""}
+      <div class="escudos">${marcador}</div>
+    </div>
+    <div>
+      <div class="anio">${p.f.anio} <span>· hace ${plural(hace, "año", "años")}</span></div>
+      <p class="relato">${esc(relato)}</p>
+      ${hitos.map(h => `<div class="hito">★ ${esc(h)}</div>`).join("")}
+      <div class="detalle">${detalles.map(esc).join(" ")}</div>
+      <button class="copiar" data-copiar="${idx}">Copiar texto</button>
+    </div>
+  </article>`;
+}
+
+function htmlHitoSuelto(h, obj) {
+  const f = leerFecha(h.fecha);
+  const hace = obj.anio - f.anio;
+  const texto = `Un ${textoFecha(f)} de ${f.anio} (hace ${plural(hace, "año", "años")}): ${[h.titulo, h.texto].filter(Boolean).join(". ")}.`.replace(/\.\.$/, ".");
+  const idx = textosParaCopiar.push(texto) - 1;
+  return `
+  <article class="partido especial" style="grid-template-columns:90px 1fr">
+    <div class="partido-media"><div class="escudos"><img src="${urlEscudo("Huracán")}" alt="Huracán" style="width:64px;height:64px"></div></div>
+    <div>
+      <div class="anio">${f.anio} <span>· hace ${plural(hace, "año", "años")}</span></div>
+      <p class="relato">${h.titulo ? `<b>${esc(h.titulo)}</b>` : ""}${h.titulo && h.texto ? " — " : ""}${esc(h.texto || "")}</p>
+      <button class="copiar" data-copiar="${idx}">Copiar texto</button>
+    </div>
+  </article>`;
+}
+
+function htmlJugador(j, obj) {
+  const anios = obj.anio - j.fecha.anio;
+  let etiqueta, dato;
+  if (j.tipo === "nac") {
+    etiqueta = `<span class="etiqueta">Nació en ${j.fecha.anio}</span>`;
+    dato = j.muerte ? `Hoy cumpliría ${anios} años` : `Cumple ${anios} años`;
+    if (j.lugarNac) dato += ` · ${j.lugarNac}`;
+  } else {
+    etiqueta = `<span class="etiqueta luto">Falleció en ${j.fecha.anio}</span>`;
+    dato = `Se cumplen ${plural(anios, "año", "años")} de su muerte`;
+  }
+  const texto = j.tipo === "nac"
+    ? `Un ${textoFecha(j.fecha)} de ${j.fecha.anio} nació ${j.nombre}${j.lugarNac ? " en " + j.lugarNac : ""}, que jugó ${plural(j.partidos, "partido", "partidos")} en Huracán.`
+    : `Un ${textoFecha(j.fecha)} de ${j.fecha.anio} falleció ${j.nombre}, que jugó ${plural(j.partidos, "partido", "partidos")} en Huracán.`;
+  textosParaCopiar.push(texto);
+  const link = URL_PAGINA_FUTBOLISTAS + "?jugador=" + encodeURIComponent(j.nombre);
+  return `
+  <div class="jugador">
+    <a href="${link}" target="_top"><img src="${urlFotoFutbolista(j.fila)}" alt="${esc(j.nombre)}" loading="lazy" onerror="fotoJugadorError(this)"></a>
+    <a class="nombre" href="${link}" target="_top">${esc(j.nombre)}</a>
+    ${etiqueta}
+    <div class="dato">${esc(dato)}</div>
+    <div class="dato">${esc([j.posicion, plural(j.partidos, "partido", "partidos") + " en Huracán"].filter(Boolean).join(" · "))}</div>
+  </div>`;
+}
+
+function htmlClub(c, obj) {
+  const anios = obj.anio - c.fund.anio;
+  textosParaCopiar.push(`${c.club} cumple ${anios} años (fundado el ${textoFecha(c.fund)} de ${c.fund.anio}).`);
+  const link = URL_PAGINA_RIVALES + "?club=" + encodeURIComponent(c.club);
+  const escudo = c.escudo && /^https?:/.test(c.escudo) ? c.escudo : urlEscudo(c.club);
+  return `
+  <a class="club" href="${link}" target="_top" title="Fundado el ${textoFecha(c.fund)} de ${c.fund.anio}">
+    <img src="${esc(escudo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+    <div><div class="nombre">${esc(c.club)}</div><div class="dato">Cumple ${anios} años · ${c.fund.anio}</div></div>
+  </a>`;
+}
+
+let diaActual = 0;
+function dibujar(desplazamiento) {
+  diaActual = desplazamiento;
+  const obj = diaObjetivo(desplazamiento);
+  const panel = document.getElementById("panel");
+  if (!DATOS) return;
+  textosParaCopiar = [];
+  const e = efemeridesDelDia(obj);
+  const bloques = [];
+
+  if (e.hitosSueltos.length || e.oficiales.length || e.amistosos.length) {
+    let h = `<div class="bloque"><h3>Partidos e hitos</h3>`;
+    h += e.hitosSueltos.map(x => htmlHitoSuelto(x, obj)).join("");
+    h += e.oficiales.map(p => htmlPartido(p, obj, e.especiales)).join("");
+    if (e.amistosos.length) {
+      h += `<details class="amistosos"${e.oficiales.length ? "" : " open"}><summary>${e.oficiales.length ? "Además, " : ""}${plural(e.amistosos.length, "triunfo", "triunfos")} en amistosos</summary>`;
+      h += e.amistosos.map(p => htmlPartido(p, obj, e.especiales)).join("") + `</details>`;
+    }
+    bloques.push(h + `</div>`);
+  }
+  if (e.jugadores.length) {
+    bloques.push(`<div class="bloque"><h3>Futbolistas</h3><div class="grilla-jugadores">${e.jugadores.map(j => htmlJugador(j, obj)).join("")}</div></div>`);
+  }
+  if (e.clubes.length) {
+    bloques.push(`<div class="bloque"><h3>Clubes que cumplen años</h3><div class="grilla-clubes">${e.clubes.map(c => htmlClub(c, obj)).join("")}</div></div>`);
+  }
+
+  const encabezado = `${desplazamiento ? "Un día como mañana" : "Un día como hoy"}, ${textoFecha(obj)}`;
+  panel.innerHTML = (bloques.length ? bloques.join("") : `<div class="vacio">Todavía no hay efemérides cargadas para el ${textoFecha(obj)}.</div>`) +
+    `<div class="pie-efem"><p>Fuente: Globopedia (www.globopedia.ar). Se permite reproducir citando la fuente.</p>` +
+    (bloques.length ? `<button class="copiar copiar-todo" data-copiar="todo">Copiar todas las efemérides del día</button>` : "") + `</div>`;
+  panel.dataset.encabezado = encabezado;
+  enviarAltura();
+}
+
+// Copiar al portapapeles (para los medios partidarios)
+async function copiarTexto(texto) {
+  try { await navigator.clipboard.writeText(texto); return true; }
+  catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = texto; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {}
+    ta.remove(); return ok;
+  }
+}
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("[data-copiar]");
+  if (!b) return;
+  const panel = document.getElementById("panel");
+  const cual = b.dataset.copiar;
+  const texto = cual === "todo"
+    ? `${panel.dataset.encabezado.toUpperCase()} — Efemérides de Huracán\n\n` + textosParaCopiar.map(t => "• " + t).join("\n") + `\n\nFuente: Globopedia (www.globopedia.ar)`
+    : textosParaCopiar[+cual] + " (Fuente: Globopedia)";
+  const ok = await copiarTexto(texto);
+  const original = b.textContent;
+  b.textContent = ok ? "¡Copiado!" : "No se pudo copiar";
+  b.classList.toggle("ok", ok);
+  setTimeout(() => { b.textContent = original; b.classList.remove("ok"); }, 1600);
+});
+
+// Pestañas hoy / mañana
+document.querySelectorAll(".pestana").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".pestana").forEach(x => x.classList.toggle("activa", x === b));
+  dibujar(+b.dataset.dia);
+}));
+
+// Revistas
+document.getElementById("tapas").innerHTML = REVISTAS.map(r =>
+  `<a href="${r.link}" target="_blank" rel="noopener" title="Revista Globopedia ${r.n}"><img src="${r.tapa}" alt="Revista Globopedia ${r.n}" loading="lazy" onload="enviarAltura()"></a>`
+).join("");
+
+// ============================================================
+// AUDIO DE LA MARCHA (YouTube, solo sonido)
+// Los navegadores no dejan arrancar con sonido sin un clic,
+// así que suena cuando el visitante toca el botón.
+// ============================================================
+let reproductor = null, sonando = false;
+function cargarApiYouTube() {
+  return new Promise(res => {
+    if (window.YT && window.YT.Player) return res();
+    window.onYouTubeIframeAPIReady = res;
+    const s = document.createElement("script");
+    s.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(s);
+  });
+}
+document.getElementById("botonAudio").addEventListener("click", async () => {
+  const boton = document.getElementById("botonAudio");
+  const caja = document.getElementById("audio");
+  if (!reproductor) {
+    boton.textContent = "♪ …";
+    await cargarApiYouTube();
+    reproductor = new YT.Player("reproductorMarcha", {
+      width: 16, height: 16, videoId: ID_VIDEO_MARCHA,
+      playerVars: { autoplay: 1, controls: 0, playsinline: 1, rel: 0 },
+      events: { onReady: e => e.target.playVideo() }
+    });
+    sonando = true;
+  } else if (sonando) { reproductor.pauseVideo(); sonando = false; }
+  else { reproductor.playVideo(); sonando = true; }
+  boton.textContent = sonando ? "♪ AUDIO OFF" : "♪ AUDIO ON";
+  caja.classList.toggle("sonando", sonando);
+});
+
+// ============================================================
+// ALTURA DEL IFRAME (Blogger ajusta el alto con este mensaje)
+// ============================================================
+let ultimaAltura = null, timerAltura = null;
+function enviarAltura() {
+  clearTimeout(timerAltura);
+  timerAltura = setTimeout(() => {
+    const altura = document.documentElement.scrollHeight;
+    if (ultimaAltura !== null && Math.abs(altura - ultimaAltura) <= 3) return;
+    ultimaAltura = altura;
+    window.parent.postMessage({ type: "ajustarAltura", altura }, "*");
+  }, 120);
+}
+window.addEventListener("load", enviarAltura);
+window.addEventListener("resize", enviarAltura);
+document.addEventListener("toggle", enviarAltura, true);
+if (window.ResizeObserver) new ResizeObserver(enviarAltura).observe(document.body);
+
+// ============================================================
+// ARRANQUE
+// ============================================================
+document.getElementById("etiquetaHoy").textContent = textoFecha(diaObjetivo(0));
+document.getElementById("etiquetaManiana").textContent = textoFecha(diaObjetivo(1));
+cargarDatos()
+  .then(() => dibujar(0))
+  .catch(err => {
+    console.error(err);
+    document.getElementById("panel").innerHTML = `<div class="vacio">No se pudieron cargar las efemérides. Probá recargar la página en un rato.</div>`;
+    enviarAltura();
+  });
+</script>
+</body>
+</html>
