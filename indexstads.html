@@ -637,7 +637,7 @@ function renderEstadisticas() {
   }
 
   // Listado de partidos, igual al de Torneos: resultado y escudo grandes en
-  // la barrita; al lado, condición, fecha y el torneo completo (con su año).
+  // la barrita; al lado, fecha, torneo completo (con su año) y condición.
   const huracan = `<img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" loading="lazy" class="escudo-huracan">`;
   const html = partidos.map(p => {
     const visitante = norm(p.Condición) === "visitante";
@@ -656,9 +656,9 @@ function renderEstadisticas() {
           <span class="resultado-header">${escapeHTML(p.Resultado1)}-${escapeHTML(p.Resultado2)}</span>
           <img class="escudo-header" src="${getEscudo(p.Club)}" alt="${escapeHTML(p.Club)}" loading="lazy">
           <span class="ronda-dt-stack">
-            ${condicion ? `${escapeHTML(condicion)}<br>` : ""}
             ${p.Fecha ? `${escapeHTML(p.Fecha)}<br>` : ""}
             ${escapeHTML(p.Torneo)}
+            ${condicion ? `<br>${escapeHTML(condicion)}` : ""}
           </span>
         </span>
         <span class="acordeon-header-der">
