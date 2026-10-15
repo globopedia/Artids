@@ -19,16 +19,26 @@
     .stat-title { font-weight:bold; color:#FF0000; margin-bottom:6px; }
     .hr { border:none; border-top:1px solid #FF0000; margin:8px 0; }
     .partido-card { border:1px solid #ccc; border-radius:6px; padding:6px; margin:4px 0; background:#fafafa; font-size:14px; text-align: center; }
+    /* Acordeón de partidos, igual al de Torneos */
     .acordeon { border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; background: #fefefe; }
-    .acordeon-header { background: #eee; padding: 4px 8px; cursor: pointer; font-size: 14px; text-align: right; position: relative; padding-right: 20px; }
-    .acordeon-header::after { content: "▾"; position: absolute; right: 0; transition: transform 0.3s; }
+    .acordeon-header {
+      background: #fff; padding: 6px 12px; cursor: pointer; font-size: 14px; position: relative;
+      padding-right: 25px; font-weight: bold; border-left: 4px solid #e00000; transition: background-color 0.2s ease;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    }
+    .acordeon-header:hover { background-color: #ffe0e0; }
+    .acordeon-header::after { content: "▾"; position: absolute; right: 8px; transition: transform 0.3s; }
     .acordeon-header.abierto::after { transform: rotate(180deg); }
-    .acordeon-body { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease; padding: 8px; }
+    .acordeon-body { max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding: 8px; }
     .acordeon-body.cerrado { max-height: 0; padding: 0 8px; }
-    /* Barrita blanca con piquito rojo, igual a la de las otras páginas */
-    .acordeon .acordeon-header { border-left: 4px solid #e00000; background-color: #ffffff; transition: background-color 0.2s ease; }
-    .acordeon .acordeon-header:hover { background-color: #ffe0e0; }
-    .acordeon-header .rival-en-barra { float:left; color:#555; pointer-events:none; }
+    .acordeon-header-izq { display: flex; align-items: center; gap: 5px; }
+    .acordeon-header-der { display: flex; align-items: center; gap: 3px; }
+    .foto-formacion { height: 84px; width: 132px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc; }
+    .foto-camiseta { height: 84px; width: 84px; object-fit: contain; padding: 3px; box-sizing: border-box; background: #fff; border-radius: 14px; border: 1px solid #ccc; }
+    .resultado-header { font-size: 48px; font-weight: bold; line-height: 1; }
+    .escudo-header { width: 60px; height: 60px; object-fit: contain; vertical-align: middle; margin: 0 6px; }
+    .ronda-dt-stack { font-size: 12px; font-weight: normal; text-align: left; line-height: 1.5; }
+    .resultado-con-escudo { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
     .resultado1-box, .resultado2-box {
       display: inline-block; width: 16px; height: 28px; font-size: 32px; font-weight: bold;
       line-height: 28px; text-align: center; margin: 2px; padding: 10px 10px;
@@ -109,9 +119,6 @@ const partidosURLs = ["artids1910","artids1925","artids1940","artids1955","artid
 const transfersURLs = ["utbolistsa","utbolistse","utbolistso"].map(f => "https://artids.vercel.app/api/data?file=" + f);
 const arbitrosURL = "https://artids.vercel.app/api/data?file=rbits";
 
-// Si un estadio tiene más partidos que esto, aparecen los cuadritos de
-// décadas y años para elegir qué período ver; si tiene menos, va todo junto.
-const TOPE_SIN_PERIODOS = 50;
 
 let estadios = [];
 let clubes = [];
@@ -210,36 +217,6 @@ document.addEventListener("error", ev => {
   img.dataset.escudoActual = "1";
   img.src = getEscudo(actual.club);
 }, true);
-
-// === Competencias (mismo criterio que Rivales) ===
-function bucketCompetencia(torneo) {
-  const t = norm(torneo);
-  if (t.includes("amistoso")) return "No oficiales";
-  if (t.includes("copa libertadores")) return "Copa Libertadores";
-  if (t.includes("sudamericana")) return "Copa Sudamericana";
-  if (t.includes("conmebol")) return "Copa Conmebol";
-  if (t.includes("argentina") || t.includes("republica")) return "Copa Argentina";
-  if (t.includes("competencia") || t.includes("superliga")) return "Copa Competencia";
-  if (t.includes("copa de honor")) return "Copa de Honor";
-  if (t.includes("varela")) return "Campeonato Béccar Varela";
-  if (t.includes("supercopa")) return "Supercopa";
-  if (t.includes("escobar")) return "Copa Escobar";
-  if (t.includes("suecia")) return "Copa Suecia 1958";
-  if (t.includes("copa centenario")) return "Copa Centenario 1993";
-  if (t.includes("maradona")) return "Copa Maradona 2020";
-  if (t.includes("ibarguren")) return "Copa Ibarguren";
-  if (t.includes("aldao")) return "Copa Ricardo Aldao";
-  if (t.includes("estimulo")) return "Estímulo";
-  if (t.includes("b nacional") || t.includes("nacional b") || t.includes("reducido") || t.includes("liguilla de ascenso") || t.includes("segundo ascenso") || t.includes("bn") || t.includes("nb")) return "2° Categoría";
-  if (t.includes("campeonato") || t.includes("promocion") || t.includes("torneo") || t.includes("descenso") || t.includes("pre-libertadores")) return "Campeonato de 1° División";
-  if (t.includes("liga anglo")) return "Liga Anglo-Argentina";
-  if (t.includes("liga 43")) return "Liga 43";
-  if (t.includes("centenario 1909")) return "Liga Centenario";
-  return "Otros";
-}
-const ORDEN_COMPETENCIAS = ["Campeonato de 1° División","Copa Argentina","Supercopa","Copa Libertadores","Copa Sudamericana","Copa Conmebol","Copa Competencia","Copa de Honor","Campeonato Béccar Varela","Copa Ibarguren","Copa Ricardo Aldao","Estímulo","Copa Escobar","Copa Suecia 1958","Copa Centenario 1993","Copa Maradona 2020","2° Categoría","Liga Centenario","Liga 43","Liga Anglo-Argentina","No oficiales","Otros"];
-const CONDICIONES = ["Local","Neutral","Visitante"];
-const SITUACIONES = ["Victoria","Empate","Derrota"];
 
 // Resultado del partido: manda la columna Situación (tolerando "derota",
 // "vitoria"...); si no se entiende, se deduce del marcador.
@@ -393,6 +370,8 @@ Promise.all([
     Huracán: (p.Huracán ?? "").trim(),
     Rival: (p.Rival ?? "").trim(),
     Foto: (p.Foto ?? "").trim(),
+    Formación: (p.Formación ?? "").trim(),
+    Camiseta: (p.Camiseta ?? "").trim(),
     Incidencias: (p.Incidencias ?? "").trim().replace(/\s*\|\s*/g, "</br>")
   }));
 
@@ -553,17 +532,19 @@ function mostrarEstadio() {
     </div>
     <div id="selectorPeriodos"></div>
     <div class="stats">
-      <h3 style="color:#FF0000;">📊 Partidos de Huracán en este estadio</h3>
+      <h3 style="color:#FF0000;">🗓️ Partidos de Huracán en este estadio</h3>
       <div id="estadisticasEstadio"></div>
     </div>`;
   renderPeriodos(todos);
   renderEstadisticas();
 }
 
-// Cuadritos de décadas y, al elegir una década, los de sus años.
+// Cuadritos de décadas (siempre, aunque haya un solo partido) y, al elegir
+// una década, los de sus años. Sin opción "Todos": cargar cientos de partidos
+// juntos hacía la página muy lenta.
 function renderPeriodos(todos) {
   const cont = document.getElementById("selectorPeriodos");
-  if (todos.length <= TOPE_SIN_PERIODOS) { cont.innerHTML = ""; return; }
+  if (!todos.length) { cont.innerHTML = ""; return; }
   const porDecada = {}, porAnio = {};
   todos.forEach(p => {
     const a = anioDe(p.Fecha); if (!a) return;
@@ -575,10 +556,9 @@ function renderPeriodos(todos) {
     : periodoActual.tipo === "anio" ? Math.floor(periodoActual.valor / 10) * 10 : null;
   const chip = (tipo, valor, texto, n) => {
     const activo = periodoActual.tipo === tipo && periodoActual.valor === valor;
-    return `<button class="chip${activo ? " activo" : ""}" data-tipo="${tipo}" data-valor="${valor ?? ""}">${texto}${n !== undefined ? `<small>${n}</small>` : ""}</button>`;
+    return `<button class="chip${activo ? " activo" : ""}" data-tipo="${tipo}" data-valor="${valor}">${texto}<small>${n}</small></button>`;
   };
-  let html = `<div class="periodos"><div class="periodos-titulo">📅 Elegí el período</div><div class="chips">`;
-  html += chip("todos", null, "Todos", todos.length);
+  let html = `<div class="periodos"><div class="periodos-titulo">📅 Elegí la década</div><div class="chips">`;
   Object.keys(porDecada).map(Number).sort((a, b) => a - b).forEach(d => { html += chip("decada", d, `${d}s`, porDecada[d]); });
   html += `</div>`;
   if (decadaElegida !== null) {
@@ -587,18 +567,14 @@ function renderPeriodos(todos) {
       .forEach(a => { html += chip("anio", a, String(a), porAnio[a]); });
     html += `</div>`;
   }
-  const n = partidosDelPeriodo(todos).length;
-  const texto = periodoActual.tipo === "todos" ? "Mostrando todos los partidos."
-    : periodoActual.tipo === "decada" ? `Mostrando la década de ${periodoActual.valor}: ${n} ${plural(n, "partido", "partidos")}.`
-    : `Mostrando ${periodoActual.valor}: ${n} ${plural(n, "partido", "partidos")}.`;
-  html += `<p class="periodo-elegido">${texto}</p></div>`;
+  html += `</div>`;
   cont.innerHTML = html;
 }
 document.addEventListener("click", function(ev) {
   const b = ev.target.closest(".chip");
   if (!b || !estadioActual) return;
-  const tipo = b.dataset.tipo, valor = b.dataset.valor === "" ? null : parseInt(b.dataset.valor, 10);
-  // Tocar de nuevo un año elegido vuelve a su década; tocar de nuevo la década, a "Todos".
+  const tipo = b.dataset.tipo, valor = parseInt(b.dataset.valor, 10);
+  // Tocar de nuevo un año elegido vuelve a su década; tocar de nuevo la década, la cierra.
   if (periodoActual.tipo === tipo && periodoActual.valor === valor) {
     periodoActual = tipo === "anio" ? { tipo: "decada", valor: Math.floor(valor / 10) * 10 } : { tipo: "todos", valor: null };
   } else {
@@ -608,6 +584,18 @@ document.addEventListener("click", function(ev) {
   renderPeriodos(todos);
   renderEstadisticas();
 });
+
+function urlCamiseta(valor) {
+  const v = (valor || "").trim();
+  if (!v || v === "-" || norm(v) === "camiseta") return "";
+  if (/^https?:\/\//i.test(v)) return v;
+  return "https://globopedia.github.io/Artids/Amisets/" + encodeURIComponent(v) + (/\.(png|jpe?g)$/i.test(v) ? "" : ".png");
+}
+function urlFormacion(valor) {
+  const v = (valor || "").trim();
+  if (!v || v === "-" || norm(v) === "formacion") return "";
+  return /^https?:\/\//i.test(v) ? v : "";
+}
 
 function renderEstadisticas() {
   const todos = PARTIDOS_POR_ESTADIO[estadioActual.id] || [];
@@ -632,76 +620,27 @@ function renderEstadisticas() {
     if (E) partes.push(`empató ${E}`);
     if (P) partes.push(`perdió ${P}`);
     const frase = partes.length > 1 ? partes.slice(0, -1).join(", ") + " y " + partes[partes.length - 1] : (partes[0] || "");
-    const filtro = periodoActual.tipo === "todos" ? "" : ` (${periodoActual.tipo === "decada" ? "década de " + periodoActual.valor : periodoActual.valor})`;
+    const filtro = periodoActual.tipo === "todos" ? "" : (periodoActual.tipo === "decada" ? "Década de " + periodoActual.valor : String(periodoActual.valor));
     resumen.innerHTML = `<p class="resumen-global" style="margin:6px 0;">
       Huracán jugó ${todos.length} ${plural(todos.length, "partido", "partidos")} en este estadio, ${periodo}.<br>
-      ${filtro ? `<b>${capitalizarPrimera(filtro.replace(/[()]/g, "").trim())}:</b> ${partidos.length} ${plural(partidos.length, "partido", "partidos")}${frase ? ": " : "."} ` : ""}${filtro ? frase : capitalizarPrimera(frase)}${frase ? "." : ""}
+      ${filtro ? `<b>${filtro}:</b> ${partidos.length} ${plural(partidos.length, "partido", "partidos")}${frase ? ": " : "."} ` : ""}${filtro ? frase : capitalizarPrimera(frase)}${frase ? "." : ""}
       ${gf || gc ? `Convirtió ${gf} ${plural(gf, "gol", "goles")} y recibió ${gc}.` : ""}
     </p>`;
   }
   setTimeout(() => dibujarTorta(G, E, P), 0);
 
-  // Checklists por competencia, condición y resultado (como en Rivales)
-  const agg = {};
-  partidos.forEach(p => {
-    const comp = bucketCompetencia(p.Torneo), cond = cap(norm(p.Condición)), sit = resultadoPartido(p);
-    if (!CONDICIONES.includes(cond) || !sit) return;
-    agg[comp] = agg[comp] || {};
-    agg[comp][cond] = agg[comp][cond] || { Victoria: 0, Empate: 0, Derrota: 0 };
-    agg[comp][cond][sit]++;
-  });
-  let html = "";
-  ORDEN_COMPETENCIAS.forEach(comp => {
-    if (!agg[comp]) return;
-    const delComp = partidos.filter(p => bucketCompetencia(p.Torneo) === comp);
-    let g = 0, e = 0, d = 0, f = 0, c = 0;
-    delComp.forEach(p => {
-      const r = resultadoPartido(p);
-      if (r === "Victoria") g++; else if (r === "Empate") e++; else if (r === "Derrota") d++;
-      f += parseInt(p.Resultado1, 10) || 0; c += parseInt(p.Resultado2, 10) || 0;
-    });
-    const partes = [];
-    if (g) partes.push(`ganó ${g}`);
-    if (e) partes.push(`empató ${e}`);
-    if (d) partes.push(`perdió ${d}`);
-    const frase = partes.length > 1 ? partes.slice(0, -1).join(", ") + " y " + partes[partes.length - 1] : (partes[0] || "");
-    let bloques = "";
-    CONDICIONES.forEach(cond => {
-      const b = agg[comp][cond];
-      if (!b || !(b.Victoria + b.Empate + b.Derrota)) return;
-      if (bloques) bloques += `<div class="hr"></div>`;
-      bloques += `<div class="stat-title">📍 ${cond}</div><ul>`;
-      SITUACIONES.forEach(sit => {
-        if (!b[sit]) return;
-        const icono = sit === "Victoria" ? "✅" : sit === "Empate" ? "🤝" : "❌";
-        bloques += `<li><label><input type="checkbox" class="chkPartidos" data-comp="${comp}" data-cond="${cond}" data-sit="${sit}"> ${icono} ${sit}s: ${b[sit]}</label>
-          <div class="partidos-lista" style="display:none; margin-left:20px;"></div></li>`;
-      });
-      bloques += `</ul>`;
-    });
-    html += `<div class="stat-group">
-      <div class="stat-title">🏆 ${comp}</div>
-      <p style="margin:6px 0; font-weight:500;">Jugó ${delComp.length} ${plural(delComp.length, "partido", "partidos")}: ${frase}. ${f || c ? `Convirtió ${f} ${plural(f, "gol", "goles")} y recibió ${c}.` : ""}</p>
-      ${bloques}
-    </div>`;
-  });
-  document.getElementById("estadisticasEstadio").innerHTML = html || "<p><i>No hay partidos en este período.</i></p>";
-}
+  const cont = document.getElementById("estadisticasEstadio");
+  if (!todos.length) { cont.innerHTML = ""; return; }
+  if (periodoActual.tipo === "todos") {
+    cont.innerHTML = `<p><i>Tocá una década (y, si querés, un año) para ver los partidos.</i></p>`;
+    return;
+  }
 
-// Al tildar un casillero, aparece la lista de partidos (fecha y rival), cada uno
-// con su ficha completa en un acordeón, igual que en las otras páginas.
-document.addEventListener("change", function(ev) {
-  if (!ev.target.classList.contains("chkPartidos")) return;
-  const contenedor = ev.target.closest("li").querySelector(".partidos-lista");
-  contenedor.innerHTML = "";
-  if (!ev.target.checked) { contenedor.style.display = "none"; return; }
-  const { comp, cond, sit } = ev.target.dataset;
-  const partidos = partidosDelPeriodo(PARTIDOS_POR_ESTADIO[estadioActual.id] || []).filter(p =>
-    bucketCompetencia(p.Torneo) === comp && cap(norm(p.Condición)) === cond && resultadoPartido(p) === sit);
-  let html = "";
-  partidos.forEach(p => {
+  // Listado de partidos, igual al de Torneos: resultado y escudo grandes en
+  // la barrita; al lado, condición, fecha y el torneo completo (con su año).
+  const huracan = `<img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" loading="lazy" class="escudo-huracan">`;
+  const html = partidos.map(p => {
     const visitante = norm(p.Condición) === "visitante";
-    const huracan = `<img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" loading="lazy" class="escudo-huracan">`;
     const rival = `<img class="escudo-rival" loading="lazy" src="${getEscudo(p.Club)}" alt="${escapeHTML(p.Club)}" />`;
     const marcador = visitante
       ? `${rival}<div class="resultado2-box">${p.Resultado2}</div><div class="resultado1-box">${p.Resultado1}</div>${huracan}`
@@ -709,12 +648,28 @@ document.addEventListener("change", function(ev) {
     const planteles = visitante
       ? `<div><b>${escapeHTML(p.Club)}:</b> ${enlazarJugadores(p.Rival)}</div><div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>`
       : `<div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div><div><b>${escapeHTML(p.Club)}:</b> ${enlazarJugadores(p.Rival)}</div>`;
-    html += `<div class="acordeon">
-      <div class="acordeon-header"><span class="rival-en-barra">${escapeHTML(p.Club)}</span>${p.Fecha}</div>
+    const condicion = vacio(p.Condición) ? "" : capitalizarPrimera(p.Condición.toLowerCase());
+    const formacion = urlFormacion(p.Formación), camiseta = urlCamiseta(p.Camiseta);
+    return `<div class="acordeon">
+      <div class="acordeon-header">
+        <span class="acordeon-header-izq">
+          <span class="resultado-header">${escapeHTML(p.Resultado1)}-${escapeHTML(p.Resultado2)}</span>
+          <img class="escudo-header" src="${getEscudo(p.Club)}" alt="${escapeHTML(p.Club)}" loading="lazy">
+          <span class="ronda-dt-stack">
+            ${condicion ? `${escapeHTML(condicion)}<br>` : ""}
+            ${p.Fecha ? `${escapeHTML(p.Fecha)}<br>` : ""}
+            ${escapeHTML(p.Torneo)}
+          </span>
+        </span>
+        <span class="acordeon-header-der">
+          ${formacion ? `<img class="foto-formacion" src="${escapeHTML(formacion)}" alt="Formación" loading="lazy" onerror="this.style.display='none'">` : ""}
+          ${camiseta ? `<img class="foto-camiseta" src="${escapeHTML(camiseta)}" alt="Camiseta" loading="lazy" onerror="this.style.display='none'">` : ""}
+        </span>
+      </div>
       <div class="acordeon-body cerrado">
         <div class="partido-card">
           ${getTorneoImage(p.Torneo)}
-          ${marcador}
+          <div class="resultado-con-escudo">${marcador}</div>
           <div><b>${escapeHTML(p.Torneo)}</b></div>
           <div><b>Estadio:</b> ${escapeHTML(p.Estadio)} - <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro)}</div>
           ${planteles}
@@ -723,14 +678,14 @@ document.addEventListener("change", function(ev) {
         </div>
       </div>
     </div>`;
-  });
-  contenedor.innerHTML = html || "<i>No hay partidos registrados</i>";
-  contenedor.style.display = "block";
-});
+  }).join("");
+  cont.innerHTML = html || "<p><i>No hay partidos en este período.</i></p>";
+}
 document.addEventListener("click", function(ev) {
-  if (ev.target.classList.contains("acordeon-header")) {
-    ev.target.nextElementSibling.classList.toggle("cerrado");
-    ev.target.classList.toggle("abierto");
+  const h = ev.target.closest(".acordeon-header");
+  if (h) {
+    h.nextElementSibling.classList.toggle("cerrado");
+    h.classList.toggle("abierto");
   }
 });
 
