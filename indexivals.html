@@ -2249,12 +2249,12 @@ function enlazarJugadores(texto) {
 
     function getEstadioImage(estadio) {
       if (!estadio) return "";
-      // Limpiamos nombre para intentar coincidir con archivos en la carpeta Estadios
+      // Limpiamos nombre para intentar coincidir con archivos en la carpeta Stads
       const fileName = estadio
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .replace(/\./g, "")
         .replace(/\s+/g, "") + ".png";
-      return "https://globopedia.github.io/Artids/Estadios/" + fileName;
+      return "https://globopedia.github.io/Artids/Stads/" + fileName;
     }
 
     function getTorneoImage(nombreTorneo) {

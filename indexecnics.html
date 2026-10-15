@@ -1241,7 +1241,7 @@ function getResumenTecnico(nombreTecnico) {
     function getEstadioImage(estadio) {
       if (!estadio) return "";
       const fileName = estadio.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\./g, "").replace(/\s+/g, "") + ".png";
-      return "https://globopedia.github.io/Artids/Estadios/" + fileName;
+      return "https://globopedia.github.io/Artids/Stads/" + fileName;
     }
 
     function getTorneoImage(nombreTorneo) {

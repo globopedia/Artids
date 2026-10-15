@@ -562,14 +562,14 @@ function htmlFotoPartido(valor, alt = "") {
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
     }
 
-    // Busca imagen de estadio en carpeta Estadios
+    // Busca imagen de estadio en carpeta Stads
     function getEstadioImage(estadio) {
       if (!estadio) return "";
       const fileName = estadio
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .replace(/\./g, "")
         .replace(/\s+/g, "") + ".png";
-      return "https://globopedia.github.io/Artids/Estadios/" + fileName;
+      return "https://globopedia.github.io/Artids/Stads/" + fileName;
     }
 
     function getTorneoImage(nombreTorneo) {

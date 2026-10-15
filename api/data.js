@@ -31,6 +31,7 @@ export default async function handler(req, res) {
     efemerides: { repo: "Lubs", path: "Efemerides.csv" },
     personajes: { repo: "Lubs", path: "Personajes.csv" },
     ecnics: { repo: "Lubs", path: "Ecnics.csv" },
+    stads: { repo: "Lubs", path: "Stads.csv" },
     ankg: { repo: "Artids", path: "Ankg.csv" },
     artids1910: { repo: "Lubs", path: "Artids1910.csv" },
     artids1925: { repo: "Lubs", path: "Artids1925.csv" },

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <script src="proteccion.js?v=3"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Estadios</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Chakra Petch', sans-serif; background:#fff; color:#222; margin:20px; }
+    h1 { color:#FF0000; text-align:center; }
+    .logo { display:block; margin:0 auto 10px; width:100px; }
+    .club-card { border:3px solid #FF0000; border-radius:20px; padding:20px; max-width:900px; margin:30px auto; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    .club-header { display:flex; align-items:center; gap:15px; border-bottom:2px solid #FF0000; padding-bottom:10px; margin-bottom:10px; flex-wrap:wrap; }
+    h2 { margin:0; color:#FF0000; font-size:22px; }
+    .stats { margin-top:20px; }
+    .stat-group { margin-bottom:20px; padding:12px; border:1px solid #FF0000; border-radius:12px; background:#fff5f5; }
+    .stat-title { font-weight:bold; color:#FF0000; margin-bottom:6px; }
+    .hr { border:none; border-top:1px solid #FF0000; margin:8px 0; }
+    .partido-card { border:1px solid #ccc; border-radius:6px; padding:6px; margin:4px 0; background:#fafafa; font-size:14px; text-align: center; }
+    .acordeon { border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; background: #fefefe; }
+    .acordeon-header { background: #eee; padding: 4px 8px; cursor: pointer; font-size: 14px; text-align: right; position: relative; padding-right: 20px; }
+    .acordeon-header::after { content: "▾"; position: absolute; right: 0; transition: transform 0.3s; }
+    .acordeon-header.abierto::after { transform: rotate(180deg); }
+    .acordeon-body { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease; padding: 8px; }
+    .acordeon-body.cerrado { max-height: 0; padding: 0 8px; }
+    /* Barrita blanca con piquito rojo, igual a la de las otras páginas */
+    .acordeon .acordeon-header { border-left: 4px solid #e00000; background-color: #ffffff; transition: background-color 0.2s ease; }
+    .acordeon .acordeon-header:hover { background-color: #ffe0e0; }
+    .acordeon-header .rival-en-barra { float:left; color:#555; pointer-events:none; }
+    .resultado1-box, .resultado2-box {
+      display: inline-block; width: 16px; height: 28px; font-size: 32px; font-weight: bold;
+      line-height: 28px; text-align: center; margin: 2px; padding: 10px 10px;
+      border: 3px solid #FF0000; border-radius: 6px; background: #fff5f5;
+      vertical-align: middle; min-width: 26px;
+    }
+    .escudo-huracan, .escudo-rival { width: 50px; height: 50px; object-fit: contain; position: relative; top: 6px; vertical-align: middle; }
+
+    .autocomplete-item { display:flex; align-items:center; gap:10px; padding:8px; cursor:pointer; }
+    .autocomplete-item:hover, .autocomplete-item.activo { background:#ffdddd; }
+    .autocomplete-item small { color:#777; margin-left:auto; padding-right:6px; }
+    .escudo-autocomplete {
+      width: 44px; height: 44px; object-fit: cover; border-radius: 50%;
+      border: 2px solid #FF0000; background: white; padding: 4px; flex-shrink:0;
+    }
+    .resumen-global { font-family: 'Segoe UI', 'Trebuchet MS', 'Arial', sans-serif; letter-spacing: 0.5px; }
+    .club-card > p { margin: 2px 0; line-height: 1.2; }
+
+    /* === Ficha del estadio === */
+    .foto-estadio {
+      display:block; width:100%; max-height:420px; object-fit:cover;
+      border-radius:14px; border:2px solid #FF0000; margin:0 0 14px; background:#f3f3f3;
+    }
+    .propietario { display:flex; align-items:center; gap:8px; margin:4px 0; }
+    .propietario img { width:34px; height:34px; object-fit:contain; }
+    .propietario a { color:#d40000; text-decoration:none; }
+    .propietario a:hover { font-weight:bold; }
+    .ficha-estadio p { margin:3px 0; line-height:1.25; }
+    .etiqueta-tamano { display:inline-block; font-size:12px; padding:1px 8px; margin-left:6px; border-radius:10px; background:#fff5f5; border:1px solid #FF0000; color:#FF0000; }
+
+    /* === Selector de período (décadas y años) === */
+    .periodos { margin:16px 0 4px; }
+    .periodos-titulo { font-weight:bold; color:#FF0000; margin-bottom:6px; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+    .chip {
+      font-family:'Chakra Petch', sans-serif; font-size:14px; cursor:pointer;
+      border:2px solid #FF0000; background:#fff; color:#FF0000; border-radius:8px;
+      padding:3px 9px; line-height:1.2;
+    }
+    .chip small { color:#999; font-size:11px; margin-left:3px; }
+    .chip:hover { background:#ffe0e0; }
+    .chip.activo { background:#FF0000; color:#fff; }
+    .chip.activo small { color:#ffd6d6; }
+    .periodo-elegido { font-size:14px; color:#555; margin:4px 0 0; }
+  </style>
+</head>
+<body>
+  <img src="https://globopedia.github.io/Artids/Íconos/Globopedia.png" alt="Logo Huracán" class="logo" />
+  <h1>🏟️ Estadios</h1>
+  <div style="text-align:center; position:relative;">
+    <label for="estadioSearch">Seleccionar estadio: </label><br>
+    <input type="text" id="estadioSearch"
+      placeholder="Buscá el estadio, su apodo o el club..."
+      autocomplete="off"
+      style="padding:8px; border-radius:8px; border:2px solid #FF0000; font-size:16px; margin-top:8px; width:400px; max-width:90%;">
+    <ul id="estadioAutocompleteList"
+      style="position:absolute;left:50%;transform:translateX(-50%);
+      background:white; border:1px solid #ccc; border-radius:8px; width:400px; max-width:90%;
+      max-height:260px; overflow:auto; list-style:none; padding:0; margin-top:2px; z-index:1000; text-align:left;">
+    </ul>
+  </div>
+  <div id="estadioInfo" class="club-card" style="display:none;"></div>
+
+  <script>
+// ============================================================
+// Página de ESTADIOS
+// Datos: Stads.csv (ficha de cada estadio) + los Artids (partidos).
+// Un partido pertenece a un estadio si su columna "Estadio" coincide con la
+// columna "Nombre" de Stads.csv o con cualquiera de sus "Otros nombres"
+// (separados por " / "). Así "El Palacio" cae en el Tomás A. Ducó, igual que
+// la columna "Anterior" de Ivals hace con los nombres viejos de los clubes.
+// Los partidos con Estadio "-" no se cuentan en ningún lado.
+// ============================================================
+const stadsURL = "https://artids.vercel.app/api/data?file=stads";
+const clubesURL = "https://artids.vercel.app/api/data?file=lubs";
+const partidosURLs = ["artids1910","artids1925","artids1940","artids1955","artids1970","artids1985","artids2000","artids2015"]
+  .map(f => "https://artids.vercel.app/api/data?file=" + f);
+const transfersURLs = ["utbolistsa","utbolistse","utbolistso"].map(f => "https://artids.vercel.app/api/data?file=" + f);
+const arbitrosURL = "https://artids.vercel.app/api/data?file=rbits";
+
+// Si un estadio tiene más partidos que esto, aparecen los cuadritos de
+// décadas y años para elegir qué período ver; si tiene menos, va todo junto.
+const TOPE_SIN_PERIODOS = 50;
+
+let estadios = [];
+let clubes = [];
+let encuentros = [];
+let futbolistas = [];
+let arbitros = [];
+let ALIAS_CLUB = {};
+let INDICE_ESTADIOS = {};      // nombre normalizado -> id del estadio
+let PARTIDOS_POR_ESTADIO = {}; // id -> partidos (de más viejo a más nuevo)
+let estadioActual = null;
+let periodoActual = { tipo: "todos", valor: null };
+
+const norm = (t) => (t || "").toString().normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+const normClub = (t) => { const k = norm(t); return ALIAS_CLUB[k] || k; };
+const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+const vacio = (v) => { const n = norm(v); return !n || n === "-" || n === "x"; };
+
+function plural(n, singular, plural) { return n === 1 ? singular : plural; }
+function capitalizarPrimera(frase) { return frase ? frase.charAt(0).toUpperCase() + frase.slice(1) : ""; }
+function escapeHTML(valor) {
+  return (valor || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function anioDe(fecha) { return parseInt((fecha || "").slice(-4), 10) || 0; }
+function claveFecha(fecha) {
+  const [d, m, a] = (fecha || "").split("/");
+  return (parseInt(a, 10) || 0) * 10000 + (parseInt(m, 10) || 0) * 100 + (parseInt(d, 10) || 0);
+}
+function listaNombres(texto) {
+  return (texto || "").split(/\s*[\/|;]\s*/).map(x => x.trim()).filter(x => x && x !== "-");
+}
+
+// === Fotos de estadios ===
+// Carpeta Artids/Stads. Primero se busca el archivo con el nombre exacto de la
+// columna "Nombre" (ej. "Tomás A. Ducó.png"); si no está, el mismo nombre
+// pegado y sin tildes ni puntos (ej. "TomasADuco.png", como estaban
+// guardadas las fotos viejas); en .png y después en .jpg.
+const URL_FOTOS_ESTADIOS = "https://globopedia.github.io/Artids/Stads/";
+function slugEstadio(nombre) {
+  return (nombre || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.']/g, "").replace(/\s+/g, "");
+}
+function candidatasFotoEstadio(nombre) {
+  const exacto = encodeURIComponent((nombre || "").trim());
+  const slug = encodeURIComponent(slugEstadio(nombre));
+  return [exacto + ".png", slug + ".png", exacto + ".jpg", slug + ".jpg"].map(f => URL_FOTOS_ESTADIOS + f);
+}
+function htmlFotoEstadio(nombre, clase, alt) {
+  const c = candidatasFotoEstadio(nombre);
+  return `<img class="${clase}" src="${c[0]}" data-candidatas="${escapeHTML(c.join("|"))}" data-i="0" alt="${escapeHTML(alt || nombre)}" loading="lazy" onerror="fotoEstadioSiguiente(this)">`;
+}
+function fotoEstadioSiguiente(img) {
+  const c = (img.dataset.candidatas || "").split("|");
+  const i = parseInt(img.dataset.i || "0", 10) + 1;
+  if (i < c.length) { img.dataset.i = String(i); img.src = c[i]; return; }
+  if (img.dataset.reemplazo) { img.onerror = null; img.src = img.dataset.reemplazo; return; }
+  img.style.display = "none";
+}
+
+// === Fotos de partidos (mismo criterio que en las otras páginas) ===
+const URL_FOTOS_PARTIDOS = "https://globopedia.github.io/Artids/Artido/";
+const EXT_FOTOS_PARTIDOS = ["jpg", "png", "jpeg"];
+function urlFotoPartido(valor) {
+  const v = (valor || "").trim();
+  if (/^https?:\/\//i.test(v)) return v;
+  const m = v.match(/^(\d{4})\d{4}[a-z]?(\.(jpe?g|png|webp|gif))?$/i);
+  if (!m) return "";
+  return URL_FOTOS_PARTIDOS + m[1] + "/" + (m[2] ? v : v + "." + EXT_FOTOS_PARTIDOS[0]);
+}
+function fotoPartidoSiguienteFormato(img) {
+  const i = parseInt(img.dataset.ext || "0", 10) + 1;
+  if (img.dataset.codigo !== "1" || i >= EXT_FOTOS_PARTIDOS.length) { img.parentElement.style.display = "none"; return; }
+  img.dataset.ext = String(i);
+  img.src = img.src.replace(/\.[^./]+$/, "." + EXT_FOTOS_PARTIDOS[i]);
+}
+function htmlFotoPartido(valor, alt = "") {
+  const url = urlFotoPartido(valor);
+  if (!url) return "";
+  const v = (valor || "").trim();
+  const esCodigoSinExtension = /^\d{8}[a-z]?$/i.test(v) ? "1" : "0";
+  return `<div style="margin:6px 0;"><img src="${url}" alt="${alt}" data-codigo="${esCodigoSinExtension}" loading="lazy" style="max-width:250px;border-radius:8px;" onerror="fotoPartidoSiguienteFormato(this)"></div>`;
+}
+
+// === Escudos ===
+function getEscudo(nombreClub) {
+  if (!nombreClub) return "";
+  return "https://globopedia.github.io/Artids/escudos/" + encodeURIComponent(nombreClub.trim()) + ".png";
+}
+// Escudo de un nombre anterior: si no hay png con ese nombre, el del nombre actual.
+document.addEventListener("error", ev => {
+  const img = ev.target;
+  if (!img || img.tagName !== "IMG" || img.dataset.escudoActual) return;
+  const src = img.currentSrc || img.src || "";
+  if (src.indexOf("/Artids/escudos/") === -1) return;
+  const nombre = decodeURIComponent(src.split("/escudos/").pop()).replace(/\.png$/i, "");
+  const actual = clubes.find(c => ALIAS_CLUB[norm(nombre)] && norm(c.club) === ALIAS_CLUB[norm(nombre)]);
+  if (!actual) return;
+  img.dataset.escudoActual = "1";
+  img.src = getEscudo(actual.club);
+}, true);
+
+// === Competencias (mismo criterio que Rivales) ===
+function bucketCompetencia(torneo) {
+  const t = norm(torneo);
+  if (t.includes("amistoso")) return "No oficiales";
+  if (t.includes("copa libertadores")) return "Copa Libertadores";
+  if (t.includes("sudamericana")) return "Copa Sudamericana";
+  if (t.includes("conmebol")) return "Copa Conmebol";
+  if (t.includes("argentina") || t.includes("republica")) return "Copa Argentina";
+  if (t.includes("competencia") || t.includes("superliga")) return "Copa Competencia";
+  if (t.includes("copa de honor")) return "Copa de Honor";
+  if (t.includes("varela")) return "Campeonato Béccar Varela";
+  if (t.includes("supercopa")) return "Supercopa";
+  if (t.includes("escobar")) return "Copa Escobar";
+  if (t.includes("suecia")) return "Copa Suecia 1958";
+  if (t.includes("copa centenario")) return "Copa Centenario 1993";
+  if (t.includes("maradona")) return "Copa Maradona 2020";
+  if (t.includes("ibarguren")) return "Copa Ibarguren";
+  if (t.includes("aldao")) return "Copa Ricardo Aldao";
+  if (t.includes("estimulo")) return "Estímulo";
+  if (t.includes("b nacional") || t.includes("nacional b") || t.includes("reducido") || t.includes("liguilla de ascenso") || t.includes("segundo ascenso") || t.includes("bn") || t.includes("nb")) return "2° Categoría";
+  if (t.includes("campeonato") || t.includes("promocion") || t.includes("torneo") || t.includes("descenso") || t.includes("pre-libertadores")) return "Campeonato de 1° División";
+  if (t.includes("liga anglo")) return "Liga Anglo-Argentina";
+  if (t.includes("liga 43")) return "Liga 43";
+  if (t.includes("centenario 1909")) return "Liga Centenario";
+  return "Otros";
+}
+const ORDEN_COMPETENCIAS = ["Campeonato de 1° División","Copa Argentina","Supercopa","Copa Libertadores","Copa Sudamericana","Copa Conmebol","Copa Competencia","Copa de Honor","Campeonato Béccar Varela","Copa Ibarguren","Copa Ricardo Aldao","Estímulo","Copa Escobar","Copa Suecia 1958","Copa Centenario 1993","Copa Maradona 2020","2° Categoría","Liga Centenario","Liga 43","Liga Anglo-Argentina","No oficiales","Otros"];
+const CONDICIONES = ["Local","Neutral","Visitante"];
+const SITUACIONES = ["Victoria","Empate","Derrota"];
+
+// Resultado del partido: manda la columna Situación (tolerando "derota",
+// "vitoria"...); si no se entiende, se deduce del marcador.
+function resultadoPartido(p) {
+  const s = norm(p.Situación);
+  if (s.startsWith("vic") || s.startsWith("vit") || s.startsWith("gan")) return "Victoria";
+  if (s.startsWith("emp")) return "Empate";
+  if (s.startsWith("der") || s.startsWith("per")) return "Derrota";
+  const a = parseInt(p.Resultado1, 10), b = parseInt(p.Resultado2, 10);
+  if (isNaN(a) || isNaN(b)) return null;
+  return a > b ? "Victoria" : a === b ? "Empate" : "Derrota";
+}
+
+// === Links a futbolistas y árbitros (mismo criterio que las otras páginas) ===
+function linkJugadorSiExiste(nombre) {
+  const nombreSeguro = escapeHTML(nombre);
+  if (!nombre || !futbolistas.some(f => norm(f.futbolista) === norm(nombre))) return nombreSeguro;
+  const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombre)}`;
+  return `<a href="${url}" target="_blank" rel="noopener" style="color:#d40000; text-decoration:none;" onmouseover="this.style.fontWeight='bold'" onmouseout="this.style.fontWeight='normal'">${nombreSeguro}</a>`;
+}
+function linkArbitroSiExiste(nombre) {
+  const nombreSeguro = escapeHTML(nombre);
+  if (!nombre || !arbitros.some(a => norm(a.nombre) === norm(nombre))) return nombreSeguro;
+  const url = `https://globopedia.github.io/Artids/indexrbits.html?arbitro=${encodeURIComponent(nombre)}`;
+  return `<a href="${url}" target="_blank" rel="noopener" style="color:#d40000; text-decoration:none;" onmouseover="this.style.fontWeight='bold'" onmouseout="this.style.fontWeight='normal'">${nombreSeguro}</a>`;
+}
+function enlazarJugadores(texto) {
+  if (!texto) return "";
+  const partes = texto.split(/(\s*[,;().]+\s*(?!\b[ye]\b\s)|\s+\b[ye]\b\s+)/);
+  return partes.map(part => {
+    if (/^(\s*[,;().]+\s*|\s+\b[ye]\b\s+)$/.test(part)) return part;
+    const original = part.trim();
+    if (!original) return part;
+    const matchMinuto = original.match(/^(\d+(?:\+\d+)?'?\s*)(.*)/);
+    let prefijoMinuto = "", candidatoNombre = original;
+    if (matchMinuto) { prefijoMinuto = matchMinuto[1]; candidatoNombre = matchMinuto[2]; }
+    const nombreLimpio = candidatoNombre.trim();
+    if (!nombreLimpio) return part;
+    if (futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio))) {
+      const url = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${encodeURIComponent(nombreLimpio)}`;
+      return prefijoMinuto + `<a href="${url}" style="color: #d40000; text-decoration: none; font-weight: normal;" onmouseover="this.style.fontWeight='bold'" onmouseout="this.style.fontWeight='normal'">${candidatoNombre}</a>`;
+    }
+    return part;
+  }).join("");
+}
+function linkearNombresEnIncidencia(texto) {
+  return texto.replace(/\b(GOL|EXP|LES|REG|ATA|DES|POS)\b(\s+)([^(]+?)(\s*\()/g, (match, tag, espacio, nombre, apertura) => {
+    const nombreLimpio = nombre.trim();
+    if (!nombreLimpio || !futbolistas.some(f => norm(f.futbolista) === norm(nombreLimpio))) return match;
+    return `${tag}${espacio}${linkJugadorSiExiste(nombreLimpio)}${apertura}`;
+  });
+}
+function renderIncidencias(texto) {
+  if (!texto) return "";
+  return linkearNombresEnIncidencia(texto)
+    .replace(/GOL/g, "<img src='https://globopedia.github.io/Artids/Íconos/Gol.png' alt='gol' style='width:20px;height:20px;'>")
+    .replace(/EXP/g, "<img src='https://globopedia.github.io/Artids/Íconos/Roja.png' alt='expulsión' style='width:20px;height:20px;'>")
+    .replace(/LES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Lesionado.png' alt='lesión' style='width:20px;height:20px;'>")
+    .replace(/\bREG\b/g, "<span title='regreso' style='font-size:17px;'>↩️</span>")
+    .replace(/\bFIN\b/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fin.png' alt='final' style='width:20px;height:20px;'>")
+    .replace(/ATA/g, "<img src='https://globopedia.github.io/Artids/Íconos/Atajada.png' alt='atajado' style='width:20px;height:20px;'>")
+    .replace(/DES/g, "<img src='https://globopedia.github.io/Artids/Íconos/Fallido.png' alt='desviado' style='width:20px;height:20px;'>")
+    .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
+}
+function getTorneoImage(nombreTorneo) {
+  if (!nombreTorneo) return "";
+  const texto = nombreTorneo.toLowerCase();
+  const torneosDisponibles = [
+    "Apertura Nacional B 2006", "Clausura Nacional B 2007","Apertura 2007","Clausura 2008", "Apertura 2008", "Clausura 2009",
+    "Apertura 2009", "Clausura 2010", "Apertura 2010", "Clausura 2011","Promoción",
+    "Nacional B 11-12", "Copa Argentina 2012","Copa Argentina 2013","Copa Argentina 2014",
+    "Copa Argentina 2015","Copa Argentina 2016","Copa Argentina 2017","Copa Argentina 2018",
+    "Copa Argentina 2019","Copa Argentina 2020","Copa Argentina 2022","Copa Argentina 2023",
+    "Copa Argentina 2024","Copa Argentina 2025", "Nacional B 12-13", "Nacional B 13-14",
+    "Nacional B 2014", "Supercopa 2015", "Campeonato 2015", "Libertadores 2015",
+    "Sudamericana 2015", "Campeonato 2016", "Libertadores 2016", "Campeonato 16-17",
+    "Sudamericana 2017", "SAF 17-18", "SAF 18-19", "SAF 19-20", "Copa Maradona 2020",
+    "Libertadores 2019", "Sudamericana 2020", "Torneo-LPF 2021", "Torneo-LPF 2022", "Torneo-LPF 2023",
+    "Copa-LPF 2021", "Copa-LPF 2022", "Copa-LPF 2023", "Copa-LPF 2024", "Torneo-LPF 2024",
+    "Apertura-LPF 2024", "Clausura-LPF 2025", "Libertadores 2023", "Sudamericana 2023", "Sudamericana 2025"
+  ];
+  for (const t of torneosDisponibles) {
+    if (texto.includes(t.toLowerCase())) {
+      return `<img src="https://globopedia.github.io/Artids/Torneos/${encodeURIComponent(t)}.png" alt="${t}" style="max-height:40px; display:block; margin:4px auto;">`;
+    }
+  }
+  return "";
+}
+
+// ============================================================
+// Carga de datos
+// ============================================================
+Promise.all([
+  fetch(stadsURL).then(r => r.text()),
+  fetch(clubesURL).then(r => r.text()),
+  ...partidosURLs.map(u => fetch(u).then(r => r.text())),
+  ...transfersURLs.map(u => fetch(u).then(r => r.text())),
+  fetch(arbitrosURL).then(r => r.text())
+]).then(textos => {
+  const csvStads = textos[0], csvClubes = textos[1];
+  const csvPartidos = textos.slice(2, 2 + partidosURLs.length);
+  const csvTransfers = textos.slice(2 + partidosURLs.length, 2 + partidosURLs.length + transfersURLs.length);
+  const csvRbits = textos[textos.length - 1];
+  const parse = (t) => Papa.parse(t, { header: true, skipEmptyLines: true }).data;
+
+  clubes = parse(csvClubes).map(c => ({
+    id: (c.id ?? "").toString().trim(),
+    club: (c.Club ?? "").toString().trim(),
+    anterior: (c.Anterior ?? "").toString().trim()
+  }));
+  ALIAS_CLUB = {};
+  clubes.forEach(c => {
+    if (!c.club || !c.anterior || c.anterior === "-") return;
+    c.anterior.split(/[|;,]/).map(a => a.trim()).filter(a => a && a !== "-")
+      .forEach(a => { ALIAS_CLUB[norm(a)] = norm(c.club); });
+  });
+
+  futbolistas = csvTransfers.flatMap(parse).map(t => ({ futbolista: (t.Futbolista || "").trim() })).filter(f => f.futbolista);
+  arbitros = parse(csvRbits).map(c => ({ nombre: (c["Árbitro"] ?? "").toString().trim() }));
+
+  estadios = parse(csvStads).map((e, i) => ({
+    id: String(i),
+    propietario: (e.Propietario ?? "").trim(),
+    nombre: (e.Nombre ?? "").trim(),
+    otros: listaNombres(e["Otros nombres"]),
+    direccion: (e["Dirección"] ?? e.Direccion ?? "").trim(),
+    inauguracion: (e["Inauguración"] ?? e.Inauguracion ?? "").trim(),
+    capacidad: (e.Capacidad ?? "").trim(),
+    medidas: (e.Medidas ?? "").trim(),
+    observaciones: (e.Observaciones ?? "").trim()
+  })).filter(e => e.nombre);
+
+  INDICE_ESTADIOS = {};
+  estadios.forEach(e => {
+    [e.nombre, ...e.otros].forEach(n => {
+      const k = norm(n);
+      if (k && !(k in INDICE_ESTADIOS)) INDICE_ESTADIOS[k] = e.id;
+    });
+  });
+
+  encuentros = csvPartidos.flatMap(parse).map(p => ({
+    Fecha: (p.Fecha ?? "").trim(),
+    Condición: (p.Condición ?? "").trim(),
+    Situación: (p.Situación ?? "").trim(),
+    Resultado1: (p.Resultado1 ?? "").trim(),
+    Resultado2: (p.Resultado2 ?? "").trim(),
+    Club: (p.Club ?? "").trim(),
+    Torneo: (p.Torneo ?? "").trim(),
+    Estadio: (p.Estadio ?? "").trim(),
+    Árbitro: (p.Árbitro ?? "").trim(),
+    Huracán: (p.Huracán ?? "").trim(),
+    Rival: (p.Rival ?? "").trim(),
+    Foto: (p.Foto ?? "").trim(),
+    Incidencias: (p.Incidencias ?? "").trim().replace(/\s*\|\s*/g, "</br>")
+  }));
+
+  PARTIDOS_POR_ESTADIO = {};
+  encuentros.forEach(p => {
+    if (vacio(p.Estadio)) return;
+    const id = INDICE_ESTADIOS[norm(p.Estadio)];
+    if (id === undefined) return;
+    (PARTIDOS_POR_ESTADIO[id] = PARTIDOS_POR_ESTADIO[id] || []).push(p);
+  });
+  Object.values(PARTIDOS_POR_ESTADIO).forEach(l => l.sort((a, b) => claveFecha(a.Fecha) - claveFecha(b.Fecha)));
+  estadios.forEach(e => { e.cantidad = (PARTIDOS_POR_ESTADIO[e.id] || []).length; });
+
+  abrirDesdeURL();
+}).catch(err => {
+  console.error("Error cargando CSVs:", err);
+  alert("No pude cargar los datos de los estadios. Probá recargar la página en un rato.");
+});
+
+// ============================================================
+// Buscador (mismo comportamiento que el de Rivales)
+// ============================================================
+let selectedIndex = -1;
+let debounceTimer;
+function debounce(func, delay) {
+  return function(...args) { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => func.apply(this, args), delay); };
+}
+const buscador = document.getElementById("estadioSearch");
+const listaSugerencias = document.getElementById("estadioAutocompleteList");
+
+function filtrarEstadios(termino) {
+  const texto = norm(termino);
+  listaSugerencias.innerHTML = "";
+  selectedIndex = -1;
+  if (!texto) return;
+  const resultados = estadios
+    .filter(e => norm(e.nombre).includes(texto) || e.otros.some(o => norm(o).includes(texto)) || norm(e.propietario).includes(texto))
+    .sort((a, b) => {
+      const pa = norm(a.nombre).startsWith(texto) ? 0 : 1, pb = norm(b.nombre).startsWith(texto) ? 0 : 1;
+      return pa - pb || b.cantidad - a.cantidad || a.nombre.localeCompare(b.nombre, "es");
+    })
+    .slice(0, 15);
+  resultados.forEach(e => {
+    const li = document.createElement("li");
+    li.className = "autocomplete-item";
+    const apodo = e.otros.find(o => norm(o).includes(texto) && !norm(e.nombre).includes(texto));
+    li.innerHTML = `
+      ${htmlFotoEstadio(e.nombre, "escudo-autocomplete", e.nombre).replace("<img ", `<img data-reemplazo="${escapeHTML(getEscudo(e.propietario) || "https://globopedia.github.io/Artids/Íconos/Globopedia.png")}" `)}
+      <span>${escapeHTML(e.nombre)}${apodo ? ` <small style="margin:0;color:#999;">(${escapeHTML(apodo)})</small>` : ""}</span>
+      <small>${e.cantidad} ${plural(e.cantidad, "partido", "partidos")}</small>`;
+    li.addEventListener("click", () => seleccionarEstadio(e.id));
+    listaSugerencias.appendChild(li);
+  });
+}
+buscador.addEventListener("input", debounce(e => filtrarEstadios(e.target.value), 200));
+buscador.addEventListener("keydown", function(e) {
+  const items = listaSugerencias.querySelectorAll("li");
+  if (e.key === "Escape") { listaSugerencias.innerHTML = ""; selectedIndex = -1; return; }
+  if (!items.length) return;
+  if (e.key === "ArrowDown") { e.preventDefault(); selectedIndex = (selectedIndex + 1) % items.length; actualizarSeleccion(items); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); selectedIndex = (selectedIndex - 1 + items.length) % items.length; actualizarSeleccion(items); }
+  else if (e.key === "Enter") { e.preventDefault(); (items[selectedIndex >= 0 ? selectedIndex : 0]).click(); }
+});
+function actualizarSeleccion(items) {
+  items.forEach((item, i) => item.classList.toggle("activo", i === selectedIndex));
+  const sel = items[selectedIndex];
+  if (sel) sel.scrollIntoView({ block: "nearest" });
+}
+document.addEventListener("click", function(e) {
+  if (!buscador.contains(e.target) && !listaSugerencias.contains(e.target)) { listaSugerencias.innerHTML = ""; selectedIndex = -1; }
+});
+
+function seleccionarEstadio(id) {
+  const e = estadios.find(x => x.id === id);
+  if (!e) return;
+  estadioActual = e;
+  periodoActual = { tipo: "todos", valor: null };
+  buscador.value = e.nombre;
+  listaSugerencias.innerHTML = "";
+  mostrarEstadio();
+  buscador.focus();
+  setTimeout(() => buscador.select(), 0);
+}
+
+// ============================================================
+// Ficha del estadio
+// ============================================================
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+// "07/09/1947" -> "7 de septiembre de 1947"; "00/05/1924" -> "mayo de 1924"; "00/00/1924" -> "1924"
+function fechaLarga(f) {
+  const m = (f || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return f;
+  const d = parseInt(m[1], 10), mes = parseInt(m[2], 10), a = m[3];
+  if (!mes) return a;
+  if (!d) return `${MESES[mes - 1]} de ${a}`;
+  return `${d} de ${MESES[mes - 1]} de ${a}`;
+}
+// "105 x 70" -> tamaño aproximado según la superficie del campo de juego
+function etiquetaTamano(medidas) {
+  const n = (medidas || "").replace(/,/g, ".").match(/(\d+(?:\.\d+)?)\s*[x×X*]\s*(\d+(?:\.\d+)?)/);
+  if (!n) return "";
+  const sup = parseFloat(n[1]) * parseFloat(n[2]);
+  const t = sup >= 7140 ? "grande" : sup >= 6600 ? "mediana" : "chica";
+  return `<span class="etiqueta-tamano" title="Superficie: ${Math.round(sup).toLocaleString("es-AR")} m²">cancha ${t}</span>`;
+}
+function campo(label, valor) {
+  return vacio(valor) ? "" : `<p><b>${label}:</b> ${valor}</p>`;
+}
+function htmlPropietario(prop) {
+  if (vacio(prop)) return "";
+  const club = clubes.find(c => normClub(c.club) === normClub(prop));
+  if (!club) return `<p><b>Propietario:</b> ${escapeHTML(prop)}</p>`;
+  const url = `https://globopedia.github.io/Artids/indexivals.html?club=${encodeURIComponent(club.club)}`;
+  return `<div class="propietario"><b>Propietario:</b>
+    <img src="${getEscudo(prop)}" alt="" loading="lazy" onerror="this.style.display='none'">
+    <a href="${url}" target="_blank" rel="noopener">${escapeHTML(prop)}</a></div>`;
+}
+
+function partidosDelPeriodo(todos) {
+  if (periodoActual.tipo === "decada") return todos.filter(p => Math.floor(anioDe(p.Fecha) / 10) * 10 === periodoActual.valor);
+  if (periodoActual.tipo === "anio") return todos.filter(p => anioDe(p.Fecha) === periodoActual.valor);
+  return todos;
+}
+
+function mostrarEstadio() {
+  const e = estadioActual;
+  if (!e) return;
+  const todos = PARTIDOS_POR_ESTADIO[e.id] || [];
+  const cont = document.getElementById("estadioInfo");
+  cont.style.display = "block";
+
+  const otros = e.otros.filter(o => norm(o) !== norm(e.nombre));
+  const primero = todos[0], ultimo = todos[todos.length - 1];
+  const capacidad = vacio(e.capacidad) ? "" : `${e.capacidad} espectadores`;
+  const medidas = vacio(e.medidas) ? "" : `${escapeHTML(e.medidas)} metros ${etiquetaTamano(e.medidas)}`;
+  const lineaPartido = (p) => `${p.Fecha} vs. ${escapeHTML(p.Club)}` +
+    (/^\d+$/.test(p.Resultado1) && /^\d+$/.test(p.Resultado2) ? ` (${p.Resultado1}-${p.Resultado2})` : "");
+
+  cont.innerHTML = `
+    ${htmlFotoEstadio(e.nombre, "foto-estadio", "Estadio " + e.nombre)}
+    <div class="club-header">
+      <div style="flex:1; min-width:220px;">
+        <h2>${escapeHTML(e.nombre)}</h2>
+        <div id="resumenEstadio"></div>
+      </div>
+      <canvas id="graficoResumen" width="120" height="120" style="margin:auto;"></canvas>
+    </div>
+    <div class="ficha-estadio">
+      ${htmlPropietario(e.propietario)}
+      ${campo("Otros nombres", escapeHTML(otros.join(", ")))}
+      ${campo("Dirección", escapeHTML(e.direccion))}
+      ${campo("Inauguración", vacio(e.inauguracion) ? "" : fechaLarga(e.inauguracion))}
+      ${campo("Capacidad", capacidad)}
+      ${campo("Medidas", medidas)}
+      ${campo("Observaciones", escapeHTML(e.observaciones))}
+      ${primero ? campo("Primer partido de Huracán", lineaPartido(primero)) : ""}
+      ${ultimo && ultimo !== primero ? campo("Último partido de Huracán", lineaPartido(ultimo)) : ""}
+    </div>
+    <div id="selectorPeriodos"></div>
+    <div class="stats">
+      <h3 style="color:#FF0000;">📊 Partidos de Huracán en este estadio</h3>
+      <div id="estadisticasEstadio"></div>
+    </div>`;
+  renderPeriodos(todos);
+  renderEstadisticas();
+}
+
+// Cuadritos de décadas y, al elegir una década, los de sus años.
+function renderPeriodos(todos) {
+  const cont = document.getElementById("selectorPeriodos");
+  if (todos.length <= TOPE_SIN_PERIODOS) { cont.innerHTML = ""; return; }
+  const porDecada = {}, porAnio = {};
+  todos.forEach(p => {
+    const a = anioDe(p.Fecha); if (!a) return;
+    const d = Math.floor(a / 10) * 10;
+    porDecada[d] = (porDecada[d] || 0) + 1;
+    porAnio[a] = (porAnio[a] || 0) + 1;
+  });
+  const decadaElegida = periodoActual.tipo === "decada" ? periodoActual.valor
+    : periodoActual.tipo === "anio" ? Math.floor(periodoActual.valor / 10) * 10 : null;
+  const chip = (tipo, valor, texto, n) => {
+    const activo = periodoActual.tipo === tipo && periodoActual.valor === valor;
+    return `<button class="chip${activo ? " activo" : ""}" data-tipo="${tipo}" data-valor="${valor ?? ""}">${texto}${n !== undefined ? `<small>${n}</small>` : ""}</button>`;
+  };
+  let html = `<div class="periodos"><div class="periodos-titulo">📅 Elegí el período</div><div class="chips">`;
+  html += chip("todos", null, "Todos", todos.length);
+  Object.keys(porDecada).map(Number).sort((a, b) => a - b).forEach(d => { html += chip("decada", d, `${d}s`, porDecada[d]); });
+  html += `</div>`;
+  if (decadaElegida !== null) {
+    html += `<div class="chips">`;
+    Object.keys(porAnio).map(Number).filter(a => Math.floor(a / 10) * 10 === decadaElegida).sort((a, b) => a - b)
+      .forEach(a => { html += chip("anio", a, String(a), porAnio[a]); });
+    html += `</div>`;
+  }
+  const n = partidosDelPeriodo(todos).length;
+  const texto = periodoActual.tipo === "todos" ? "Mostrando todos los partidos."
+    : periodoActual.tipo === "decada" ? `Mostrando la década de ${periodoActual.valor}: ${n} ${plural(n, "partido", "partidos")}.`
+    : `Mostrando ${periodoActual.valor}: ${n} ${plural(n, "partido", "partidos")}.`;
+  html += `<p class="periodo-elegido">${texto}</p></div>`;
+  cont.innerHTML = html;
+}
+document.addEventListener("click", function(ev) {
+  const b = ev.target.closest(".chip");
+  if (!b || !estadioActual) return;
+  const tipo = b.dataset.tipo, valor = b.dataset.valor === "" ? null : parseInt(b.dataset.valor, 10);
+  // Tocar de nuevo un año elegido vuelve a su década; tocar de nuevo la década, a "Todos".
+  if (periodoActual.tipo === tipo && periodoActual.valor === valor) {
+    periodoActual = tipo === "anio" ? { tipo: "decada", valor: Math.floor(valor / 10) * 10 } : { tipo: "todos", valor: null };
+  } else {
+    periodoActual = { tipo, valor };
+  }
+  const todos = PARTIDOS_POR_ESTADIO[estadioActual.id] || [];
+  renderPeriodos(todos);
+  renderEstadisticas();
+});
+
+function renderEstadisticas() {
+  const todos = PARTIDOS_POR_ESTADIO[estadioActual.id] || [];
+  const partidos = partidosDelPeriodo(todos);
+  let G = 0, E = 0, P = 0, gf = 0, gc = 0;
+  partidos.forEach(p => {
+    const r = resultadoPartido(p);
+    if (r === "Victoria") G++; else if (r === "Empate") E++; else if (r === "Derrota") P++;
+    gf += parseInt(p.Resultado1, 10) || 0;
+    gc += parseInt(p.Resultado2, 10) || 0;
+  });
+
+  // Frase general arriba, junto a la torta
+  const resumen = document.getElementById("resumenEstadio");
+  if (!todos.length) {
+    resumen.innerHTML = `<p class="resumen-global">Todavía no hay partidos de Huracán cargados en este estadio.</p>`;
+  } else {
+    const a1 = anioDe(todos[0].Fecha), a2 = anioDe(todos[todos.length - 1].Fecha);
+    const periodo = a1 === a2 ? `en ${a1}` : `entre ${a1} y ${a2}`;
+    const partes = [];
+    if (G) partes.push(`ganó ${G}`);
+    if (E) partes.push(`empató ${E}`);
+    if (P) partes.push(`perdió ${P}`);
+    const frase = partes.length > 1 ? partes.slice(0, -1).join(", ") + " y " + partes[partes.length - 1] : (partes[0] || "");
+    const filtro = periodoActual.tipo === "todos" ? "" : ` (${periodoActual.tipo === "decada" ? "década de " + periodoActual.valor : periodoActual.valor})`;
+    resumen.innerHTML = `<p class="resumen-global" style="margin:6px 0;">
+      Huracán jugó ${todos.length} ${plural(todos.length, "partido", "partidos")} en este estadio, ${periodo}.<br>
+      ${filtro ? `<b>${capitalizarPrimera(filtro.replace(/[()]/g, "").trim())}:</b> ${partidos.length} ${plural(partidos.length, "partido", "partidos")}${frase ? ": " : "."} ` : ""}${filtro ? frase : capitalizarPrimera(frase)}${frase ? "." : ""}
+      ${gf || gc ? `Convirtió ${gf} ${plural(gf, "gol", "goles")} y recibió ${gc}.` : ""}
+    </p>`;
+  }
+  setTimeout(() => dibujarTorta(G, E, P), 0);
+
+  // Checklists por competencia, condición y resultado (como en Rivales)
+  const agg = {};
+  partidos.forEach(p => {
+    const comp = bucketCompetencia(p.Torneo), cond = cap(norm(p.Condición)), sit = resultadoPartido(p);
+    if (!CONDICIONES.includes(cond) || !sit) return;
+    agg[comp] = agg[comp] || {};
+    agg[comp][cond] = agg[comp][cond] || { Victoria: 0, Empate: 0, Derrota: 0 };
+    agg[comp][cond][sit]++;
+  });
+  let html = "";
+  ORDEN_COMPETENCIAS.forEach(comp => {
+    if (!agg[comp]) return;
+    const delComp = partidos.filter(p => bucketCompetencia(p.Torneo) === comp);
+    let g = 0, e = 0, d = 0, f = 0, c = 0;
+    delComp.forEach(p => {
+      const r = resultadoPartido(p);
+      if (r === "Victoria") g++; else if (r === "Empate") e++; else if (r === "Derrota") d++;
+      f += parseInt(p.Resultado1, 10) || 0; c += parseInt(p.Resultado2, 10) || 0;
+    });
+    const partes = [];
+    if (g) partes.push(`ganó ${g}`);
+    if (e) partes.push(`empató ${e}`);
+    if (d) partes.push(`perdió ${d}`);
+    const frase = partes.length > 1 ? partes.slice(0, -1).join(", ") + " y " + partes[partes.length - 1] : (partes[0] || "");
+    let bloques = "";
+    CONDICIONES.forEach(cond => {
+      const b = agg[comp][cond];
+      if (!b || !(b.Victoria + b.Empate + b.Derrota)) return;
+      if (bloques) bloques += `<div class="hr"></div>`;
+      bloques += `<div class="stat-title">📍 ${cond}</div><ul>`;
+      SITUACIONES.forEach(sit => {
+        if (!b[sit]) return;
+        const icono = sit === "Victoria" ? "✅" : sit === "Empate" ? "🤝" : "❌";
+        bloques += `<li><label><input type="checkbox" class="chkPartidos" data-comp="${comp}" data-cond="${cond}" data-sit="${sit}"> ${icono} ${sit}s: ${b[sit]}</label>
+          <div class="partidos-lista" style="display:none; margin-left:20px;"></div></li>`;
+      });
+      bloques += `</ul>`;
+    });
+    html += `<div class="stat-group">
+      <div class="stat-title">🏆 ${comp}</div>
+      <p style="margin:6px 0; font-weight:500;">Jugó ${delComp.length} ${plural(delComp.length, "partido", "partidos")}: ${frase}. ${f || c ? `Convirtió ${f} ${plural(f, "gol", "goles")} y recibió ${c}.` : ""}</p>
+      ${bloques}
+    </div>`;
+  });
+  document.getElementById("estadisticasEstadio").innerHTML = html || "<p><i>No hay partidos en este período.</i></p>";
+}
+
+// Al tildar un casillero, aparece la lista de partidos (fecha y rival), cada uno
+// con su ficha completa en un acordeón, igual que en las otras páginas.
+document.addEventListener("change", function(ev) {
+  if (!ev.target.classList.contains("chkPartidos")) return;
+  const contenedor = ev.target.closest("li").querySelector(".partidos-lista");
+  contenedor.innerHTML = "";
+  if (!ev.target.checked) { contenedor.style.display = "none"; return; }
+  const { comp, cond, sit } = ev.target.dataset;
+  const partidos = partidosDelPeriodo(PARTIDOS_POR_ESTADIO[estadioActual.id] || []).filter(p =>
+    bucketCompetencia(p.Torneo) === comp && cap(norm(p.Condición)) === cond && resultadoPartido(p) === sit);
+  let html = "";
+  partidos.forEach(p => {
+    const visitante = norm(p.Condición) === "visitante";
+    const huracan = `<img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán" loading="lazy" class="escudo-huracan">`;
+    const rival = `<img class="escudo-rival" loading="lazy" src="${getEscudo(p.Club)}" alt="${escapeHTML(p.Club)}" />`;
+    const marcador = visitante
+      ? `${rival}<div class="resultado2-box">${p.Resultado2}</div><div class="resultado1-box">${p.Resultado1}</div>${huracan}`
+      : `${huracan}<div class="resultado1-box">${p.Resultado1}</div><div class="resultado2-box">${p.Resultado2}</div>${rival}`;
+    const planteles = visitante
+      ? `<div><b>${escapeHTML(p.Club)}:</b> ${enlazarJugadores(p.Rival)}</div><div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div>`
+      : `<div><b>Huracán:</b> ${enlazarJugadores(p.Huracán)}</div><div><b>${escapeHTML(p.Club)}:</b> ${enlazarJugadores(p.Rival)}</div>`;
+    html += `<div class="acordeon">
+      <div class="acordeon-header"><span class="rival-en-barra">${escapeHTML(p.Club)}</span>${p.Fecha}</div>
+      <div class="acordeon-body cerrado">
+        <div class="partido-card">
+          ${getTorneoImage(p.Torneo)}
+          ${marcador}
+          <div><b>${escapeHTML(p.Torneo)}</b></div>
+          <div><b>Estadio:</b> ${escapeHTML(p.Estadio)} - <b>Árbitro:</b> ${linkArbitroSiExiste(p.Árbitro)}</div>
+          ${planteles}
+          ${htmlFotoPartido(p.Foto, "Incidencias")}
+          <div>${renderIncidencias(p.Incidencias)}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+  contenedor.innerHTML = html || "<i>No hay partidos registrados</i>";
+  contenedor.style.display = "block";
+});
+document.addEventListener("click", function(ev) {
+  if (ev.target.classList.contains("acordeon-header")) {
+    ev.target.nextElementSibling.classList.toggle("cerrado");
+    ev.target.classList.toggle("abierto");
+  }
+});
+
+// === Torta de resultados (igual a la de Rivales) ===
+let slicesGlobal = [], datosGlobal = [], hoverIndex = -1;
+function dibujarTorta(ganados, empatados, perdidos) {
+  const canvas = document.getElementById("graficoResumen");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const total = ganados + empatados + perdidos;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = total ? "" : "none";
+  if (!total) return;
+  const cx = 60, cy = 60, rBase = 50;
+  datosGlobal = [
+    { value: ganados, color: "#FF0000", label: `${ganados} ${plural(ganados, "victoria", "victorias")}` },
+    { value: empatados, color: "#cccccc", label: `${empatados} ${plural(empatados, "empate", "empates")}` },
+    { value: perdidos, color: "#FFFFFF", label: `${perdidos} ${plural(perdidos, "derrota", "derrotas")}` }
+  ];
+  const escudo = new Image();
+  escudo.src = "https://globopedia.github.io/Artids/escudos/Huracán.png";
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let start = 0;
+    slicesGlobal = [];
+    datosGlobal.forEach((d, i) => {
+      if (!d.value) return;
+      const slice = (d.value / total) * 2 * Math.PI;
+      const r = i === hoverIndex ? rBase + 6 : rBase;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, start + slice); ctx.closePath();
+      ctx.fillStyle = d.color; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, cy, r, start, start + slice); ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.stroke();
+      slicesGlobal.push({ start, end: start + slice, index: i, label: d.label });
+      start += slice;
+    });
+    ctx.beginPath(); ctx.arc(cx, cy, 25, 0, 2 * Math.PI); ctx.fillStyle = "#fff"; ctx.fill();
+    if (escudo.complete) ctx.drawImage(escudo, cx - 10, cy - 16, 20, 32);
+  }
+  escudo.onload = draw;
+  draw();
+  canvas.onmousemove = function(ev) {
+    const rect = canvas.getBoundingClientRect();
+    const dx = ev.clientX - rect.left - cx, dy = ev.clientY - rect.top - cy;
+    hoverIndex = -1; canvas.title = "";
+    if (Math.sqrt(dx * dx + dy * dy) <= rBase) {
+      let ang = Math.atan2(dy, dx); if (ang < 0) ang += 2 * Math.PI;
+      const s = slicesGlobal.find(s => ang >= s.start && ang <= s.end);
+      if (s) { hoverIndex = s.index; canvas.title = s.label; }
+    }
+    draw();
+  };
+  canvas.onmouseleave = function() { hoverIndex = -1; canvas.title = ""; draw(); };
+}
+
+// === Sonidos sutiles (los mismos de las otras páginas) ===
+let audioCtxSonidos = null;
+function reproducirTono(frecuencia, duracionMs, volumen) {
+  try {
+    if (!audioCtxSonidos) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return; audioCtxSonidos = new A(); }
+    if (audioCtxSonidos.state === "suspended") audioCtxSonidos.resume();
+    const ctx = audioCtxSonidos, osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "sine"; osc.frequency.value = frecuencia; gain.gain.value = volumen;
+    osc.connect(gain); gain.connect(ctx.destination);
+    const fin = ctx.currentTime + duracionMs / 1000;
+    gain.gain.exponentialRampToValueAtTime(0.0001, fin);
+    osc.start(); osc.stop(fin);
+  } catch (e) {}
+}
+let ultimoTick = 0;
+document.addEventListener("mouseover", function(e) {
+  if (!(e.target.closest("a") || e.target.closest(".acordeon-header") || e.target.closest(".chip"))) return;
+  const ahora = Date.now();
+  if (ahora - ultimoTick < 150) return;
+  ultimoTick = ahora;
+  reproducirTono(900, 45, 0.035);
+});
+document.addEventListener("click", function(e) {
+  if (e.target.closest(".acordeon-header") || e.target.closest(".chip")) reproducirTono(500, 70, 0.05);
+});
+
+// === Link directo: indexstads.html?estadio=Tomás A. Ducó (acepta también otros nombres) ===
+function abrirDesdeURL() {
+  const pedido = new URLSearchParams(window.location.search).get("estadio");
+  if (!pedido) return;
+  const id = INDICE_ESTADIOS[norm(pedido)];
+  if (id !== undefined) seleccionarEstadio(id);
+}
+
+// === Altura del iframe en Blogger ===
+function postAltura() {
+  const altura = document.documentElement.scrollHeight || document.body.scrollHeight;
+  parent.postMessage({ type: 'ajustarAltura', altura: altura }, '*');
+}
+window.addEventListener('load', postAltura);
+window.addEventListener('resize', postAltura);
+new MutationObserver(postAltura).observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
+document.addEventListener('load', ev => { if (ev.target && ev.target.tagName === 'IMG') postAltura(); }, true);
+let contadorAltura = 0;
+const fallbackAltura = setInterval(() => { postAltura(); if (++contadorAltura > 10) clearInterval(fallbackAltura); }, 500);
+  </script>
+</body>
+</html>
