@@ -2247,13 +2247,22 @@ function enlazarJugadores(texto) {
         .replace(/PEN/g, "<img src='https://globopedia.github.io/Artids/Íconos/Penales.png' alt='penales' style='width:20px;height:20px;'>");
     }
 
+// Fotos de estadios (carpeta Stads): el archivo se llama como el estadio, sin
+// puntos (ej. "Tomás A Ducó.png"). Si no está en .png, se prueba .jpg y .webp.
+document.addEventListener("error", function (ev) {
+  const img = ev.target;
+  if (!img || img.tagName !== "IMG") return;
+  const src = img.currentSrc || img.src || "";
+  if (src.indexOf("/Artids/Stads/") === -1) return;
+  const orden = ["png", "jpg", "webp"];
+  const m = src.match(/\.(png|jpg|webp)(\?.*)?$/i);
+  const i = m ? orden.indexOf(m[1].toLowerCase()) : -1;
+  if (i >= 0 && i < orden.length - 1) { ev.stopPropagation(); img.src = src.replace(/\.(png|jpg|webp)(\?.*)?$/i, "." + orden[i + 1]); }
+  else img.style.display = "none";
+}, true);
     function getEstadioImage(estadio) {
       if (!estadio) return "";
-      // Limpiamos nombre para intentar coincidir con archivos en la carpeta Stads
-      const fileName = estadio
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/\./g, "")
-        .replace(/\s+/g, "") + ".png";
+            const fileName = encodeURIComponent(estadio.normalize("NFC").replace(/\./g, "").trim()) + ".png";
       return "https://globopedia.github.io/Artids/Stads/" + fileName;
     }
 

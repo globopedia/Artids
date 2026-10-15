@@ -151,22 +151,33 @@ function listaNombres(texto) {
 }
 
 // === Fotos de estadios ===
-// Carpeta Artids/Stads. Primero se busca el archivo con el nombre exacto de la
-// columna "Nombre" (ej. "Tomás A. Ducó.png"); si no está, el mismo nombre
-// pegado y sin tildes ni puntos (ej. "TomasADuco.png", como estaban
-// guardadas las fotos viejas); en .png y después en .jpg.
+// Carpeta Artids/Stads. El archivo se llama como el estadio, tal como se lee,
+// con tildes y espacios pero SIN puntos (ej. "Tomás A Ducó.png",
+// "Gasómetro.png"), en .png, .jpg o .webp. Se busca primero con la columna
+// "Nombre" y después con cada uno de los "Otros nombres". Como resguardo,
+// también se prueba el formato viejo pegado y sin tildes (ej. "TomasADuco.png").
 const URL_FOTOS_ESTADIOS = "https://globopedia.github.io/Artids/Stads/";
+function archivoEstadio(nombre) {
+  return (nombre || "").normalize("NFC").replace(/\./g, "").trim();
+}
 function slugEstadio(nombre) {
-  return (nombre || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.']/g, "").replace(/\s+/g, "");
+  return (nombre || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[.']/g, "").replace(/\s+/g, "");
 }
-function candidatasFotoEstadio(nombre) {
-  const exacto = encodeURIComponent((nombre || "").trim());
-  const slug = encodeURIComponent(slugEstadio(nombre));
-  return [exacto + ".png", slug + ".png", exacto + ".jpg", slug + ".jpg"].map(f => URL_FOTOS_ESTADIOS + f);
+function candidatasFotoEstadio(nombres) {
+  const lista = [];
+  (Array.isArray(nombres) ? nombres : [nombres]).forEach(n => {
+    const base = archivoEstadio(n);
+    if (!base) return;
+    ["png", "jpg", "webp"].forEach(ext => lista.push(URL_FOTOS_ESTADIOS + encodeURIComponent(base) + "." + ext));
+  });
+  const viejo = slugEstadio(Array.isArray(nombres) ? nombres[0] : nombres);
+  if (viejo) ["png", "jpg"].forEach(ext => lista.push(URL_FOTOS_ESTADIOS + encodeURIComponent(viejo) + "." + ext));
+  return [...new Set(lista)];
 }
-function htmlFotoEstadio(nombre, clase, alt) {
-  const c = candidatasFotoEstadio(nombre);
-  return `<img class="${clase}" src="${c[0]}" data-candidatas="${escapeHTML(c.join("|"))}" data-i="0" alt="${escapeHTML(alt || nombre)}" loading="lazy" onerror="fotoEstadioSiguiente(this)">`;
+function htmlFotoEstadio(nombres, clase, alt) {
+  const c = candidatasFotoEstadio(nombres);
+  const titulo = Array.isArray(nombres) ? nombres[0] : nombres;
+  return `<img class="${clase}" src="${c[0]}" data-candidatas="${escapeHTML(c.join("|"))}" data-i="0" alt="${escapeHTML(alt || titulo)}" loading="lazy" onerror="fotoEstadioSiguiente(this)">`;
 }
 function fotoEstadioSiguiente(img) {
   const c = (img.dataset.candidatas || "").split("|");
@@ -511,7 +522,7 @@ function mostrarEstadio() {
     (/^\d+$/.test(p.Resultado1) && /^\d+$/.test(p.Resultado2) ? ` (${p.Resultado1}-${p.Resultado2})` : "");
 
   cont.innerHTML = `
-    ${htmlFotoEstadio(e.nombre, "foto-estadio", "Estadio " + e.nombre)}
+    ${htmlFotoEstadio([e.nombre, ...e.otros], "foto-estadio", "Estadio " + e.nombre)}
     <div class="club-header">
       <div style="flex:1; min-width:220px;">
         <h2>${escapeHTML(e.nombre)}</h2>
