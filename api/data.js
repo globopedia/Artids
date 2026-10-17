@@ -62,7 +62,13 @@ export default async function handler(req, res) {
       return res.status(response.status).send("No se pudo acceder al archivo");
     }
 
-    const data = await response.text();
+    let data = await response.text();
+
+    // Partidos todavía no jugados (próximo rival): se cargan en el CSV sin
+    // resultado y con fecha de hoy en adelante. Solo los pide la página de
+    // inicio (con "&proximos=1"); al resto de las páginas no se les mandan,
+    // así no aparecen como partidos jugados en Rivales, Torneos, etc.
+    if (/^artids/.test(file) && req.query.proximos !== "1") data = sinPartidosPendientes(data);
 
     // Caché: la respuesta se guarda en la red de Vercel y se reutiliza para
     // TODOS los visitantes durante 5 minutos ("fresca"), y hasta 1 hora más
@@ -78,4 +84,41 @@ export default async function handler(req, res) {
   } catch (error) {
     res.status(500).send("Error interno");
   }
+}
+
+// Fecha de hoy en Argentina como número AAAAMMDD.
+function hoyArgentina() {
+  const d = new Date(Date.now() - 3 * 3600 * 1000);
+  return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+}
+
+// Primeros campos de una línea CSV (respeta comillas).
+function camposIniciales(linea, cuantos) {
+  const out = []; let campo = "", comillas = false;
+  for (let i = 0; i < linea.length && out.length < cuantos; i++) {
+    const c = linea[i];
+    if (c === '"') { if (comillas && linea[i + 1] === '"') { campo += '"'; i++; } else comillas = !comillas; }
+    else if (c === "," && !comillas) { out.push(campo); campo = ""; }
+    else campo += c;
+  }
+  if (out.length < cuantos) out.push(campo);
+  return out;
+}
+
+// Saca las filas con fecha futura, y las de hoy que todavía no tienen resultado.
+function sinPartidosPendientes(texto) {
+  const hoy = hoyArgentina();
+  const salto = texto.includes("\r\n") ? "\r\n" : "\n";
+  return texto.split(/\r?\n/).filter((linea, i) => {
+    if (i === 0 || !linea.trim()) return true;
+    const m = linea.match(/^(\d{2})\/(\d{2})\/(\d{4}),/);
+    if (!m) return true;
+    const fecha = +m[3] * 10000 + +m[2] * 100 + +m[1];
+    if (fecha > hoy) return false;
+    if (fecha === hoy) {
+      const sit = (camposIniciales(linea, 4)[3] || "").trim().toLowerCase();
+      if (!["victoria", "empate", "derrota"].includes(sit)) return false;
+    }
+    return true;
+  }).join(salto);
 }
