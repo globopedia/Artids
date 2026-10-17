@@ -530,6 +530,9 @@ async function cargarDatos() {
   const clubes = parsear(ivals).map(c => ({
     club: limpiar(c.Club), id: limpiar(c.id),
     fund: leerFecha(c.Fundacion),
+    // Si tiene algo en "Disolucion" (aunque sea 00/00/2003), el club ya no existe:
+    // en el inicio dice "Hubiera cumplido". La fecha no se muestra.
+    disuelto: !vacio(c.Disolucion),
     escudo: limpiar(c.Escudo)
   })).filter(c => c.club && c.fund);
 
@@ -763,7 +766,8 @@ function htmlTecnico(t, obj) {
 
 function htmlClub(c, obj) {
   const anios = obj.anio - c.fund.anio;
-  textosParaCopiar.push(`${c.club} cumple ${anios} años (fundado el ${textoFecha(c.fund)} de ${c.fund.anio}).`);
+  const cumple = c.disuelto ? "hubiera cumplido" : "cumple";
+  textosParaCopiar.push(`${c.club} ${cumple} ${anios} años (fundado el ${textoFecha(c.fund)} de ${c.fund.anio}).`);
   const link = URL_PAGINA_RIVALES + "?club=" + encodeURIComponent(c.club);
   const escudo = c.escudo && /^https?:/.test(c.escudo) ? c.escudo : urlEscudo(c.club);
   return `
@@ -771,7 +775,7 @@ function htmlClub(c, obj) {
     <div class="imagen"><img src="${esc(escudo)}" alt="${esc(c.club)}" loading="lazy" onerror="this.style.visibility='hidden'"></div>
     <span class="nombre">${esc(c.club)}</span>
     <span class="etiqueta">Fundado en ${c.fund.anio}</span>
-    <div class="dato">Cumple ${anios} años</div>
+    <div class="dato">${c.disuelto ? "Hubiera cumplido" : "Cumple"} ${anios} años</div>
   </a>`;
 }
 
