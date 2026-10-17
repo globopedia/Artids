@@ -241,7 +241,13 @@ let HECHOS_ESPECIALES = [];
 // Se muestra desde antes y hasta el mismo día del partido. El pronóstico usa
 // los últimos N partidos (oficiales y amistosos) contra ese rival y los últimos N en la misma
 // condición (local / visitante / neutral), aunque se repitan.
-const CANTIDAD_PRONOSTICO = 5;
+// Muestra para el pronóstico (oficiales y amistosos, aunque se repitan):
+const PRONOSTICO = {
+  rivalGeneral: 3,      // últimos partidos contra ese rival
+  rivalCondicion: 3,    // últimos contra ese rival en la misma condición
+  huracanGeneral: 2,    // últimos de Huracán contra cualquier rival
+  huracanCondicion: 2   // últimos de Huracán en la misma condición, contra cualquiera
+};
 
 // Cuántos futbolistas mostrar por día (los de más partidos en Huracán).
 const MAX_FUTBOLISTAS = 5;
@@ -867,9 +873,12 @@ function pronostico(prox) {
   nombres.add(norm(prox.Club));
   const historial = DATOS.partidos.filter(p => p.f && !esAnulado(p) && nombres.has(norm(p.Club)) &&
     ["victoria", "empate", "derrota"].includes(norm(p.Situación)));
-  const general = historial.slice(-CANTIDAD_PRONOSTICO);
-  const condicion = historial.filter(p => p.Condición === prox.Condición).slice(-CANTIDAD_PRONOSTICO);
-  const muestra = [...general, ...condicion];
+  const jugados = DATOS.partidos.filter(p => p.f && !esAnulado(p) && ["victoria", "empate", "derrota"].includes(norm(p.Situación)));
+  const general = historial.slice(-PRONOSTICO.rivalGeneral);
+  const condicion = historial.filter(p => p.Condición === prox.Condición).slice(-PRONOSTICO.rivalCondicion);
+  const recientes = jugados.slice(-PRONOSTICO.huracanGeneral);
+  const recientesCond = jugados.filter(p => p.Condición === prox.Condición).slice(-PRONOSTICO.huracanCondicion);
+  const muestra = [...general, ...condicion, ...recientes, ...recientesCond];
   if (!muestra.length) return { general, condicion, total: 0 };
   const cuenta = { victoria: 0, empate: 0, derrota: 0 };
   let golesH = 0, golesR = 0;
@@ -901,14 +910,6 @@ function htmlProximo(prox) {
                   vacio(prox.Estadio) ? "" : prox.Estadio].filter(Boolean).join(" · ");
   const orden = (h, r) => rivalLocal ? `${r}-${h}` : `${h}-${r}`;
   const fijas = pr.total ? [...new Set(pr.fijas.map(([h, r]) => orden(h, r)))] : [];
-  const deQuien = rivalLocal ? `${prox.Club} - Huracán` : `Huracán - ${prox.Club}`;
-  const condTxt = { local: "como local", visitante: "como visitante", neutral: "en cancha neutral" }[prox.Condición] || "en esa condición";
-
-  const verbo = prox.Condición === "visitante" ? `visita a ${prox.Club}` : prox.Condición === "local" ? `recibe a ${prox.Club}` : `enfrenta a ${prox.Club}`;
-  const texto = `Próximo partido: Huracán ${verbo} el ${diaSemana(prox.f)} ${textoFecha(prox.f)}` +
-    (vacio(prox.Estadio) ? "" : ` en ${prox.Estadio}`) + (torneo ? `, por la ${torneo.replace(/^(\d+\S*)\s+fecha\s+(del|de la|de)\s+/i, "$1 fecha del ")}` : "") + "." +
-    (pr.total ? ` Chances: Huracán ${pr.pctH}%, ${prox.Club} ${pr.pctR}%. Las fijas (${deQuien}): ${fijas.join(", ")}.` : "");
-  const idx = textosParaCopiar.push(texto) - 1;
 
   const izq = rivalLocal ? pct(pr.pctR, pr.pctH) + escR : pct(pr.pctH, pr.pctR) + escH;
   const der = rivalLocal ? escH + pct(pr.pctH, pr.pctR) : escR + pct(pr.pctR, pr.pctH);
@@ -918,11 +919,10 @@ function htmlProximo(prox) {
     <div class="cruce"><div class="lado izq">${izq}</div><div class="vs">vs</div><div class="lado der">${der}</div></div>
     <div class="cuando">${esc(cuando)}</div>
     ${pr.total ? `
-    <div class="subt">Las fijas <small style="text-transform:none;letter-spacing:0;font-weight:500">(${esc(deQuien)})</small></div>
+    <div class="subt">Las fijas</div>
     <div class="fijas">${fijas.map(f => `<span>${f}</span>`).join("")}</div>
-    <div class="nota">Según los últimos ${pr.general.length} partidos ante ${esc(prox.Club)} y los últimos ${pr.condicion.length} ${condTxt}.</div>`
+    <div class="nota">${pr.general.length ? `Según los últimos partidos ante ${esc(prox.Club)} y el presente de Huracán.` : "Primer enfrentamiento: según el presente de Huracán."}</div>`
     : `<div class="nota">Primer enfrentamiento: todavía no hay historial para el pronóstico.</div>`}
-    <button class="copiar" data-copiar="${idx}">Copiar texto</button>
   </div>`;
 }
 
