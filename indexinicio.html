@@ -110,29 +110,29 @@
 
     /* Fila superior: Próximo rival (a la izquierda, ~2 fichas de ancho) + Cumpleaños */
     .fila-superior { display: flex; gap: 18px; align-items: flex-start; }
-    .fila-superior > .col-proximo { flex: 0 0 340px; max-width: 340px; }
+    .fila-superior > .col-proximo { flex: 0 0 360px; max-width: 360px; }
     .fila-superior > .col-cumples { flex: 1 1 auto; min-width: 0; }
     .proximo { border: 2px solid var(--rojo); border-radius: 12px; padding: 12px; background: #fff; text-align: center; }
     .proximo .torneo { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--gris); min-height: 28px; }
     .proximo .torneo img { height: 28px; width: auto; }
-    .proximo .cruce { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; margin: 8px 0 4px; }
+    .proximo .cruce { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; margin: 10px 0 4px; }
+    .proximo .lado { display: flex; align-items: center; gap: 6px; }
+    .proximo .lado.izq { justify-content: flex-end; }
+    .proximo .lado.der { justify-content: flex-start; }
+    .proximo .equipo { width: 76px; }
     .proximo .equipo img { width: 58px; height: 58px; object-fit: contain; display: block; margin: 0 auto 2px; }
-    .proximo .equipo span { font: 700 13px 'Poppins', sans-serif; line-height: 1.2; display: block; }
-    .proximo .vs { font: 800 16px 'Poppins', sans-serif; color: var(--rojo); }
-    .proximo .cuando { font-size: 12.5px; color: var(--gris); margin-bottom: 10px; }
+    .proximo .equipo span { font: 700 12px 'Poppins', sans-serif; line-height: 1.2; display: block; }
+    .proximo .pct { font: 800 30px/58px 'Poppins', sans-serif; letter-spacing: -1px; align-self: flex-start; }
+    .proximo .pct.alto { color: #1e9e3a; }
+    .proximo .pct.bajo { color: var(--rojo); }
+    .proximo .pct.parejo { color: #e0a800; }
+    .proximo .vs { font: 800 15px 'Poppins', sans-serif; color: var(--gris); align-self: flex-start; line-height: 58px; }
+    .proximo .cuando { font-size: 12.5px; color: var(--gris); margin-bottom: 4px; }
     .proximo .subt { font: 700 11px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: var(--rojo-oscuro); margin: 10px 0 6px; }
-    .chance { display: grid; grid-template-columns: 96px 1fr 38px; align-items: center; gap: 6px; font-size: 12.5px; margin: 4px 0; text-align: left; }
-    .chance .barra { height: 10px; border-radius: 6px; background: #f1e3e3; overflow: hidden; }
-    .chance .barra i { display: block; height: 100%; border-radius: 6px; background: var(--rojo); }
-    .chance.empate .barra i { background: #9a9aa0; }
-    .chance.rival .barra i { background: #3a3a3c; }
-    .chance b { text-align: right; font-family: 'Poppins', sans-serif; }
     .fijas { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
     .fijas span { font: 800 16px 'Poppins', sans-serif; color: var(--rojo); border: 2px solid var(--rojo); border-radius: 8px; padding: 2px 10px; }
     .proximo .nota { font-size: 11px; color: var(--gris); margin-top: 8px; }
-    .proximo details { font-size: 11.5px; color: var(--gris); margin-top: 4px; text-align: left; }
-    .proximo details summary { cursor: pointer; text-align: center; }
-    .proximo details li { margin: 1px 0; }
+
     .ficha { display: block; text-align: center; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 8px; color: var(--texto); background: #fff; }
     a.ficha { cursor: pointer; transition: background .15s, border-color .15s; }
     a.ficha:hover { text-decoration: none; border-color: var(--rojo); background: var(--rojo-suave); }
@@ -239,7 +239,7 @@ let HECHOS_ESPECIALES = [];
 // PRÓXIMO RIVAL: el partido se carga en Artids2015.csv sin resultado (Situación
 // y Resultados con "-"), con al menos Fecha, Condición, Club, Torneo y Estadio.
 // Se muestra desde antes y hasta el mismo día del partido. El pronóstico usa
-// los últimos N partidos oficiales contra ese rival y los últimos N en la misma
+// los últimos N partidos (oficiales y amistosos) contra ese rival y los últimos N en la misma
 // condición (local / visitante / neutral), aunque se repitan.
 const CANTIDAD_PRONOSTICO = 5;
 
@@ -865,7 +865,7 @@ function htmlPersona(x, obj) {
 function pronostico(prox) {
   const nombres = DATOS.anteriores.get(norm(prox.Club)) || new Set([norm(prox.Club)]);
   nombres.add(norm(prox.Club));
-  const historial = DATOS.partidos.filter(p => p.f && esOficial(p) && nombres.has(norm(p.Club)) &&
+  const historial = DATOS.partidos.filter(p => p.f && !esAnulado(p) && nombres.has(norm(p.Club)) &&
     ["victoria", "empate", "derrota"].includes(norm(p.Situación)));
   const general = historial.slice(-CANTIDAD_PRONOSTICO);
   const condicion = historial.filter(p => p.Condición === prox.Condición).slice(-CANTIDAD_PRONOSTICO);
@@ -874,20 +874,23 @@ function pronostico(prox) {
   const cuenta = { victoria: 0, empate: 0, derrota: 0 };
   let golesH = 0, golesR = 0;
   muestra.forEach(p => { cuenta[norm(p.Situación)]++; golesH += p.g1; golesR += p.g2; });
-  // Porcentajes que suman 100 (se reparte el redondeo al que más decimales tenga)
-  const brutos = ["victoria", "empate", "derrota"].map(k => cuenta[k] * 100 / muestra.length);
-  const enteros = brutos.map(Math.floor);
-  let falta = 100 - enteros.reduce((a, b) => a + b, 0);
-  brutos.map((v, i) => [v - enteros[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (falta > 0) { enteros[i]++; falta--; } });
+  // Chances: el empate se reparte por mitades entre los dos (50/20/30 -> 60/40).
+  // Se redondea para que los dos sumen 100.
+  const crudoH = (cuenta.victoria + cuenta.empate / 2) * 100 / muestra.length;
+  let pctH = Math.round(crudoH);
+  const pctR = 100 - pctH;
   const promH = golesH / muestra.length, promR = golesR / muestra.length;
   const redondeo = x => (x - Math.floor(x) >= 0.5 ? Math.floor(x) + 1 : Math.floor(x));
   const fijas = [[Math.floor(promH), Math.floor(promR)], [redondeo(promH), redondeo(promR)], [Math.ceil(promH), Math.ceil(promR)]];
-  return { general, condicion, total: muestra.length, ganar: enteros[0], empatar: enteros[1], perder: enteros[2], promH, promR, fijas };
+  return { general, condicion, total: muestra.length, pctH, pctR, promH, promR, fijas };
 }
 
 function htmlProximo(prox) {
   const pr = pronostico(prox);
   const rivalLocal = prox.Condición === "visitante";
+  // Color del porcentaje: verde el mayor, rojo el menor, amarillo si empatan.
+  const color = (yo, otro) => yo > otro ? "alto" : yo < otro ? "bajo" : "parejo";
+  const pct = (v, otro) => pr.total ? `<div class="pct ${color(v, otro)}">${v}%</div>` : "";
   const escH = `<div class="equipo"><img src="${urlEscudo("Huracán")}" alt="Huracán"><span>Huracán</span></div>`;
   const escR = `<div class="equipo"><img src="${urlEscudo(prox.Club)}" alt="${esc(prox.Club)}" onerror="this.style.visibility='hidden'"><span>${esc(prox.Club)}</span></div>`;
   const torneo = limpiar(prox.Torneo).replace(/\s*\((amistoso|Amistoso)\)\s*$/, "");
@@ -904,27 +907,21 @@ function htmlProximo(prox) {
   const verbo = prox.Condición === "visitante" ? `visita a ${prox.Club}` : prox.Condición === "local" ? `recibe a ${prox.Club}` : `enfrenta a ${prox.Club}`;
   const texto = `Próximo partido: Huracán ${verbo} el ${diaSemana(prox.f)} ${textoFecha(prox.f)}` +
     (vacio(prox.Estadio) ? "" : ` en ${prox.Estadio}`) + (torneo ? `, por la ${torneo.replace(/^(\d+\S*)\s+fecha\s+(del|de la|de)\s+/i, "$1 fecha del ")}` : "") + "." +
-    (pr.total ? ` Chances: Huracán ${pr.ganar}%, empate ${pr.empatar}%, ${prox.Club} ${pr.perder}%. Las fijas (${deQuien}): ${fijas.join(", ")}.` : "");
+    (pr.total ? ` Chances: Huracán ${pr.pctH}%, ${prox.Club} ${pr.pctR}%. Las fijas (${deQuien}): ${fijas.join(", ")}.` : "");
   const idx = textosParaCopiar.push(texto) - 1;
 
-  const filaPartido = p => `<li>${p.Fecha} · ${p.Condición === "local" ? `Huracán ${p.g1}-${p.g2} ${esc(p.Club)}` : `${esc(p.Club)} ${p.g2}-${p.g1} Huracán`}</li>`;
+  const izq = rivalLocal ? pct(pr.pctR, pr.pctH) + escR : pct(pr.pctH, pr.pctR) + escH;
+  const der = rivalLocal ? escH + pct(pr.pctH, pr.pctR) : escR + pct(pr.pctR, pr.pctH);
   return `
   <div class="proximo">
     <div class="torneo"><img src="${imgsTorneo[0]}" data-otra="${imgsTorneo[1]}" alt="" onerror="if(this.dataset.otra){this.src=this.dataset.otra;this.dataset.otra='';}else{this.remove();}"><span>${esc([fechaTorneo, nombreTorneo].filter(Boolean).join(" · "))}</span></div>
-    <div class="cruce">${rivalLocal ? escR : escH}<div class="vs">vs</div>${rivalLocal ? escH : escR}</div>
+    <div class="cruce"><div class="lado izq">${izq}</div><div class="vs">vs</div><div class="lado der">${der}</div></div>
     <div class="cuando">${esc(cuando)}</div>
     ${pr.total ? `
-    <div class="subt">Chances</div>
-    <div class="chance"><span>Huracán</span><div class="barra"><i style="width:${pr.ganar}%"></i></div><b>${pr.ganar}%</b></div>
-    <div class="chance empate"><span>Empate</span><div class="barra"><i style="width:${pr.empatar}%"></i></div><b>${pr.empatar}%</b></div>
-    <div class="chance rival"><span>${esc(prox.Club)}</span><div class="barra"><i style="width:${pr.perder}%"></i></div><b>${pr.perder}%</b></div>
     <div class="subt">Las fijas <small style="text-transform:none;letter-spacing:0;font-weight:500">(${esc(deQuien)})</small></div>
     <div class="fijas">${fijas.map(f => `<span>${f}</span>`).join("")}</div>
-    <div class="nota">Según los últimos ${pr.general.length} partidos oficiales ante ${esc(prox.Club)} y los últimos ${pr.condicion.length} ${condTxt}.</div>
-    <details><summary>Ver los partidos</summary>
-      <b>Últimos en general</b><ul>${pr.general.map(filaPartido).join("")}</ul>
-      <b>Últimos ${condTxt}</b><ul>${pr.condicion.map(filaPartido).join("")}</ul>
-    </details>` : `<div class="nota">Primer enfrentamiento oficial: todavía no hay historial para el pronóstico.</div>`}
+    <div class="nota">Según los últimos ${pr.general.length} partidos ante ${esc(prox.Club)} y los últimos ${pr.condicion.length} ${condTxt}.</div>`
+    : `<div class="nota">Primer enfrentamiento: todavía no hay historial para el pronóstico.</div>`}
     <button class="copiar" data-copiar="${idx}">Copiar texto</button>
   </div>`;
 }
