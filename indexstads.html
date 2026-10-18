@@ -485,7 +485,13 @@ function etiquetaTamano(medidas) {
   const n = (medidas || "").replace(/,/g, ".").match(/(\d+(?:\.\d+)?)\s*[x×X*]\s*(\d+(?:\.\d+)?)/);
   if (!n) return "";
   const sup = parseFloat(n[1]) * parseFloat(n[2]);
-  const t = sup >= 7140 ? "grande" : sup >= 6600 ? "mediana" : "chica";
+  // Superficie (largo x ancho) en m²:
+  //   9.451 o más     -> muy grande
+  //   8.101 a 9.450   -> grande
+  //   6.750 a 8.100   -> mediana
+  //   5.400 a 6.749   -> chica
+  //   menos de 5.400  -> muy chica
+  const t = sup >= 9451 ? "muy grande" : sup >= 8101 ? "grande" : sup >= 6750 ? "mediana" : sup >= 5400 ? "chica" : "muy chica";
   return `<span class="etiqueta-tamano" title="Superficie: ${Math.round(sup).toLocaleString("es-AR")} m²">cancha ${t}</span>`;
 }
 function campo(label, valor) {
