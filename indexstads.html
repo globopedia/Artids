@@ -486,12 +486,11 @@ function etiquetaTamano(medidas) {
   if (!n) return "";
   const sup = parseFloat(n[1]) * parseFloat(n[2]);
   // Superficie (largo x ancho) en m²:
-  //   9.451 o más     -> muy grande
-  //   8.101 a 9.450   -> grande
-  //   6.750 a 8.100   -> mediana
-  //   5.400 a 6.749   -> chica
-  //   menos de 5.400  -> muy chica
-  const t = sup >= 9451 ? "muy grande" : sup >= 8101 ? "grande" : sup >= 6750 ? "mediana" : sup >= 5400 ? "chica" : "muy chica";
+  //   7.500 o más     -> muy grande  (110 x 70, 105 x 72...)
+  //   7.100 a 7.499   -> grande      (reglamentaria: 105 x 68 a 105 x 71)
+  //   6.600 a 7.099   -> chica       (100 x 67, 102 x 66, 102 x 68...)
+  //   menos de 6.600  -> muy chica
+  const t = sup >= 7500 ? "muy grande" : sup >= 7100 ? "grande" : sup >= 6600 ? "chica" : "muy chica";
   return `<span class="etiqueta-tamano" title="Superficie: ${Math.round(sup).toLocaleString("es-AR")} m²">cancha ${t}</span>`;
 }
 function campo(label, valor) {
