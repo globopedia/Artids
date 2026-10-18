@@ -115,13 +115,13 @@
     .proximo { border: 2px solid var(--rojo); border-radius: 12px; padding: 12px; background: #fff; text-align: center; }
     .proximo .torneo { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--gris); min-height: 28px; }
     .proximo .torneo img { height: 28px; width: auto; }
-    .proximo .cruce { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; margin: 10px 0 4px; }
-    .proximo .lado { display: flex; align-items: center; gap: 6px; }
+    .proximo .cruce { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 6px; margin: 10px 0 4px; }
+    .proximo .lado { display: flex; align-items: flex-start; gap: 6px; }
     .proximo .lado.izq { justify-content: flex-end; }
     .proximo .lado.der { justify-content: flex-start; }
-    .proximo .equipo { width: 76px; }
+    .proximo .equipo { width: 76px; display: flex; flex-direction: column; align-items: center; }
     .proximo .equipo img { width: 58px; height: 58px; object-fit: contain; display: block; margin: 0 auto 2px; }
-    .proximo .equipo span { font: 700 12px 'Poppins', sans-serif; line-height: 1.2; display: block; }
+    .proximo .equipo span { font: 700 12px 'Poppins', sans-serif; line-height: 1.2; display: block; white-space: nowrap; }
     .proximo .pct { font: 800 30px/58px 'Poppins', sans-serif; letter-spacing: -1px; align-self: flex-start; }
     .proximo .pct.alto { color: #1e9e3a; }
     .proximo .pct.bajo { color: var(--rojo); }
@@ -131,7 +131,6 @@
     .proximo .subt { font: 700 11px 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: var(--rojo-oscuro); margin: 10px 0 6px; }
     .fijas { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
     .fijas span { font: 800 16px 'Poppins', sans-serif; color: var(--rojo); border: 2px solid var(--rojo); border-radius: 8px; padding: 2px 10px; }
-    .proximo .nota { font-size: 11px; color: var(--gris); margin-top: 8px; }
 
     .ficha { display: block; text-align: center; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 8px; color: var(--texto); background: #fff; }
     a.ficha { cursor: pointer; transition: background .15s, border-color .15s; }
@@ -247,6 +246,20 @@ const PRONOSTICO = {
   rivalCondicion: 3,    // últimos contra ese rival en la misma condición
   huracanGeneral: 2,    // últimos de Huracán contra cualquier rival
   huracanCondicion: 2   // últimos de Huracán en la misma condición, contra cualquiera
+};
+// Nombre del rival en la tarjeta del próximo partido: si pasa de este largo
+// se acorta (sin lo que va entre paréntesis y con iniciales: "R. Central").
+const MAX_NOMBRE_RIVAL = 14;
+// Nombres cortos "de tribuna" para los que la regla no queda bien.
+// Se pueden agregar más: "nombre como figura en el CSV": "nombre corto".
+const NOMBRES_CORTOS = {
+  "Newell's Old Boys (Rosario)": "Newell's",
+  "San Lorenzo de Almagro": "San Lorenzo",
+  "Vélez Sarsfield": "Vélez",
+  "Argentinos Juniors": "Argentinos",
+  "Gimnasia y Esgrima (La Plata)": "Gimnasia",
+  "Defensa y Justicia": "Defensa",
+  "Estudiantes (Río Cuarto)": "Estudiantes RC"
 };
 
 // Cuántos futbolistas mostrar por día (los de más partidos en Huracán).
@@ -894,6 +907,18 @@ function pronostico(prox) {
   return { general, condicion, total: muestra.length, pctH, pctR, promH, promR, fijas };
 }
 
+function nombreCorto(club) {
+  const completo = limpiar(club);
+  if (NOMBRES_CORTOS[completo]) return NOMBRES_CORTOS[completo];
+  if (completo.length <= MAX_NOMBRE_RIVAL) return completo;
+  const partes = completo.replace(/\s*\([^)]*\)/g, "").trim().split(" ");
+  // Se pasan a inicial las primeras palabras (no "de", "y", etc.) hasta que entre.
+  for (let i = 0; i < partes.length - 1 && partes.join(" ").length > MAX_NOMBRE_RIVAL; i++) {
+    if (partes[i].length > 3 && !partes[i].endsWith(".")) partes[i] = partes[i].charAt(0).toUpperCase() + ".";
+  }
+  return partes.join(" ");
+}
+
 function htmlProximo(prox) {
   const pr = pronostico(prox);
   const rivalLocal = prox.Condición === "visitante";
@@ -901,7 +926,7 @@ function htmlProximo(prox) {
   const color = (yo, otro) => yo > otro ? "alto" : yo < otro ? "bajo" : "parejo";
   const pct = (v, otro) => pr.total ? `<div class="pct ${color(v, otro)}">${v}%</div>` : "";
   const escH = `<div class="equipo"><img src="${urlEscudo("Huracán")}" alt="Huracán"><span>Huracán</span></div>`;
-  const escR = `<div class="equipo"><img src="${urlEscudo(prox.Club)}" alt="${esc(prox.Club)}" onerror="this.style.visibility='hidden'"><span>${esc(prox.Club)}</span></div>`;
+  const escR = `<div class="equipo"><img src="${urlEscudo(prox.Club)}" alt="${esc(prox.Club)}" onerror="this.style.visibility='hidden'"><span title="${esc(prox.Club)}">${esc(nombreCorto(prox.Club))}</span></div>`;
   const torneo = limpiar(prox.Torneo).replace(/\s*\((amistoso|Amistoso)\)\s*$/, "");
   const nombreTorneo = torneo.replace(/^.*?\b(del|de la|de)\s+/i, "").replace(/^Campeonato\s+/i, "");
   const fechaTorneo = (torneo.match(/^\d+\S*\s+fecha/i) || [""])[0];
@@ -919,10 +944,8 @@ function htmlProximo(prox) {
     <div class="cruce"><div class="lado izq">${izq}</div><div class="vs">vs</div><div class="lado der">${der}</div></div>
     <div class="cuando">${esc(cuando)}</div>
     ${pr.total ? `
-    <div class="subt">Las fijas</div>
-    <div class="fijas">${fijas.map(f => `<span>${f}</span>`).join("")}</div>
-    <div class="nota">${pr.general.length ? `Según los últimos partidos ante ${esc(prox.Club)} y el presente de Huracán.` : "Primer enfrentamiento: según el presente de Huracán."}</div>`
-    : `<div class="nota">Primer enfrentamiento: todavía no hay historial para el pronóstico.</div>`}
+    <div class="subt">Hacé caso a papá, acá está la fija:</div>
+    <div class="fijas">${fijas.map(f => `<span>${f}</span>`).join("")}</div>` : ""}
   </div>`;
 }
 
