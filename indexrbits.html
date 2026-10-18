@@ -615,14 +615,16 @@ document.addEventListener("error", function (ev) {
       const nombreArbitro = parametros.get("arbitro");
 
       if (nombreArbitro) {
-        // Le damos medio segundo para que los CSV terminen de cargar
-        setTimeout(() => {
+        // Se reintenta hasta que los CSV terminen de cargar (hasta 20 segundos)
+        let intentos = 0;
+        const abrir = () => {
           const encontrado = arbitros.find(a => norm(a.nombre) === norm(nombreArbitro));
-          if (!encontrado) return;
+          if (!encontrado) { if (++intentos < 40) setTimeout(abrir, 500); return; }
           document.getElementById("arbitroSearch").value = encontrado.nombre;
           document.getElementById("arbitroSelect").value = encontrado.id;
           mostrarArbitro();
-        }, 500);
+        };
+        setTimeout(abrir, 500);
       }
     });
   </script>
