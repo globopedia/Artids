@@ -499,19 +499,11 @@ function htmlFotoPartido(valor, alt = "") {
       }).join("");
     }
 
-    // Logo de un torneo (ver comentario en la carga de Orneos.csv).
-    function urlLogoTorneo(torneo, excepcion) {
-      const base = "https://globopedia.github.io/Artids/";
-      const ex = (excepcion || "").toString().trim();
-      const vacio = !ex || ex === "-" || /^foto\d*$/i.test(ex);
-      const archivo = (nombre) => /\.(png|jpe?g|webp|svg)$/i.test(nombre) ? nombre : nombre + ".png";
-      if (!vacio) {
-        if (/^https?:/i.test(ex)) return ex;
-        const ruta = archivo(ex.includes("/") ? ex : "Torneos/" + ex);
-        return base + ruta.split("/").map(encodeURIComponent).join("/");
-      }
-      const t = (torneo || "").toString().trim();
-      return t ? base + "Torneos/" + encodeURIComponent(archivo(t)) : "";
+    // Logo de un torneo: Torneos/<Torneo>.png (el archivo se llama igual que
+    // la columna "Torneo"; la "/" de temporadas como 1985/1986 se escribe "-").
+    function urlLogoTorneo(torneo) {
+      const t = (torneo || "").toString().trim().replace(/\//g, "-");
+      return t ? "https://globopedia.github.io/Artids/Torneos/" + encodeURIComponent(t) + ".png" : "";
     }
 
     // Logo del patrocinador (Torneos/<Patrocinador>.png), o "" si no hay.
@@ -620,10 +612,9 @@ function htmlFotoPartido(valor, alt = "") {
           // Título largo (columna "Nombre"); si falta, se usa el del torneo.
           titulo: (c.Nombre ?? c.Torneo ?? "").toString().trim(),
           // Logo del torneo: sale del nombre (Torneos/<Torneo>.png), igual que
-          // los escudos de los clubes. La columna "Foto" es solo para
-          // excepciones (otro logo de la carpeta Torneos, "Banderas/Chile", o
-          // una URL completa); "-" o vacío = usar el nombre del torneo.
-          foto: urlLogoTorneo(c.Torneo ?? c.Nombre ?? "", c.Foto ?? c.Foto1 ?? ""),
+          // los escudos de los clubes. Si el archivo no existe se muestra el
+          // logo de Globopedia (ver onerror del encabezado y del buscador).
+          foto: urlLogoTorneo(c.Torneo ?? c.Nombre ?? ""),
           // Patrocinador: su logo está en Torneos/<Patrocinador>.png
           patrocinador: (c.Patrocinador ?? "").toString().trim(),
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim(),
@@ -985,7 +976,7 @@ function htmlFotoPartido(valor, alt = "") {
             const imgUrl = t.foto ? t.foto : "https://globopedia.github.io/Artids/logo_globopedia.png";
             
             li.innerHTML = `
-              <img src="${imgUrl}" class="autocomplete-thumb" alt="">
+              <img src="${imgUrl}" class="autocomplete-thumb" alt="" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';">
               <span><b>${t.nombre}</b></span>
             `;
 
@@ -1854,10 +1845,15 @@ function mostrarTorneo() {
   const cont = document.getElementById("torneoInfo");
   cont.style.display = "block";
 
-  const partidosTorneo = encuentros.filter(p => 
-    norm(p.Torneo).includes(norm(torneo.nombre)) || 
-    norm(torneo.nombre).includes(norm(p.Torneo))
-  );
+  // En Orneos.csv los torneos cortos se llaman "Torneo Apertura 1997", pero en
+  // los CSV de partidos figuran como "Campeonato Apertura 1997": se prueban
+  // ambas formas para que el cambio de palabra no deje la lista vacía.
+  const claves = [norm(torneo.nombre)];
+  if (/^torneo /.test(claves[0])) claves.push(claves[0].replace(/^torneo /, "campeonato "));
+  const partidosTorneo = encuentros.filter(p => {
+    const pt = norm(p.Torneo);
+    return claves.some(k => pt.includes(k) || (pt && k.includes(pt)));
+  });
 
   // Incorporaciones (debut REAL, en amistoso) y Nuevas adquisiciones (debut
   // OFICIAL) que corresponden a este torneo puntual. Cada jugador puede
