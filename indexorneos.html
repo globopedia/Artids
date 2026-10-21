@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'MuseoModerno', sans-serif; background:#fff; color:#222; margin:20px; }
     h1 { color:#FF0000; text-align:center; }
@@ -86,6 +87,30 @@
     }
 
     h2 { margin:0; color:#FF0000; font-size:24px; }
+
+    /* Encabezado del torneo: logo del torneo | nombre | logo del patrocinador,
+       todo centrado. Si no hay patrocinador, el recuadro de la derecha queda
+       invisible (ocupa lugar) para que el nombre siga centrado. */
+    .torneo-header { justify-content:center; gap:22px; }
+    .torneo-logo-box {
+      width:86px; height:86px; flex-shrink:0; box-sizing:border-box;
+      display:flex; align-items:center; justify-content:center;
+      background:#fff; border:1px solid #FF0000; border-radius:12px; padding:7px;
+      box-shadow:0 1px 4px rgba(0,0,0,.08);
+    }
+    .torneo-logo-box img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
+    .torneo-logo-box.vacio { visibility:hidden; }
+    .torneo-titulo {
+      font-family:'Saira Condensed', 'Oswald', sans-serif; font-weight:800; font-style:italic;
+      text-transform:uppercase; letter-spacing:.8px; line-height:1.05;
+      font-size:30px; color:#FF0000; text-align:center; flex:0 1 560px;
+      text-shadow:1px 1px 0 rgba(139,0,0,.18);
+    }
+    @media (max-width:600px) {
+      .torneo-header { gap:10px; }
+      .torneo-logo-box { width:58px; height:58px; padding:4px; border-radius:9px; }
+      .torneo-titulo { font-size:20px; flex:1 1 0; min-width:0; }
+    }
     
     #torneoInfo p { font-family: 'Chakra Petch', sans-serif; margin: 4px 0; line-height: 1.3; font-size: 15px; }
 
@@ -474,6 +499,28 @@ function htmlFotoPartido(valor, alt = "") {
       }).join("");
     }
 
+    // Logo de un torneo (ver comentario en la carga de Orneos.csv).
+    function urlLogoTorneo(torneo, excepcion) {
+      const base = "https://globopedia.github.io/Artids/";
+      const ex = (excepcion || "").toString().trim();
+      const vacio = !ex || ex === "-" || /^foto\d*$/i.test(ex);
+      const archivo = (nombre) => /\.(png|jpe?g|webp|svg)$/i.test(nombre) ? nombre : nombre + ".png";
+      if (!vacio) {
+        if (/^https?:/i.test(ex)) return ex;
+        const ruta = archivo(ex.includes("/") ? ex : "Torneos/" + ex);
+        return base + ruta.split("/").map(encodeURIComponent).join("/");
+      }
+      const t = (torneo || "").toString().trim();
+      return t ? base + "Torneos/" + encodeURIComponent(archivo(t)) : "";
+    }
+
+    // Logo del patrocinador (Torneos/<Patrocinador>.png), o "" si no hay.
+    function urlPatrocinador(p) {
+      const v = (p || "").toString().trim();
+      if (!v || v === "-" || /^foto\d*$/i.test(v)) return "";
+      return "https://globopedia.github.io/Artids/Torneos/" + encodeURIComponent(v) + ".png";
+    }
+
     function getEscudo(nombreClub) {
       if (!nombreClub) return "";
       try {
@@ -570,7 +617,15 @@ function htmlFotoPartido(valor, alt = "") {
         torneos = Papa.parse(csvTorneos, { header:true, skipEmptyLines:true }).data.map((c, i) => ({
           id: (c.ID ?? c.id ?? i).toString().trim(),
           nombre: (c.Torneo ?? c.Nombre ?? "").toString().trim(),
-          foto: (c.Foto1 ?? c.foto1 ?? c.Foto ?? c.foto ?? c.Escudo ?? "").toString().trim(),
+          // Título largo (columna "Nombre"); si falta, se usa el del torneo.
+          titulo: (c.Nombre ?? c.Torneo ?? "").toString().trim(),
+          // Logo del torneo: sale del nombre (Torneos/<Torneo>.png), igual que
+          // los escudos de los clubes. La columna "Foto" es solo para
+          // excepciones (otro logo de la carpeta Torneos, "Banderas/Chile", o
+          // una URL completa); "-" o vacío = usar el nombre del torneo.
+          foto: urlLogoTorneo(c.Torneo ?? c.Nombre ?? "", c.Foto ?? c.Foto1 ?? ""),
+          // Patrocinador: su logo está en Torneos/<Patrocinador>.png
+          patrocinador: (c.Patrocinador ?? "").toString().trim(),
           datos: (c.Datos ?? c.datos ?? c.Detalle ?? "").toString().trim(),
           participantes: (c.Participantes ?? c.participantes ?? "").toString().trim(),
           // NUEVO: tabla de posiciones, en una sola celda.
@@ -2443,9 +2498,18 @@ function mostrarTorneo() {
     .join("");
 
   cont.innerHTML = `
-    <div class="club-header">
-      <img src="${imgTorneoUrl}" alt="${torneo.nombre}" class="torneo-img-header">
-      <h2>${torneo.nombre}</h2>
+    <div class="club-header torneo-header">
+      <div class="torneo-logo-box" title="${escapeHTML(torneo.nombre)}">
+        <img src="${imgTorneoUrl}" alt="${escapeHTML(torneo.nombre)}"
+             onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';">
+      </div>
+      <h2 class="torneo-titulo">${escapeHTML(torneo.titulo || torneo.nombre)}</h2>
+      ${urlPatrocinador(torneo.patrocinador)
+        ? `<div class="torneo-logo-box" title="${escapeHTML(torneo.patrocinador)}">
+             <img src="${urlPatrocinador(torneo.patrocinador)}" alt="${escapeHTML(torneo.patrocinador)}"
+                  onerror="this.parentNode.classList.add('vacio');">
+           </div>`
+        : `<div class="torneo-logo-box vacio"></div>`}
     </div>
     ${renderParticipantesEscudos(torneo.participantes)}
     ${torneo.datos ? `<p><b>Detalles:</b> ${torneo.datos}</p>` : ""}
