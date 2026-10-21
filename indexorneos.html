@@ -1852,7 +1852,16 @@ function mostrarTorneo() {
   if (/^torneo /.test(claves[0])) claves.push(claves[0].replace(/^torneo /, "campeonato "));
   const partidosTorneo = encuentros.filter(p => {
     const pt = norm(p.Torneo);
-    return claves.some(k => pt.includes(k) || (pt && k.includes(pt)));
+    // "Campeonato 2016" no debe tomar partidos de "Campeonato 2016/2017"
+    // (ni "Campeonato 1985" los de "Campeonato 1985/1986").
+    return claves.some(k => {
+      let i = pt.indexOf(k);
+      while (i !== -1) {
+        if (!/^[\/-]\d/.test(pt.slice(i + k.length))) return true;
+        i = pt.indexOf(k, i + 1);
+      }
+      return pt && k.includes(pt);
+    });
   });
 
   // Incorporaciones (debut REAL, en amistoso) y Nuevas adquisiciones (debut
