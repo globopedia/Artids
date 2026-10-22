@@ -167,6 +167,8 @@
       .partido { grid-template-columns: 1fr; }
       .partido-media .foto { max-width: 340px; }
       .efem-titulo { font-size: 20px; }
+      /* En el celular queda solo la solapa de HOY (sin ayer, mañana ni pasado mañana) */
+      .pestana:not([data-dia="0"]) { display: none; }
       .audio { position: static; justify-content: center; margin-top: 8px; }
     }
     /* Celulares: el cruce del "Próximo rival" (porcentaje – escudo – vs –
@@ -201,7 +203,6 @@
 
   <!-- 2) Efemérides -->
   <section class="efemerides">
-    <h2 class="efem-titulo">Efemérides quemeras</h2>
     <div class="pestanas" role="tablist">
       <button class="pestana" data-dia="-1" role="tab">Un día como ayer<small id="etiquetaAyer"></small></button>
       <button class="pestana activa" data-dia="0" role="tab">Un día como hoy<small id="etiquetaHoy"></small></button>
