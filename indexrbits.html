@@ -81,7 +81,8 @@
   font-family: 'Chakra Petch', sans-serif;
 }
   </style>
-  <link rel="stylesheet" href="movil.css?v=2">
+  <link rel="stylesheet" href="movil.css?v=3">
+  <script src="filapartido.js?v=1"></script>
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/Íconos/Globopedia.png" alt="Logo Huracán" class="logo" />
@@ -514,7 +515,7 @@ function htmlFotoPartido(valor, alt = "") {
 
             contenedor.innerHTML += `
               <div class="acordeon">
-                <div class="acordeon-header">${p.Club} - ${p.Fecha}</div>
+                <div class="acordeon-header"><span class="ah-desk">${p.Club} - ${p.Fecha}</span>${filaPartidoMovil(p, getEscudo(p.Club))}</div>
                 <div class="acordeon-body cerrado">${bloqueHTML}</div>
               </div>
             `;
@@ -529,10 +530,11 @@ function htmlFotoPartido(valor, alt = "") {
     });
 
     document.addEventListener("click", function(e) {
-      if (e.target.classList.contains("acordeon-header")) {
-        const body = e.target.nextElementSibling;
-        body.classList.toggle("cerrado");
-        e.target.classList.toggle("abierto");
+      // closest(): así también abre si se toca el resultado, el escudo o la camiseta
+      const cab = e.target.closest(".acordeon-header");
+      if (cab) {
+        cab.nextElementSibling.classList.toggle("cerrado");
+        cab.classList.toggle("abierto");
       }
     });
 

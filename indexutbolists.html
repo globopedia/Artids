@@ -182,7 +182,8 @@
   margin-top: 2px;
 }
   </style>
-  <link rel="stylesheet" href="movil.css?v=2">
+  <link rel="stylesheet" href="movil.css?v=3">
+  <script src="filapartido.js?v=1"></script>
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/Íconos/Globopedia.png" alt="Globopedia" class="logo" />
@@ -2501,7 +2502,7 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
 
         contenedor.innerHTML += `
          <div class="acordeon ${lado === 'Rival' ? 'acordeon-rival' : ''}">
- <div class="acordeon-header">
+ <div class="acordeon-header"><span class="ah-desk">
   ${fueExpulsado ? `
   <span title="Expulsado" style="display:inline-block; transform: rotate(-20deg); margin-right:6px;">
     <svg width="12" height="16" viewBox="0 0 12 16">
@@ -2518,6 +2519,12 @@ return jugadores.some(j => norm(j) === norm(futbolista)) &&
   <img src="${getEscudo(p.Club)}" alt="${p.Club}" title="${p.Club}"
        style="height:22px; vertical-align:middle; margin:0 6px;">
   ${lado === "Huracan" && p.Técnico ? `[${p.Técnico}]` : ""}
+</span>${filaPartidoMovil(p, getEscudo(p.Club), {
+    soloRonda: lado === "Huracan",
+    conDT: lado === "Huracan",
+    extra: `${fueExpulsado ? "🟥" : ""}${iconoGol}<span class="ah-min">${condicion === "Suplente" ? "Sup." : "Tit."} ${minutosJugados}’</span>
+            <b style="color:${puntajeRedondeado >= 7 ? '#006400' : puntajeRedondeado >= 5 ? '#b8860b' : '#8B0000'}">(${puntajeRedondeado})</b>`
+  })}
 </div>
 <div class="acordeon-body cerrado">${bloqueHTML}</div>
           </div>

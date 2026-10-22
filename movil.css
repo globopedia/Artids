@@ -7,7 +7,7 @@
    dentro del HTML (style="...") que arma cada página.
    ============================================================ */
 /* Partes que solo se muestran en el celular (fuera de la regla de abajo quedan ocultas) */
-.nc-corto, .et-corta { display: none; }
+.nc-corto, .et-corta, .ah-movil { display: none; }
 
 @media (max-width: 600px) {
 
@@ -136,6 +136,30 @@
   .ronda-dt-stack br { display: none; }
   .rd-fecha { order: -1; }
   .rd-ronda::before, .rd-dt::before, .rd-extra::before { content: "\00a0-\00a0"; }
+
+  /* ---- Vendidos y conversos (Rivales): de a cuatro, fotos más chicas ---- */
+  .pase-fila { gap: 8px 4px !important; }
+  .jugador-pase { width: calc(25% - 4px) !important; }
+  .jugador-pase img { width: 44px !important; height: 44px !important; border-width: 1px !important; }
+  .jugador-pase-arquero img { border-width: 2px !important; }
+  .jugador-pase-nombre { font-size: 10px !important; }
+
+  /* ---- Renglón de partido "de celular" en Futbolistas, Técnicos, Rivales
+          y Árbitros (lo arma filapartido.js): mismo formato que Torneos ---- */
+  .ah-desk { display: none !important; }
+  .ah-movil {
+    display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px;
+    width: 100%; text-align: left; font-weight: normal;
+  }
+  .ah-movil .resultado-header { font-size: 30px; font-weight: bold; line-height: 1; }
+  .ah-movil .escudo-header { width: 36px; height: 36px; object-fit: contain; }
+  .ah-movil .ah-extra { font-size: 12px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .ah-movil .foto-camiseta {
+    margin-left: auto; height: 46px; width: 46px; object-fit: contain; padding: 2px;
+    box-sizing: border-box; background: #fff; border-radius: 9px; border: 1px solid #ccc;
+  }
+  .ah-movil .ronda-dt-stack { font-weight: normal; text-align: left; }
+  .acordeon-header:has(.ah-movil) { text-align: left !important; }
 
   /* ---- Tablas de posiciones: solo Equipo y Pts ---- */
   .tabla-pos .col-extra { display: none !important; }
