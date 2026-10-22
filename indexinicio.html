@@ -160,7 +160,7 @@
     .tapas img { width: 90px; height: 120px; object-fit: cover; border-radius: 4px; box-shadow: 0 3px 10px rgba(0,0,0,.5); display: block; }
 
     @media (max-width: 760px) {
-      .fila-superior { flex-direction: column; }
+      .fila-superior { flex-direction: column; align-items: stretch; }
       .fila-superior > .col-proximo { flex: 1 1 auto; max-width: none; width: 100%; }
     }
     @media (max-width: 620px) {
@@ -168,6 +168,21 @@
       .partido-media .foto { max-width: 340px; }
       .efem-titulo { font-size: 20px; }
       .audio { position: static; justify-content: center; margin-top: 8px; }
+    }
+    /* Celulares: el cruce del "Próximo rival" (porcentaje – escudo – vs –
+       escudo – porcentaje) no entraba y el porcentaje de la derecha quedaba
+       cortado. Achicamos porcentajes y escudos para que entre todo. */
+    @media (max-width: 420px) {
+      .proximo { padding: 10px 6px; }
+      .proximo .cruce { gap: 2px; }
+      .proximo .lado { gap: 3px; }
+      .proximo .equipo { width: 62px; }
+      .proximo .equipo img { width: 46px; height: 46px; }
+      .proximo .equipo span { font-size: 11px; white-space: normal; }
+      .proximo .pct { font-size: 22px; line-height: 46px; letter-spacing: -0.5px; }
+      .proximo .vs { font-size: 13px; line-height: 46px; }
+      /* Cumpleaños: de a dos fichas por renglón */
+      .grilla-fichas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     }
   </style>
 </head>

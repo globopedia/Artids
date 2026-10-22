@@ -1,0 +1,89 @@
+/* ============================================================
+   GLOBOPEDIA — AJUSTES PARA CELULAR
+   Se carga al final de cada página (después de sus propios estilos)
+   y solo actúa en pantallas angostas (hasta 600 px). En la
+   computadora no cambia nada.
+   Muchas reglas llevan !important porque pisan estilos escritos
+   dentro del HTML (style="...") que arma cada página.
+   ============================================================ */
+@media (max-width: 600px) {
+
+  /* Menos margen alrededor de la página: en el celular cada píxel cuenta */
+  body { margin: 8px !important; }
+
+  /* Ficha principal (futbolista, técnico, rival, árbitro, estadio, torneo) */
+  .club-card {
+    padding: 12px !important;
+    border-radius: 14px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Encabezado de la ficha: foto ARRIBA y los datos DEBAJO, todo centrado.
+     (El de Torneos queda como está: logo – título – patrocinador en fila.) */
+  .club-header:not(.torneo-header) {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 10px !important;
+  }
+  .club-header:not(.torneo-header) > div {
+    width: 100%;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  /* Foto de futbolista / técnico / árbitro un poco más grande */
+  .club-header:not(.torneo-header) > img[style*="140px"] {
+    width: 150px !important;
+    height: 200px !important;
+  }
+  .ficha-titulo { text-align: center !important; }
+  .ficha-apellido { font-size: 36px !important; }
+
+  /* Cuadros de estadísticas y listas con casillas: sin sangrías
+     acumuladas, así el partido abierto usa todo el ancho */
+  .stat-group { padding: 8px !important; }
+  .stat-group ul, .stats ul {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    list-style: none !important;
+  }
+  .partidos-lista { margin-left: 0 !important; }
+
+  /* Renglón de cada partido: alineado a la izquierda, no tirado a la derecha */
+  .acordeon-header {
+    text-align: left !important;
+    padding-left: 8px !important;
+  }
+  .acordeon-body { padding: 6px 4px !important; }
+  .acordeon-body.cerrado { padding: 0 4px !important; }
+
+  /* Marcador del partido: escudo – goles – goles – escudo en una sola línea */
+  .resultado-con-escudo { flex-wrap: nowrap !important; gap: 4px !important; }
+  .resultado1-box, .resultado2-box {
+    font-size: 24px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    padding: 6px 4px !important;
+    min-width: 22px !important;
+  }
+  .escudo-huracan, .escudo-rival { width: 40px !important; height: 40px !important; }
+
+  /* Buscadores y su lista desplegable: que no se salgan de la pantalla */
+  input[type="text"], input:not([type]), select {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  ul[id^="autocomplete"] { max-width: calc(100vw - 16px) !important; }
+
+  /* Grillas de tres columnas (ej. Incorporaciones de Torneos): de a dos */
+  ul[style*="grid-template-columns:1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  ul[style*="grid-template-columns:1fr 1fr 1fr"] > li { min-width: 0; }
+
+  /* Nada más ancho que la pantalla */
+  img, canvas, video, iframe { max-width: 100%; }
+}

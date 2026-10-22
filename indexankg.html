@@ -3,6 +3,7 @@
 <head>
   <script src="proteccion.js?v=3"></script>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RANKING DE FUTBOLISTAS</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -225,6 +226,20 @@ html, body {
     gap: 2px;
     align-items: center;
     justify-content: center;
+  }
+
+  /* === Celulares: la tabla entra en la pantalla sin achicarse toda === */
+  @media (max-width: 600px) {
+    th, td { font-size: 13px; padding: 6px 3px; white-space: normal; }
+    .col-numero { width: 22px; }
+    .col-jugador { width: auto; }
+    .col-periodo { width: 26%; }
+    .col-estadistica { width: 20%; }
+    .jugador { gap: 6px; }
+    .foto-jugador { width: 34px; height: 34px; flex: 0 0 34px; }
+    .jugador-extra { font-size: 11px; flex-wrap: wrap; }
+    #filtroPosiciones label, .led-label { padding: 4px 7px; margin: 3px; font-size: 12px; }
+    select, input[type="date"] { max-width: 100%; font-size: 13px; }
   }
 </style>
 </head>
@@ -1105,7 +1120,7 @@ function generarRanking(todosLosPartidos) {
 }
 
 function irAFutbolista(nombre) {
-  window.location.href = `https://globopedia.github.io/Artids/indexutbolists.html?nombre=${nombre}`;
+  window.location.href = `https://globopedia.github.io/Artids/indexutbolists.html?jugador=${nombre}`;
 }
 
 function renderRanking(ranking) {
