@@ -167,6 +167,10 @@
       .partido { grid-template-columns: 1fr; }
       .partido-media .foto { max-width: 340px; }
       .efem-titulo { font-size: 20px; }
+      /* Revistas: cinco tapas por fila en el celular */
+      .revistas { padding: 12px 8px; }
+      .tapas { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+      .tapas img { width: 100%; height: auto; aspect-ratio: 3 / 4; }
       /* En el celular no van las solapas: se muestra directamente lo de HOY */
       .pestanas { display: none; }
       .panel { border-radius: 14px; }
