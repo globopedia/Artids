@@ -11,6 +11,24 @@
    1090 px de contenido = entran 5 cartas del plantel por fila en Torneos. */
 .club-card { max-width: 1090px; }
 
+/* Cartas del plantel (Torneos) en la computadora: un poco más chicas,
+   así entran 6 por fila. (En el celular las reglas de abajo las ponen
+   de a dos.) */
+.plantel-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)) !important; }
+.carta-foto { height: 180px !important; }
+.carta-cinta { width: 20px !important; padding: 52px 0 58px !important; }
+.carta-cinta span { font-size: 11px !important; }
+.carta-escudo-torneo { width: 28px !important; height: 28px !important; }
+.carta-triangulo { width: 46px !important; height: 46px !important; }
+.carta-triangulo img { width: 22px !important; height: 22px !important; }
+.carta-pie { left: 20px !important; padding: 18px 5px 5px !important; }
+.carta-nombre { font-size: 12px !important; }
+.carta-datos { font-size: 10px !important; gap: 4px !important; }
+.carta-cuerpo { padding: 3px 6px 6px !important; }
+.carta-estrellas { font-size: 19px !important; letter-spacing: 1px !important; }
+.carta-stats { font-size: 10.5px !important; }
+.carta-stats > div { padding: 2px 6px !important; }
+
 /* Partes que solo se muestran en el celular (fuera de la regla de abajo quedan ocultas) */
 .nc-corto, .et-corta, .ah-movil { display: none; }
 
