@@ -326,7 +326,7 @@
       text-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
   </style>
-  <link rel="stylesheet" href="movil.css?v=1">
+  <link rel="stylesheet" href="movil.css?v=2">
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/Íconos/Globopedia.png" alt="Logo Huracán" class="logo" />
@@ -1708,7 +1708,10 @@ function renderTablaPosiciones(texto, titulo = "") {
   if (idxEquipo === -1) idxEquipo = 1; // por defecto, la segunda columna
   const idxPts = encabezado.findIndex(c => ["pts", "puntos"].includes(norm(c)));
 
-  const thead = encabezado.map(c => `<th>${escapeHTML(c)}</th>`).join("");
+  // Clase de cada columna: en el celular solo se ven Equipo y Pts (las
+  // demás, "col-extra", se ocultan desde movil.css).
+  const claseCol = i => i === idxEquipo ? "col-equipo" : i === idxPts ? "col-pts" : "col-extra";
+  const thead = encabezado.map((c, i) => `<th class="${claseCol(i)}">${escapeHTML(c)}</th>`).join("");
 
   // Color de fila: una letra pegada al final de la PRIMERA columna (la
   // posición) tiñe toda la fila, y la letra no se muestra. Ej.: "20°r".
@@ -1741,8 +1744,7 @@ function renderTablaPosiciones(texto, titulo = "") {
         return `<td class="col-equipo">${escudo}${nombre}</td>`;
       }
 
-      const clase = i === idxPts ? ` class="col-pts"` : "";
-      return `<td${clase}>${escapeHTML(valor)}</td>`;
+      return `<td class="${claseCol(i)}">${escapeHTML(valor)}</td>`;
     }).join("");
 
     // Huracán va siempre con letra roja y negrita; si además tiene letra de
@@ -2124,12 +2126,23 @@ function mostrarTorneo() {
   }
 
   const URL_PAGINA_FUTBOLISTAS = "https://globopedia.github.io/Artids/indexutbolists.html";
+// En el celular la canchita muestra solo el apellido: se saca el nombre de
+// pila y las iniciales sueltas ("Leandro N Díaz" -> "Díaz",
+// "Matías De los Santos" -> "De los Santos").
+function apellidoCancha(nombre) {
+  const t = (nombre || "").replace(/\s*\(.*?\)\s*/g, " ").trim().split(/\s+/);
+  if (t.length < 2) return t.join(" ");
+  let r = t.slice(1);
+  while (r.length > 1 && /^[A-ZÁÉÍÓÚÑ]\.?$/.test(r[0])) r = r.slice(1);
+  return r.join(" ");
+}
+
 
   function tarjetaJugadorCanchaEquipo(j, esArquero = false) {
     const claseArquero = esArquero ? " jugador-cancha-arquero" : "";
     const contenido = `
       <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
-      <span class="jugador-cancha-nombre">${j.nombre}</span>
+      <span class="jugador-cancha-nombre"><span class="nc-completo">${j.nombre}</span><span class="nc-corto">${apellidoCancha(j.nombre)}</span></span>
       <span class="jugador-cancha-veces">${j.puntaje.toFixed(2)}</span>
     `;
 
@@ -2199,7 +2212,7 @@ function mostrarTorneo() {
     const porcentaje = segmento * 10;
     const contorno = "-1px -1px 0 #B71C1C, 1px -1px 0 #B71C1C, -1px 1px 0 #B71C1C, 1px 1px 0 #B71C1C";
     return `
-      <div style="position:relative; display:inline-block; font-size:22px; letter-spacing:2px; line-height:1;" title="${(segmento / 2).toFixed(1)} / 5">
+      <div class="carta-estrellas" style="position:relative; display:inline-block; font-size:22px; letter-spacing:2px; line-height:1;" title="${(segmento / 2).toFixed(1)} / 5">
         <div style="color:#fff; text-shadow:${contorno};">★★★★★</div>
         <div style="position:absolute; top:0; left:0; width:${porcentaje}%; overflow:hidden; white-space:nowrap; color:#FFC107; text-shadow:${contorno};">★★★★★</div>
       </div>
@@ -2224,7 +2237,7 @@ function mostrarTorneo() {
   // posición, por puntaje del Hall Globopedia) — todo en UNA sola grilla,
   // sin franjas de título por posición, para que no queden huecos grandes.
   let htmlPlantel = `<h3 style="color:#FF0000; margin-top:20px; border-bottom:2px solid #FF0000;">👥 Plantel en este Torneo</h3>`;
-  htmlPlantel += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:10px; margin-bottom:15px;">`;
+  htmlPlantel += `<div class="plantel-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:10px; margin-bottom:15px;">`;
 
   // Carta (jugador o director técnico): mismo diseño para ambos.
   const nombreTorneoCorto = escapeHTML(
@@ -2244,19 +2257,28 @@ function mostrarTorneo() {
   if (escalaCinta < 0.62) escalaCinta = 0.62;
   if (escalaCinta > 1.3) escalaCinta = 1.3;
 
+  // Etiquetas abreviadas de la carta (solo se ven en el celular, donde van dos cartas por fila)
+  const ETIQUETA_CORTA = {
+    "Partidos jugados": "PJ", "Partidos ganados": "PG", "Minutos jugados": "MJ",
+    "Goles": "Goles", "Asistencias": "Asist.", "Expulsiones": "Exp.",
+    "Vallas invictas": "Vallas inv.", "Penales atajados": "Pen. atajados",
+    "Partidos dirigidos": "PD", "Minutos dirigidos": "MD", "Goles a favor": "GF",
+    "Goles recibidos": "GC", "Puntos conseguidos": "Pts"
+  };
+
   function tarjetaCarta({ url, fotoUrl, nombre, posicion, edad, banderaHTML, segmento, filas, esDT = false }) {
     // Los técnicos van en un gris más oscuro, para distinguirlos de los jugadores.
     const fondoCarta = esDT ? "#c9c9c9" : "#fafafa";
     const fondoTabla = esDT ? "#e4e4e4" : "#fff";
     const fondoFilaPar = esDT ? "#d6d6d6" : "#f7f7f7";
     return `
-          <a href="${url}" target="_blank" rel="noopener"
+          <a href="${url}" target="_blank" rel="noopener" class="carta"
              style="display:block; border:2px solid #222; border-radius:12px; overflow:hidden; text-align:center; background:${fondoCarta}; font-family:'Chakra Petch', sans-serif; position:relative; text-decoration:none; color:inherit; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);">
             <div style="position:relative;">
-              <img src="${fotoUrl}" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';" style="width:100%; height:215px; object-fit:cover; object-position:center 15%; display:block;">
+              <img src="${fotoUrl}" onerror="this.onerror=null; this.src='https://globopedia.github.io/Artids/logo_globopedia.png';" class="carta-foto" style="width:100%; height:215px; object-fit:cover; object-position:center 15%; display:block;">
 
               <!-- Franja vidriada de punta a punta, en el margen izquierdo (más angosta, para que no aplaste las fotos) -->
-              <div style="position:absolute; top:0; left:0; bottom:0; width:24px; background:rgba(255,255,255,.25); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); border-right:1px solid rgba(255,255,255,.4); z-index:1; display:flex; align-items:center; justify-content:center; padding:64px 0 70px; box-sizing:border-box;">
+              <div class="carta-cinta" style="position:absolute; top:0; left:0; bottom:0; width:24px; background:rgba(255,255,255,.25); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); border-right:1px solid rgba(255,255,255,.4); z-index:1; display:flex; align-items:center; justify-content:center; padding:64px 0 70px; box-sizing:border-box;">
                 <span style="writing-mode:vertical-rl; transform:rotate(180deg) scaleY(${escalaCinta.toFixed(2)}); transform-origin:center; font-family:'Oswald', 'Chakra Petch', sans-serif; font-weight:700; font-size:13px; letter-spacing:1.5px; color:#8B0000; text-shadow:-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; white-space:nowrap;">
                   ${nombreTorneoCorto}
                 </span>
@@ -2264,10 +2286,10 @@ function mostrarTorneo() {
 
               <!-- Escudo del torneo, arriba a la izquierda, sobre la franja vidriada (más grande, para que se distinga bien) -->
               <img src="${torneo.foto || 'https://globopedia.github.io/Artids/logo_globopedia.png'}" alt="${torneo.nombre}"
-                   style="position:absolute; top:4px; left:4px; width:34px; height:34px; object-fit:contain; background:#fff; border-radius:50%; padding:2px; box-shadow:0 1px 3px rgba(0,0,0,.3); z-index:2;">
+                   class="carta-escudo-torneo" style="position:absolute; top:4px; left:4px; width:34px; height:34px; object-fit:contain; background:#fff; border-radius:50%; padding:2px; box-shadow:0 1px 3px rgba(0,0,0,.3); z-index:2;">
 
               <!-- Escudo de Huracán, en triángulo recortado en la punta superior derecha, centrado dentro del triángulo -->
-              <div style="position:absolute; top:0; right:0; width:56px; height:56px; overflow:hidden; clip-path:polygon(100% 0%, 0% 0%, 100% 100%); z-index:2;">
+              <div class="carta-triangulo" style="position:absolute; top:0; right:0; width:56px; height:56px; overflow:hidden; clip-path:polygon(100% 0%, 0% 0%, 100% 100%); z-index:2;">
                 <div style="position:relative; width:100%; height:100%; background:#fff;">
                   <img src="https://globopedia.github.io/Artids/escudos/Huracán.png" alt="Huracán"
                        style="position:absolute; top:33%; left:67%; transform:translate(-50%,-50%); width:26px; height:26px; object-fit:contain;">
@@ -2277,9 +2299,9 @@ function mostrarTorneo() {
               <!-- El bloque de nombre/bandera/posición/edad arranca DESPUÉS de la
                    franja vidriada, no desde el margen izquierdo, para que la
                    banda nunca lo tape ni le reste contraste. -->
-              <div style="position:absolute; left:24px; right:0; bottom:0; background:linear-gradient(transparent, rgba(139,0,0,.88) 45%); color:#fff; padding:22px 8px 6px; text-align:center;">
-                <div style="font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase;">${nombre}</div>
-                <div style="font-size:11px; display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
+              <div class="carta-pie" style="position:absolute; left:24px; right:0; bottom:0; background:linear-gradient(transparent, rgba(139,0,0,.88) 45%); color:#fff; padding:22px 8px 6px; text-align:center;">
+                <div class="carta-nombre" style="font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase;">${nombre}</div>
+                <div class="carta-datos" style="font-size:11px; display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
                   ${banderaHTML}
                   <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${posicion}</span>
                   <span>·</span>
@@ -2287,12 +2309,12 @@ function mostrarTorneo() {
                 </div>
               </div>
             </div>
-            <div style="padding:3px 8px 8px;">
+            <div class="carta-cuerpo" style="padding:3px 8px 8px;">
               ${renderEstrellas(segmento)}
-              <div style="margin-top:3px; font-size:11px; background:${fondoTabla}; border-radius:6px; border:1px solid #eee; overflow:hidden;">
+              <div class="carta-stats" style="margin-top:3px; font-size:11px; background:${fondoTabla}; border-radius:6px; border:1px solid #eee; overflow:hidden;">
                 ${filas.map(([etiqueta, valor], idx) => `
                   <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 8px; ${idx % 2 === 0 ? `background:${fondoFilaPar};` : ""}">
-                    <span style="text-align:left; color:#555;">${etiqueta}:</span>
+                    <span style="text-align:left; color:#555;"><span class="et-larga">${etiqueta}:</span><span class="et-corta">${ETIQUETA_CORTA[etiqueta] || etiqueta}</span></span>
                     <span style="text-align:right; font-weight:bold; color:#8B0000;">${valor}</span>
                   </div>
                 `).join("")}
@@ -2468,9 +2490,9 @@ function mostrarTorneo() {
               <span class="resultado-header">${p.Resultado1}-${p.Resultado2}</span>
               <img class="escudo-header" src="${getEscudo(p.Club)}" alt="${p.Club}">
               <span class="ronda-dt-stack">
-                ${extraerRondaDeTorneo(p.Torneo) ? `${escapeHTML(extraerRondaDeTorneo(p.Torneo))}<br>` : ""}
-                ${p.Fecha ? `${escapeHTML(p.Fecha)}<br>` : ""}
-                ${p.Técnico ? `DT ${escapeHTML(p.Técnico)}` : ""}
+                ${extraerRondaDeTorneo(p.Torneo) ? `<span class="rd-ronda">${escapeHTML(extraerRondaDeTorneo(p.Torneo))}</span><br>` : ""}
+                ${p.Fecha ? `<span class="rd-fecha">${escapeHTML(p.Fecha)}</span><br>` : ""}
+                ${p.Técnico ? `<span class="rd-dt">DT ${escapeHTML(p.Técnico)}</span>` : ""}
               </span>
             </span>
             <span class="acordeon-header-der">

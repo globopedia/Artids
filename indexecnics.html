@@ -138,7 +138,7 @@
       transition: all 0.2s;
     }
   </style>
-  <link rel="stylesheet" href="movil.css?v=1">
+  <link rel="stylesheet" href="movil.css?v=2">
 </head>
 <body>
   <img src="https://globopedia.github.io/Artids/Íconos/Globopedia.png" alt="Logo Huracán" class="logo" />
@@ -943,12 +943,23 @@ function obtenerFormacionTecnico(idTecnico, listaFutbolistas) {
 // URL pública de la página de Futbolistas, para que "Sus jugadores" linkee directo al jugador.
 // Ajustá esta constante si la página vive en otra dirección.
 const URL_PAGINA_FUTBOLISTAS = "https://globopedia.github.io/Artids/indexutbolists.html";
+// En el celular la canchita muestra solo el apellido: se saca el nombre de
+// pila y las iniciales sueltas ("Leandro N Díaz" -> "Díaz",
+// "Matías De los Santos" -> "De los Santos").
+function apellidoCancha(nombre) {
+  const t = (nombre || "").replace(/\s*\(.*?\)\s*/g, " ").trim().split(/\s+/);
+  if (t.length < 2) return t.join(" ");
+  let r = t.slice(1);
+  while (r.length > 1 && /^[A-ZÁÉÍÓÚÑ]\.?$/.test(r[0])) r = r.slice(1);
+  return r.join(" ");
+}
+
 
 function tarjetaJugadorCancha(j, esArquero = false) {
   const claseArquero = esArquero ? " jugador-cancha-arquero" : "";
   const contenido = `
     <img src="${j.foto}" alt="${j.nombre}" onerror="this.style.visibility='hidden'">
-    <span class="jugador-cancha-nombre">${j.nombre}</span>
+    <span class="jugador-cancha-nombre"><span class="nc-completo">${j.nombre}</span><span class="nc-corto">${apellidoCancha(j.nombre)}</span></span>
     <span class="jugador-cancha-veces">${j.veces} ${j.veces === 1 ? "partido" : "partidos"}</span>
   `;
 

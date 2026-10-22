@@ -6,6 +6,9 @@
    Muchas reglas llevan !important porque pisan estilos escritos
    dentro del HTML (style="...") que arma cada página.
    ============================================================ */
+/* Partes que solo se muestran en el celular (fuera de la regla de abajo quedan ocultas) */
+.nc-corto, .et-corta { display: none; }
+
 @media (max-width: 600px) {
 
   /* Menos margen alrededor de la página: en el celular cada píxel cuenta */
@@ -83,6 +86,60 @@
     grid-template-columns: 1fr 1fr !important;
   }
   ul[style*="grid-template-columns:1fr 1fr 1fr"] > li { min-width: 0; }
+
+  /* ---- Canchitas: fotos un tercio más chicas y solo el apellido ---- */
+  .cancha { padding: 12px 4px !important; gap: 8px !important; }
+  .cancha-fila { gap: 4px !important; }
+  .jugador-cancha { min-width: 50px !important; max-width: 84px !important; }
+  .jugador-cancha img { width: 32px !important; height: 41px !important; border-width: 1px !important; }
+  .jugador-cancha-arquero img { border-width: 2px !important; }
+  .jugador-cancha-nombre { font-size: 10px !important; }
+  .jugador-cancha-veces { font-size: 10px !important; }
+  .nc-completo { display: none !important; }
+  .nc-corto { display: inline !important; }
+
+  /* ---- Cartas del plantel (Torneos): dos por fila, en proporción ---- */
+  .plantel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+  .carta { border-width: 1px !important; border-radius: 9px !important; }
+  .carta-foto { height: 150px !important; }
+  .carta-cinta { width: 16px !important; padding: 40px 0 46px !important; }
+  .carta-cinta span { font-size: 9px !important; letter-spacing: 1px !important; }
+  .carta-escudo-torneo { width: 24px !important; height: 24px !important; top: 3px !important; left: 3px !important; }
+  .carta-triangulo { width: 40px !important; height: 40px !important; }
+  .carta-triangulo img { width: 18px !important; height: 18px !important; }
+  .carta-pie { left: 16px !important; padding: 16px 4px 4px !important; }
+  .carta-nombre { font-size: 11px !important; }
+  .carta-datos { font-size: 9px !important; gap: 3px !important; }
+  .carta-datos img { height: 10px !important; }
+  .carta-cuerpo { padding: 2px 4px 5px !important; }
+  .carta-estrellas { font-size: 15px !important; letter-spacing: 1px !important; }
+  .carta-stats { font-size: 10px !important; }
+  .carta-stats > div { padding: 2px 5px !important; }
+  .et-larga { display: none !important; }
+  .et-corta { display: inline !important; }
+
+  /* ---- Renglón de cada partido (Torneos, Estadios): resultado, escudo,
+          formación y camiseta más chicos en una línea; debajo
+          "fecha - ronda - DT" ---- */
+  .acordeon-header-izq { display: contents !important; }
+  .acordeon-header { gap: 6px !important; padding-right: 22px !important; }
+  .resultado-header { font-size: 30px !important; }
+  .escudo-header { width: 36px !important; height: 36px !important; margin: 0 2px !important; }
+  .acordeon-header-der { margin-left: auto; }
+  .foto-formacion { height: 46px !important; width: 72px !important; }
+  .foto-camiseta { height: 46px !important; width: 46px !important; border-radius: 9px !important; padding: 2px !important; }
+  .ronda-dt-stack {
+    order: 10; flex: 0 0 100%;
+    display: flex !important; flex-wrap: wrap;
+    font-size: 12px !important; line-height: 1.3 !important;
+  }
+  .ronda-dt-stack br { display: none; }
+  .rd-fecha { order: -1; }
+  .rd-ronda::before, .rd-dt::before, .rd-extra::before { content: "\00a0-\00a0"; }
+
+  /* ---- Tablas de posiciones: solo Equipo y Pts ---- */
+  .tabla-pos .col-extra { display: none !important; }
+  .tabla-pos { width: 100% !important; }
 
   /* Nada más ancho que la pantalla */
   img, canvas, video, iframe { max-width: 100%; }
