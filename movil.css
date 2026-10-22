@@ -6,6 +6,11 @@
    Muchas reglas llevan !important porque pisan estilos escritos
    dentro del HTML (style="...") que arma cada página.
    ============================================================ */
+/* ANCHO EN LA COMPUTADORA: la ficha (futbolista, técnico, torneo, rival,
+   árbitro, estadio) ocupa más ancho, con menos margen a los costados.
+   1090 px de contenido = entran 5 cartas del plantel por fila en Torneos. */
+.club-card { max-width: 1090px; }
+
 /* Partes que solo se muestran en el celular (fuera de la regla de abajo quedan ocultas) */
 .nc-corto, .et-corta, .ah-movil { display: none; }
 
