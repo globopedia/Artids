@@ -442,7 +442,10 @@ function frasetorneo(torneo) {
 const aRival = club => /^selección/i.test(club) ? "a la " + club : "a " + club;
 const conRival = club => /^selección/i.test(club) ? "con la " + club : "con " + club;
 const anteRival = club => /^selección/i.test(club) ? "ante la " + club : "ante " + club;
-const esClasico = club => /san lorenzo/i.test(club);
+// Solo es clásico con San Lorenzo de Almagro (no con San Lorenzo de Mar del
+// Plata ni con Racing San Lorenzo): se compara el nombre completo del club.
+const CLASICOS = ["San Lorenzo de Almagro"];
+const esClasico = club => CLASICOS.some(c => limpiar(c).toLowerCase() === limpiar(club).toLowerCase());
 
 function lugar(p) {
   if (p.Condición === "local") return "como local";
